@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import Icon from '../common/Icon.tsx'
+import { ROLES } from '../../constants/roles'
 
 type SidebarProps = {
   isCollapsed: boolean
@@ -14,6 +15,8 @@ function navLinkClass(isActive: boolean) {
 }
 
 export default function Sidebar({ isCollapsed }: SidebarProps) {
+  const user = JSON.parse(sessionStorage.getItem('authUser') || '{}')
+
   return (
     <aside className={`sidebar${isCollapsed ? ' active' : ''}`}>
       <div>
@@ -51,6 +54,19 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
           </li>
 
           <li className="sidebar-menu-group-title">Settings</li>
+          {/* Show Company only for coaching_admin */}
+          {user.role === ROLES.COACHING_ADMIN && (
+            <li>
+              <NavLink
+                to="/dashboard/settings/company"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="icon-park-outline:setting-two" className="menu-icon" />
+                <span>Company</span>
+              </NavLink>
+            </li>
+          )}
+          {/*
           <li>
             <NavLink
               to="/dashboard/settings/company"
@@ -60,6 +76,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
               <span>Company</span>
             </NavLink>
           </li>
+          */}
           <li>
             <NavLink
               to="/dashboard/settings/notification"
