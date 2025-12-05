@@ -1,0 +1,36 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Ensure top-right dropdown stays within viewport */
+.navbar-header .dropdown {
+  position: relative;
+}
+
+.navbar-header .dropdown-menu.to-top {
+  right: 0;
+  left: auto;
+}
+
+@media (max-width: 480px) {
+  .navbar-header .dropdown-menu-sm {
+    width: min(312px, 100vw - 24px);
+  }
+}
+
