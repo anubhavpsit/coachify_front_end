@@ -3,5 +3,12 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    host: true,
+    allowedHosts: [
+      'howk.coachify.local',
+      '*.coachify.local'     // optional wildcard
+    ]
+  },
   plugins: [react()],
 })

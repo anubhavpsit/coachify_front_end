@@ -1,15 +1,135 @@
 import type { FormEvent } from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
+
+type LoginUser = {
+  id: number
+  name: string
+  email: string
+  role: string
+  created_at: string
+  updated_at: string
+  tenant_id: number
+}
+
+type LoginResponse = {
+  user: LoginUser
+  token: string
+}
+
+type TenantResponse = {
+  tenant: {
+    id: number
+    [key: string]: unknown
+  }
+}
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 
 export default function SignInPage() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [tenantId, setTenantId] = useState<number | null>(null)
+  const [isTenantResolved, setIsTenantResolved] = useState(false)
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const storedTenantId = window.sessionStorage.getItem('tenant_id')
+    if (storedTenantId) {
+      const parsed = Number.parseInt(storedTenantId, 10)
+      if (!Number.isNaN(parsed)) {
+        setTenantId(parsed)
+      }
+      setIsTenantResolved(true)
+      return
+    }
+
+    const { hostname } = window.location
+    const parts = hostname.split('.')
+
+    if (parts.length < 3) {
+      setIsTenantResolved(true)
+      return
+    }
+
+    const subdomain = parts[0]
+
+    axios
+      .get<TenantResponse>(`${API_BASE_URL}/tenants/${subdomain}`)
+      .then((response) => {
+        const tenant = response.data?.tenant
+        if (tenant && typeof tenant.id === 'number') {
+          setTenantId(tenant.id)
+          window.sessionStorage.setItem('tenant_id', String(tenant.id))
+          window.sessionStorage.setItem('tenant', JSON.stringify(tenant))
+        } else {
+          setError('Unable to load tenant information.')
+        }
+      })
+      .catch(() => {
+        setError('Unable to load tenant information.')
+      })
+      .finally(() => {
+        setIsTenantResolved(true)
+      })
+  }, [])
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    navigate('/dashboard')
+
+    if (typeof window === 'undefined') return
+
+    setError(null)
+
+    if (!tenantId) {
+      setError('Tenant information is missing.')
+      return
+    }
+
+    const formData = new FormData(event.currentTarget)
+    const email = String(formData.get('email') ?? '').trim()
+    const password = String(formData.get('password') ?? '')
+
+    if (!email || !password) {
+      setError('Email and password are required.')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await axios.post<LoginResponse>(
+        `${API_BASE_URL}/auth/login`,
+        {
+          email,
+          password,
+          tenant_id: tenantId,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+
+      const { user, token } = response.data
+
+      window.sessionStorage.setItem('authUser', JSON.stringify(user))
+      window.sessionStorage.setItem('authToken', token)
+      window.sessionStorage.setItem('tenant_id', String(user.tenant_id))
+
+      navigate('/dashboard')
+    } catch {
+      setError('Invalid credentials or server error.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -33,6 +153,14 @@ export default function SignInPage() {
             <p className="mb-32 text-secondary-light text-lg">
               Welcome back! Please enter your credentials.
             </p>
+            {!isTenantResolved && (
+              <p className="mb-16 text-secondary-light text-sm">
+                Loading tenant information...
+              </p>
+            )}
+            {error && (
+              <p className="mb-16 text-danger-600 text-sm">{error}</p>
+            )}
           </div>
           <form onSubmit={handleSubmit}>
             <div className="icon-field mb-16">
@@ -43,6 +171,7 @@ export default function SignInPage() {
                 type="email"
                 className="form-control h-56-px bg-neutral-50 radius-12"
                 placeholder="Email"
+                name="email"
                 required
               />
             </div>
@@ -57,6 +186,7 @@ export default function SignInPage() {
                     className="form-control h-56-px bg-neutral-50 radius-12"
                     id="signin-password"
                     placeholder="Password"
+                    name="password"
                     required
                     minLength={8}
                   />
@@ -84,8 +214,9 @@ export default function SignInPage() {
             <button
               type="submit"
               className="btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-8"
+              disabled={isSubmitting || !isTenantResolved}
             >
-              Sign In
+              {isSubmitting ? 'Signing In...' : 'Sign In'}
             </button>
 
             <div className="mt-32 text-center text-sm">
@@ -106,4 +237,3 @@ export default function SignInPage() {
     </section>
   )
 }
-
