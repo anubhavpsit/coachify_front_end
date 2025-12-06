@@ -1,6 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import DashboardLayout from './layouts/DashboardLayout.tsx'
 import DashboardPage from './pages/dashboard/DashboardPage.tsx'
+import SubjectsPage from './pages/subjects/SubjectsPage.tsx'
+import ClassesPage from './pages/classes/ClassesPage.tsx'
 import CompanyPage from './pages/settings/CompanyPage.tsx'
 import NotificationPage from './pages/settings/NotificationPage.tsx'
 import NotificationAlertPage from './pages/settings/NotificationAlertPage.tsx'
@@ -24,6 +26,12 @@ function App() {
             element={<NotificationAlertPage />}
           />
           <Route path="settings/theme" element={<ThemePage />} />
+        </Route>
+        <Route path="/subjects" element={<DashboardLayout />}>
+          <Route index element={<SubjectsPage />} />
+        </Route>
+        <Route path="/classes" element={<DashboardLayout />}>
+          <Route index element={<ClassesPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

@@ -56,15 +56,35 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
           <li className="sidebar-menu-group-title">Settings</li>
           {/* Show Company only for coaching_admin */}
           {user.role === ROLES.COACHING_ADMIN && (
-            <li>
-              <NavLink
-                to="/dashboard/settings/company"
-                className={({ isActive }) => navLinkClass(isActive)}
-              >
-                <Icon icon="icon-park-outline:setting-two" className="menu-icon" />
-                <span>Company</span>
-              </NavLink>
-            </li>
+            <>
+              <li>
+                <NavLink
+                  to="/dashboard/settings/company"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="icon-park-outline:setting-two" className="menu-icon" />
+                  <span>Company</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/subjects"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <span>Subjects</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/classes"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <span>Classes</span>
+                </NavLink>
+              </li>
+            </>
           )}
           {/*
           <li>
