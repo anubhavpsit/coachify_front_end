@@ -30,12 +30,20 @@ export default function TeachersPage() {
   const [deleteTeacher, setDeleteTeacher] = useState<Teacher | null>(null);
 
   const [saving, setSaving] = useState(false);
+  const [userRole, setUserRole] = useState<string>('');
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
 
+  useEffect(() => {
+    const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
+    setUserRole(authUser.role);
+  }, []);
+
   /** Fetch Teachers */
   useEffect(() => {
-    const fetchTeachers = async () => {
+    if (!userRole) return; // wait until role is set
+
+    const fetchTeachersOld = async () => {
       try {
         const token = sessionStorage.getItem('authToken');
         const response = await axios.get(`${API_BASE_URL}/teachers`, {
@@ -49,8 +57,32 @@ export default function TeachersPage() {
         setLoading(false);
       }
     };
+
+    const fetchTeachers = async () => {
+      try {
+        const token = sessionStorage.getItem('authToken');
+        let url = `${API_BASE_URL}/teachers`; // admin sees all teachers
+
+        if (userRole === 'student') {
+          url = `${API_BASE_URL}/students/teachers`; // assigned teachers for student
+        }
+
+        const response = await axios.get(url, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+        });
+
+        if (response.data.success) {
+          setTeachers(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching teachers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchTeachers();
-  }, [API_BASE_URL]);
+  }, [API_BASE_URL, userRole]);
 
   /** Create Teacher */
   const handleSaveTeacher = async (e: React.FormEvent) => {

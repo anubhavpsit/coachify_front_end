@@ -54,7 +54,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
           </li>
 
           <li className="sidebar-menu-group-title">Settings</li>
-          {user.role === ROLES.TEACHER && (
+          {(user.role === ROLES.TEACHER || user.role === ROLES.COACHING_ADMIN) && (
             <>
               <li>
                 <NavLink
@@ -62,12 +62,24 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
                   <Icon icon="mdi:book-outline" className="menu-icon" />
-                  <span>My Students</span>
+                  <span>Students</span>
                 </NavLink>
               </li>
             </>
           )}
-          
+          {(user.role === ROLES.STUDENT || user.role === ROLES.COACHING_ADMIN) && (
+            <>
+              <li>
+                <NavLink
+                  to="/teachers"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <span>Teachers</span>
+                </NavLink>
+              </li>
+            </>
+          )}
           {/* Show Company only for coaching_admin */}
           {user.role === ROLES.COACHING_ADMIN && (
             <>
@@ -98,6 +110,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                   <span>Classes</span>
                 </NavLink>
               </li>
+              {/*
               <li>
                 <NavLink
                   to="/teachers"
@@ -116,6 +129,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                   <span>Students</span>
                 </NavLink>
               </li>
+              */}
             </>
           )}
           {/*
