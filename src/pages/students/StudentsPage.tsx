@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
+import AssignTeachersModal from '../../components/AssignTeachersModal';
 
 interface StudentProfile {
   class: string;
@@ -55,6 +56,14 @@ export default function StudentsPage() {
   const [deleteStudent, setDeleteStudent] = useState<Student | null>(null);
   const [subjects, setSubjects] = useState<string[]>([]);
 
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
+
+  const handleOpenAssignModal = (studentId: number) => {
+    console.dir("AAAAA");
+    setSelectedStudentId(studentId);
+    setShowAssignModal(true);
+  };
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -292,6 +301,17 @@ export default function StudentsPage() {
                           <>
                             <Button variant="link" onClick={() => handleOpenEditModal(student)}>Edit</Button>
                             <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>Delete</Button>
+                            <Button variant="link" onClick={() => handleOpenAssignModal(student.id)} >Assign Teachers</Button>
+{selectedStudentId && (
+  <AssignTeachersModal
+    show={showAssignModal}
+    onHide={() => setShowAssignModal(false)}
+    studentId={selectedStudentId}
+    onAssigned={() => {
+      // optionally refresh students list or show a success message
+    }}
+  />
+)}
                           </>
                         )}
                       </td>
