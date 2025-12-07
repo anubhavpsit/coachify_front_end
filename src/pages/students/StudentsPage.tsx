@@ -1,37 +1,97 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Icon from '../../components/common/Icon.tsx';
 import { Modal, Button } from 'react-bootstrap';
+
+interface StudentProfile {
+  class: string;
+  subjects: string[];
+  phone: string;
+}
 
 interface Student {
   id: number;
   name: string;
   email: string;
   tenant_id: number;
+  student_profile?: StudentProfile | null;
+}
+
+interface StudentForm {
+  name: string;
+  email: string;
+  password: string;
+  class: string;
+  subjects: string[];
+  phone: string;
 }
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
-  // Add student modal
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newStudentName, setNewStudentName] = useState('');
-  const [newStudentEmail, setNewStudentEmail] = useState('');
-  const [newStudentPassword, setNewStudentPassword] = useState('');
-
-  // Edit student modal
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editStudent, setEditStudent] = useState<Student | null>(null);
-  const [editStudentPassword, setEditStudentPassword] = useState('');
-
-  // Delete student modal
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteStudent, setDeleteStudent] = useState<Student | null>(null);
-
   const [saving, setSaving] = useState(false);
+  const [classes, setClasses] = useState<string[]>([]);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
+  const tenantId = sessionStorage.getItem('tenant_id');
+
+  // Add student modal state
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newStudentForm, setNewStudentForm] = useState<StudentForm>({
+    name: '',
+    email: '',
+    password: '',
+    class: '',
+    subjects: [],
+    phone: '',
+  });
+
+  // Edit student modal state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editStudentForm, setEditStudentForm] = useState<StudentForm | null>(null);
+  const [editStudentId, setEditStudentId] = useState<number | null>(null);
+
+  // Delete student modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteStudent, setDeleteStudent] = useState<Student | null>(null);
+  const [subjects, setSubjects] = useState<string[]>([]);
+
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const token = sessionStorage.getItem('authToken');
+        const response = await axios.get(`${API_BASE_URL}/subjects/${tenantId}`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        });
+        if (response.data.status) {
+          setSubjects(response.data.data); // expecting an array of strings
+        }
+      } catch (error) {
+        console.error('Error fetching subjects:', error);
+      }
+    };
+    fetchSubjects();
+  }, [API_BASE_URL]);
+
+
+  // Fetch classes
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const token = sessionStorage.getItem('authToken');
+        const response = await axios.get(`${API_BASE_URL}/classes/${tenantId}`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        });
+        if (response.data.success) {
+          setClasses(response.data.data); // expecting an array of strings
+        }
+      } catch (error) {
+        console.error('Error fetching classes:', error);
+      }
+    };
+    fetchClasses();
+  }, [API_BASE_URL]);
+
 
   // Fetch students
   useEffect(() => {
@@ -43,7 +103,7 @@ export default function StudentsPage() {
         });
 
         if (response.data.success) {
-          setStudents(response.data.data);
+          setStudents(response.data.data || []);
         }
       } catch (error) {
         console.error('Error fetching students:', error);
@@ -55,29 +115,42 @@ export default function StudentsPage() {
     fetchStudents();
   }, [API_BASE_URL]);
 
+
+  const handleSubjectToggle = (subject: string, type: 'add' | 'edit') => {
+    if (type === 'add') {
+      setNewStudentForm(prev => ({
+        ...prev,
+        subjects: prev.subjects.includes(subject)
+          ? prev.subjects.filter(s => s !== subject)
+          : [...prev.subjects, subject],
+      }));
+    } else {
+      setEditStudentForm(prev => prev ? {
+        ...prev,
+        subjects: prev.subjects.includes(subject)
+          ? prev.subjects.filter(s => s !== subject)
+          : [...prev.subjects, subject],
+      } : null);
+    }
+  };
+
   // Add student
   const handleSaveStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStudentName.trim() || !newStudentEmail.trim() || !newStudentPassword.trim()) return;
+    if (!newStudentForm.name.trim() || !newStudentForm.email.trim() || !newStudentForm.password.trim()) return;
 
     setSaving(true);
     try {
       const token = sessionStorage.getItem('authToken');
       const response = await axios.post(
         `${API_BASE_URL}/students`,
-        {
-          name: newStudentName,
-          email: newStudentEmail,
-          password: newStudentPassword,
-        },
+        newStudentForm,
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
 
       if (response.data.success) {
         setStudents(prev => [...prev, response.data.data]);
-        setNewStudentName('');
-        setNewStudentEmail('');
-        setNewStudentPassword('');
+        setNewStudentForm({ name: '', email: '', password: '', class: '', subjects: [], phone: '' });
         setShowAddModal(false);
       }
     } catch (error) {
@@ -90,33 +163,40 @@ export default function StudentsPage() {
 
   // Open edit modal
   const handleOpenEditModal = (student: Student) => {
-    setEditStudent(student);
-    setEditStudentPassword('');
+    setEditStudentId(student.id);
+    setEditStudentForm({
+      name: student.name,
+      email: student.email,
+      password: '',
+      class: student.student_profile?.class || '',
+      subjects: student.student_profile?.subjects || [],
+      phone: student.student_profile?.phone || '',
+    });
     setShowEditModal(true);
   };
 
   // Update student
   const handleUpdateStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editStudent) return;
+    if (!editStudentForm || editStudentId === null) return;
 
     setSaving(true);
     try {
       const token = sessionStorage.getItem('authToken');
       const response = await axios.put(
-        `${API_BASE_URL}/students/${editStudent.id}`,
-        {
-          name: editStudent.name,
-          email: editStudent.email,
-          password: editStudentPassword || undefined,
-        },
+        `${API_BASE_URL}/students/${editStudentId}`,
+        editStudentForm,
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
 
       if (response.data.success) {
         setStudents(prev =>
-          prev.map(s => (s.id === editStudent.id ? { ...editStudent, password: undefined } : s))
+          prev.map(s =>
+            s.id === editStudentId ? response.data.data : s
+          )
         );
+        setEditStudentForm(null);
+        setEditStudentId(null);
         setShowEditModal(false);
       }
     } catch (error) {
@@ -136,8 +216,8 @@ export default function StudentsPage() {
   // Delete student
   const handleDeleteStudent = async () => {
     if (!deleteStudent) return;
-
     setSaving(true);
+
     try {
       const token = sessionStorage.getItem('authToken');
       await axios.delete(`${API_BASE_URL}/students/${deleteStudent.id}`, {
@@ -145,6 +225,7 @@ export default function StudentsPage() {
       });
 
       setStudents(prev => prev.filter(s => s.id !== deleteStudent.id));
+      setDeleteStudent(null);
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Error deleting student:', error);
@@ -158,8 +239,8 @@ export default function StudentsPage() {
     <div>
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 className="fw-semibold mb-0">Students</h6>
-        <Button variant="primary" onClick={() => setShowAddModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
-          <iconify-icon icon="ic:baseline-plus" className="icon text-xl line-height-1"></iconify-icon>
+        <Button variant="primary" onClick={() => setShowAddModal(true)}>
+          <iconify-icon icon="ic:baseline-plus" className="icon text-xl"></iconify-icon>
           Add New Student
         </Button>
       </div>
@@ -185,35 +266,32 @@ export default function StudentsPage() {
                   <tr>
                     <th>Name</th>
                     <th>Email</th>
-                    <th className="text-center">Type</th>
+                    <th>Class</th>
+                    <th>Subjects</th>
+                    <th>Phone</th>
                     <th className="text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {students.map(student => (
+                  {students.filter(s => s !== null).map(student => (
                     <tr key={student.id}>
                       <td>{student.name}</td>
                       <td>{student.email}</td>
-                      <td className="text-center">
-                        {student.tenant_id === 0 ? (
-                          <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
-                            Default
-                          </span>
-                        ) : (
-                          <span className="bg-warning-focus text-warning-main px-24 py-4 rounded-pill fw-medium text-sm">
-                            Custom
-                          </span>
-                        )}
+                      <td>
+                        {classes.find(c => c.id == student.student_profile?.class)?.name || '-'}
                       </td>
+                      <td>
+                        {student.student_profile?.subjects
+                          ?.map((subId) => subjects.find(s => s.id === subId)?.subject)
+                          .filter(Boolean) // remove undefined if subject not found
+                          .join(', ') || '-'}
+                      </td>
+                      <td>{student.student_profile?.phone || '-'}</td>
                       <td className="text-center">
                         {student.tenant_id !== 0 && (
                           <>
-                            <Button variant="link" onClick={() => handleOpenEditModal(student)}>
-                              <iconify-icon icon="ic:baseline-edit" className="text-primary text-lg"></iconify-icon>
-                            </Button>
-                            <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>
-                              <iconify-icon icon="ic:baseline-delete" className="text-danger text-lg"></iconify-icon>
-                            </Button>
+                            <Button variant="link" onClick={() => handleOpenEditModal(student)}>Edit</Button>
+                            <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>Delete</Button>
                           </>
                         )}
                       </td>
@@ -238,9 +316,8 @@ export default function StudentsPage() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Enter Student Name"
-                value={newStudentName}
-                onChange={(e) => setNewStudentName(e.target.value)}
+                value={newStudentForm.name}
+                onChange={(e) => setNewStudentForm({ ...newStudentForm, name: e.target.value })}
                 disabled={saving}
               />
             </div>
@@ -249,9 +326,8 @@ export default function StudentsPage() {
               <input
                 type="email"
                 className="form-control"
-                placeholder="Enter Student Email"
-                value={newStudentEmail}
-                onChange={(e) => setNewStudentEmail(e.target.value)}
+                value={newStudentForm.email}
+                onChange={(e) => setNewStudentForm({ ...newStudentForm, email: e.target.value })}
                 disabled={saving}
               />
             </div>
@@ -260,9 +336,49 @@ export default function StudentsPage() {
               <input
                 type="password"
                 className="form-control"
-                placeholder="Enter Password"
-                value={newStudentPassword}
-                onChange={(e) => setNewStudentPassword(e.target.value)}
+                value={newStudentForm.password}
+                onChange={(e) => setNewStudentForm({ ...newStudentForm, password: e.target.value })}
+                disabled={saving}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Class</label>
+              <select
+                className="form-control"
+                value={newStudentForm.class}
+                onChange={(e) => setNewStudentForm({ ...newStudentForm, class: e.target.value })}
+                disabled={saving}
+              >
+                <option value="">Select Class</option>
+                  {classes.map((cls, index) => (
+                    <option key={index} value={cls.id}>{cls.name}</option>
+                  ))}
+              </select>
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Subjects</label>
+              <div className="d-flex flex-wrap gap-2">
+                {subjects.map((sub, index) => (
+                  <div className="form-check" key={index}>
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={newStudentForm.subjects.includes(sub.id)}
+                      onChange={() => handleSubjectToggle(sub.id, 'add')}
+                      disabled={saving}
+                    />
+                    <label className="form-check-label">{sub.subject}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Phone</label>
+              <input
+                type="text"
+                className="form-control"
+                value={newStudentForm.phone}
+                onChange={(e) => setNewStudentForm({ ...newStudentForm, phone: e.target.value })}
                 disabled={saving}
               />
             </div>
@@ -286,8 +402,8 @@ export default function StudentsPage() {
               <input
                 type="text"
                 className="form-control"
-                value={editStudent?.name || ''}
-                onChange={(e) => editStudent && setEditStudent({ ...editStudent, name: e.target.value })}
+                value={editStudentForm?.name || ''}
+                onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, name: e.target.value })}
                 disabled={saving}
               />
             </div>
@@ -296,18 +412,60 @@ export default function StudentsPage() {
               <input
                 type="email"
                 className="form-control"
-                value={editStudent?.email || ''}
-                onChange={(e) => editStudent && setEditStudent({ ...editStudent, email: e.target.value })}
+                value={editStudentForm?.email || ''}
+                onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, email: e.target.value })}
                 disabled={saving}
               />
             </div>
             <div className="mb-3">
-              <label className="form-label fw-semibold">Password (Leave blank to keep current)</label>
+              <label className="form-label fw-semibold">Password (leave blank to keep current)</label>
               <input
                 type="password"
                 className="form-control"
-                value={editStudentPassword}
-                onChange={(e) => setEditStudentPassword(e.target.value)}
+                value={editStudentForm?.password || ''}
+                onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, password: e.target.value })}
+                disabled={saving}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Class</label>
+              <select
+                className="form-control"
+                value={editStudentForm?.class || ''}
+                onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, class: Number(e.target.value) })}
+                disabled={saving}
+              >
+                <option value="">Select Class</option>
+                {classes.map(cls => (
+                  <option key={cls.id} value={cls.id}>{cls.name}</option>
+                ))}
+              </select>
+
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Subjects</label>
+              <div className="d-flex flex-wrap gap-2">
+                {subjects.map((sub, index) => (
+                  <div className="form-check" key={index}>
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      checked={editStudentForm?.subjects.includes(sub.id) || false}
+                      onChange={() => handleSubjectToggle(sub.id, 'edit')}
+                      disabled={saving}
+                    />
+                    <label className="form-check-label">{sub.subject}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Phone</label>
+              <input
+                type="text"
+                className="form-control"
+                value={editStudentForm?.phone || ''}
+                onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, phone: e.target.value })}
                 disabled={saving}
               />
             </div>
