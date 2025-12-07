@@ -54,6 +54,20 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
           </li>
 
           <li className="sidebar-menu-group-title">Settings</li>
+          {user.role === ROLES.TEACHER && (
+            <>
+              <li>
+                <NavLink
+                  to="/students"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <span>My Students</span>
+                </NavLink>
+              </li>
+            </>
+          )}
+          
           {/* Show Company only for coaching_admin */}
           {user.role === ROLES.COACHING_ADMIN && (
             <>

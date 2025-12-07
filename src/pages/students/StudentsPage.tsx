@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import AssignTeachersModal from '../../components/AssignTeachersModal';
+import { ROLES } from '../../constants/roles'
 
 interface StudentProfile {
   class: string;
@@ -31,6 +32,8 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState(false);
   const [classes, setClasses] = useState<string[]>([]);
+  const [myStudents, setMyStudents] = useState<Student[]>([]);
+  const [userRole, setUserRole] = useState<string>('');
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
   const tenantId = sessionStorage.getItem('tenant_id');
@@ -60,10 +63,14 @@ export default function StudentsPage() {
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
 
   const handleOpenAssignModal = (studentId: number) => {
-    console.dir("AAAAA");
     setSelectedStudentId(studentId);
     setShowAssignModal(true);
   };
+
+  useEffect(() => {
+    const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
+    setUserRole(authUser.role);
+  }, []);
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -104,7 +111,7 @@ export default function StudentsPage() {
 
   // Fetch students
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchStudentsOld = async () => {
       try {
         const token = sessionStorage.getItem('authToken');
         const response = await axios.get(`${API_BASE_URL}/students`, {
@@ -120,9 +127,33 @@ export default function StudentsPage() {
         setLoading(false);
       }
     };
+    const fetchStudents = async () => {
+      try {
+        const token = sessionStorage.getItem('authToken');
+        console.dir("userRole")
+        console.dir(userRole)
+        console.dir("userRole")
+        let url = `${API_BASE_URL}/students`; 
+        if (userRole === 'teacher') {
+          url = `${API_BASE_URL}/teachers/students`; // my students for teacher
+        }
+        const response = await axios.get(url, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        });
 
+        if (response.data.success) {
+          setStudents(response.data.data);
+          // if (userRole === 'teacher') setStudents(response.data.data);
+          // else setStudents(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching students:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchStudents();
-  }, [API_BASE_URL]);
+  }, [API_BASE_URL, userRole]);
 
 
   const handleSubjectToggle = (subject: string, type: 'add' | 'edit') => {
@@ -246,16 +277,22 @@ export default function StudentsPage() {
 
   return (
     <div>
+
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 className="fw-semibold mb-0">Students</h6>
-        <Button variant="primary" onClick={() => setShowAddModal(true)}>
+        {userRole === ROLES.COACHING_ADMIN ? (
+        <Button variant="primary" onClick={() => setShowAddModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
           <iconify-icon icon="ic:baseline-plus" className="icon text-xl"></iconify-icon>
           Add New Student
         </Button>
+        ) : (
+          <></>  
+          )}
       </div>
 
       {/* Students Table */}
       <div className="card">
+
         <div className="card-header border-bottom bg-base py-16 px-24">
           <span className="text-md fw-medium text-secondary-light">Students List</span>
         </div>
@@ -276,9 +313,15 @@ export default function StudentsPage() {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Class</th>
-                    <th>Subjects</th>
-                    <th>Phone</th>
-                    <th className="text-center">Actions</th>
+                    <th>Subjects {userRole}</th>
+                    {userRole === ROLES.COACHING_ADMIN ? (
+                      <>
+                        <th>Phone</th>
+                        <th className="text-center">Actions</th>
+                      </>
+                    ) : (
+                      <></>      
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -295,7 +338,8 @@ export default function StudentsPage() {
                           .filter(Boolean) // remove undefined if subject not found
                           .join(', ') || '-'}
                       </td>
-                      <td>{student.student_profile?.phone || '-'}</td>
+                      {userRole === ROLES.COACHING_ADMIN ? (
+                      <><td>{student.student_profile?.phone || '-'}</td>
                       <td className="text-center">
                         {student.tenant_id !== 0 && (
                           <>
@@ -314,7 +358,10 @@ export default function StudentsPage() {
 )}
                           </>
                         )}
-                      </td>
+                      </td></> 
+                    ) : (
+                      <></>  
+                      )}
                     </tr>
                   ))}
                 </tbody>
