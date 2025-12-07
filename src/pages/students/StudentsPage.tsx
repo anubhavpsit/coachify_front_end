@@ -128,13 +128,14 @@ export default function StudentsPage() {
       }
     };
     const fetchStudents = async () => {
+      if (!userRole) return; // wait until userRole is set
       try {
         const token = sessionStorage.getItem('authToken');
         console.dir("userRole")
         console.dir(userRole)
         console.dir("userRole")
         let url = `${API_BASE_URL}/students`; 
-        if (userRole === 'teacher') {
+        if (userRole == 'teacher') {
           url = `${API_BASE_URL}/teachers/students`; // my students for teacher
         }
         const response = await axios.get(url, {
