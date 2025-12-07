@@ -84,6 +84,24 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                   <span>Classes</span>
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="/teachers"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <span>Teachers</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/students"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <span>Students</span>
+                </NavLink>
+              </li>
             </>
           )}
           {/*

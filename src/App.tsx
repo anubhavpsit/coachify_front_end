@@ -3,6 +3,8 @@ import DashboardLayout from './layouts/DashboardLayout.tsx'
 import DashboardPage from './pages/dashboard/DashboardPage.tsx'
 import SubjectsPage from './pages/subjects/SubjectsPage.tsx'
 import ClassesPage from './pages/classes/ClassesPage.tsx'
+import TeachersPage from './pages/teachers/TeachersPage.tsx'
+import StudentsPage from './pages/students/StudentsPage.tsx'
 import CompanyPage from './pages/settings/CompanyPage.tsx'
 import NotificationPage from './pages/settings/NotificationPage.tsx'
 import NotificationAlertPage from './pages/settings/NotificationAlertPage.tsx'
@@ -32,6 +34,12 @@ function App() {
         </Route>
         <Route path="/classes" element={<DashboardLayout />}>
           <Route index element={<ClassesPage />} />
+        </Route>
+        <Route path="/teachers" element={<DashboardLayout />}>
+          <Route index element={<TeachersPage />} />
+        </Route>
+        <Route path="/students" element={<DashboardLayout />}>
+          <Route index element={<StudentsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
