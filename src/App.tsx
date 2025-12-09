@@ -4,7 +4,9 @@ import DashboardPage from './pages/dashboard/DashboardPage.tsx'
 import SubjectsPage from './pages/subjects/SubjectsPage.tsx'
 import ClassesPage from './pages/classes/ClassesPage.tsx'
 import TeachersPage from './pages/teachers/TeachersPage.tsx'
+import DailyActivitiesPage from './pages/teachers/DailyActivitiesPage.tsx'
 import StudentsPage from './pages/students/StudentsPage.tsx'
+import StudentActivitiesPage from './pages/students/StudentActivitiesPage.tsx'
 import CompanyPage from './pages/settings/CompanyPage.tsx'
 import NotificationPage from './pages/settings/NotificationPage.tsx'
 import NotificationAlertPage from './pages/settings/NotificationAlertPage.tsx'
@@ -37,9 +39,11 @@ function App() {
         </Route>
         <Route path="/teachers" element={<DashboardLayout />}>
           <Route index element={<TeachersPage />} />
+          <Route path="daily-activities" element={<DailyActivitiesPage />} />
         </Route>
         <Route path="/students" element={<DashboardLayout />}>
           <Route index element={<StudentsPage />} />
+          <Route path="activities" element={<StudentActivitiesPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

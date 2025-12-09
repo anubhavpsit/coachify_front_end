@@ -80,6 +80,32 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
               </li>
             </>
           )}
+          {user?.role === ROLES.STUDENT && (
+            <>
+              <li>
+                <NavLink
+                  to="/students/activities"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:calendar-check" className="menu-icon" />
+                  <span>My Activities</span>
+                </NavLink>
+              </li>
+            </>
+          )}
+          {user?.role === ROLES.TEACHER && (
+            <>
+              <li>
+                <NavLink 
+                  to="/teachers/daily-activities"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:calendar-check" className="menu-icon" />
+                  <span>Daily Activities</span>
+                </NavLink>
+              </li>
+            </>
+          )}
           {/* Show Company only for coaching_admin */}
           {user.role === ROLES.COACHING_ADMIN && (
             <>
