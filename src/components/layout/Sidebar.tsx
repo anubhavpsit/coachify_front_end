@@ -145,6 +145,15 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                   <span>Fees</span>
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="/expenses"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:cash-multiple" className="menu-icon" />
+                  <span>Expenses</span>
+                </NavLink>
+              </li>
               {/*
               <li>
                 <NavLink
