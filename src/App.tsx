@@ -7,6 +7,7 @@ import TeachersPage from './pages/teachers/TeachersPage.tsx'
 import DailyActivitiesPage from './pages/teachers/DailyActivitiesPage.tsx'
 import StudentsPage from './pages/students/StudentsPage.tsx'
 import StudentActivitiesPage from './pages/students/StudentActivitiesPage.tsx'
+import FeeComponent from './pages/fees/FeeComponent.tsx'
 import CompanyPage from './pages/settings/CompanyPage.tsx'
 import NotificationPage from './pages/settings/NotificationPage.tsx'
 import NotificationAlertPage from './pages/settings/NotificationAlertPage.tsx'
@@ -36,6 +37,9 @@ function App() {
         </Route>
         <Route path="/classes" element={<DashboardLayout />}>
           <Route index element={<ClassesPage />} />
+        </Route>
+        <Route path="/fees" element={<DashboardLayout />}>
+          <Route index element={<FeeComponent />} />
         </Route>
         <Route path="/teachers" element={<DashboardLayout />}>
           <Route index element={<TeachersPage />} />
