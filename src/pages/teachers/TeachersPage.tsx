@@ -10,6 +10,14 @@ interface Teacher {
   tenant_id: number;
 }
 
+function getTodayDateValue() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export default function TeachersPage() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,11 +27,13 @@ export default function TeachersPage() {
   const [newTeacherName, setNewTeacherName] = useState('');
   const [newTeacherEmail, setNewTeacherEmail] = useState('');
   const [newTeacherPassword, setNewTeacherPassword] = useState('');
+  const [newTeacherDob, setNewTeacherDob] = useState<string>(getTodayDateValue()); // initialize with today
 
   // Edit teacher modal
   const [showEditModal, setShowEditModal] = useState(false);
   const [editTeacher, setEditTeacher] = useState<Teacher & { password?: string } | null>(null);
   const [editTeacherPassword, setEditTeacherPassword] = useState('');
+  const [editTeacherDob, setEditTeacherDob] = useState<string>(''); // will populate on edit
 
   // Delete teacher modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -97,7 +107,8 @@ export default function TeachersPage() {
         {
           name: newTeacherName,
           email: newTeacherEmail,
-          password: newTeacherPassword
+          password: newTeacherPassword,
+          dob: newTeacherDob, // send dob
         },
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
@@ -121,6 +132,7 @@ export default function TeachersPage() {
   const handleOpenEditModal = (teacher: Teacher) => {
     setEditTeacher(teacher);
     setEditTeacherPassword(''); // reset password field
+    setEditTeacherDob(teacher.dob || ''); // populate DOB
     setShowEditModal(true);
   };
 
@@ -137,7 +149,8 @@ export default function TeachersPage() {
         {
           name: editTeacher.name,
           email: editTeacher.email,
-          password: editTeacherPassword || undefined // send only if changed
+          password: editTeacherPassword || undefined, // send only if changed
+          dob: editTeacherDob, // send updated DOB
         },
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
@@ -280,6 +293,15 @@ export default function TeachersPage() {
                 onChange={(e) => setNewTeacherPassword(e.target.value)}
               />
             </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Date of Birth</label>
+              <input
+                type="date"
+                className="form-control"
+                value={newTeacherDob}
+                onChange={(e) => setNewTeacherDob(e.target.value)}
+              />
+            </div>
             <div className="d-flex justify-content-end gap-2 mt-3">
               <Button variant="secondary" onClick={() => setShowAddModal(false)}>Cancel</Button>
               <Button type="submit" variant="primary" disabled={saving}>
@@ -323,6 +345,15 @@ export default function TeachersPage() {
                 placeholder="Enter new password (leave blank to keep current)"
                 value={editTeacherPassword}
                 onChange={(e) => setEditTeacherPassword(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Date of Birth</label>
+              <input
+                type="date"
+                className="form-control"
+                value={editTeacherDob}
+                onChange={(e) => setEditTeacherDob(e.target.value)}
               />
             </div>
             <div className="d-flex justify-content-end gap-2 mt-3">

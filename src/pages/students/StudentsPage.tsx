@@ -27,6 +27,14 @@ interface StudentForm {
   phone: string;
 }
 
+function getTodayDateValue() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,6 +42,7 @@ export default function StudentsPage() {
   const [classes, setClasses] = useState<string[]>([]);
   const [myStudents, setMyStudents] = useState<Student[]>([]);
   const [userRole, setUserRole] = useState<string>('');
+  //const [dob, setDob] = useState<string>(getTodayDateValue())
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
   const tenantId = sessionStorage.getItem('tenant_id');
@@ -47,6 +56,7 @@ export default function StudentsPage() {
     class: '',
     subjects: [],
     phone: '',
+    dob: '',
   });
 
   // Edit student modal state
@@ -191,7 +201,7 @@ export default function StudentsPage() {
 
       if (response.data.success) {
         setStudents(prev => [...prev, response.data.data]);
-        setNewStudentForm({ name: '', email: '', password: '', class: '', subjects: [], phone: '' });
+        setNewStudentForm({ name: '', email: '', password: '', class: '', subjects: [], phone: '', dob: '' });
         setShowAddModal(false);
       }
     } catch (error) {
@@ -212,6 +222,7 @@ export default function StudentsPage() {
       class: student.student_profile?.class || '',
       subjects: student.student_profile?.subjects || [],
       phone: student.student_profile?.phone || '',
+      dob: student.dob || '',
     });
     setShowEditModal(true);
   };
@@ -410,6 +421,15 @@ export default function StudentsPage() {
               />
             </div>
             <div className="mb-3">
+              <label className="form-label fw-semibold">Date of birth</label>
+              <input
+                type="date"
+                className="form-control"
+                value={newStudentForm.dob || getTodayDateValue()}
+                onChange={(e) => setNewStudentForm({ ...newStudentForm, dob: e.target.value })}
+              />
+            </div>
+            <div className="mb-3">
               <label className="form-label fw-semibold">Class</label>
               <select
                 className="form-control"
@@ -493,6 +513,15 @@ export default function StudentsPage() {
                 value={editStudentForm?.password || ''}
                 onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, password: e.target.value })}
                 disabled={saving}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Date of Birth</label>
+              <input
+                type="date"
+                className="form-control"
+                value={editStudentForm?.dob || ''}
+                onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, dob: e.target.value })}
               />
             </div>
             <div className="mb-3">

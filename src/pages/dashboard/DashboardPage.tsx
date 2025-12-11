@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
+import BirthdayCard from '../../components/BirthdayCard';
 
 type DashboardStats = {
   role: string
@@ -219,6 +220,11 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
+
+              <div className="row g-3">
+                <BirthdayCard />
+              </div>
+              
             </>
           )}
 
