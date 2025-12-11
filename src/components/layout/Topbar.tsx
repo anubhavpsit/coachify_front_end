@@ -66,6 +66,7 @@ export default function Topbar({
               {themeLabel}
             </button>
 
+            {/*
             <button
               type="button"
               className="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"
@@ -77,7 +78,8 @@ export default function Topbar({
                 className="text-primary-light text-xl"
               />
             </button>
-
+            */}
+            
             <div className={`dropdown${isProfileOpen ? ' show' : ''}`}>
               <button
                 className="d-flex justify-content-center align-items-center rounded-circle border-0 bg-transparent"

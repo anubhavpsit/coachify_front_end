@@ -109,6 +109,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
           {/* Show Company only for coaching_admin */}
           {user.role === ROLES.COACHING_ADMIN && (
             <>
+              {/*
               <li>
                 <NavLink
                   to="/dashboard/settings/company"
@@ -118,6 +119,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                   <span>Company</span>
                 </NavLink>
               </li>
+              */}
               <li>
                 <NavLink
                   to="/subjects"
