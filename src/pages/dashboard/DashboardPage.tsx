@@ -3,6 +3,7 @@ import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
 import BirthdayCard from '../../components/BirthdayCard';
+import LowAttendanceCard from '../../components/LowAttendanceCard';
 
 type DashboardStats = {
   role: string
@@ -223,6 +224,10 @@ export default function DashboardPage() {
 
               <div className="row g-3">
                 <BirthdayCard />
+              </div>
+
+              <div className="row g-3">
+                <LowAttendanceCard />
               </div>
               
             </>
