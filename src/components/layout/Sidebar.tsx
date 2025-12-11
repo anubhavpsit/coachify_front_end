@@ -156,6 +156,15 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                   <span>Expenses</span>
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="/dashboard/attendance"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="ic:baseline-check-circle" />
+                  <span>Daily Attendance</span>
+                </NavLink>
+              </li>
               {/*
               <li>
                 <NavLink

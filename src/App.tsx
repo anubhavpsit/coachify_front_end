@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import DashboardLayout from './layouts/DashboardLayout.tsx'
 import DashboardPage from './pages/dashboard/DashboardPage.tsx'
+import DailyAttendance from './pages/dashboard/DailyAttendance.tsx'
 import SubjectsPage from './pages/subjects/SubjectsPage.tsx'
 import ClassesPage from './pages/classes/ClassesPage.tsx'
 import TeachersPage from './pages/teachers/TeachersPage.tsx'
@@ -25,6 +26,7 @@ function App() {
         <Route path="/auth/sign-up" element={<SignUpPage />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />
+          <Route path="attendance" element={<DailyAttendance />} />
           <Route path="settings/company" element={<CompanyPage />} />
           <Route path="settings/notification" element={<NotificationPage />} />
           <Route
