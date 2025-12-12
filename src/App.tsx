@@ -8,6 +8,7 @@ import TeachersPage from './pages/teachers/TeachersPage.tsx'
 import DailyActivitiesPage from './pages/teachers/DailyActivitiesPage.tsx'
 import StudentsPage from './pages/students/StudentsPage.tsx'
 import StudentActivitiesPage from './pages/students/StudentActivitiesPage.tsx'
+import StudentAssessmentsPage from './pages/students/StudentAssessmentsPage.tsx'
 import FeeComponent from './pages/fees/FeeComponent.tsx'
 import ExpensesComponent from './pages/expenses/ExpensesComponent.tsx'
 import CompanyPage from './pages/settings/CompanyPage.tsx'
@@ -17,6 +18,7 @@ import ThemePage from './pages/settings/ThemePage.tsx'
 import SignInPage from './pages/auth/SignInPage.tsx'
 import SignUpPage from './pages/auth/SignUpPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
+import AssessmentsPage from './pages/assessments/AssessmentsPage.tsx'
 
 function App() {
   return (
@@ -54,6 +56,10 @@ function App() {
         <Route path="/students" element={<DashboardLayout />}>
           <Route index element={<StudentsPage />} />
           <Route path="activities" element={<StudentActivitiesPage />} />
+          <Route path="assessments" element={<StudentAssessmentsPage />} />
+        </Route>
+        <Route path="/assessments" element={<DashboardLayout />}>
+          <Route index element={<AssessmentsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

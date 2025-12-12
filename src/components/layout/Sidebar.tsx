@@ -65,6 +65,15 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                   <span>Students</span>
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="/assessments"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:file-document-edit-outline" className="menu-icon" />
+                  <span>Assessments</span>
+                </NavLink>
+              </li>
             </>
           )}
           {(user.role === ROLES.STUDENT || user.role === ROLES.COACHING_ADMIN) && (
@@ -89,6 +98,15 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
                 >
                   <Icon icon="mdi:calendar-check" className="menu-icon" />
                   <span>My Activities</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/students/assessments"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:file-document-edit-outline" className="menu-icon" />
+                  <span>My Assessments</span>
                 </NavLink>
               </li>
             </>

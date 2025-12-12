@@ -25,6 +25,16 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [topStudents, setTopStudents] = useState<
+    {
+      student_id: number
+      student_name: string | null
+      average_percentage: number
+      last_percentage: number
+      last_graded_at: string
+    }[]
+  >([])
+  const [loadingTopStudents, setLoadingTopStudents] = useState(false)
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -63,6 +73,42 @@ export default function DashboardPage() {
     }
 
     fetchStats()
+  }, [])
+
+  useEffect(() => {
+    const fetchTopStudents = async () => {
+      setLoadingTopStudents(true)
+      try {
+        const token = sessionStorage.getItem('authToken')
+        if (!token) {
+          setLoadingTopStudents(false)
+          return
+        }
+
+        const response = await axios.get<{
+          success: boolean
+          data: {
+            student_id: number
+            student_name: string | null
+            average_percentage: number
+            last_percentage: number
+            last_graded_at: string
+          }[]
+        }>(`${API_BASE_URL}/dashboard/assessments/top-students`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        if (response.data.success) {
+          setTopStudents(response.data.data || [])
+        }
+      } catch (error) {
+        console.error('Error loading top students:', error)
+      } finally {
+        setLoadingTopStudents(false)
+      }
+    }
+
+    fetchTopStudents()
   }, [])
 
   const user = (() => {
@@ -226,10 +272,59 @@ export default function DashboardPage() {
                 <BirthdayCard />
               </div>
 
-              <div className="row g-3">
+              <div className="row g-3 mb-3">
                 <LowAttendanceCard />
               </div>
-              
+
+              <div className="row g-3 mt-2">
+                <div className="col-12">
+                  <div className="card">
+                    <div className="card-header border-bottom bg-base py-16 px-24 d-flex justify-content-between align-items-center">
+                      <span className="text-md fw-medium text-secondary-light">
+                        Top Performing Students
+                      </span>
+                    </div>
+                    <div className="card-body">
+                      {loadingTopStudents ? (
+                        <div className="text-center py-4">
+                          <span className="spinner-border spinner-border-sm"></span>
+                          <span className="ms-2">Loading top students...</span>
+                        </div>
+                      ) : topStudents.length === 0 ? (
+                        <p className="text-muted mb-0">
+                          No assessment results available yet.
+                        </p>
+                      ) : (
+                        <div className="table-responsive">
+                          <table className="table bordered-table mb-0">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Student</th>
+                                <th>Average %</th>
+                                <th>Last %</th>
+                                <th>Last Assessed</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {topStudents.map((s, index) => (
+                                <tr key={s.student_id}>
+                                  <td>{index + 1}</td>
+                                  <td>{s.student_name ?? 'Unknown'}</td>
+                                  <td>{s.average_percentage.toFixed(2)}%</td>
+                                  <td>{s.last_percentage.toFixed(2)}%</td>
+                                  <td>{s.last_graded_at}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </>
           )}
 
