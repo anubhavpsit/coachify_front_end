@@ -3,6 +3,7 @@ import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
 import BirthdayCard from '../../components/BirthdayCard';
+import TodayBirthdayCard from '../../components/TodayBirthdayCard';
 import LowAttendanceCard from '../../components/LowAttendanceCard';
 
 type DashboardStats = {
@@ -268,13 +269,14 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              <div className="row g-3">
-                <BirthdayCard />
-              </div>
 
-              <div className="row g-3 mb-3">
-                <LowAttendanceCard />
+              <TodayBirthdayCard />
+
+              <div className="row g-3 mt-2">
+              <BirthdayCard />
+              <LowAttendanceCard />
               </div>
+              
 
               <div className="row g-3 mt-2">
                 <div className="col-12">
@@ -395,6 +397,8 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
+
+              <TodayBirthdayCard />
             </>
           )}
 
