@@ -22,6 +22,7 @@ type LoginResponse = {
 type TenantResponse = {
   tenant: {
     id: number
+    theme_color?: string
     [key: string]: unknown
   }
 }
@@ -39,6 +40,10 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+    const savedColor = window.localStorage.getItem('templateColor')
+    if (savedColor) {
+      document.documentElement.style.setProperty('--primary-600', savedColor)
+    }
 
     const storedTenantId = window.sessionStorage.getItem('tenant_id')
     if (storedTenantId) {
@@ -68,6 +73,17 @@ export default function SignInPage() {
           setTenantId(tenant.id)
           window.sessionStorage.setItem('tenant_id', String(tenant.id))
           window.sessionStorage.setItem('tenant', JSON.stringify(tenant))
+          // ✅ APPLY THEME COLOR
+          if (tenant.theme_color) {
+            document.documentElement.style.setProperty(
+              '--primary-600',
+              tenant.theme_color
+            )
+            window.localStorage.setItem(
+              'templateColor',
+              tenant.theme_color
+            )
+          }
         } else {
           setError('Unable to load tenant information.')
         }

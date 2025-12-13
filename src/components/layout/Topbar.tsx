@@ -32,6 +32,12 @@ export default function Topbar({
   }
 
   useEffect(() => {
+    
+    const savedColor = window.localStorage.getItem('templateColor')
+    if (savedColor) {
+      document.documentElement.style.setProperty('--primary-600', savedColor)
+    }
+
     const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
     setUser(authUser);
   }, []);  

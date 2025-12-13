@@ -41,7 +41,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
 
       <div className="sidebar-menu-area">
         <ul className="sidebar-menu" id="sidebar-menu">
-          <li className="sidebar-menu-group-title">Dashboard</li>
+          {/*<li className="sidebar-menu-group-title">Dashboard</li>*/}
           <li>
             <NavLink
               to="/dashboard"
@@ -49,11 +49,11 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
               className={({ isActive }) => navLinkClass(isActive)}
             >
               <Icon icon="solar:home-smile-angle-outline" className="menu-icon" />
-              <span>Overview</span>
+              <span>Dashboard</span>
             </NavLink>
           </li>
 
-          <li className="sidebar-menu-group-title">Settings</li>
+          {/* <li className="sidebar-menu-group-title">Settings</li> */}
           {(user.role === ROLES.TEACHER || user.role === ROLES.COACHING_ADMIN) && (
             <>
               <li>
@@ -214,8 +214,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
               <Icon icon="icon-park-outline:setting-two" className="menu-icon" />
               <span>Company</span>
             </NavLink>
-          </li>
-          */}
+          </li>          
           <li>
             <NavLink
               to="/dashboard/settings/notification"
@@ -233,7 +232,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
               <Icon icon="solar:bell-bing-outline" className="menu-icon" />
               <span>Notification Alert</span>
             </NavLink>
-          </li>
+          </li>          
           <li>
             <NavLink
               to="/dashboard/settings/theme"
@@ -243,7 +242,8 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
               <span>Theme</span>
             </NavLink>
           </li>
-
+          */}
+          {/*
           <li className="sidebar-menu-group-title">Access</li>
           <li>
             <NavLink
@@ -254,6 +254,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
               <span>Sign Up</span>
             </NavLink>
           </li>
+          */}
         </ul>
       </div>
     </aside>
