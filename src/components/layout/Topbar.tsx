@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { MouseEventHandler } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Icon from '../common/Icon.tsx'
+import Avatar from '../common/Avatar.tsx';
 
 type TopbarProps = {
   onToggleSidebar: MouseEventHandler<HTMLButtonElement>
@@ -17,6 +18,7 @@ export default function Topbar({
   themeLabel,
 }: TopbarProps) {
   const [isProfileOpen, setProfileOpen] = useState(false)
+  const [user, setUser] = useState<object>('');
   const navigate = useNavigate()
 
   const handleLogout: MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -28,6 +30,11 @@ export default function Topbar({
     setProfileOpen(false)
     navigate('/')
   }
+
+  useEffect(() => {
+    const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
+    setUser(authUser);
+  }, []);  
 
   return (
     <header className="navbar-header px-24 py-16 border-bottom bg-base">
@@ -86,10 +93,13 @@ export default function Topbar({
                 type="button"
                 onClick={() => setProfileOpen((previous) => !previous)}
               >
-                <img
-                  src="/assets/images/user.png"
-                  alt="User"
-                  className="w-40-px h-40-px object-fit-cover rounded-circle"
+                <Avatar
+                  user={user}
+                  size={40}
+                  color={{
+                    bg: "bg-info-100",
+                    text: "text-info-600",
+                  }}
                 />
               </button>
               <div
@@ -100,10 +110,10 @@ export default function Topbar({
                 <div className="py-12 px-16 radius-8 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
                   <div>
                     <h6 className="text-lg text-primary-light fw-semibold mb-2">
-                      Admin
+                      {user.name}
                     </h6>
                     <span className="text-secondary-light fw-medium text-sm">
-                      Coachify
+                      {user.role}
                     </span>
                   </div>
                 </div>

@@ -155,7 +155,7 @@ export default function SignInPage() {
             </p>
             {!isTenantResolved && (
               <p className="mb-16 text-secondary-light text-sm">
-                Loading tenant information...
+                Please wit we are getting ready to sign you in...
               </p>
             )}
             {error && (

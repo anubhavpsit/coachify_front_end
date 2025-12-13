@@ -326,7 +326,7 @@ export default function StudentsPage() {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Class</th>
-                    <th>Subjects {userRole}</th>
+                    <th>Subjects</th>
                     {userRole === ROLES.COACHING_ADMIN ? (
                       <>
                         <th>Phone</th>
