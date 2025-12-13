@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import Avatar from './common/Avatar.tsx';
 interface UserAttendance {
   id: number;
   name: string;
@@ -36,9 +36,25 @@ export default function LowAttendanceCard() {
         <div className="card-body" style={{ maxHeight: "300px", overflowY: users.length > 4 ? 'auto' : 'visible' }}>
           {users.map(user => (
             <div key={user.id} className="d-flex align-items-center justify-content-between gap-3 mb-3">
-              <div>
-                <h6 className="text-md mb-0 fw-medium">{user.name}</h6>
-                <span className="text-sm text-secondary-light fw-medium">{user.role}</span>
+              <div className="d-flex align-items-center gap-2">
+                <Avatar
+                  user={user}
+                  size={32}
+                  color={
+                    user.role === "teacher"
+                      ? { bg: "bg-success-100", text: "text-success-600" }
+                      : { bg: "bg-info-100", text: "text-info-600" }
+                  }
+                />
+
+                <div className="d-flex flex-column">
+                  <h6 className="text-md mb-0 fw-medium">
+                    {user.name}
+                  </h6>
+                  <span className="text-sm text-secondary-light fw-medium">
+                    {user.role}
+                  </span>
+                </div>
               </div>
               <span className="fw-semibold">{user.attendance_percentage}%</span>
             </div>

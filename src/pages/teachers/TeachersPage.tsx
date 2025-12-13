@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import Icon from '../../components/common/Icon.tsx';
+import Avatar from '../../components/common/Avatar.tsx';
 
 interface Teacher {
   id: number;
@@ -233,7 +234,19 @@ export default function TeachersPage() {
                 <tbody>
                   {teachers.map(teacher => (
                     <tr key={teacher.id}>
-                      <td>{teacher.name}</td>
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <Avatar
+                            user={teacher}
+                            size={32}
+                            color={{
+                              bg: "bg-success-100",
+                              text: "text-success-600",
+                            }}
+                          />
+                          <span>{teacher.name}</span>
+                        </div>
+                      </td>
                       <td>{teacher.email}</td>
                       <td className="text-center">
                         {teacher.tenant_id !== 0 && (

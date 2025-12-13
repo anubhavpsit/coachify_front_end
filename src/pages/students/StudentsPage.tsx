@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import AssignTeachersModal from '../../components/AssignTeachersModal';
+import Avatar from '../../components/common/Avatar.tsx';
 import { ROLES } from '../../constants/roles'
 
 interface StudentProfile {
@@ -339,7 +340,19 @@ export default function StudentsPage() {
                 <tbody>
                   {students.filter(s => s !== null).map(student => (
                     <tr key={student.id}>
-                      <td>{student.name}</td>
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <Avatar
+                            user={student}
+                            size={32}
+                            color={{
+                              bg: "bg-info-100",
+                              text: "text-info-600",
+                            }}
+                          />
+                          <span>{student.name}</span>
+                        </div>
+                      </td>
                       <td>{student.email}</td>
                       <td>
                         {classes.find(c => c.id == student.student_profile?.class)?.name || '-'}

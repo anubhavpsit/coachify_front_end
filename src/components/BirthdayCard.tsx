@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import Avatar from './common/Avatar.tsx';
 interface BirthdayUser {
   id: number;
   name: string;
@@ -60,9 +60,26 @@ export default function BirthdayCard({ title = 'Birthday this month', maxHeight 
             users.map(user => (
               <div className="d-flex align-items-center justify-content-between gap-3 mb-24" key={user.id}>
                 <div className="d-flex align-items-center">
-                  <div className="flex-grow-1">
-                    <h6 className="text-md mb-0 fw-medium">{user.name}</h6>
-                    <span className="text-sm text-secondary-light fw-medium">{user.role}</span>
+
+                  <div className="d-flex align-items-center gap-2">
+                    <Avatar
+                      user={user}
+                      size={32}
+                      color={
+                        user.role === "teacher"
+                          ? { bg: "bg-success-100", text: "text-success-600" }
+                          : { bg: "bg-info-100", text: "text-info-600" }
+                      }
+                    />
+
+                    <div className="d-flex flex-column">
+                      <h6 className="text-md mb-0 fw-medium">
+                        {user.name}
+                      </h6>
+                      <span className="text-sm text-secondary-light fw-medium">
+                        {user.role}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
