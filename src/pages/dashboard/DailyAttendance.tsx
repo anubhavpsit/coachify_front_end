@@ -15,7 +15,7 @@ interface Attendance {
   user_id: number;
   role: 'student' | 'teacher';
   attendance_date: string;
-  status: 'present' | 'absent' | 'leave';
+  status: 'present' | 'absent' | 'leave' | 'not_marked';
   reason?: string | null;
 }
 
@@ -28,39 +28,10 @@ export default function DailyAttendance() {
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
 
-  // Fetch all students and teachers
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const token = sessionStorage.getItem('authToken');
-        const res = await axios.get(`${API_BASE_URL}/users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(res.data.data || []);
-
-        // Initialize attendance state
-        const initialAttendance: Record<number, Attendance> = {};
-        (res.data.data || []).forEach((user: User) => {
-          initialAttendance[user.id] = {
-            user_id: user.id,
-            role: user.role,
-            attendance_date: date,
-            status: 'absent',
-          };
-        });
-        setAttendance(initialAttendance);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, [API_BASE_URL, date]);
-
+  // Fetch users and initialize attendance
   useEffect(() => {
     const fetchUsersAndAttendance = async () => {
+      setLoading(true);
       try {
         const token = sessionStorage.getItem('authToken');
 
@@ -68,24 +39,25 @@ export default function DailyAttendance() {
         const usersRes = await axios.get(`${API_BASE_URL}/users?roles=student,teacher`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setUsers(usersRes.data.data || []);
+        const usersData: User[] = usersRes.data.data || [];
+        setUsers(usersData);
 
         // Fetch attendance for the selected date
         const attendanceRes = await axios.get(`${API_BASE_URL}/attendances?date=${date}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        const attendanceData: Attendance[] = attendanceRes.data.data || [];
 
         // Map attendance records to user_id => Attendance
         const attendanceMap: Record<number, Attendance> = {};
-        (usersRes.data.data || []).forEach((user: User) => {
-          const record = attendanceRes.data.data.find((att: Attendance) => att.user_id === user.id);
+        usersData.forEach((user) => {
+          const record = attendanceData.find((att) => att.user_id === user.id);
           attendanceMap[user.id] = record
             ? { ...record }
-            : { user_id: user.id, role: user.role, attendance_date: date, status: 'absent' };
+            : { user_id: user.id, role: user.role, attendance_date: date, status: 'not_marked' };
         });
 
         setAttendance(attendanceMap);
-
       } catch (error) {
         console.error('Error fetching users or attendance:', error);
       } finally {
@@ -96,22 +68,26 @@ export default function DailyAttendance() {
     fetchUsersAndAttendance();
   }, [API_BASE_URL, date]);
 
-
-  const handleStatusChange = (userId: number, status: 'present' | 'absent' | 'leave') => {
-    setAttendance(prev => ({
+  // Handle status change
+  const handleStatusChange = (
+    userId: number,
+    status: 'present' | 'absent' | 'leave' | 'not_marked'
+  ) => {
+    setAttendance((prev) => ({
       ...prev,
       [userId]: {
         ...prev[userId],
         status,
-      }
+      },
     }));
   };
 
+  // Save attendance
   const handleSaveAttendance = async () => {
     setSaving(true);
     try {
       const token = sessionStorage.getItem('authToken');
-      const requests = Object.values(attendance).map(att =>
+      const requests = Object.values(attendance).map((att) =>
         axios.post(`${API_BASE_URL}/attendances`, att, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -142,7 +118,7 @@ export default function DailyAttendance() {
         <Form.Control
           type="date"
           value={date}
-          onChange={e => setDate(e.target.value)}
+          onChange={(e) => setDate(e.target.value)}
           style={{ maxWidth: '200px' }}
         />
       </div>
@@ -150,16 +126,21 @@ export default function DailyAttendance() {
         <Table bordered hover responsive>
           <thead>
             <tr>
+              <th>S.no</th>
               <th>Name</th>
               <th>Role</th>
               <th className="text-center">Present</th>
               <th className="text-center">Absent</th>
               <th className="text-center">Leave</th>
+              <th className="text-center">Not Marked</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user, index) => (
-              <tr key={user.id}>
+              <tr
+                key={user.id}
+                className={attendance[user.id]?.status === 'not_marked' ? 'table-warning' : ''}
+              >
                 <td>{index + 1}</td>
                 <td>{user.name}</td>
                 <td>{user.role.charAt(0).toUpperCase() + user.role.slice(1)}</td>
@@ -170,7 +151,6 @@ export default function DailyAttendance() {
                     checked={attendance[user.id]?.status === 'present'}
                     onChange={() => handleStatusChange(user.id, 'present')}
                   />
-                  
                 </td>
                 <td className="text-center">
                   <Form.Check
@@ -186,6 +166,14 @@ export default function DailyAttendance() {
                     name={`status_${user.id}`}
                     checked={attendance[user.id]?.status === 'leave'}
                     onChange={() => handleStatusChange(user.id, 'leave')}
+                  />
+                </td>
+                <td className="text-center">
+                  <Form.Check
+                    type="radio"
+                    name={`status_${user.id}`}
+                    checked={attendance[user.id]?.status === 'not_marked'}
+                    onChange={() => handleStatusChange(user.id, 'not_marked')}
                   />
                 </td>
               </tr>
