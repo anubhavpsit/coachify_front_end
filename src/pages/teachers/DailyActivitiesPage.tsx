@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Button } from "react-bootstrap";
 
 export default function DailyActivitiesPage() {
+  const [searchParams] = useSearchParams();
   const [students, setStudents] = useState([]);
   const [activities, setActivities] = useState([
     {
@@ -17,7 +19,13 @@ export default function DailyActivitiesPage() {
     },
   ]);
 
-  const [mode, setMode] = useState<"student" | "batch" | "history">("student");
+  const [mode, setMode] = useState<"student" | "batch" | "history">(() => {
+    const fromQuery = searchParams.get("mode");
+    if (fromQuery === "student" || fromQuery === "batch" || fromQuery === "history") {
+      return fromQuery;
+    }
+    return "student";
+  });
   const [classes, setClasses] = useState<any[]>([]);
   const [allSubjects, setAllSubjects] = useState<any[]>([]);
   const [batchForm, setBatchForm] = useState({
@@ -30,7 +38,13 @@ export default function DailyActivitiesPage() {
   });
 
   const [historyActivities, setHistoryActivities] = useState<any[]>([]);
-  const [historyDate, setHistoryDate] = useState<string>("");
+  const [historyDate, setHistoryDate] = useState<string>(() => {
+    const fromQuery = searchParams.get("date");
+    if (fromQuery && !Number.isNaN(Date.parse(fromQuery))) {
+      return fromQuery;
+    }
+    return "";
+  });
 
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? "http://coachify.local/api/v1";

@@ -6,6 +6,8 @@ import BirthdayCard from '../../components/BirthdayCard';
 import TodayBirthdayCard from '../../components/TodayBirthdayCard';
 import LowAttendanceCard from '../../components/LowAttendanceCard';
 import EnquiriesFollowUpCard from '../../components/EnquiriesFollowUpCard';
+import PendingActionsCard from '../../components/PendingActionsCard';
+import TeacherActivityGapsCard from '../../components/TeacherActivityGapsCard';
 
 type DashboardStats = {
   role: string
@@ -271,6 +273,10 @@ export default function DashboardPage() {
               </div>
 
 
+              <PendingActionsCard />
+
+              <TeacherActivityGapsCard />
+
               <TodayBirthdayCard />
 
               <div className="row g-3 mt-2">
@@ -399,6 +405,8 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
+
+              <PendingActionsCard />
 
               <TodayBirthdayCard />
             </>

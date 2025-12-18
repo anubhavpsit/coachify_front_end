@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Table, Button, Form, Spinner } from 'react-bootstrap';
 import { ROLES } from '../../constants/roles';
@@ -20,11 +21,20 @@ interface Attendance {
 }
 
 export default function DailyAttendance() {
+  const [searchParams] = useSearchParams();
   const [users, setUsers] = useState<User[]>([]);
   const [attendance, setAttendance] = useState<Record<number, Attendance>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState<string>(() => {
+    const fromQuery = searchParams.get('date');
+
+    if (fromQuery && !Number.isNaN(Date.parse(fromQuery))) {
+      return fromQuery;
+    }
+
+    return new Date().toISOString().split('T')[0];
+  });
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
 
