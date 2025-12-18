@@ -5,6 +5,7 @@ import { ROLES } from '../../constants/roles'
 import BirthdayCard from '../../components/BirthdayCard';
 import TodayBirthdayCard from '../../components/TodayBirthdayCard';
 import LowAttendanceCard from '../../components/LowAttendanceCard';
+import EnquiriesFollowUpCard from '../../components/EnquiriesFollowUpCard';
 
 type DashboardStats = {
   role: string
@@ -273,8 +274,9 @@ export default function DashboardPage() {
               <TodayBirthdayCard />
 
               <div className="row g-3 mt-2">
-              <BirthdayCard />
-              <LowAttendanceCard />
+                <BirthdayCard />
+                <LowAttendanceCard />
+                <EnquiriesFollowUpCard />
               </div>
               
 

@@ -176,6 +176,15 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
               </li>
               <li>
                 <NavLink
+                  to="/enquiries"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:account-question-outline" className="menu-icon" />
+                  <span>Enquiries</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
                   to="/dashboard/attendance"
                   className={({ isActive }) => navLinkClass(isActive)}
                 >

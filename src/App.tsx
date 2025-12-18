@@ -11,6 +11,7 @@ import StudentActivitiesPage from './pages/students/StudentActivitiesPage.tsx'
 import StudentAssessmentsPage from './pages/students/StudentAssessmentsPage.tsx'
 import FeeComponent from './pages/fees/FeeComponent.tsx'
 import ExpensesComponent from './pages/expenses/ExpensesComponent.tsx'
+import EnquiriesPage from './pages/enquiries/EnquiriesPage.tsx'
 import CompanyPage from './pages/settings/CompanyPage.tsx'
 import NotificationPage from './pages/settings/NotificationPage.tsx'
 import NotificationAlertPage from './pages/settings/NotificationAlertPage.tsx'
@@ -19,6 +20,7 @@ import SignInPage from './pages/auth/SignInPage.tsx'
 import SignUpPage from './pages/auth/SignUpPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import AssessmentsPage from './pages/assessments/AssessmentsPage.tsx'
+import ProfilePage from './pages/profile/ProfilePage.tsx'
 
 function App() {
   return (
@@ -49,6 +51,9 @@ function App() {
         <Route path="/expenses" element={<DashboardLayout />}>
           <Route index element={<ExpensesComponent />} />
         </Route>
+        <Route path="/enquiries" element={<DashboardLayout />}>
+          <Route index element={<EnquiriesPage />} />
+        </Route>
         <Route path="/teachers" element={<DashboardLayout />}>
           <Route index element={<TeachersPage />} />
           <Route path="daily-activities" element={<DailyActivitiesPage />} />
@@ -60,6 +65,9 @@ function App() {
         </Route>
         <Route path="/assessments" element={<DashboardLayout />}>
           <Route index element={<AssessmentsPage />} />
+        </Route>
+        <Route path="/profile" element={<DashboardLayout />}>
+          <Route index element={<ProfilePage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

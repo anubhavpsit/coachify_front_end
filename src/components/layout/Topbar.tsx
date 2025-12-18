@@ -126,7 +126,10 @@ export default function Topbar({
                 <button
                   type="button"
                   className="dropdown-item text-sm"
-                  onClick={() => setProfileOpen(false)}
+                  onClick={() => {
+                    setProfileOpen(false)
+                    navigate('/profile')
+                  }}
                 >
                   Profile
                 </button>
