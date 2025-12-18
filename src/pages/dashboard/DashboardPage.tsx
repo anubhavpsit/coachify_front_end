@@ -8,6 +8,7 @@ import LowAttendanceCard from '../../components/LowAttendanceCard';
 import EnquiriesFollowUpCard from '../../components/EnquiriesFollowUpCard';
 import PendingActionsCard from '../../components/PendingActionsCard';
 import TeacherActivityGapsCard from '../../components/TeacherActivityGapsCard';
+import PendingFeesCard from '../../components/PendingFeesCard';
 
 type DashboardStats = {
   role: string
@@ -274,6 +275,8 @@ export default function DashboardPage() {
 
 
               <PendingActionsCard />
+
+              <PendingFeesCard />
 
               <TeacherActivityGapsCard />
 
