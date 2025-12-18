@@ -133,6 +133,7 @@ export default function Topbar({
                 >
                   Profile
                 </button>
+                {/*
                 <button
                   type="button"
                   className="dropdown-item text-sm"
@@ -140,6 +141,7 @@ export default function Topbar({
                 >
                   Settings
                 </button>
+                */}
                 <button
                   type="button"
                   className="dropdown-item text-sm text-danger-600"
