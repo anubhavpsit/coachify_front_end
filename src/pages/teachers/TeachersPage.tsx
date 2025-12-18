@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import Icon from '../../components/common/Icon.tsx';
 import Avatar from '../../components/common/Avatar.tsx';
+import UserProfileModal from '../../components/UserProfileModal';
 
 interface Teacher {
   id: number;
@@ -43,12 +44,20 @@ export default function TeachersPage() {
   const [saving, setSaving] = useState(false);
   const [userRole, setUserRole] = useState<string>('');
 
+  const [viewUserId, setViewUserId] = useState<number | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
 
   useEffect(() => {
     const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
     setUserRole(authUser.role);
   }, []);
+
+  const handleViewUser = (id: number) => {
+    setViewUserId(id);
+    setShowProfileModal(true);
+  };
 
   /** Fetch Teachers */
   useEffect(() => {
@@ -251,12 +260,22 @@ export default function TeachersPage() {
                       <td className="text-center">
                         {teacher.tenant_id !== 0 && (
                           <>
-                            <Button variant="link" onClick={() => handleOpenEditModal(teacher)}>
-                              <iconify-icon icon="ic:baseline-edit" className="text-primary text-lg"></iconify-icon>
+                            <Button
+                              variant="link"
+                              onClick={() => handleViewUser(teacher.id)}
+                            >
+                              View
                             </Button>
-                            <Button variant="link" onClick={() => handleOpenDeleteModal(teacher)}>
-                              <iconify-icon icon="ic:baseline-delete" className="text-danger text-lg"></iconify-icon>
-                            </Button>
+                            {userRole === 'coaching_admin' && (
+                              <>
+                                <Button variant="link" onClick={() => handleOpenEditModal(teacher)}>
+                                  <iconify-icon icon="ic:baseline-edit" className="text-primary text-lg"></iconify-icon>
+                                </Button>
+                                <Button variant="link" onClick={() => handleOpenDeleteModal(teacher)}>
+                                  <iconify-icon icon="ic:baseline-delete" className="text-danger text-lg"></iconify-icon>
+                                </Button>
+                              </>
+                            )}
                           </>
                         )}
                       </td>
@@ -394,6 +413,13 @@ export default function TeachersPage() {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <UserProfileModal
+        show={showProfileModal}
+        onHide={() => setShowProfileModal(false)}
+        userId={viewUserId}
+        canEditImage={userRole === 'coaching_admin'}
+      />
     </div>
   );
 }

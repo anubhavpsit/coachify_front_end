@@ -4,6 +4,7 @@ import { Modal, Button } from 'react-bootstrap';
 import AssignTeachersModal from '../../components/AssignTeachersModal';
 import Avatar from '../../components/common/Avatar.tsx';
 import { ROLES } from '../../constants/roles'
+import UserProfileModal from '../../components/UserProfileModal';
 
 interface StudentProfile {
   class: string;
@@ -73,9 +74,17 @@ export default function StudentsPage() {
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
 
+  const [viewUserId, setViewUserId] = useState<number | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   const handleOpenAssignModal = (studentId: number) => {
     setSelectedStudentId(studentId);
     setShowAssignModal(true);
+  };
+
+  const handleViewUser = (id: number) => {
+    setViewUserId(id);
+    setShowProfileModal(true);
   };
 
   useEffect(() => {
@@ -327,13 +336,12 @@ export default function StudentsPage() {
                     <th>Email</th>
                     <th>Class</th>
                     <th>Subjects</th>
-                    {userRole === ROLES.COACHING_ADMIN ? (
+                    <th className="text-center">Profile</th>
+                    {userRole === ROLES.COACHING_ADMIN && (
                       <>
                         <th>Phone</th>
                         <th className="text-center">Actions</th>
                       </>
-                    ) : (
-                      <></>      
                     )}
                   </tr>
                 </thead>
@@ -363,29 +371,37 @@ export default function StudentsPage() {
                           .filter(Boolean) // remove undefined if subject not found
                           .join(', ') || '-'}
                       </td>
-                      {userRole === ROLES.COACHING_ADMIN ? (
-                      <><td>{student.student_profile?.phone || '-'}</td>
                       <td className="text-center">
-                        {student.tenant_id !== 0 && (
-                          <>
-                            <Button variant="link" onClick={() => handleOpenEditModal(student)}>Edit</Button>
-                            <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>Delete</Button>
-                            <Button variant="link" onClick={() => handleOpenAssignModal(student.id)} >Assign Teachers</Button>
-{selectedStudentId && (
-  <AssignTeachersModal
-    show={showAssignModal}
-    onHide={() => setShowAssignModal(false)}
-    studentId={selectedStudentId}
-    onAssigned={() => {
-      // optionally refresh students list or show a success message
-    }}
-  />
-)}
-                          </>
-                        )}
-                      </td></> 
-                    ) : (
-                      <></>  
+                        <Button
+                          variant="link"
+                          onClick={() => handleViewUser(student.id)}
+                        >
+                          View
+                        </Button>
+                      </td>
+                      {userRole === ROLES.COACHING_ADMIN && (
+                        <>
+                          <td>{student.student_profile?.phone || '-'}</td>
+                          <td className="text-center">
+                            {student.tenant_id !== 0 && (
+                              <>
+                                <Button variant="link" onClick={() => handleOpenEditModal(student)}>Edit</Button>
+                                <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>Delete</Button>
+                                <Button variant="link" onClick={() => handleOpenAssignModal(student.id)} >Assign Teachers</Button>
+                                {selectedStudentId && (
+                                  <AssignTeachersModal
+                                    show={showAssignModal}
+                                    onHide={() => setShowAssignModal(false)}
+                                    studentId={selectedStudentId}
+                                    onAssigned={() => {
+                                      // optionally refresh students list or show a success message
+                                    }}
+                                  />
+                                )}
+                              </>
+                            )}
+                          </td>
+                        </>
                       )}
                     </tr>
                   ))}
@@ -600,6 +616,13 @@ export default function StudentsPage() {
           <Button variant="danger" onClick={handleDeleteStudent} disabled={saving}>{saving ? 'Deleting...' : 'Delete'}</Button>
         </Modal.Footer>
       </Modal>
+
+      <UserProfileModal
+        show={showProfileModal}
+        onHide={() => setShowProfileModal(false)}
+        userId={viewUserId}
+        canEditImage={userRole === ROLES.COACHING_ADMIN}
+      />
     </div>
   );
 }
