@@ -71,8 +71,8 @@ export default function ProfilePage() {
         setProfileError(null)
         setPerformanceError(null)
 
-        const token = sessionStorage.getItem('authToken')
-        const authUserRaw = sessionStorage.getItem('authUser')
+        const token = localStorage.getItem('authToken')
+        const authUserRaw = localStorage.getItem('authUser')
 
         if (!token || !authUserRaw) {
           setProfileError('You are not authenticated.')
@@ -430,4 +430,3 @@ export default function ProfilePage() {
     </div>
   )
 }
-

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent, MouseEventHandler } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import Icon from '../common/Icon.tsx'
 import Avatar from '../common/Avatar.tsx';
 
@@ -22,14 +23,44 @@ export default function Topbar({
   const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate()
 
-  const handleLogout: MouseEventHandler<HTMLButtonElement> = (event) => {
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
+
+  const handleLogout: MouseEventHandler<HTMLButtonElement> = async (event) => {
     event.preventDefault()
-    if (typeof window !== 'undefined') {
-      window.localStorage.clear()
-      window.sessionStorage.clear()
+
+    try {
+      const token =
+        typeof window !== 'undefined'
+          ? window.localStorage.getItem('authToken')
+          : null
+
+      if (token) {
+        await axios.post(
+          `${API_BASE_URL}/auth/logout`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+            },
+          },
+        )
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error during logout:', error)
+    } finally {
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('authUser')
+        window.localStorage.removeItem('authToken')
+        window.localStorage.removeItem('tenant_id')
+        window.localStorage.removeItem('tenant')
+        window.sessionStorage.clear()
+      }
+      setProfileOpen(false)
+      navigate('/')
     }
-    setProfileOpen(false)
-    navigate('/')
   }
 
   useEffect(() => {
@@ -39,7 +70,7 @@ export default function Topbar({
       document.documentElement.style.setProperty('--primary-600', savedColor)
     }
 
-    const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
+    const authUser = JSON.parse(window.localStorage.getItem('authUser') || '{}');
     setUser(authUser);
   }, []);  
 

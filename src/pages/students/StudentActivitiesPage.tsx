@@ -20,7 +20,7 @@ export default function StudentActivitiesPage() {
 
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
-  const token = sessionStorage.getItem('authToken');
+  const token = localStorage.getItem('authToken');
 
   const loadActivities = async (date?: string) => {
     if (!token) return;

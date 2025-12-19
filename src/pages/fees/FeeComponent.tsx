@@ -74,7 +74,7 @@ export default function FeeComponent() {
     const fetchStudents = async () => {
       setLoadingStudents(true)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         const response = await axios.get(`${API_BASE_URL}/students`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -99,7 +99,7 @@ export default function FeeComponent() {
     const fetchFees = async () => {
       setLoadingFees(true)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         const { from, to } = getMonthDateRange(filterMonth)
 
         let url = `${API_BASE_URL}/student-fees`
@@ -140,7 +140,7 @@ export default function FeeComponent() {
 
     setSaving(true)
     try {
-      const token = sessionStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken')
       const payload = {
         student_id: Number(selectedStudentId),
         from_date: fromDate,
@@ -354,4 +354,3 @@ export default function FeeComponent() {
     </div>
   )
 }
-

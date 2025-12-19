@@ -50,7 +50,7 @@ export default function TeachersPage() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
 
   useEffect(() => {
-    const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
     setUserRole(authUser.role);
   }, []);
 
@@ -65,7 +65,7 @@ export default function TeachersPage() {
 
     const fetchTeachersOld = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
         const response = await axios.get(`${API_BASE_URL}/teachers`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
         });
@@ -80,7 +80,7 @@ export default function TeachersPage() {
 
     const fetchTeachers = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
         let url = `${API_BASE_URL}/teachers`; // admin sees all teachers
 
         if (userRole === 'student') {
@@ -111,7 +111,7 @@ export default function TeachersPage() {
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       const response = await axios.post(
         `${API_BASE_URL}/teachers`,
         {
@@ -153,7 +153,7 @@ export default function TeachersPage() {
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       const response = await axios.put(
         `${API_BASE_URL}/teachers/${editTeacher.id}`,
         {
@@ -191,7 +191,7 @@ export default function TeachersPage() {
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       await axios.delete(`${API_BASE_URL}/teachers/${deleteTeacher.id}`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
       });

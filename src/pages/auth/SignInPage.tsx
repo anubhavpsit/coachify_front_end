@@ -40,12 +40,19 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return
+
+    // If already logged in, redirect to dashboard
+    const existingToken = window.localStorage.getItem('authToken')
+    if (existingToken) {
+      navigate('/dashboard')
+      return
+    }
     const savedColor = window.localStorage.getItem('templateColor')
     if (savedColor) {
       document.documentElement.style.setProperty('--primary-600', savedColor)
     }
 
-    const storedTenantId = window.sessionStorage.getItem('tenant_id')
+    const storedTenantId = window.localStorage.getItem('tenant_id')
     if (storedTenantId) {
       const parsed = Number.parseInt(storedTenantId, 10)
       if (!Number.isNaN(parsed)) {
@@ -71,8 +78,8 @@ export default function SignInPage() {
         const tenant = response.data?.tenant
         if (tenant && typeof tenant.id === 'number') {
           setTenantId(tenant.id)
-          window.sessionStorage.setItem('tenant_id', String(tenant.id))
-          window.sessionStorage.setItem('tenant', JSON.stringify(tenant))
+          window.localStorage.setItem('tenant_id', String(tenant.id))
+          window.localStorage.setItem('tenant', JSON.stringify(tenant))
           // ✅ APPLY THEME COLOR
           if (tenant.theme_color) {
             document.documentElement.style.setProperty(
@@ -94,7 +101,7 @@ export default function SignInPage() {
       .finally(() => {
         setIsTenantResolved(true)
       })
-  }, [])
+  }, [navigate])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -136,9 +143,9 @@ export default function SignInPage() {
 
       const { user, token } = response.data
 
-      window.sessionStorage.setItem('authUser', JSON.stringify(user))
-      window.sessionStorage.setItem('authToken', token)
-      window.sessionStorage.setItem('tenant_id', String(user.tenant_id))
+      window.localStorage.setItem('authUser', JSON.stringify(user))
+      window.localStorage.setItem('authToken', token)
+      window.localStorage.setItem('tenant_id', String(user.tenant_id))
 
       navigate('/dashboard')
     } catch {

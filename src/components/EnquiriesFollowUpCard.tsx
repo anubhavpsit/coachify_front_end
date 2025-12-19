@@ -40,7 +40,7 @@ export default function EnquiriesFollowUpCard() {
       setLoading(true)
       setError(null)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         if (!token) {
           setError('You are not authenticated.')
           setLoading(false)

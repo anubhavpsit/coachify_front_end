@@ -48,7 +48,7 @@ export default function UserProfileModal({
     const fetchProfile = async () => {
       setLoading(true)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         const response = await axios.get(`${API_BASE_URL}/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -75,7 +75,7 @@ export default function UserProfileModal({
 
     setUploading(true)
     try {
-      const token = sessionStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken')
       const formData = new FormData()
       formData.append('profile_image', file)
 
@@ -172,4 +172,3 @@ export default function UserProfileModal({
     </Modal>
   )
 }
-

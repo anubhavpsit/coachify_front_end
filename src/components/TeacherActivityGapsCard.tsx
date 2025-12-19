@@ -37,7 +37,7 @@ export default function TeacherActivityGapsCard() {
       setLoading(true)
       setError(null)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         if (!token) {
           setLoading(false)
           return
@@ -126,4 +126,3 @@ export default function TeacherActivityGapsCard() {
     </div>
   )
 }
-

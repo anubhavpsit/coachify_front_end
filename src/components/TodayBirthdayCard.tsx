@@ -29,7 +29,7 @@ export default function TodayBirthdayCard({
   useEffect(() => {
     const fetchTodaysBirthdays = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
 
         const response = await axios.get(
           `${API_BASE_URL}/dashboard/birthday/today`,

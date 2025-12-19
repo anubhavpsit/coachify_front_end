@@ -15,9 +15,9 @@ export default function ClassesPage() {
   const [editingClass, setEditingClass] = useState<CoachingClass | null>(null);
   const [name, setName] = useState('');
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
-  const tenantId = sessionStorage.getItem('tenant_id');
-  const token = sessionStorage.getItem('authToken');
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
+const tenantId = localStorage.getItem('tenant_id');
+const token = localStorage.getItem('authToken');
 
   useEffect(() => {
     fetchClasses();

@@ -37,7 +37,7 @@ export default function AssignTeachersModal({
 
     const fetchTeachers = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+    const token = localStorage.getItem('authToken');
         const res = await axios.get(`${API_BASE_URL}/teachers`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
         });
@@ -63,7 +63,7 @@ export default function AssignTeachersModal({
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       await axios.post(
         `${API_BASE_URL}/students/${studentId}/assign-teachers`,
         { teacher_ids: selectedTeacherIds },

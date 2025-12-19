@@ -22,7 +22,7 @@ export default function BirthdayCard({ title = 'Birthday this month', maxHeight 
   useEffect(() => {
     const fetchBirthdays = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
         const response = await axios.get(`${API_BASE_URL}/dashboard/birthdays/current-month`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
         });

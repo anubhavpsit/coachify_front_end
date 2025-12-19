@@ -47,7 +47,7 @@ export default function DashboardPage() {
       setError(null)
 
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         if (!token) {
           setError('You are not authenticated.')
           setLoading(false)
@@ -84,7 +84,7 @@ export default function DashboardPage() {
     const fetchTopStudents = async () => {
       setLoadingTopStudents(true)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         if (!token) {
           setLoadingTopStudents(false)
           return
@@ -118,7 +118,7 @@ export default function DashboardPage() {
 
   const user = (() => {
     try {
-      return JSON.parse(sessionStorage.getItem('authUser') || '{}')
+      return JSON.parse(localStorage.getItem('authUser') || '{}')
     } catch {
       return {}
     }

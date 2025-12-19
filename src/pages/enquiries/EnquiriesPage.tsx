@@ -88,7 +88,7 @@ export default function EnquiriesPage() {
   const [savingCommunication, setSavingCommunication] = useState(false)
 
   useEffect(() => {
-    const authUserRaw = sessionStorage.getItem('authUser')
+    const authUserRaw = localStorage.getItem('authUser')
     if (authUserRaw) {
       try {
         const authUser = JSON.parse(authUserRaw) as { role?: string }
@@ -106,7 +106,7 @@ export default function EnquiriesPage() {
       setLoading(true)
       setError(null)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         if (!token) {
           setError('You are not authenticated.')
           setLoading(false)
@@ -179,7 +179,7 @@ export default function EnquiriesPage() {
     setError(null)
 
     try {
-      const token = sessionStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken')
       if (!token) {
         setError('You are not authenticated.')
         setSaving(false)
@@ -236,7 +236,7 @@ export default function EnquiriesPage() {
       enquiry.status === 'active' ? 'inactive' : 'active'
 
     try {
-      const token = sessionStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken')
       if (!token) {
         alert('You are not authenticated.')
         return
@@ -270,7 +270,7 @@ export default function EnquiriesPage() {
 
   const handleOpenDetail = async (enquiryId: number) => {
     try {
-      const token = sessionStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken')
       if (!token) {
         alert('You are not authenticated.')
         return
@@ -312,7 +312,7 @@ export default function EnquiriesPage() {
 
     setSavingCommunication(true)
     try {
-      const token = sessionStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken')
       if (!token) {
         alert('You are not authenticated.')
         setSavingCommunication(false)
@@ -853,4 +853,3 @@ export default function EnquiriesPage() {
     </div>
   )
 }
-

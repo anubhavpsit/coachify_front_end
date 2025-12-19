@@ -64,7 +64,7 @@ export default function SearchResultsPage() {
   })
 
   useEffect(() => {
-    const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}')
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}')
     setUserRole(authUser.role || '')
   }, [])
 
@@ -80,7 +80,7 @@ export default function SearchResultsPage() {
       return
     }
 
-    const token = sessionStorage.getItem('authToken')
+    const token = localStorage.getItem('authToken')
     if (!token) {
       setError('You are not authenticated.')
       return
@@ -311,4 +311,3 @@ export default function SearchResultsPage() {
     </div>
   )
 }
-

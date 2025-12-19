@@ -15,7 +15,9 @@ function navLinkClass(isActive: boolean) {
 }
 
 export default function Sidebar({ isCollapsed }: SidebarProps) {
-  const user = JSON.parse(sessionStorage.getItem('authUser') || '{}')
+  const user = JSON.parse(
+    window.localStorage.getItem('authUser') || '{}',
+  )
 
   return (
     <aside className={`sidebar${isCollapsed ? ' active' : ''}`}>

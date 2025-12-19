@@ -14,7 +14,7 @@ export default function LowAttendanceCard() {
 
   useEffect(() => {
     const fetchLowAttendance = async () => {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       const res = await axios.get(`${API_BASE_URL}/attendance/low-percentage`, {
         headers: { Authorization: `Bearer ${token}` },
       });

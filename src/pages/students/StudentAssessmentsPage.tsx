@@ -34,7 +34,7 @@ export default function StudentAssessmentsPage() {
     import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
   const STORAGE_BASE_URL =
     import.meta.env.VITE_STORAGE_BASE_URL ?? 'http://coachify.local/storage';
-  const token = sessionStorage.getItem('authToken');
+  const token = localStorage.getItem('authToken');
 
   const [upcoming, setUpcoming] = useState<AssessmentAssignment[]>([]);
   const [history, setHistory] = useState<AssessmentAssignment[]>([]);

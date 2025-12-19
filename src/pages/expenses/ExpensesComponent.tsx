@@ -68,7 +68,7 @@ export default function ExpensesComponent() {
     const fetchUsers = async () => {
       setLoadingUsers(true)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         const response = await axios.get(
           `${API_BASE_URL}/expenses/users`,
           {
@@ -96,7 +96,7 @@ export default function ExpensesComponent() {
     const fetchExpenses = async () => {
       setLoadingExpenses(true)
       try {
-        const token = sessionStorage.getItem('authToken')
+        const token = localStorage.getItem('authToken')
         const { from, to } = getMonthDateRange(filterMonth)
 
         let url = `${API_BASE_URL}/expenses`
@@ -137,7 +137,7 @@ export default function ExpensesComponent() {
 
     setSaving(true)
     try {
-      const token = sessionStorage.getItem('authToken')
+      const token = localStorage.getItem('authToken')
       const payload = {
         amount: Number(amount),
         expense_date: expenseDate,
@@ -349,4 +349,3 @@ export default function ExpensesComponent() {
     </div>
   )
 }
-

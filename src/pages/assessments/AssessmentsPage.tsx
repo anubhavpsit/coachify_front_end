@@ -111,12 +111,12 @@ export default function AssessmentsPage() {
   const [uploadAnswerStudentId, setUploadAnswerStudentId] =
     useState<string>('');
 
-  const token = sessionStorage.getItem('authToken');
-  const tenantId = sessionStorage.getItem('tenant_id');
+  const token = localStorage.getItem('authToken');
+  const tenantId = localStorage.getItem('tenant_id');
 
   useEffect(() => {
     try {
-      const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
+      const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
       if (authUser?.role) {
         setUserRole(authUser.role);
       }

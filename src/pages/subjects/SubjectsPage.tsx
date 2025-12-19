@@ -22,7 +22,7 @@ export default function SubjectsPage() {
   const [saving, setSaving] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
-  const tenantId = sessionStorage.getItem('tenant_id');
+  const tenantId = localStorage.getItem('tenant_id');
 
   // Inside your SubjectsPage component, add these new states
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -33,7 +33,7 @@ export default function SubjectsPage() {
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
         const response = await axios.get(`${API_BASE_URL}/subjects/${tenantId}`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
         });
@@ -58,7 +58,7 @@ export default function SubjectsPage() {
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       const response = await axios.post(
         `${API_BASE_URL}/subjects`,
         { subject: newSubject },
@@ -90,7 +90,7 @@ export default function SubjectsPage() {
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       const response = await axios.put(
         `${API_BASE_URL}/subjects/${editSubject.id}`,
         { subject: editSubject.subject },
@@ -125,7 +125,7 @@ export default function SubjectsPage() {
     setSaving(true);
 
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       await axios.delete(`${API_BASE_URL}/subjects/${deleteSubject.id}`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       });

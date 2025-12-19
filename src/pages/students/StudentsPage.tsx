@@ -47,7 +47,7 @@ export default function StudentsPage() {
   //const [dob, setDob] = useState<string>(getTodayDateValue())
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
-  const tenantId = sessionStorage.getItem('tenant_id');
+  const tenantId = localStorage.getItem('tenant_id');
 
   // Add student modal state
   const [showAddModal, setShowAddModal] = useState(false);
@@ -88,14 +88,14 @@ export default function StudentsPage() {
   };
 
   useEffect(() => {
-    const authUser = JSON.parse(sessionStorage.getItem('authUser') || '{}');
+    const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
     setUserRole(authUser.role);
   }, []);
 
   useEffect(() => {
     const fetchSubjects = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
         const response = await axios.get(`${API_BASE_URL}/subjects/${tenantId}`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
         });
@@ -114,7 +114,7 @@ export default function StudentsPage() {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
         const response = await axios.get(`${API_BASE_URL}/classes/${tenantId}`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
         });
@@ -133,7 +133,7 @@ export default function StudentsPage() {
   useEffect(() => {
     const fetchStudentsOld = async () => {
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
         const response = await axios.get(`${API_BASE_URL}/students`, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
         });
@@ -150,7 +150,7 @@ export default function StudentsPage() {
     const fetchStudents = async () => {
       if (!userRole) return; // wait until userRole is set
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
         console.dir("userRole")
         console.dir(userRole)
         console.dir("userRole")
@@ -202,7 +202,7 @@ export default function StudentsPage() {
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       const response = await axios.post(
         `${API_BASE_URL}/students`,
         newStudentForm,
@@ -244,7 +244,7 @@ export default function StudentsPage() {
 
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       const response = await axios.put(
         `${API_BASE_URL}/students/${editStudentId}`,
         editStudentForm,
@@ -281,7 +281,7 @@ export default function StudentsPage() {
     setSaving(true);
 
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       await axios.delete(`${API_BASE_URL}/students/${deleteStudent.id}`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       });

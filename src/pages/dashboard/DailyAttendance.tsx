@@ -43,7 +43,7 @@ export default function DailyAttendance() {
     const fetchUsersAndAttendance = async () => {
       setLoading(true);
       try {
-        const token = sessionStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken');
 
         // Fetch users
         const usersRes = await axios.get(`${API_BASE_URL}/users?roles=student,teacher`, {
@@ -96,7 +96,7 @@ export default function DailyAttendance() {
   const handleSaveAttendance = async () => {
     setSaving(true);
     try {
-      const token = sessionStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
       const requests = Object.values(attendance).map((att) =>
         axios.post(`${API_BASE_URL}/attendances`, att, {
           headers: { Authorization: `Bearer ${token}` },
