@@ -20,7 +20,7 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
   return (
     <aside className={`sidebar${isCollapsed ? ' active' : ''}`}>
       <div>
-        <NavLink to="/" className="sidebar-logo">
+        <NavLink to="/dashboard" className="sidebar-logo">
           <img
             src="/assets/images/logo.png"
             alt="Coachify logo"
