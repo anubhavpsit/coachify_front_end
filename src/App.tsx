@@ -21,6 +21,7 @@ import SignUpPage from './pages/auth/SignUpPage.tsx'
 import NotFoundPage from './pages/NotFoundPage.tsx'
 import AssessmentsPage from './pages/assessments/AssessmentsPage.tsx'
 import ProfilePage from './pages/profile/ProfilePage.tsx'
+import SearchResultsPage from './pages/search/SearchResultsPage.tsx'
 
 function App() {
   return (
@@ -65,6 +66,9 @@ function App() {
         </Route>
         <Route path="/assessments" element={<DashboardLayout />}>
           <Route index element={<AssessmentsPage />} />
+        </Route>
+        <Route path="/search" element={<DashboardLayout />}>
+          <Route index element={<SearchResultsPage />} />
         </Route>
         <Route path="/profile" element={<DashboardLayout />}>
           <Route index element={<ProfilePage />} />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { MouseEventHandler } from 'react'
+import type { FormEvent, MouseEventHandler } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Icon from '../common/Icon.tsx'
 import Avatar from '../common/Avatar.tsx';
@@ -19,6 +19,7 @@ export default function Topbar({
 }: TopbarProps) {
   const [isProfileOpen, setProfileOpen] = useState(false)
   const [user, setUser] = useState<object>('');
+  const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate()
 
   const handleLogout: MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -42,6 +43,15 @@ export default function Topbar({
     setUser(authUser);
   }, []);  
 
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const trimmed = searchTerm.trim()
+    if (!trimmed) return
+
+    setProfileOpen(false)
+    navigate(`/search?q=${encodeURIComponent(trimmed)}`)
+  }
+
   return (
     <header className="navbar-header px-24 py-16 border-bottom bg-base">
       <div className="row align-items-center justify-content-between">
@@ -62,9 +72,24 @@ export default function Topbar({
                 className="icon text-2xl active"
               />
             </button>
-            <form className="navbar-search d-none d-md-flex">
-              <input type="text" name="search" placeholder="Search" />
-              <Icon icon="ion:search-outline" className="icon" />
+            <form
+              className="navbar-search d-none d-md-flex"
+              onSubmit={handleSearchSubmit}
+            >
+              <input
+                type="text"
+                name="search"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+              <button
+                type="submit"
+                className="border-0 bg-transparent p-0 d-flex align-items-center"
+                aria-label="Search"
+              >
+                <Icon icon="ion:search-outline" className="icon" />
+              </button>
             </form>
           </div>
         </div>
