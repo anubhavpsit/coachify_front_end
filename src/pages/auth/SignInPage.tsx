@@ -241,7 +241,7 @@ export default function SignInPage() {
             >
               {isSubmitting ? 'Signing In...' : 'Sign In'}
             </button>
-
+            {/*
             <div className="mt-32 text-center text-sm">
               <p className="mb-0">
                 Don&apos;t have an account?{' '}
@@ -254,6 +254,7 @@ export default function SignInPage() {
                 </button>
               </p>
             </div>
+            */}
           </form>
         </div>
       </div>
