@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Icon from '../../components/common/Icon.tsx';
 import { Modal, Button } from 'react-bootstrap';
+import Icon from '../../components/common/Icon.tsx';
 
 interface Subject {
   id: number;
@@ -153,7 +153,7 @@ export default function SubjectsPage() {
           <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
             <span className="text-md fw-medium text-secondary-light mb-0">Subjects List</span>
             <Button variant="primary" onClick={() => setShowAddModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
-              <iconify-icon icon="ic:baseline-plus" className="icon text-xl line-height-1"></iconify-icon>
+              <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
               Add New Subject
             </Button>
           </div>
@@ -194,10 +194,10 @@ export default function SubjectsPage() {
                           {subject.tenant_id !== 0 ? (
                             <>
                               <Button variant="link" onClick={() => handleOpenEditModal(subject)}>
-                                <iconify-icon icon="ic:baseline-edit" className="text-primary text-lg"></iconify-icon>
+                                <Icon icon="ic:baseline-edit" className="text-primary text-lg" />
                               </Button>
                               <Button variant="link" onClick={() => handleOpenDeleteModal(subject)}>
-                                <iconify-icon icon="ic:baseline-delete" className="text-danger text-lg"></iconify-icon>
+                                <Icon icon="ic:baseline-delete" className="text-danger text-lg" />
                               </Button>
                               </>
                             ) : (

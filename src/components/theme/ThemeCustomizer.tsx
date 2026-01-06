@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react'
-
 type ThemeCustomizerProps = {
   isOpen: boolean
   onToggle: () => void

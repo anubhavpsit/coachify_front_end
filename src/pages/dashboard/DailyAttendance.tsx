@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Table, Button, Form, Spinner } from 'react-bootstrap';
-import { ROLES } from '../../constants/roles';
 
 interface User {
   id: number;

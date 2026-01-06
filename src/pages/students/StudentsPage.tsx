@@ -3,12 +3,13 @@ import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import AssignTeachersModal from '../../components/AssignTeachersModal';
 import Avatar from '../../components/common/Avatar.tsx';
+import Icon from '../../components/common/Icon.tsx';
 import { ROLES } from '../../constants/roles'
 import UserProfileModal from '../../components/UserProfileModal';
 
 interface StudentProfile {
-  class: string;
-  subjects: string[];
+  class: number | null;
+  subjects: number[];
   phone: string;
 }
 
@@ -18,15 +19,17 @@ interface Student {
   email: string;
   tenant_id: number;
   student_profile?: StudentProfile | null;
+  dob?: string | null;
 }
 
 interface StudentForm {
   name: string;
   email: string;
   password: string;
-  class: string;
-  subjects: string[];
+  class: number | '';
+  subjects: number[];
   phone: string;
+  dob: string;
 }
 
 function getTodayDateValue() {
@@ -41,8 +44,7 @@ export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState(false);
-  const [classes, setClasses] = useState<string[]>([]);
-  const [myStudents, setMyStudents] = useState<Student[]>([]);
+  const [classes, setClasses] = useState<{ id: number; name: string }[]>([]);
   const [userRole, setUserRole] = useState<string>('');
   //const [dob, setDob] = useState<string>(getTodayDateValue())
 
@@ -69,7 +71,7 @@ export default function StudentsPage() {
   // Delete student modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteStudent, setDeleteStudent] = useState<Student | null>(null);
-  const [subjects, setSubjects] = useState<string[]>([]);
+  const [subjects, setSubjects] = useState<{ id: number; subject: string }[]>([]);
 
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
@@ -131,22 +133,6 @@ export default function StudentsPage() {
 
   // Fetch students
   useEffect(() => {
-    const fetchStudentsOld = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        const response = await axios.get(`${API_BASE_URL}/students`, {
-          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-        });
-
-        if (response.data.success) {
-          setStudents(response.data.data || []);
-        }
-      } catch (error) {
-        console.error('Error fetching students:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     const fetchStudents = async () => {
       if (!userRole) return; // wait until userRole is set
       try {
@@ -177,20 +163,20 @@ export default function StudentsPage() {
   }, [API_BASE_URL, userRole]);
 
 
-  const handleSubjectToggle = (subject: string, type: 'add' | 'edit') => {
+  const handleSubjectToggle = (subjectId: number, type: 'add' | 'edit') => {
     if (type === 'add') {
       setNewStudentForm(prev => ({
         ...prev,
-        subjects: prev.subjects.includes(subject)
-          ? prev.subjects.filter(s => s !== subject)
-          : [...prev.subjects, subject],
+        subjects: prev.subjects.includes(subjectId)
+          ? prev.subjects.filter(s => s !== subjectId)
+          : [...prev.subjects, subjectId],
       }));
     } else {
       setEditStudentForm(prev => prev ? {
         ...prev,
-        subjects: prev.subjects.includes(subject)
-          ? prev.subjects.filter(s => s !== subject)
-          : [...prev.subjects, subject],
+        subjects: prev.subjects.includes(subjectId)
+          ? prev.subjects.filter(s => s !== subjectId)
+          : [...prev.subjects, subjectId],
       } : null);
     }
   };
@@ -304,7 +290,7 @@ export default function StudentsPage() {
         <h6 className="fw-semibold mb-0">Students</h6>
         {userRole === ROLES.COACHING_ADMIN ? (
         <Button variant="primary" onClick={() => setShowAddModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
-          <iconify-icon icon="ic:baseline-plus" className="icon text-xl"></iconify-icon>
+          <Icon icon="ic:baseline-plus" className="icon text-xl" />
           Add New Student
         </Button>
         ) : (
@@ -463,7 +449,12 @@ export default function StudentsPage() {
               <select
                 className="form-control"
                 value={newStudentForm.class}
-                onChange={(e) => setNewStudentForm({ ...newStudentForm, class: e.target.value })}
+                onChange={(e) =>
+                  setNewStudentForm({
+                    ...newStudentForm,
+                    class: e.target.value === '' ? '' : Number(e.target.value),
+                  })
+                }
                 disabled={saving}
               >
                 <option value="">Select Class</option>

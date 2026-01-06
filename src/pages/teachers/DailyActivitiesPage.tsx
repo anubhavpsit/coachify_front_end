@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Button } from "react-bootstrap";
 
 export default function DailyActivitiesPage() {
   const [searchParams] = useSearchParams();
-  const [students, setStudents] = useState([]);
-  const [activities, setActivities] = useState([
+  const [students, setStudents] = useState<any[]>([]);
+  const [activities, setActivities] = useState<any[]>([
     {
       id: null as number | null,
       student_id: "",
@@ -214,30 +214,6 @@ const handleSelectStudent = async (
   // --------------------------
   // Fetch subjects for a row
   // --------------------------
-  const handleSelectStudentss = async (
-    index: number,
-    studentId: number,
-    currentSubjectId: number | null = null
-  ) => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/students/${studentId}/subjects`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const updated = [...activities];
-      updated[index] = {
-        ...updated[index],
-        student_id: studentId,
-        subjects: response.data.data || [],
-        subject_id: currentSubjectId ?? "", // keep existing subject if editing
-      };
-      setActivities(updated);
-    } catch (error) {
-      console.error("Failed to fetch subjects:", error);
-    }
-  };
-
   // --------------------------
   // Handle change per field
   // --------------------------
@@ -581,7 +557,7 @@ const handleSelectStudent = async (
                 }
               >
                 <option value="">Select Subject</option>
-                {activity.subjects?.map((sub) => (
+                {activity.subjects?.map((sub: any) => (
                   <option key={sub.id} value={sub.id}>
                     {sub.subject}
                   </option>

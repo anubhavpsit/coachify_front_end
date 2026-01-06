@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Button, Modal } from 'react-bootstrap';
+import Icon from '../../components/common/Icon.tsx';
 
 interface AssessmentResultRow {
   marks_obtained: number;
@@ -107,9 +108,6 @@ export default function AssessmentsPage() {
   >(null);
   const [uploadAssessmentFileType, setUploadAssessmentFileType] =
     useState<AssessmentFileType>('question_paper');
-  const [uploadAnswerFile, setUploadAnswerFile] = useState<File | null>(null);
-  const [uploadAnswerStudentId, setUploadAnswerStudentId] =
-    useState<string>('');
 
   const token = localStorage.getItem('authToken');
   const tenantId = localStorage.getItem('tenant_id');
@@ -296,8 +294,6 @@ export default function AssessmentsPage() {
     setAssessmentFiles([]);
     setUploadAssessmentFile(null);
     setUploadAssessmentFileType('question_paper');
-    setUploadAnswerFile(null);
-    setUploadAnswerStudentId('');
 
     const detailed = await loadAssessmentDetails(assessment.id);
     if (detailed) {
@@ -463,39 +459,6 @@ export default function AssessmentsPage() {
     }
   };
 
-  const handleUploadAnswerFile = async () => {
-    if (!filesModalAssessment || !uploadAnswerFile || !uploadAnswerStudentId)
-      return;
-
-    setSaving(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', uploadAnswerFile);
-
-      const response = await axios.post(
-        `${API_BASE_URL}/assessments/${filesModalAssessment.id}/students/${uploadAnswerStudentId}/files`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        },
-      );
-
-      if (response.data.success) {
-        setUploadAnswerFile(null);
-        setUploadAnswerStudentId('');
-        await fetchAssessmentFiles(filesModalAssessment.id);
-      }
-    } catch (error) {
-      console.error('Error uploading answer sheet:', error);
-      alert('Failed to upload answer sheet');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
     <div>
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
@@ -505,10 +468,7 @@ export default function AssessmentsPage() {
           className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
           onClick={() => setShowCreateModal(true)}
         >
-          <iconify-icon
-            icon="ic:baseline-plus"
-            className="icon text-xl"
-          ></iconify-icon>
+          <Icon icon="ic:baseline-plus" className="icon text-xl" />
           Create Assessment
         </Button>
       </div>
@@ -555,28 +515,28 @@ export default function AssessmentsPage() {
                           variant="link"
                           onClick={() => openAssignModal(asm)}
                         >
-                          <iconify-icon
+                          <Icon
                             icon="mdi:account-multiple-plus"
                             className="text-primary text-lg"
-                          ></iconify-icon>
+                          />
                         </Button>
                         <Button
                           variant="link"
                           onClick={() => openResultsModal(asm)}
                         >
-                          <iconify-icon
+                          <Icon
                             icon="mdi:clipboard-text-outline"
                             className="text-success text-lg"
-                          ></iconify-icon>
+                          />
                         </Button>
                         <Button
                           variant="link"
                           onClick={() => openFilesModal(asm)}
                         >
-                          <iconify-icon
+                          <Icon
                             icon="mdi:paperclip"
                             className="text-secondary text-lg"
-                          ></iconify-icon>
+                          />
                         </Button>
                       </td>
                     </tr>

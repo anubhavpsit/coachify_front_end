@@ -5,21 +5,29 @@ import axios from 'axios'
 import Icon from '../common/Icon.tsx'
 import Avatar from '../common/Avatar.tsx';
 
+type TopbarUser = {
+  name: string;
+  role?: string;
+  profile_image?: string | null;
+}
+
 type TopbarProps = {
   onToggleSidebar: MouseEventHandler<HTMLButtonElement>
   onToggleTheme: () => void
-  onOpenCustomizer: () => void
   themeLabel: string
 }
 
 export default function Topbar({
   onToggleSidebar,
   onToggleTheme,
-  onOpenCustomizer,
   themeLabel,
 }: TopbarProps) {
   const [isProfileOpen, setProfileOpen] = useState(false)
-  const [user, setUser] = useState<object>('');
+  const [user, setUser] = useState<TopbarUser>({
+    name: '',
+    role: '',
+    profile_image: null,
+  });
   const [searchTerm, setSearchTerm] = useState('')
   const navigate = useNavigate()
 
@@ -64,15 +72,25 @@ export default function Topbar({
   }
 
   useEffect(() => {
-    
     const savedColor = window.localStorage.getItem('templateColor')
     if (savedColor) {
       document.documentElement.style.setProperty('--primary-600', savedColor)
     }
 
-    const authUser = JSON.parse(window.localStorage.getItem('authUser') || '{}');
-    setUser(authUser);
-  }, []);  
+    const stored = window.localStorage.getItem('authUser')
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as Partial<TopbarUser>
+        setUser((previous) => ({
+          ...previous,
+          ...parsed,
+        }))
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error parsing authUser from localStorage', error)
+      }
+    }
+  }, [])
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -134,21 +152,6 @@ export default function Topbar({
             >
               {themeLabel}
             </button>
-
-            {/*
-            <button
-              type="button"
-              className="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center"
-              onClick={onOpenCustomizer}
-              aria-label="Open theme customization"
-            >
-              <Icon
-                icon="ri:settings-3-line"
-                className="text-primary-light text-xl"
-              />
-            </button>
-            */}
-            
             <div className={`dropdown${isProfileOpen ? ' show' : ''}`}>
               <button
                 className="d-flex justify-content-center align-items-center rounded-circle border-0 bg-transparent"

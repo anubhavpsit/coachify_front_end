@@ -8,14 +8,6 @@ interface Teacher {
   email: string;
 }
 
-interface Student {
-  id: number;
-  name: string;
-  email: string;
-  tenant_id: number;
-  student_profile?: any;
-}
-
 export default function AssignTeachersModal({
   show,
   onHide,

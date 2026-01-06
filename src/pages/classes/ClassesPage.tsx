@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
+import Icon from '../../components/common/Icon.tsx';
 
 interface CoachingClass {
   id: number;
@@ -87,8 +88,8 @@ const token = localStorage.getItem('authToken');
         <div className="card">
           <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
             <span className="text-md fw-medium text-secondary-light mb-0">Subjects List</span>
-            <Button variant="primary" onClick={() => setShowAddModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
-              <iconify-icon icon="ic:baseline-plus" className="icon text-xl line-height-1"></iconify-icon>
+            <Button variant="primary" onClick={() => setShowModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
+              <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
               Add New Class
             </Button>
           </div>
@@ -129,10 +130,10 @@ const token = localStorage.getItem('authToken');
                             {cls.tenant_id !== 0 ? (
                               <>
                                 <Button variant="link" onClick={() => handleEdit(cls)}>
-                                  <iconify-icon icon="ic:baseline-edit" className="text-primary text-lg"></iconify-icon>
+                                  <Icon icon="ic:baseline-edit" className="text-primary text-lg" />
                                 </Button>
                                 <Button variant="link" onClick={() => handleDelete(cls.id)}>
-                                  <iconify-icon icon="ic:baseline-delete" className="text-danger text-lg"></iconify-icon>
+                                  <Icon icon="ic:baseline-delete" className="text-danger text-lg" />
                                 </Button>
                               </>
                             ) : (

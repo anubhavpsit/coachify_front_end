@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
-import Icon from '../../components/common/Icon.tsx';
 import Avatar from '../../components/common/Avatar.tsx';
+import Icon from '../../components/common/Icon.tsx';
 import UserProfileModal from '../../components/UserProfileModal';
 
 interface Teacher {
@@ -10,6 +10,7 @@ interface Teacher {
   name: string;
   email: string;
   tenant_id: number;
+  dob?: string | null;
 }
 
 function getTodayDateValue() {
@@ -62,21 +63,6 @@ export default function TeachersPage() {
   /** Fetch Teachers */
   useEffect(() => {
     if (!userRole) return; // wait until role is set
-
-    const fetchTeachersOld = async () => {
-      try {
-        const token = localStorage.getItem('authToken');
-        const response = await axios.get(`${API_BASE_URL}/teachers`, {
-          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
-        });
-
-        if (response.data.success) setTeachers(response.data.data);
-      } catch (error) {
-        console.error('Error fetching teachers:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     const fetchTeachers = async () => {
       try {
@@ -212,7 +198,7 @@ export default function TeachersPage() {
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 className="fw-semibold mb-0">Teachers</h6>
         <Button variant="primary" onClick={() => setShowAddModal(true)}  className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
-          <iconify-icon icon="ic:baseline-plus" className="icon text-xl"></iconify-icon>
+          <Icon icon="ic:baseline-plus" className="icon text-xl" />
           Add New Teacher
         </Button>
       </div>
@@ -269,10 +255,10 @@ export default function TeachersPage() {
                             {userRole === 'coaching_admin' && (
                               <>
                                 <Button variant="link" onClick={() => handleOpenEditModal(teacher)}>
-                                  <iconify-icon icon="ic:baseline-edit" className="text-primary text-lg"></iconify-icon>
+                                  <Icon icon="ic:baseline-edit" className="text-primary text-lg" />
                                 </Button>
                                 <Button variant="link" onClick={() => handleOpenDeleteModal(teacher)}>
-                                  <iconify-icon icon="ic:baseline-delete" className="text-danger text-lg"></iconify-icon>
+                                  <Icon icon="ic:baseline-delete" className="text-danger text-lg" />
                                 </Button>
                               </>
                             )}

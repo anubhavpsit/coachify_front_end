@@ -29,7 +29,6 @@ export default function DashboardLayout() {
             setSidebarCollapsed((previous) => !previous)
           }
           onToggleTheme={toggleTheme}
-          onOpenCustomizer={() => setCustomizerOpen(true)}
           themeLabel={themeLabel}
         />
 

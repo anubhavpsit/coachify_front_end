@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from 'react';
 
 interface User {
   name: string;
@@ -62,7 +62,7 @@ export default function Avatar({
   const resolvedColor =
     color ?? AVATAR_COLORS[getColorIndex(user.name)];
 
-  const avatarStyle: React.CSSProperties = {
+  const avatarStyle: CSSProperties = {
     width: size,
     height: size,
     minWidth: size,
@@ -73,7 +73,7 @@ export default function Avatar({
   if (hasValidImage) {
     return (
       <img
-        src={user.profile_image}
+        src={user.profile_image ?? undefined}
         alt={user.name}
         style={{ width: size, height: size, minWidth: size }}
         className={`rounded-circle object-fit-cover ${className}`}
