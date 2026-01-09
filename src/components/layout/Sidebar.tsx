@@ -1,4 +1,4 @@
-import { MouseEvent } from 'react'
+import type { MouseEvent } from 'react'
 import { NavLink } from 'react-router-dom'
 import Icon from '../common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
