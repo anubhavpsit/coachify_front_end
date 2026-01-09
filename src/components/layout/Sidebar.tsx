@@ -1,9 +1,12 @@
+import { MouseEvent } from 'react'
 import { NavLink } from 'react-router-dom'
 import Icon from '../common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
 
 type SidebarProps = {
   isCollapsed: boolean
+  isOpen: boolean
+  onClose: () => void
 }
 
 const linkBaseClass =
@@ -14,13 +17,44 @@ function navLinkClass(isActive: boolean) {
   return `${linkBaseClass}${activeClass}`
 }
 
-export default function Sidebar({ isCollapsed }: SidebarProps) {
+export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) {
   const user = JSON.parse(
     window.localStorage.getItem('authUser') || '{}',
   )
 
+  const sidebarClassNames = [
+    'sidebar',
+    isCollapsed ? 'active' : '',
+    isOpen ? 'sidebar-open' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+  const handleMenuClick = (event: MouseEvent<HTMLUListElement>) => {
+    if (!isOpen) return
+
+    const target = event.target as HTMLElement
+    const anchor = target.closest('a')
+    if (!anchor) return
+
+    if (typeof window !== 'undefined' && window.innerWidth < 1200) {
+      onClose()
+    }
+  }
+
   return (
-    <aside className={`sidebar${isCollapsed ? ' active' : ''}`}>
+    <aside
+      className={sidebarClassNames}
+      style={isOpen ? { zIndex: 200 } : undefined}
+    >
+      <button
+        type="button"
+        className="sidebar-close-btn"
+        aria-label="Close menu"
+        onClick={onClose}
+      >
+        <Icon icon="ic:round-close" className="icon" />
+      </button>
       <div>
         <NavLink to="/dashboard" className="sidebar-logo">
           <img
@@ -42,7 +76,11 @@ export default function Sidebar({ isCollapsed }: SidebarProps) {
       </div>
 
       <div className="sidebar-menu-area">
-        <ul className="sidebar-menu" id="sidebar-menu">
+        <ul
+          className="sidebar-menu"
+          id="sidebar-menu"
+          onClick={handleMenuClick}
+        >
           {/*<li className="sidebar-menu-group-title">Dashboard</li>*/}
           <li>
             <NavLink

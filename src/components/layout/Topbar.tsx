@@ -15,12 +15,14 @@ type TopbarProps = {
   onToggleSidebar: MouseEventHandler<HTMLButtonElement>
   onToggleTheme: () => void
   themeLabel: string
+  isSidebarActive: boolean
 }
 
 export default function Topbar({
   onToggleSidebar,
   onToggleTheme,
   themeLabel,
+  isSidebarActive,
 }: TopbarProps) {
   const [isProfileOpen, setProfileOpen] = useState(false)
   const [user, setUser] = useState<TopbarUser>({
@@ -101,6 +103,10 @@ export default function Topbar({
     navigate(`/search?q=${encodeURIComponent(trimmed)}`)
   }
 
+  const toggleButtonClass = `sidebar-toggle${
+    isSidebarActive ? ' active' : ''
+  }`
+
   return (
     <header className="navbar-header px-24 py-16 border-bottom bg-base">
       <div className="row align-items-center justify-content-between">
@@ -108,9 +114,10 @@ export default function Topbar({
           <div className="d-flex flex-wrap align-items-center gap-4">
             <button
               type="button"
-              className="sidebar-toggle"
+              className={toggleButtonClass}
               onClick={onToggleSidebar}
               aria-label="Toggle sidebar"
+              aria-expanded={isSidebarActive}
             >
               <Icon
                 icon="heroicons:bars-3-solid"

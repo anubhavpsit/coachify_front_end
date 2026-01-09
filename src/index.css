@@ -34,3 +34,9 @@ body {
   }
 }
 
+/* Make sure the sidebar toggle is visible on smaller screens */
+.navbar-header .sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
