@@ -310,7 +310,7 @@ export default function StudentsPage() {
           classId: fallbackClass,
           subjects: editStudentForm.subjects,
           phone: editStudentForm.phone,
-          createdAt: existingStudent?.created_at,
+          createdAt: existingStudent?.created_at ?? undefined,
         });
 
         setStudents(prev =>
