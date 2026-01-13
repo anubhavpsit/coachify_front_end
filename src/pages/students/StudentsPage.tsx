@@ -20,6 +20,7 @@ interface Student {
   tenant_id: number;
   student_profile?: StudentProfile | null;
   dob?: string | null;
+  created_at?: string | null;
 }
 
 interface StudentForm {
@@ -30,6 +31,13 @@ interface StudentForm {
   subjects: number[];
   phone: string;
   dob: string;
+}
+
+interface StudentFallbackData {
+  classId: number | null;
+  subjects: number[];
+  phone: string;
+  createdAt?: string;
 }
 
 function getTodayDateValue() {
@@ -78,6 +86,53 @@ export default function StudentsPage() {
 
   const [viewUserId, setViewUserId] = useState<number | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  const formatAddedOn = (isoString?: string | null) => {
+    if (!isoString) return '-';
+    const parsedDate = new Date(isoString);
+    if (Number.isNaN(parsedDate.getTime())) return '-';
+    return parsedDate.toLocaleString();
+  };
+
+  const getStudentTimestamp = (student: Student) => {
+    if (!student.created_at) return 0;
+    const timestamp = Date.parse(student.created_at);
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+  };
+
+  const sortStudentsByCreatedAt = (list: Student[]) => {
+    return [...list].sort((a, b) => getStudentTimestamp(b) - getStudentTimestamp(a));
+  };
+
+  const enrichStudentData = (student: Student, fallback: StudentFallbackData): Student => {
+    const normalizedClass =
+      typeof student.student_profile?.class === 'number'
+        ? student.student_profile.class
+        : fallback.classId;
+    const serverSubjects = student.student_profile?.subjects;
+    const normalizedSubjects =
+      Array.isArray(serverSubjects) && serverSubjects.length > 0
+        ? serverSubjects
+        : fallback.subjects;
+    const serverPhone = student.student_profile?.phone;
+    const normalizedPhone =
+      typeof serverPhone === 'string' && serverPhone.trim().length > 0
+        ? serverPhone
+        : fallback.phone;
+    const normalizedCreatedAt =
+      student.created_at ?? fallback.createdAt ?? new Date().toISOString();
+
+    return {
+      ...student,
+      created_at: normalizedCreatedAt,
+      student_profile: {
+        ...(student.student_profile ?? {}),
+        class: normalizedClass,
+        subjects: normalizedSubjects,
+        phone: normalizedPhone,
+      } as StudentProfile,
+    };
+  };
 
   const handleOpenAssignModal = (studentId: number) => {
     setSelectedStudentId(studentId);
@@ -149,9 +204,10 @@ export default function StudentsPage() {
         });
 
         if (response.data.success) {
-          setStudents(response.data.data);
-          // if (userRole === 'teacher') setStudents(response.data.data);
-          // else setStudents(response.data.data);
+          const fetchedStudents = Array.isArray(response.data.data)
+            ? (response.data.data as Student[])
+            : [];
+          setStudents(sortStudentsByCreatedAt(fetchedStudents));
         }
       } catch (error) {
         console.error('Error fetching students:', error);
@@ -196,7 +252,16 @@ export default function StudentsPage() {
       );
 
       if (response.data.success) {
-        setStudents(prev => [...prev, response.data.data]);
+        const createdStudent: Student = response.data.data;
+        const fallbackClass = newStudentForm.class === '' ? null : Number(newStudentForm.class);
+        const enrichedStudent = enrichStudentData(createdStudent, {
+          classId: fallbackClass,
+          subjects: newStudentForm.subjects,
+          phone: newStudentForm.phone,
+          createdAt: createdStudent.created_at ?? new Date().toISOString(),
+        });
+
+        setStudents(prev => sortStudentsByCreatedAt([enrichedStudent, ...prev]));
         setNewStudentForm({ name: '', email: '', password: '', class: '', subjects: [], phone: '', dob: '' });
         setShowAddModal(false);
       }
@@ -237,10 +302,22 @@ export default function StudentsPage() {
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
 
-      if (response.data.success) {
+      if (response.data.success && editStudentForm) {
+        const updatedStudent: Student = response.data.data;
+        const fallbackClass = editStudentForm.class === '' ? null : Number(editStudentForm.class);
+        const existingStudent = students.find(s => s.id === editStudentId);
+        const enrichedStudent = enrichStudentData(updatedStudent, {
+          classId: fallbackClass,
+          subjects: editStudentForm.subjects,
+          phone: editStudentForm.phone,
+          createdAt: existingStudent?.created_at,
+        });
+
         setStudents(prev =>
-          prev.map(s =>
-            s.id === editStudentId ? response.data.data : s
+          sortStudentsByCreatedAt(
+            prev.map(s =>
+              s.id === editStudentId ? enrichedStudent : s
+            )
           )
         );
         setEditStudentForm(null);
@@ -322,6 +399,7 @@ export default function StudentsPage() {
                     <th>Email</th>
                     <th>Class</th>
                     <th>Subjects</th>
+                    <th>Added On</th>
                     <th className="text-center">Profile</th>
                     {userRole === ROLES.COACHING_ADMIN && (
                       <>
@@ -357,6 +435,7 @@ export default function StudentsPage() {
                           .filter(Boolean) // remove undefined if subject not found
                           .join(', ') || '-'}
                       </td>
+                      <td>{formatAddedOn(student.created_at)}</td>
                       <td className="text-center">
                         <Button
                           variant="link"
