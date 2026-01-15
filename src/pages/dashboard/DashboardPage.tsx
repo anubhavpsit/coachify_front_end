@@ -9,6 +9,7 @@ import EnquiriesFollowUpCard from '../../components/EnquiriesFollowUpCard';
 import PendingActionsCard from '../../components/PendingActionsCard';
 import TeacherActivityGapsCard from '../../components/TeacherActivityGapsCard';
 import PendingFeesCard from '../../components/PendingFeesCard';
+import ActivityLogCard from '../../components/ActivityLogCard';
 
 type DashboardStats = {
   role: string
@@ -341,8 +342,8 @@ export default function DashboardPage() {
             </>
           )}
 
-          {role === ROLES.TEACHER && (
-            <>
+      {role === ROLES.TEACHER && (
+        <>
               <div className="col-xxl-3 col-md-6">
                 <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-1">
                   <div className="d-flex align-items-center justify-content-between mb-12">
@@ -508,6 +509,8 @@ export default function DashboardPage() {
           )}
         </div>
       )}
+
+      {role === ROLES.COACHING_ADMIN && <ActivityLogCard />}
     </div>
   )
 }
