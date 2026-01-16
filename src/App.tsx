@@ -22,6 +22,7 @@ import NotFoundPage from './pages/NotFoundPage.tsx'
 import AssessmentsPage from './pages/assessments/AssessmentsPage.tsx'
 import ProfilePage from './pages/profile/ProfilePage.tsx'
 import SearchResultsPage from './pages/search/SearchResultsPage.tsx'
+import NotificationsPage from './pages/notifications/NotificationsPage.tsx'
 
 function App() {
   return (
@@ -72,6 +73,9 @@ function App() {
         </Route>
         <Route path="/profile" element={<DashboardLayout />}>
           <Route index element={<ProfilePage />} />
+        </Route>
+        <Route path="/notifications" element={<DashboardLayout />}>
+          <Route index element={<NotificationsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

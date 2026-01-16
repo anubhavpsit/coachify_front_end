@@ -232,6 +232,15 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
                   <span>Daily Attendance</span>
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="/notifications"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="solar:bell-bing-outline" className="menu-icon" />
+                  <span>Notifications</span>
+                </NavLink>
+              </li>
               {/*
               <li>
                 <NavLink
