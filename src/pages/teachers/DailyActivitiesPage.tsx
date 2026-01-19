@@ -1,14 +1,77 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { Button } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
+
+type AttachmentFileType = "image" | "pdf" | "other";
+
+type ActivityAttachment = {
+  id: number;
+  original_name: string;
+  path: string;
+  url?: string | null;
+  file_type?: AttachmentFileType;
+  mime_type?: string | null;
+};
+
+type StudentOption = {
+  id: number;
+  name: string;
+};
+
+type SubjectOption = {
+  id: number;
+  subject: string;
+};
+
+type ClassOption = {
+  id: number;
+  name: string;
+};
+
+type HistoryActivityRow = {
+  id: number;
+  activity_date: string;
+  chapter?: string | null;
+  topic?: string | null;
+  homework?: string | null;
+  homework_status?: "not_done" | "partial" | "done" | null;
+  student?: { id: number; name: string } | null;
+  subject?: { id: number; subject: string } | null;
+  attachments?: ActivityAttachment[];
+};
+
+type ActivityFormRow = {
+  id: number | null;
+  student_id: number | "";
+  subjects: SubjectOption[];
+  subject_id: number | "";
+  chapter: string;
+  topic: string;
+  notes: string;
+  homework: string;
+  homework_status?: "not_done" | "partial" | "done";
+  attachments: ActivityAttachment[];
+};
+
+type ActivityApiResponse = {
+  id: number;
+  student_id: number;
+  subject_id: number;
+  chapter?: string | null;
+  topic?: string | null;
+  notes?: string | null;
+  homework?: string | null;
+  homework_status?: "not_done" | "partial" | "done" | null;
+  attachments?: ActivityAttachment[];
+};
 
 export default function DailyActivitiesPage() {
   const [searchParams] = useSearchParams();
-  const [students, setStudents] = useState<any[]>([]);
-  const [activities, setActivities] = useState<any[]>([
+  const [students, setStudents] = useState<StudentOption[]>([]);
+  const [activities, setActivities] = useState<ActivityFormRow[]>([
     {
-      id: null as number | null,
+      id: null,
       student_id: "",
       subjects: [],
       subject_id: "",
@@ -16,6 +79,8 @@ export default function DailyActivitiesPage() {
       topic: "",
       notes: "",
       homework: "",
+      homework_status: "not_done",
+      attachments: [],
     },
   ]);
 
@@ -26,8 +91,8 @@ export default function DailyActivitiesPage() {
     }
     return "student";
   });
-  const [classes, setClasses] = useState<any[]>([]);
-  const [allSubjects, setAllSubjects] = useState<any[]>([]);
+  const [classes, setClasses] = useState<ClassOption[]>([]);
+  const [allSubjects, setAllSubjects] = useState<SubjectOption[]>([]);
   const [batchForm, setBatchForm] = useState({
     class_id: "",
     subject_id: "",
@@ -37,7 +102,9 @@ export default function DailyActivitiesPage() {
     homework: "",
   });
 
-  const [historyActivities, setHistoryActivities] = useState<any[]>([]);
+  const [historyActivities, setHistoryActivities] = useState<
+    HistoryActivityRow[]
+  >([]);
   const [historyDate, setHistoryDate] = useState<string>(() => {
     const fromQuery = searchParams.get("date");
     if (fromQuery && !Number.isNaN(Date.parse(fromQuery))) {
@@ -48,18 +115,36 @@ export default function DailyActivitiesPage() {
 
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? "http://coachify.local/api/v1";
+  const STORAGE_BASE_URL =
+    import.meta.env.VITE_STORAGE_BASE_URL ?? "http://coachify.local/storage";
   const token = localStorage.getItem("authToken");
   const tenantId = localStorage.getItem("tenant_id");
+
+  const [previewAttachment, setPreviewAttachment] =
+    useState<ActivityAttachment | null>(null);
+  const [uploadingAttachmentId, setUploadingAttachmentId] = useState<number | null>(
+    null,
+  );
+  const [deletingAttachmentId, setDeletingAttachmentId] = useState<number | null>(
+    null,
+  );
 
   // --------------------------
   // Load students once
   // --------------------------
   const loadStudents = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/teachers/students`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setStudents(response.data.data);
+      const response = await axios.get<{ data: StudentOption[] }>(
+        `${API_BASE_URL}/teachers/students`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const list = (response.data?.data || []).map((student) => ({
+        id: student.id,
+        name: student.name,
+      }));
+      setStudents(list);
     } catch (error) {
       console.error("Error loading students:", error);
     }
@@ -73,20 +158,28 @@ export default function DailyActivitiesPage() {
 
     try {
       const [classesRes, subjectsRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/classes/${tenantId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        axios.get(`${API_BASE_URL}/subjects/${tenantId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
+        axios.get<{ success: boolean; data: ClassOption[] }>(
+          `${API_BASE_URL}/classes/${tenantId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        ),
+        axios.get<{ data?: SubjectOption[]; subjects?: SubjectOption[]; status?: boolean }>(
+          `${API_BASE_URL}/subjects/${tenantId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        ),
       ]);
 
-      if (classesRes.data.success) {
-        setClasses(classesRes.data.data || []);
-      }
-      if (subjectsRes.data.status) {
-        setAllSubjects(subjectsRes.data.data || []);
-      }
+      const classesData = classesRes.data.success
+        ? classesRes.data.data || []
+        : [];
+      const subjectsData =
+        subjectsRes.data.data || subjectsRes.data.subjects || [];
+
+      setClasses(classesData);
+      setAllSubjects(subjectsData);
     } catch (error) {
       console.error("Error loading classes/subjects:", error);
     }
@@ -102,21 +195,24 @@ export default function DailyActivitiesPage() {
       });
 
       // Fetch subjects for all rows
-      const loadedActivities = await Promise.all(
-        response.data.data.map(async (act: any) => {
-          const subjectResponse = await axios.get(
+      const apiActivities: ActivityApiResponse[] = response.data.data || [];
+      const loadedActivities: ActivityFormRow[] = await Promise.all(
+        apiActivities.map(async (act) => {
+          const subjectResponse = await axios.get<{ data: SubjectOption[] }>(
             `${API_BASE_URL}/students/${act.student_id}/subjects`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           return {
             id: act.id,
             student_id: act.student_id,
-            subjects: subjectResponse.data.data || [],
+            subjects: subjectResponse.data?.data || [],
             subject_id: act.subject_id,
-            chapter: act.chapter,
-            topic: act.topic,
-            notes: act.notes,
-            homework: act.homework,
+            chapter: act.chapter ?? "",
+            topic: act.topic ?? "",
+            notes: act.notes ?? "",
+            homework: act.homework ?? "",
+            homework_status: act.homework_status ?? "not_done",
+            attachments: act.attachments || [],
           };
         })
       );
@@ -132,10 +228,10 @@ export default function DailyActivitiesPage() {
   // --------------------------
   const loadHistoryActivities = async (date?: string) => {
     try {
-      const params: any = {};
+      const params: Record<string, string> = {};
       if (date) params.date = date;
 
-      const response = await axios.get(
+      const response = await axios.get<{ data: HistoryActivityRow[] }>(
         `${API_BASE_URL}/teacher/daily-activities`,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -143,7 +239,7 @@ export default function DailyActivitiesPage() {
         }
       );
 
-      setHistoryActivities(response.data.data || []);
+      setHistoryActivities(response.data?.data || []);
     } catch (error) {
       console.error("Error loading history activities:", error);
     }
@@ -161,7 +257,7 @@ export default function DailyActivitiesPage() {
       );
 
       setHistoryActivities((prev) =>
-        prev.map((act: any) =>
+        prev.map((act) =>
           act.id === activityId ? { ...act, homework_status: newStatus } : act
         )
       );
@@ -179,7 +275,7 @@ const handleSelectStudent = async (
   currentSubjectId: number | null = null
 ) => {
   try {
-    const response = await axios.get(
+    const response = await axios.get<{ data: SubjectOption[] }>(
       `${API_BASE_URL}/students/${studentId}/subjects`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -188,7 +284,7 @@ const handleSelectStudent = async (
     updated[index] = {
       ...updated[index],
       student_id: studentId,
-      subjects: response.data.data || [],
+      subjects: response.data?.data || [],
       subject_id: currentSubjectId ?? updated[index].subject_id ?? "",
     };
     setActivities(updated);
@@ -217,7 +313,11 @@ const handleSelectStudent = async (
   // --------------------------
   // Handle change per field
   // --------------------------
-  const handleChange = (index: number, field: string, value: any) => {
+  const handleChange = <K extends keyof ActivityFormRow>(
+    index: number,
+    field: K,
+    value: ActivityFormRow[K],
+  ) => {
     const updated = [...activities];
     updated[index][field] = value;
     setActivities(updated);
@@ -238,6 +338,7 @@ const handleSelectStudent = async (
         topic: "",
         notes: "",
         homework: "",
+        attachments: [],
       },
     ]);
   };
@@ -247,9 +348,22 @@ const handleSelectStudent = async (
   // --------------------------
   const submitActivities = async () => {
     try {
+      const formattedActivities = activities.map((activity) => ({
+        id: activity.id,
+        student_id:
+          activity.student_id !== "" ? Number(activity.student_id) : undefined,
+        subject_id:
+          activity.subject_id !== "" ? Number(activity.subject_id) : undefined,
+        chapter: activity.chapter || null,
+        topic: activity.topic || null,
+        notes: activity.notes || null,
+        homework: activity.homework || null,
+        homework_status: activity.homework_status ?? undefined,
+      }));
+
       await axios.post(
         `${API_BASE_URL}/daily-activities`,
-        { activities },
+        { activities: formattedActivities },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       alert("Activities saved successfully!");
@@ -265,7 +379,10 @@ const handleSelectStudent = async (
   // Remove an activity row
   // --------------------------
   const removeActivityRow = async (index: number) => {
-   const activity: any = activities[index];
+   const activity = activities[index];
+   if (!activity) {
+     return;
+   }
 
     // If this row is not saved yet, just remove it from state
     if (!activity.id) {
@@ -286,6 +403,175 @@ const handleSelectStudent = async (
       console.error("Error deleting activity:", error);
       alert("Failed to delete activity.");
     }
+  };
+
+  const getAttachmentUrl = (attachment: ActivityAttachment) => {
+    if (attachment.url) return attachment.url;
+    return `${STORAGE_BASE_URL}/${attachment.path}`;
+  };
+
+  const ensureActivityExists = async (index: number) => {
+    const activity = activities[index];
+    if (!activity) return null;
+
+    if (!token) {
+      alert("Authentication error. Please log in again.");
+      return null;
+    }
+
+    if (activity.id) {
+      return activity.id;
+    }
+
+    if (!activity.student_id || !activity.subject_id) {
+      alert("Select a student and subject before uploading attachments.");
+      return null;
+    }
+
+    try {
+      const payload = {
+        activities: [
+          {
+            id: activity.id,
+            student_id: Number(activity.student_id),
+            subject_id: Number(activity.subject_id),
+            chapter: activity.chapter || null,
+            topic: activity.topic || null,
+            notes: activity.notes || null,
+            homework: activity.homework || null,
+            homework_status: activity.homework_status ?? undefined,
+          },
+        ],
+      };
+
+      const response = await axios.post(
+        `${API_BASE_URL}/daily-activities`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const saved = response.data?.data?.[0];
+      if (saved?.id) {
+        setActivities((prev) => {
+          const updated = [...prev];
+          updated[index] = {
+            ...updated[index],
+            ...saved,
+            attachments: saved.attachments || [],
+          } as ActivityFormRow;
+          return updated;
+        });
+        return saved.id;
+      }
+    } catch (error) {
+      console.error("Error saving activity before upload:", error);
+      alert(
+        "Failed to save the activity before uploading attachments. Please try again.",
+      );
+    }
+
+    return null;
+  };
+
+  const handleActivityAttachmentUpload = async (
+    index: number,
+    files: File[],
+  ) => {
+    if (!files.length) return;
+
+    const activityId = await ensureActivityExists(index);
+    if (!activityId || !token) return;
+
+    try {
+      setUploadingAttachmentId(activityId);
+
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await axios.post(
+          `${API_BASE_URL}/daily-activities/${activityId}/attachments`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        const uploaded = response.data?.data;
+        if (uploaded) {
+          setActivities((prev) => {
+            const updated = [...prev];
+            const row = { ...updated[index] } as ActivityFormRow;
+            const existing = row.attachments || [];
+            row.attachments = [uploaded, ...existing];
+            row.id = activityId;
+            updated[index] = row;
+            return updated;
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error uploading attachment:", error);
+      alert("Failed to upload attachment. Please try again.");
+    } finally {
+      setUploadingAttachmentId(null);
+    }
+  };
+
+  const handleDeleteAttachment = async (
+    activityId: number | null,
+    attachmentId: number,
+    index: number,
+  ) => {
+    if (!activityId || !token) return;
+
+    try {
+      setDeletingAttachmentId(attachmentId);
+      await axios.delete(
+        `${API_BASE_URL}/daily-activities/${activityId}/attachments/${attachmentId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      setActivities((prev) => {
+        const updated = [...prev];
+        const row = { ...updated[index] } as ActivityFormRow;
+        row.attachments = (row.attachments || []).filter(
+          (attachment) => attachment.id !== attachmentId,
+        );
+        updated[index] = row;
+        return updated;
+      });
+    } catch (error) {
+      console.error("Error deleting attachment:", error);
+      alert("Failed to delete attachment.");
+    } finally {
+      setDeletingAttachmentId(null);
+    }
+  };
+
+  const renderReadOnlyAttachments = (
+    attachments?: ActivityAttachment[],
+  ) => {
+    if (!attachments || attachments.length === 0) {
+      return <span className="text-sm text-gray-500">-</span>;
+    }
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {attachments.map((file) => (
+          <button
+            key={file.id}
+            type="button"
+            className="text-blue-600 underline text-xs"
+            onClick={() => setPreviewAttachment(file)}
+          >
+            {file.original_name}
+          </button>
+        ))}
+      </div>
+    );
   };
 
    // --------------------------
@@ -319,15 +605,15 @@ const handleSelectStudent = async (
 
        // Reload activities so per-student list reflects new entries
        loadActivities();
-     } catch (error: any) {
-       console.error("Error saving batch activity:", error);
-       if (error?.response?.data?.message) {
-         alert(error.response.data.message);
-       } else {
-         alert("Failed to save batch activity.");
-       }
-     }
-   };
+    } catch (error: unknown) {
+      console.error("Error saving batch activity:", error);
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else {
+        alert("Failed to save batch activity.");
+      }
+    }
+  };
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
@@ -379,6 +665,7 @@ const handleSelectStudent = async (
                   <th className="border px-2 py-1">Chapter</th>
                   <th className="border px-2 py-1">Topic</th>
                   <th className="border px-2 py-1">Homework</th>
+                  <th className="border px-2 py-1">Attachments</th>
                   <th className="border px-2 py-1">Homework Status</th>
                 </tr>
               </thead>
@@ -393,7 +680,7 @@ const handleSelectStudent = async (
                     </td>
                   </tr>
                 ) : (
-                  historyActivities.map((act: any) => (
+                  historyActivities.map((act) => (
                     <tr key={act.id}>
                       <td className="border px-2 py-1">
                         {act.activity_date}
@@ -412,6 +699,9 @@ const handleSelectStudent = async (
                       </td>
                       <td className="border px-2 py-1">
                         {act.homework ?? "-"}
+                      </td>
+                      <td className="border px-2 py-1">
+                        {renderReadOnlyAttachments(act.attachments)}
                       </td>
                       <td className="border px-2 py-1">
                         <select
@@ -557,7 +847,7 @@ const handleSelectStudent = async (
                 }
               >
                 <option value="">Select Subject</option>
-                {activity.subjects?.map((sub: any) => (
+                {activity.subjects?.map((sub) => (
                   <option key={sub.id} value={sub.id}>
                     {sub.subject}
                   </option>
@@ -598,6 +888,69 @@ const handleSelectStudent = async (
             onChange={(e) => handleChange(index, "homework", e.target.value)}
           ></textarea>
 
+              <div className="mb-3">
+                <label className="block font-semibold mb-1">Attachments</label>
+                {activity.attachments?.length ? (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {activity.attachments.map((file) => (
+                      <div
+                        key={file.id}
+                        className="flex items-center gap-2 border rounded px-2 py-1 bg-white"
+                      >
+                        <span className="text-sm truncate max-w-[140px]">
+                          {file.original_name}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="link"
+                          onClick={() => setPreviewAttachment(file)}
+                        >
+                          View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline-danger"
+                          disabled={deletingAttachmentId === file.id}
+                          onClick={() =>
+                            handleDeleteAttachment(activity.id, file.id, index)
+                          }
+                        >
+                          {deletingAttachmentId === file.id ? "Removing" : "Remove"}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 mb-2">
+                    No attachments yet.
+                  </p>
+                )}
+
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf"
+                  className="w-full border p-2"
+                  disabled={
+                    !activity.student_id ||
+                    !activity.subject_id ||
+                    (activity.id !== null && uploadingAttachmentId === activity.id)
+                  }
+                  onChange={(e) => {
+                    const files = e.target.files
+                      ? Array.from(e.target.files)
+                      : [];
+                    if (files.length) {
+                      handleActivityAttachmentUpload(index, files);
+                    }
+                    e.target.value = "";
+                  }}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Supported formats: images or PDFs up to 10&nbsp;MB.
+                </p>
+              </div>
+
           <div className="flex justify-end mt-2">
             <Button
               variant="outline-danger"
@@ -616,6 +969,39 @@ const handleSelectStudent = async (
           </div>
         </>
       )}
+
+      <Modal
+        show={!!previewAttachment}
+        onHide={() => setPreviewAttachment(null)}
+        centered
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Attachment Preview</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {previewAttachment ? (
+            previewAttachment.file_type === "pdf" ? (
+              <iframe
+                title="Attachment PDF"
+                src={`${getAttachmentUrl(previewAttachment)}#toolbar=0`}
+                className="w-full h-[70vh]"
+              ></iframe>
+            ) : (
+              <img
+                src={getAttachmentUrl(previewAttachment)}
+                alt={previewAttachment.original_name}
+                className="max-h-[70vh] w-full object-contain"
+              />
+            )
+          ) : null}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setPreviewAttachment(null)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

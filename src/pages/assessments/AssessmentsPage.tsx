@@ -52,13 +52,20 @@ interface AssessmentFileRow {
   student_id?: number | null;
   uploaded_at?: string | null;
   student?: { id: number; name: string } | null;
+  file_type?: 'image' | 'pdf' | 'other';
+  url?: string | null;
 }
 
 export default function AssessmentsPage() {
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
-  const STORAGE_BASE_URL =
-    import.meta.env.VITE_STORAGE_BASE_URL ?? 'http://coachify.local/storage';
+const STORAGE_BASE_URL =
+  import.meta.env.VITE_STORAGE_BASE_URL ?? 'http://coachify.local/storage';
+
+const getAssessmentFileUrl = (file: AssessmentFileRow) => {
+  if (file.url) return file.url;
+  return `${STORAGE_BASE_URL}/${file.path}`;
+};
 
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,6 +115,8 @@ export default function AssessmentsPage() {
   >(null);
   const [uploadAssessmentFileType, setUploadAssessmentFileType] =
     useState<AssessmentFileType>('question_paper');
+  const [previewAssessmentFile, setPreviewAssessmentFile] =
+    useState<AssessmentFileRow | null>(null);
 
   const token = localStorage.getItem('authToken');
   const tenantId = localStorage.getItem('tenant_id');
@@ -172,11 +181,14 @@ export default function AssessmentsPage() {
           ? `${API_BASE_URL}/teachers/students`
           : `${API_BASE_URL}/students`;
 
-      const response = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get<{ success: boolean; data: StudentOption[] }>(
+        url,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (response.data.success) {
-        const list = (response.data.data || []).map((item: any) => ({
+        const list = (response.data.data || []).map((item) => ({
           id: item.id,
           name: item.name,
         }));
@@ -869,14 +881,28 @@ export default function AssessmentsPage() {
                   </thead>
                   <tbody>
                     {assessmentFiles.map(file => {
-                      const url = `${STORAGE_BASE_URL}/${file.path}`;
+                      const url = getAssessmentFileUrl(file);
                       return (
                         <tr key={file.id}>
                           <td className="text-capitalize">{file.type}</td>
                           <td>
-                            <a href={url} target="_blank" rel="noreferrer">
+                            <button
+                              type="button"
+                              className="btn btn-link btn-sm px-0"
+                              onClick={() => setPreviewAssessmentFile(file)}
+                            >
                               {file.original_name}
-                            </a>
+                            </button>
+                            <div>
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs"
+                              >
+                                Download
+                              </a>
+                            </div>
                           </td>
                           <td>
                             {file.student
@@ -897,6 +923,44 @@ export default function AssessmentsPage() {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setFilesModalAssessment(null)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        show={!!previewAssessmentFile}
+        onHide={() => setPreviewAssessmentFile(null)}
+        centered
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Attachment Preview</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {previewAssessmentFile ? (
+            previewAssessmentFile.file_type === 'pdf' ? (
+              <iframe
+                title="Assessment File PDF"
+                src={`${getAssessmentFileUrl(previewAssessmentFile)}#toolbar=0`}
+                className="w-100"
+                style={{ minHeight: '70vh' }}
+              ></iframe>
+            ) : (
+              <img
+                src={getAssessmentFileUrl(previewAssessmentFile)}
+                alt={previewAssessmentFile.original_name}
+                className="w-100"
+                style={{ maxHeight: '70vh', objectFit: 'contain' }}
+              />
+            )
+          ) : null}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setPreviewAssessmentFile(null)}
+          >
             Close
           </Button>
         </Modal.Footer>
