@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Button, Modal } from 'react-bootstrap';
 import Icon from '../../components/common/Icon.tsx';
+import { ROLES } from '../../constants/roles';
 
 interface AssessmentResultRow {
   marks_obtained: number;
@@ -29,6 +30,8 @@ interface Assessment {
   total_marks: number;
   scheduled_date?: string | null;
   status: string;
+  is_admin_approved?: boolean;
+  approved_at?: string | null;
   subject?: { id: number; subject: string };
   class?: { id: number; name: string };
   teacher?: { id: number; name: string };
@@ -54,6 +57,8 @@ interface AssessmentFileRow {
   student?: { id: number; name: string } | null;
   file_type?: 'image' | 'pdf' | 'other';
   url?: string | null;
+  is_admin_approved?: boolean;
+  approved_at?: string | null;
 }
 
 export default function AssessmentsPage() {
@@ -104,6 +109,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   >([]);
 
   const [userRole, setUserRole] = useState<string>('');
+  const isAdmin = userRole === ROLES.COACHING_ADMIN;
 
   const [filesModalAssessment, setFilesModalAssessment] =
     useState<Assessment | null>(null);
@@ -148,6 +154,40 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
       console.error('Error fetching assessments:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateAssessmentApproval = async (
+    assessmentId: number,
+    approved = true,
+  ) => {
+    try {
+      const response = await axios.patch(
+        `${API_BASE_URL}/assessments/${assessmentId}/approval`,
+        { approved },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+          },
+        },
+      );
+
+      if (response.data.success) {
+        const updated = response.data.data as Assessment;
+        setAssessments(prev =>
+          prev.map(asm => (asm.id === assessmentId ? updated : asm)),
+        );
+        if (assignModalAssessment && assignModalAssessment.id === assessmentId) {
+          setAssignModalAssessment(updated);
+        }
+        if (filesModalAssessment && filesModalAssessment.id === assessmentId) {
+          setFilesModalAssessment(updated);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating approval:', error);
+      alert('Failed to update approval.');
     }
   };
 
@@ -298,6 +338,26 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
       }
     } catch (error) {
       console.error('Error loading assessment files:', error);
+    }
+  };
+
+  const updateAttachmentApproval = async (
+    attachmentId: number,
+    approved = true,
+  ) => {
+    try {
+      await axios.patch(
+        `${API_BASE_URL}/assessments/files/${attachmentId}/approval`,
+        { approved },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      if (filesModalAssessment) {
+        await fetchAssessmentFiles(filesModalAssessment.id);
+      }
+    } catch (error) {
+      console.error('Error updating attachment approval:', error);
+      alert('Failed to update attachment approval.');
     }
   };
 
@@ -510,6 +570,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                     <th>Teacher</th>
                     <th>Date</th>
                     <th>Status</th>
+                    <th>Approval</th>
                     <th className="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -522,6 +583,35 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                       <td>{asm.teacher?.name ?? '-'}</td>
                       <td>{asm.scheduled_date ?? '-'}</td>
                       <td className="text-capitalize">{asm.status}</td>
+                      <td>
+                        <div className="d-flex flex-column gap-1">
+                          <span
+                            className={
+                              asm.is_admin_approved
+                                ? 'badge bg-success-subtle text-success'
+                                : 'badge bg-warning-subtle text-warning'
+                            }
+                          >
+                            {asm.is_admin_approved ? 'Approved' : 'Pending'}
+                          </span>
+                          {isAdmin && (
+                            <button
+                              type="button"
+                              className="btn btn-link btn-sm px-0 text-decoration-none"
+                              onClick={() =>
+                                updateAssessmentApproval(
+                                  asm.id,
+                                  !asm.is_admin_approved,
+                                )
+                              }
+                            >
+                              {asm.is_admin_approved
+                                ? 'Mark as pending'
+                                : 'Approve'}
+                            </button>
+                          )}
+                        </div>
+                      </td>
                       <td className="text-center">
                         <Button
                           variant="link"
@@ -877,6 +967,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                       <th>File</th>
                       <th>Student</th>
                       <th>Uploaded At</th>
+                      <th>Approval</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -912,6 +1003,35 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                               : '-'}
                           </td>
                           <td>{file.uploaded_at ?? '-'}</td>
+                          <td>
+                            <div className="d-flex flex-column gap-1">
+                              <span
+                                className={
+                                  file.is_admin_approved
+                                    ? 'badge bg-success-subtle text-success'
+                                    : 'badge bg-warning-subtle text-warning'
+                                }
+                              >
+                                {file.is_admin_approved ? 'Approved' : 'Pending'}
+                              </span>
+                              {isAdmin && (
+                                <button
+                                  type="button"
+                                  className="btn btn-link btn-sm px-0 text-decoration-none"
+                                  onClick={() =>
+                                    updateAttachmentApproval(
+                                      file.id,
+                                      !file.is_admin_approved,
+                                    )
+                                  }
+                                >
+                                  {file.is_admin_approved
+                                    ? 'Mark as pending'
+                                    : 'Approve'}
+                                </button>
+                              )}
+                            </div>
+                          </td>
                         </tr>
                       );
                     })}

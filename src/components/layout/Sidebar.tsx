@@ -167,6 +167,15 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
           {/* Show Company only for coaching_admin */}
           {user.role === ROLES.COACHING_ADMIN && (
             <>
+              <li>
+                <NavLink
+                  to="/approvals"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:check-decagram" className="menu-icon" />
+                  <span>Approvals</span>
+                </NavLink>
+              </li>
               {/*
               <li>
                 <NavLink

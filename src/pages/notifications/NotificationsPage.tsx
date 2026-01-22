@@ -109,6 +109,10 @@ export default function NotificationsPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [reloadFlag, setReloadFlag] = useState(0)
+  const [sendingNotificationId, setSendingNotificationId] = useState<number | null>(
+    null,
+  )
 
   const token =
     typeof window !== 'undefined'
@@ -171,7 +175,19 @@ export default function NotificationsPage() {
       })
 
     return () => controller.abort()
-  }, [token, page, perPage, statusFilter, typeFilter, search, startDate, endDate, sortBy, sortDirection])
+  }, [
+    token,
+    page,
+    perPage,
+    statusFilter,
+    typeFilter,
+    search,
+    startDate,
+    endDate,
+    sortBy,
+    sortDirection,
+    reloadFlag,
+  ])
 
   const statusOptions = useMemo<Option[]>(() => {
     const base: Option[] = [{ value: 'all', label: 'All statuses' }]
@@ -225,6 +241,27 @@ export default function NotificationsPage() {
     const normalized = status.toLowerCase()
     const className = statusClassMap[normalized] ?? 'badge bg-neutral-100 text-neutral-600'
     return <span className={className}>{normalized.replace('_', ' ')}</span>
+  }
+
+  const refreshTable = () => setReloadFlag((previous) => previous + 1)
+
+  const handleSendNotification = async (notificationId: number) => {
+    if (!token) return
+
+    setSendingNotificationId(notificationId)
+    try {
+      await axios.post(
+        `${API_BASE_URL}/notifications/${notificationId}/send`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      refreshTable()
+    } catch (apiError) {
+      console.error('Failed to send notification', apiError)
+      alert('Unable to send notification. Please review it and try again.')
+    } finally {
+      setSendingNotificationId(null)
+    }
   }
 
   return (
@@ -393,19 +430,20 @@ export default function NotificationsPage() {
                   <th>Created</th>
                   <th>Sent at</th>
                   <th>Last error</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading && (
                   <tr>
-                    <td colSpan={9} className="text-center py-4">
+                    <td colSpan={10} className="text-center py-4">
                       Loading notifications…
                     </td>
                   </tr>
                 )}
                 {!loading && records.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="text-center py-4">
+                    <td colSpan={10} className="text-center py-4">
                       {error ?? 'No notifications found for the selected filters.'}
                     </td>
                   </tr>
@@ -448,6 +486,22 @@ export default function NotificationsPage() {
                         <span className="text-sm text-danger-600">
                           {truncate(notification.last_error, 80)}
                         </span>
+                      </td>
+                      <td>
+                        {notification.status.toLowerCase() === 'sent' ? (
+                          <span className="text-success-600 text-sm">Sent</span>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary btn-sm"
+                            disabled={sendingNotificationId === notification.id}
+                            onClick={() => handleSendNotification(notification.id)}
+                          >
+                            {sendingNotificationId === notification.id
+                              ? 'Sending...'
+                              : 'Send now'}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
