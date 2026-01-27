@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Button, Modal } from 'react-bootstrap';
 import Icon from '../../components/common/Icon.tsx';
@@ -41,6 +41,18 @@ interface Assessment {
 interface StudentOption {
   id: number;
   name: string;
+  classId: number | null;
+}
+
+interface StudentApiResponseItem {
+  id: number;
+  name: string;
+  student_profile?: {
+    class?: number | string | null;
+  } | null;
+  studentProfile?: {
+    class?: number | string | null;
+  } | null;
 }
 
 type AssessmentFileType = 'question_paper' | 'answer_sheet' | 'other';
@@ -89,6 +101,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   );
   const [classes, setClasses] = useState<{ id: number; name: string }[]>([]);
   const [students, setStudents] = useState<StudentOption[]>([]);
+  const [studentsLoaded, setStudentsLoaded] = useState(false);
 
   const [assignModalAssessment, setAssignModalAssessment] =
     useState<Assessment | null>(null);
@@ -215,29 +228,69 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   };
 
   const fetchStudents = async () => {
+    setStudentsLoaded(false);
     try {
       const url =
         userRole === 'teacher'
           ? `${API_BASE_URL}/teachers/students`
           : `${API_BASE_URL}/students`;
 
-      const response = await axios.get<{ success: boolean; data: StudentOption[] }>(
+      const response = await axios.get<{
+        success: boolean;
+        data: StudentApiResponseItem[];
+      }>(
         url,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
       if (response.data.success) {
-        const list = (response.data.data || []).map((item) => ({
-          id: item.id,
-          name: item.name,
-        }));
+        const list = (response.data.data || []).map(item => {
+          const profile = item.student_profile ?? item.studentProfile ?? null;
+          const rawClass = profile?.class ?? null;
+          let classId: number | null = null;
+          if (rawClass !== null && rawClass !== undefined) {
+            const parsed = Number(rawClass);
+            classId = Number.isNaN(parsed) ? null : parsed;
+          }
+
+          const student: StudentOption = {
+            id: item.id,
+            name: item.name,
+            classId,
+          };
+          return student;
+        });
         setStudents(list);
       }
     } catch (error) {
       console.error('Error loading students:', error);
+    } finally {
+      setStudentsLoaded(true);
     }
   };
+
+  const assignClassId = useMemo(() => {
+    const raw =
+      assignModalAssessment?.class_id ?? assignModalAssessment?.class?.id ?? null;
+    if (raw === null || raw === undefined) return null;
+    const parsed = Number(raw);
+    return Number.isNaN(parsed) ? null : parsed;
+  }, [assignModalAssessment]);
+
+  const filteredStudents = useMemo(() => {
+    if (assignClassId === null) return students;
+    return students.filter(st => st.classId === assignClassId);
+  }, [assignClassId, students]);
+
+  useEffect(() => {
+    if (assignClassId === null || !studentsLoaded) return;
+    setSelectedStudentIds(prev =>
+      prev.filter(id =>
+        students.some(st => st.id === id && st.classId === assignClassId),
+      ),
+    );
+  }, [assignClassId, students, studentsLoaded]);
 
   useEffect(() => {
     fetchAssessments();
@@ -767,23 +820,31 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
             <div className="border rounded p-2"
               style={{ maxHeight: '260px', overflowY: 'auto' }}
             >
-              {students.map(st => (
-                <div key={st.id} className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id={`student-${st.id}`}
-                    checked={selectedStudentIds.includes(st.id)}
-                    onChange={() => toggleStudentSelection(st.id)}
-                  />
-                  <label
-                    className="form-check-label ms-1"
-                    htmlFor={`student-${st.id}`}
-                  >
-                    {st.name}
-                  </label>
-                </div>
-              ))}
+              {filteredStudents.length === 0 ? (
+                <p className="text-muted mb-0">
+                  {studentsLoaded
+                    ? 'No students available for this class.'
+                    : 'Loading students...'}
+                </p>
+              ) : (
+                filteredStudents.map(st => (
+                  <div key={st.id} className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id={`student-${st.id}`}
+                      checked={selectedStudentIds.includes(st.id)}
+                      onChange={() => toggleStudentSelection(st.id)}
+                    />
+                    <label
+                      className="form-check-label ms-1"
+                      htmlFor={`student-${st.id}`}
+                    >
+                      {st.name}
+                    </label>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </Modal.Body>
