@@ -101,6 +101,7 @@ export default function DailyActivitiesPage() {
     notes: "",
     homework: "",
   });
+  const [batchAttachments, setBatchAttachments] = useState<File[]>([]);
 
   const [historyActivities, setHistoryActivities] = useState<
     HistoryActivityRow[]
@@ -578,33 +579,57 @@ const handleSelectStudent = async (
    // Submit batch activity for class & subject
    // --------------------------
   const submitBatchActivity = async () => {
-     try {
-       await axios.post(
-         `${API_BASE_URL}/daily-activities/batch`,
-         {
-           class_id: batchForm.class_id,
-           subject_id: batchForm.subject_id,
-           chapter: batchForm.chapter || null,
-           topic: batchForm.topic || null,
-           notes: batchForm.notes || null,
-           homework: batchForm.homework || null,
-         },
-         { headers: { Authorization: `Bearer ${token}` } }
-       );
+    try {
+      const hasAttachments = batchAttachments.length > 0;
 
-       alert("Batch activity saved successfully!");
+      if (hasAttachments) {
+        const formData = new FormData();
+        formData.append("class_id", batchForm.class_id);
+        formData.append("subject_id", batchForm.subject_id);
+        if (batchForm.chapter) formData.append("chapter", batchForm.chapter);
+        if (batchForm.topic) formData.append("topic", batchForm.topic);
+        if (batchForm.notes) formData.append("notes", batchForm.notes);
+        if (batchForm.homework) formData.append("homework", batchForm.homework);
 
-       setBatchForm({
-         class_id: "",
-         subject_id: "",
-         chapter: "",
-         topic: "",
-         notes: "",
-         homework: "",
-       });
+        batchAttachments.forEach((file) => {
+          formData.append("attachments[]", file);
+        });
 
-       // Reload activities so per-student list reflects new entries
-       loadActivities();
+        await axios.post(`${API_BASE_URL}/daily-activities/batch`, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      } else {
+        await axios.post(
+          `${API_BASE_URL}/daily-activities/batch`,
+          {
+            class_id: batchForm.class_id,
+            subject_id: batchForm.subject_id,
+            chapter: batchForm.chapter || null,
+            topic: batchForm.topic || null,
+            notes: batchForm.notes || null,
+            homework: batchForm.homework || null,
+          },
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
+      }
+
+      alert("Batch activity saved successfully!");
+
+      setBatchForm({
+        class_id: "",
+        subject_id: "",
+        chapter: "",
+        topic: "",
+        notes: "",
+        homework: "",
+      });
+      setBatchAttachments([]);
+
+      // Reload activities so per-student list reflects new entries
+      loadActivities();
     } catch (error: unknown) {
       console.error("Error saving batch activity:", error);
       if (axios.isAxiosError(error) && error.response?.data?.message) {
@@ -801,6 +826,56 @@ const handleSelectStudent = async (
                 setBatchForm((prev) => ({ ...prev, homework: e.target.value }))
               }
             ></textarea>
+
+            <div className="mb-4">
+              <label className="block font-semibold mb-1">Attachments</label>
+              {batchAttachments.length ? (
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {batchAttachments.map((file, index) => (
+                    <div
+                      key={`${file.name}-${index}`}
+                      className="flex items-center gap-2 border rounded px-2 py-1 bg-white"
+                    >
+                      <span className="text-sm truncate max-w-[160px]">
+                        {file.name}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline-danger"
+                        onClick={() =>
+                          setBatchAttachments((prev) =>
+                            prev.filter((_, idx) => idx !== index),
+                          )
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 mb-2">
+                  No attachments yet.
+                </p>
+              )}
+
+              <input
+                type="file"
+                multiple
+                accept="image/*,.pdf"
+                className="w-full border p-2"
+                onChange={(e) => {
+                  const files = e.target.files ? Array.from(e.target.files) : [];
+                  if (files.length) {
+                    setBatchAttachments((prev) => [...files, ...prev]);
+                  }
+                  e.target.value = "";
+                }}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Supported formats: images or PDFs up to 10&nbsp;MB.
+              </p>
+            </div>
           </div>
 
           <div className="flex gap-3 my-3">
