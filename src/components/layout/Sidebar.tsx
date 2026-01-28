@@ -2,6 +2,7 @@ import type { MouseEvent } from 'react'
 import { NavLink } from 'react-router-dom'
 import Icon from '../common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
+import { getTenantBranding, getTenantBrandName } from '../../utils/branding'
 
 type SidebarProps = {
   isCollapsed: boolean
@@ -21,6 +22,8 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
   const user = JSON.parse(
     window.localStorage.getItem('authUser') || '{}',
   )
+  const branding = getTenantBranding()
+  const brandName = getTenantBrandName()
 
   const sidebarClassNames = [
     'sidebar',
@@ -58,18 +61,18 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
       <div>
         <NavLink to="/dashboard" className="sidebar-logo">
           <img
-            src="/assets/images/logo.png"
-            alt="Coachify logo"
+            src={branding.logoLight}
+            alt={`${brandName} logo`}
             className="light-logo"
           />
           <img
-            src="/assets/images/logo-light.png"
-            alt="Coachify logo"
+            src={branding.logoDark}
+            alt={`${brandName} logo`}
             className="dark-logo"
           />
           <img
-            src="/assets/images/logo-icon.png"
-            alt="Coachify logo icon"
+            src={branding.logoIcon}
+            alt={`${brandName} icon`}
             className="logo-icon"
           />
         </NavLink>

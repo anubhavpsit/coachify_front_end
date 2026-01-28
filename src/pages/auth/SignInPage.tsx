@@ -3,6 +3,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
+import {
+  getTenantBranding,
+  getTenantBrandName,
+  setTenantBranding,
+} from '../../utils/branding'
 
 type LoginUser = {
   id: number
@@ -37,6 +42,8 @@ export default function SignInPage() {
   const [error, setError] = useState<string | null>(null)
   const [tenantId, setTenantId] = useState<number | null>(null)
   const [isTenantResolved, setIsTenantResolved] = useState(false)
+  const [branding, setBranding] = useState(getTenantBranding())
+  const [brandName, setBrandName] = useState(getTenantBrandName())
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -58,6 +65,8 @@ export default function SignInPage() {
       if (!Number.isNaN(parsed)) {
         setTenantId(parsed)
       }
+      setBranding(getTenantBranding())
+      setBrandName(getTenantBrandName())
       setIsTenantResolved(true)
       return
     }
@@ -79,7 +88,9 @@ export default function SignInPage() {
         if (tenant && typeof tenant.id === 'number') {
           setTenantId(tenant.id)
           window.localStorage.setItem('tenant_id', String(tenant.id))
-          window.localStorage.setItem('tenant', JSON.stringify(tenant))
+          const updatedBranding = setTenantBranding(tenant)
+          setBranding(updatedBranding)
+          setBrandName(getTenantBrandName())
           // ✅ APPLY THEME COLOR
           if (tenant.theme_color) {
             document.documentElement.style.setProperty(
@@ -170,7 +181,7 @@ export default function SignInPage() {
               className="border-0 bg-transparent mb-40 max-w-290-px p-0"
               onClick={() => navigate('/')}
             >
-              <img src="/assets/images/logo.png" alt="Coachify" />
+              <img src={branding.logoLight} alt={`${brandName} logo`} />
             </button>
             <h4 className="mb-12">Sign in to your account</h4>
             <p className="mb-32 text-secondary-light text-lg">

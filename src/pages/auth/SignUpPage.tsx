@@ -2,10 +2,13 @@ import type { FormEvent } from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Icon from '../../components/common/Icon.tsx'
+import { getTenantBranding, getTenantBrandName } from '../../utils/branding'
 
 export default function SignUpPage() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const branding = getTenantBranding()
+  const brandName = getTenantBrandName()
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -27,7 +30,7 @@ export default function SignUpPage() {
               className="border-0 bg-transparent mb-40 max-w-290-px p-0"
               onClick={() => navigate('/')}
             >
-              <img src="/assets/images/logo.png" alt="Coachify" />
+              <img src={branding.logoLight} alt={`${brandName} logo`} />
             </button>
             <h4 className="mb-12">Sign up to your account</h4>
             <p className="mb-32 text-secondary-light text-lg">
