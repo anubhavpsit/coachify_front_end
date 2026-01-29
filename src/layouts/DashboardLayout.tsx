@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from '../components/layout/Sidebar.tsx'
 import Topbar from '../components/layout/Topbar.tsx'
 import Footer from '../components/layout/Footer.tsx'
-import ThemeCustomizer from '../components/theme/ThemeCustomizer.tsx'
+//import ThemeCustomizer from '../components/theme/ThemeCustomizer.tsx'
 import { useTheme } from '../hooks/useTheme.ts'
 
 export default function DashboardLayout() {
@@ -12,8 +12,9 @@ export default function DashboardLayout() {
   const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth >= 1200 : true,
   )
-  const [isCustomizerOpen, setCustomizerOpen] = useState(false)
-  const { theme, setTheme, toggleTheme } = useTheme()
+  //const [isCustomizerOpen, setCustomizerOpen] = useState(false)
+  //const { theme, setTheme, toggleTheme } = useTheme()
+  const { theme, toggleTheme } = useTheme()
 
   const themeLabel = theme === 'dark' ? 'dark' : 'light'
 
@@ -77,7 +78,7 @@ export default function DashboardLayout() {
 
         <Footer />
       </main>
-
+      {/*
       <ThemeCustomizer
         isOpen={isCustomizerOpen}
         onToggle={() => setCustomizerOpen((previous) => !previous)}
@@ -85,7 +86,7 @@ export default function DashboardLayout() {
         theme={theme}
         setTheme={setTheme}
       />
-
+      */}
       {!isDesktop && (
         <div
           className={`body-overlay${isSidebarOpen ? ' show' : ''}`}

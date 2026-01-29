@@ -4,15 +4,15 @@ export default function Footer() {
       <div className="row align-items-center justify-content-between">
         <div className="col-auto">
           <p className="mb-0 text-sm text-secondary-light">
-            © {new Date().getFullYear()} Coachify. All Rights Reserved.
+            © {new Date().getFullYear()} Classly. All Rights Reserved.
           </p>
         </div>
-        <div className="col-auto">
+{/*        <div className="col-auto">
           <p className="mb-0 text-sm text-secondary-light">
             Built on&nbsp;
             <span className="text-primary-600 fw-semibold">Wowdash UI</span>
           </p>
-        </div>
+        </div>*/}
       </div>
     </footer>
   )
