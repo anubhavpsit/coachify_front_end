@@ -77,6 +77,13 @@ export default function DailyActivityApprovalsPage() {
     null,
   )
 
+  const formatAddedOn = (isoString?: string | null) => {
+    if (!isoString) return '-';
+    const parsedDate = new Date(isoString);
+    if (Number.isNaN(parsedDate.getTime())) return '-';
+    return parsedDate.toLocaleString();
+  };
+
   const authUserRaw = typeof window !== 'undefined'
     ? window.localStorage.getItem('authUser')
     : null
@@ -352,7 +359,11 @@ export default function DailyActivityApprovalsPage() {
             <tbody>
               {activities.map(activity => (
                 <tr key={activity.id}>
-                  <td>{activity.activity_date}</td>
+                  <td>
+                    {activity?.activity_date
+                      ? formatAddedOn(activity.activity_date)
+                      : '-'}
+                  </td>
                   <td>{activity.teacher?.name ?? '-'}</td>
                   <td>{activity.student?.name ?? '-'}</td>
                   <td>{activity.subject?.subject ?? '-'}</td>

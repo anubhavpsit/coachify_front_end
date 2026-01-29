@@ -11,7 +11,7 @@ type SidebarProps = {
 }
 
 const linkBaseClass =
-  'd-flex align-items-center gap-2 w-100 text-md fw-medium hover-text-primary'
+  'd-flex align-items-center gap-2 w-100 text-md fw-medium'
 
 function navLinkClass(isActive: boolean) {
   const activeClass = isActive ? ' active-page' : ''
@@ -104,7 +104,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
                   to="/students"
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
-                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <Icon icon="mdi:account-school" className="menu-icon" />
                   <span>Students</span>
                 </NavLink>
               </li>
@@ -126,7 +126,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
                   to="/teachers"
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
-                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <Icon icon="mdi:human-male-board" className="menu-icon" />
                   <span>Teachers</span>
                 </NavLink>
               </li>
@@ -204,7 +204,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
                   to="/classes"
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
-                  <Icon icon="mdi:book-outline" className="menu-icon" />
+                  <Icon icon="mdi:library-outline" className="menu-icon" />
                   <span>Classes</span>
                 </NavLink>
               </li>

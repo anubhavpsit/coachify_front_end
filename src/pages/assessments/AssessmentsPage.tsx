@@ -84,6 +84,13 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   return `${STORAGE_BASE_URL}/${file.path}`;
 };
 
+  const formatAddedOn = (isoString?: string | null) => {
+    if (!isoString) return '-';
+    const parsedDate = new Date(isoString);
+    if (Number.isNaN(parsedDate.getTime())) return '-';
+    return parsedDate.toLocaleString();
+  };
+
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -634,7 +641,11 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                       <td>{asm.subject?.subject ?? '-'}</td>
                       <td>{asm.class?.name ?? '-'}</td>
                       <td>{asm.teacher?.name ?? '-'}</td>
-                      <td>{asm.scheduled_date ?? '-'}</td>
+                      <td>
+                        {asm?.scheduled_date
+                          ? formatAddedOn(asm.scheduled_date)
+                          : '-'}
+                      </td>
                       <td className="text-capitalize">{asm.status}</td>
                       <td>
                         <div className="d-flex flex-column gap-1">

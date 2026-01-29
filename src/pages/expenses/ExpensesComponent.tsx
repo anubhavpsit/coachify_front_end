@@ -64,6 +64,15 @@ export default function ExpensesComponent() {
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 
+  const formatAddedOn = (isoString?: string | null) => {
+    if (!isoString) return '-';
+
+    const parsedDate = new Date(isoString);
+    if (Number.isNaN(parsedDate.getTime())) return '-';
+
+    return parsedDate.toLocaleDateString();
+  };
+
   useEffect(() => {
     const fetchUsers = async () => {
       setLoadingUsers(true)
@@ -330,7 +339,11 @@ export default function ExpensesComponent() {
                 <tbody>
                   {expenses.map((expense) => (
                     <tr key={expense.id}>
-                      <td>{expense.expense_date}</td>
+                      <td>
+                        {expense?.expense_date
+                          ? formatAddedOn(expense.expense_date)
+                          : '-'}
+                      </td>
                       <td>{expense.amount}</td>
                       <td>{expense.description || '-'}</td>
                       <td>{expense.user?.name || '-'}</td>
