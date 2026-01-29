@@ -169,7 +169,7 @@ export default function DashboardPage() {
                   <div className="d-flex align-items-center justify-content-between mb-12">
                     <div className="d-flex align-items-center gap-2">
                       <span className="mb-0 w-48-px h-48-px bg-base text-pink text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-group-fill"></i>
+                        <i className="ri-graduation-cap-line"></i>
                       </span>
                       <div>
                         <span className="mb-0 fw-medium text-secondary-light text-lg">
@@ -191,7 +191,7 @@ export default function DashboardPage() {
                   <div className="d-flex align-items-center justify-content-between mb-12">
                     <div className="d-flex align-items-center gap-2">
                       <span className="mb-0 w-48-px h-48-px bg-base text-purple text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-user-fill"></i>
+                        <i className="ri-presentation-line"></i>
                       </span>
                       <div>
                         <span className="mb-0 fw-medium text-secondary-light text-lg">
@@ -213,7 +213,7 @@ export default function DashboardPage() {
                   <div className="d-flex align-items-center justify-content-between mb-12">
                     <div className="d-flex align-items-center gap-2">
                       <span className="mb-0 w-48-px h-48-px bg-base text-info-main text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-book-open-fill"></i>
+                        <i className="ri-book-open-line"></i>
                       </span>
                       <div>
                         <span className="mb-0 fw-medium text-secondary-light text-lg">
@@ -235,7 +235,7 @@ export default function DashboardPage() {
                   <div className="d-flex align-items-center justify-content-between mb-12">
                     <div className="d-flex align-items-center gap-2">
                       <span className="mb-0 w-48-px h-48-px bg-primary-50 text-primary-600 text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-bar-chart-grouped-fill"></i>
+                        <i className="ri-arrow-up-circle-line"></i>
                       </span>
                       <div>
                         <span className="mb-0 fw-medium text-secondary-light text-lg">
@@ -257,7 +257,7 @@ export default function DashboardPage() {
                   <div className="d-flex align-items-center justify-content-between mb-12">
                     <div className="d-flex align-items-center gap-2">
                       <span className="mb-0 w-48-px h-48-px bg-danger-50 text-danger-600 text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-cash-line"></i>
+                        <i className="ri-arrow-down-circle-line"></i>
                       </span>
                       <div>
                         <span className="mb-0 fw-medium text-secondary-light text-lg">
