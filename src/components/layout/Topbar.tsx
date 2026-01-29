@@ -14,14 +14,13 @@ type TopbarUser = {
 type TopbarProps = {
   onToggleSidebar: MouseEventHandler<HTMLButtonElement>
   onToggleTheme: () => void
-  themeLabel: string
+  themeLabel?: string
   isSidebarActive: boolean
 }
 
 export default function Topbar({
   onToggleSidebar,
   onToggleTheme,
-  themeLabel,
   isSidebarActive,
 }: TopbarProps) {
   const [isProfileOpen, setProfileOpen] = useState(false)
@@ -157,7 +156,6 @@ export default function Topbar({
               className="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center text-xs text-uppercase"
               onClick={onToggleTheme}
             >
-              {/*themeLabel*/}
             </button>
             <div className={`dropdown${isProfileOpen ? ' show' : ''}`}>
               <button
