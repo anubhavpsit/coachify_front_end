@@ -37,7 +37,6 @@ export default function PendingFeesCard() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [asOfDate, setAsOfDate] = useState<string | null>(null)
-  const [selectedId, setSelectedId] = useState<number | null>(null)
   const [showDetails, setShowDetails] = useState(false)
   const [details, setDetails] = useState<any | null>(null)
   const [detailsLoading, setDetailsLoading] = useState(false)
@@ -88,7 +87,6 @@ export default function PendingFeesCard() {
 
   const openDetails = async (studentId: number) => {
     if (!token) return
-    setSelectedId(studentId)
     setShowDetails(true)
     setDetails(null)
     setDetailsError(null)
