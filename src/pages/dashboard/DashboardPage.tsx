@@ -277,7 +277,7 @@ export default function DashboardPage() {
 
               <PendingActionsCard />
 
-              <PendingFeesCard />
+              {role === ROLES.COACHING_ADMIN && <PendingFeesCard />}
 
               <TeacherActivityGapsCard />
 

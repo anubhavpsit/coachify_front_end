@@ -113,6 +113,13 @@ export default function DailyActivitiesPage() {
     }
     return "";
   });
+  const [activityDate, setActivityDate] = useState<string>(() => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  });
 
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? "http://coachify.local/api/v1";
@@ -360,6 +367,7 @@ const handleSelectStudent = async (
         notes: activity.notes || null,
         homework: activity.homework || null,
         homework_status: activity.homework_status ?? undefined,
+        activity_date: activityDate || undefined,
       }));
 
       await axios.post(
@@ -441,6 +449,7 @@ const handleSelectStudent = async (
             notes: activity.notes || null,
             homework: activity.homework || null,
             homework_status: activity.homework_status ?? undefined,
+            activity_date: activityDate || undefined,
           },
         ],
       };
@@ -611,6 +620,7 @@ const handleSelectStudent = async (
             topic: batchForm.topic || null,
             notes: batchForm.notes || null,
             homework: batchForm.homework || null,
+            activity_date: activityDate || undefined,
           },
           { headers: { Authorization: `Bearer ${token}` } },
         );
@@ -754,6 +764,15 @@ const handleSelectStudent = async (
       ) : mode === "batch" ? (
         <>
           <div className="border p-4 mb-4 rounded bg-gray-50">
+            <label className="block font-semibold mb-1">Activity Date</label>
+            <input
+              type="date"
+              className="w-full border p-2 mb-3"
+              value={activityDate}
+              onChange={(e) => setActivityDate(e.target.value)}
+            />
+          </div>
+          <div className="border p-4 mb-4 rounded bg-gray-50">
             <label className="block font-semibold mb-1">Class</label>
             <select
               className="w-full border p-2 mb-3"
@@ -889,6 +908,16 @@ const handleSelectStudent = async (
         </>
       ) : (
         <>
+          <div className="border p-4 mb-4 rounded bg-gray-50">
+            <label className="block font-semibold mb-1">Activity Date</label>
+            <input
+              type="date"
+              className="w-full border p-2 mb-1"
+              value={activityDate}
+              onChange={(e) => setActivityDate(e.target.value)}
+            />
+            <p className="text-sm text-gray-500">Applies to all activities below.</p>
+          </div>
           {activities.map((activity, index) => (
             <div
               key={index}
