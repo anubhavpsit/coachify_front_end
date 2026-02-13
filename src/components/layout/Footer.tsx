@@ -1,10 +1,13 @@
+import { getTenantBrandName } from '../../utils/branding'
+
 export default function Footer() {
+  const brandName = getTenantBrandName()
   return (
     <footer className="d-footer mt-auto px-24 py-16 border-top bg-base">
       <div className="row align-items-center justify-content-between">
         <div className="col-auto">
           <p className="mb-0 text-sm text-secondary-light">
-            © {new Date().getFullYear()} Classly. All Rights Reserved.
+            © {new Date().getFullYear()} {brandName}. All Rights Reserved.
           </p>
         </div>
 {/*        <div className="col-auto">
@@ -17,4 +20,3 @@ export default function Footer() {
     </footer>
   )
 }
-

@@ -68,3 +68,44 @@ export function getTenantBrandName(fallback: string = DEFAULT_BRAND_NAME): strin
     return fallback;
   }
 }
+
+// Returns true only if the stored tenant has at least one custom logo URL.
+export function tenantHasBrandLogo(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    const rawTenant = window.localStorage.getItem('tenant');
+    if (!rawTenant) return false;
+
+    const parsed = JSON.parse(rawTenant);
+    const logoLight = parsed?.logo_light_url || parsed?.branding?.logo_light_url;
+    const logoDark = parsed?.logo_dark_url || parsed?.branding?.logo_dark_url;
+    const logoIcon = parsed?.logo_icon_url || parsed?.branding?.logo_icon_url;
+
+    return [logoLight, logoDark, logoIcon].some(
+      (v) => typeof v === 'string' && v.trim().length > 0,
+    );
+  } catch {
+    return false;
+  }
+}
+
+// Returns the best available tenant-provided logo URL, or null if none.
+export function getTenantPrimaryLogoUrl(): string | null {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const rawTenant = window.localStorage.getItem('tenant');
+    if (!rawTenant) return null;
+
+    const parsed = JSON.parse(rawTenant);
+    const logoLight: unknown = parsed?.logo_light_url || parsed?.branding?.logo_light_url;
+    const logoDark: unknown = parsed?.logo_dark_url || parsed?.branding?.logo_dark_url;
+    const logoIcon: unknown = parsed?.logo_icon_url || parsed?.branding?.logo_icon_url;
+
+    const pick = (v: unknown) => (typeof v === 'string' && v.trim().length > 0 ? v.trim() : null);
+    return pick(logoLight) || pick(logoDark) || pick(logoIcon);
+  } catch {
+    return null;
+  }
+}

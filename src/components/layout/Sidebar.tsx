@@ -2,7 +2,7 @@ import type { MouseEvent } from 'react'
 import { NavLink } from 'react-router-dom'
 import Icon from '../common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
-import { getTenantBranding, getTenantBrandName } from '../../utils/branding'
+import { getTenantBrandName, getTenantPrimaryLogoUrl } from '../../utils/branding'
 
 type SidebarProps = {
   isCollapsed: boolean
@@ -22,8 +22,19 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
   const user = JSON.parse(
     window.localStorage.getItem('authUser') || '{}',
   )
-  const branding = getTenantBranding()
-  const brandName = getTenantBrandName()
+  const brandNameRaw = getTenantBrandName()
+  const brandName = brandNameRaw
+    ? brandNameRaw.charAt(0).toUpperCase() + brandNameRaw.slice(1)
+    : ''
+  const logoUrl = getTenantPrimaryLogoUrl()
+  const isExpanded = !isCollapsed || isOpen
+
+  function brandInitials(name: string): string {
+    const parts = name.trim().split(/\s+/).filter(Boolean)
+    if (parts.length === 0) return ''
+    const initials = parts.slice(0, 2).map(p => p[0]).join('')
+    return initials.toUpperCase()
+  }
 
   const sidebarClassNames = [
     'sidebar',
@@ -60,21 +71,25 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
       </button>
       <div>
         <NavLink to="/dashboard" className="sidebar-logo">
-          <img
-            src={branding.logoLight}
-            alt={`${brandName} logo`}
-            className="light-logo"
-          />
-          <img
-            src={branding.logoDark}
-            alt={`${brandName} logo`}
-            className="dark-logo"
-          />
-          <img
-            src={branding.logoIcon}
-            alt={`${brandName} icon`}
-            className="logo-icon"
-          />
+          {logoUrl ? (
+            <>
+              <img src={logoUrl} alt={`${brandName} logo`} className="light-logo" />
+              <img src={logoUrl} alt={`${brandName} logo`} className="dark-logo" />
+              <img src={logoUrl} alt={`${brandName} icon`} className="logo-icon" />
+            </>
+          ) : isExpanded ? (
+            <div className="fw-bold text-xl text-truncate" title={brandName}>
+              {brandName}
+            </div>
+          ) : (
+            <div
+              className="logo-icon d-flex align-items-center justify-content-center fw-bold text-lg"
+              aria-label={brandName}
+              title={brandName}
+            >
+              {brandInitials(brandName || '')}
+            </div>
+          )}
         </NavLink>
       </div>
 

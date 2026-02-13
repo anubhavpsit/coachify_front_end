@@ -7,6 +7,8 @@ import {
   getTenantBranding,
   getTenantBrandName,
   setTenantBranding,
+  tenantHasBrandLogo,
+  getTenantPrimaryLogoUrl,
 } from '../../utils/branding'
 
 type LoginUser = {
@@ -44,6 +46,16 @@ export default function SignInPage() {
   const [isTenantResolved, setIsTenantResolved] = useState(false)
   const [branding, setBranding] = useState(getTenantBranding())
   const [brandName, setBrandName] = useState(getTenantBrandName())
+
+  // Keep page title in sync with resolved brand
+  useEffect(() => {
+    const displayBrandName = brandName
+      ? brandName.charAt(0).toUpperCase() + brandName.slice(1)
+      : ''
+    if (typeof document !== 'undefined' && displayBrandName) {
+      document.title = `${displayBrandName} – Sign In`
+    }
+  }, [brandName])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -176,20 +188,41 @@ export default function SignInPage() {
       <div className="auth-right py-32 px-24 d-flex flex-column justify-content-center">
         <div className="max-w-464-px mx-auto w-100">
           <div>
-            <button
-              type="button"
-              className="border-0 bg-transparent mb-40 max-w-290-px p-0"
-              onClick={() => navigate('/')}
-            >
-              <img src={branding.logoLight} alt={`${brandName} logo`} />
-            </button>
+            {!isTenantResolved ? (
+              <div className="mb-24 text-secondary-light text-lg">
+                Preparing your workspace...
+              </div>
+            ) : (
+              (() => {
+                const logoUrl = getTenantPrimaryLogoUrl()
+                const displayBrandName = brandName
+                  ? brandName.charAt(0).toUpperCase() + brandName.slice(1)
+                  : ''
+                if (logoUrl) {
+                  return (
+                    <button
+                      type="button"
+                      className="border-0 bg-transparent mb-40 max-w-290-px p-0"
+                      onClick={() => navigate('/')}
+                    >
+                      <img src={logoUrl} alt={`${displayBrandName} logo`} />
+                    </button>
+                  )
+                }
+                return (
+                  <div className="mb-24 text-secondary-700 fw-semibold text-2xl">
+                    {displayBrandName}
+                  </div>
+                )
+              })()
+            )}
             <h4 className="mb-12">Sign in to your account</h4>
             <p className="mb-32 text-secondary-light text-lg">
               Welcome back! Please enter your credentials.
             </p>
             {!isTenantResolved && (
               <p className="mb-16 text-secondary-light text-sm">
-                Please wit we are getting ready to sign you in...
+                Please wait, we are setting things up...
               </p>
             )}
             {error && (
