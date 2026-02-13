@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Button } from 'react-bootstrap'
+import { formatDate } from '../../utils/date'
 
 interface StudentProfile {
   class?: string | number
@@ -395,8 +396,8 @@ export default function FeeComponent() {
                       <tbody>
                         {historyItems.map((item) => (
                           <tr key={item.id}>
-                            <td>{new Date(item.from_date).toLocaleDateString()} → {new Date(item.to_date).toLocaleDateString()}</td>
-                            <td>{item.paid_at ? new Date(item.paid_at).toLocaleDateString() : '-'}</td>
+                            <td>{formatDate(item.from_date)} → {formatDate(item.to_date)}</td>
+                            <td>{item.paid_at ? formatDate(item.paid_at) : '-'}</td>
                             <td>₹{Number(item.amount).toFixed(2)}</td>
                             <td>{item.payment_mode || '-'}</td>
                           </tr>
@@ -453,11 +454,11 @@ export default function FeeComponent() {
                   {fees.map((fee) => (
                     <tr key={fee.id}>
                       <td>{fee.student?.name || '-'}</td>
-                      <td>{fee.from_date}</td>
-                      <td>{fee.to_date}</td>
+                      <td>{formatDate(fee.from_date)}</td>
+                      <td>{formatDate(fee.to_date)}</td>
                       <td>{fee.amount}</td>
                       <td>{fee.payment_mode}</td>
-                      <td>{new Date(fee.created_at).toLocaleDateString()}</td>
+                      <td>{formatDate(fee.created_at)}</td>
                     </tr>
                   ))}
                 </tbody>

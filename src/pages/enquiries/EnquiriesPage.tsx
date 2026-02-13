@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Modal, Button } from 'react-bootstrap'
 import Icon from '../../components/common/Icon.tsx'
+import { formatDateTime } from '../../utils/date'
 
 type Enquiry = {
   id: number
@@ -372,12 +373,7 @@ export default function EnquiriesPage() {
     }
   }
 
-  const formatDateTime = (value?: string | null) => {
-    if (!value) return '-'
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return value
-    return date.toLocaleString()
-  }
+  // Date/time formatting handled via shared util
 
   const filteredEnquiries = enquiries
 

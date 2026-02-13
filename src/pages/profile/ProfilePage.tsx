@@ -3,6 +3,7 @@ import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
 import Avatar from '../../components/common/Avatar.tsx'
 import { ROLES } from '../../constants/roles.ts'
+import { formatDate } from '../../utils/date'
 
 type StudentProfile = {
   class?: string | null
@@ -219,7 +220,7 @@ export default function ProfilePage() {
           </p>
           {typeof profile.not_marked_days === 'number' && (
             <p className="text-xs text-muted mb-0">
-              {profile.not_marked_days} day(s) yet to be marked.
+              {Math.round(profile.not_marked_days)} day(s) yet to be marked.
             </p>
           )}
         </div>
@@ -372,7 +373,7 @@ export default function ProfilePage() {
                     <div className="d-flex justify-content-between align-items-center mb-8">
                       <span className="text-secondary-light text-sm">Date of Birth</span>
                       <span className="text-sm fw-medium">
-                        {profile.dob}
+                        {formatDate(profile.dob)}
                       </span>
                     </div>
                   )}

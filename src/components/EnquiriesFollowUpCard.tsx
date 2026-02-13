@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { formatDate } from '../utils/date'
 
 type Enquiry = {
   id: number
@@ -22,12 +23,7 @@ type FollowUpResponse = {
   }
 }
 
-function formatDate(value?: string | null): string {
-  if (!value) return 'Never'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleDateString()
-}
+// Use shared date formatter for consistency
 
 export default function EnquiriesFollowUpCard() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])

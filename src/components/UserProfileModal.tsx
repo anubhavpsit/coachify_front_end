@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Modal, Button } from 'react-bootstrap'
 import axios from 'axios'
 import Avatar from './common/Avatar'
+import { formatDate } from '../utils/date'
 import { Spinner } from 'react-bootstrap'
 
 interface StudentProfile {
@@ -165,13 +166,7 @@ export default function UserProfileModal({
     loadHistory()
   }, [show, userId, authRole, user])
 
-  const formatDate = (iso?: string | null) => {
-    if (!iso) return '-'
-    const d = new Date(iso)
-    if (Number.isNaN(d.getTime())) return iso
-    // e.g., 15 Feb 2026
-    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-  }
+  // date display handled via shared util
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -232,7 +227,7 @@ export default function UserProfileModal({
                 </div>
                 {user.dob && (
                   <div className="text-sm text-secondary-light">
-                    DOB: {user.dob}
+                    DOB: {formatDate(user.dob)}
                   </div>
                 )}
               </div>

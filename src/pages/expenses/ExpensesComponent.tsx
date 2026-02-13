@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Button } from 'react-bootstrap'
+import { formatDate } from '../../utils/date'
 
 interface ExpenseUser {
   id: number
@@ -64,14 +65,7 @@ export default function ExpensesComponent() {
   const API_BASE_URL =
     import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 
-  const formatAddedOn = (isoString?: string | null) => {
-    if (!isoString) return '-';
-
-    const parsedDate = new Date(isoString);
-    if (Number.isNaN(parsedDate.getTime())) return '-';
-
-    return parsedDate.toLocaleDateString();
-  };
+  // Display formatting via shared util
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -340,17 +334,13 @@ export default function ExpensesComponent() {
                   {expenses.map((expense) => (
                     <tr key={expense.id}>
                       <td>
-                        {expense?.expense_date
-                          ? formatAddedOn(expense.expense_date)
-                          : '-'}
+                        {expense?.expense_date ? formatDate(expense.expense_date) : '-'}
                       </td>
                       <td>{expense.amount}</td>
                       <td>{expense.description || '-'}</td>
                       <td>{expense.user?.name || '-'}</td>
                       <td>{expense.note || '-'}</td>
-                      <td>
-                        {new Date(expense.created_at).toLocaleDateString()}
-                      </td>
+                      <td>{formatDate(expense.created_at)}</td>
                     </tr>
                   ))}
                 </tbody>
