@@ -16,6 +16,8 @@ interface UserProfile {
   name: string
   email: string
   role: string
+  attendance_percentage?: number
+  not_marked_days?: number
   dob?: string | null
   created_at?: string | null
   profile_img?: string | null
@@ -232,6 +234,20 @@ export default function UserProfileModal({
                 )}
               </div>
             </div>
+
+            {(typeof user.attendance_percentage === 'number' || typeof user.not_marked_days === 'number') && (
+              <div className="mb-3">
+                <h6 className="fw-semibold mb-1">Attendance</h6>
+                <div className="fw-bold">
+                  {typeof user.attendance_percentage === 'number' ? `${user.attendance_percentage.toFixed(2)}%` : '—'}
+                </div>
+                {typeof user.not_marked_days === 'number' && (
+                  <div className="text-sm text-secondary-light">
+                    {Math.round(user.not_marked_days)} day(s) yet to be marked.
+                  </div>
+                )}
+              </div>
+            )}
 
             {user.role === 'student' && (
               <div className="mb-3">
