@@ -7,7 +7,6 @@ import {
   getTenantBranding,
   getTenantBrandName,
   setTenantBranding,
-  tenantHasBrandLogo,
   getTenantPrimaryLogoUrl,
 } from '../../utils/branding'
 
@@ -44,7 +43,8 @@ export default function SignInPage() {
   const [error, setError] = useState<string | null>(null)
   const [tenantId, setTenantId] = useState<number | null>(null)
   const [isTenantResolved, setIsTenantResolved] = useState(false)
-  const [branding, setBranding] = useState(getTenantBranding())
+  // We only need the setter to trigger re-renders when branding changes.
+  const [, setBranding] = useState(() => getTenantBranding())
   const [brandName, setBrandName] = useState(getTenantBrandName())
 
   // Keep page title in sync with resolved brand
