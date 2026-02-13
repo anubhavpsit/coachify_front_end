@@ -56,6 +56,8 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
     }
   }
 
+  const hasPinnedFacts = typeof window !== 'undefined' && window.localStorage.getItem('hasPinnedFacts') === 'true';
+
   return (
     <aside
       className={sidebarClassNames}
@@ -110,6 +112,29 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               <span>Dashboard</span>
             </NavLink>
           </li>
+
+          {hasPinnedFacts && (
+            <li>
+              <NavLink
+                to="/facts"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:bookmark-outline" className="menu-icon" />
+                <span>Facts</span>
+              </NavLink>
+            </li>
+          )}
+          {user.role === ROLES.COACHING_ADMIN && (
+            <li>
+              <NavLink
+                to="/admin/facts"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:image-text" className="menu-icon" />
+                <span>Manage Facts</span>
+              </NavLink>
+            </li>
+          )}
 
           {/* <li className="sidebar-menu-group-title">Settings</li> */}
           {(user.role === ROLES.TEACHER || user.role === ROLES.COACHING_ADMIN) && (

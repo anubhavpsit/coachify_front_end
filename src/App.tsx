@@ -24,6 +24,8 @@ import ProfilePage from './pages/profile/ProfilePage.tsx'
 import SearchResultsPage from './pages/search/SearchResultsPage.tsx'
 import NotificationsPage from './pages/notifications/NotificationsPage.tsx'
 import DailyActivityApprovalsPage from './pages/approvals/DailyActivityApprovalsPage.tsx'
+import AdminFactsPage from './pages/facts/AdminFactsPage.tsx'
+import FactsPage from './pages/facts/FactsPage.tsx'
 
 function App() {
   return (
@@ -80,6 +82,12 @@ function App() {
         </Route>
         <Route path="/notifications" element={<DashboardLayout />}>
           <Route index element={<NotificationsPage />} />
+        </Route>
+        <Route path="/facts" element={<DashboardLayout />}>
+          <Route index element={<FactsPage />} />
+        </Route>
+        <Route path="/admin/facts" element={<DashboardLayout />}>
+          <Route index element={<AdminFactsPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
