@@ -118,10 +118,19 @@ export default function NotificationsPage() {
     typeof window !== 'undefined'
       ? window.localStorage.getItem('authToken')
       : null
+  const authUser =
+    typeof window !== 'undefined'
+      ? JSON.parse(window.localStorage.getItem('authUser') || 'null')
+      : null
+  const role: string | null = authUser?.role ?? null
 
   useEffect(() => {
     if (!token) {
       setError('Sign in to view notifications.')
+      return
+    }
+    if (role !== 'coaching_admin' && role !== 'super_admin') {
+      setError('Only coaching admins can view notifications.')
       return
     }
 
@@ -177,6 +186,7 @@ export default function NotificationsPage() {
     return () => controller.abort()
   }, [
     token,
+    role,
     page,
     perPage,
     statusFilter,
@@ -259,6 +269,26 @@ export default function NotificationsPage() {
     } catch (apiError) {
       console.error('Failed to send notification', apiError)
       alert('Unable to send notification. Please review it and try again.')
+    } finally {
+      setSendingNotificationId(null)
+    }
+  }
+
+  const handleCancelNotification = async (notificationId: number) => {
+    if (!token) return
+    if (!confirm('Cancel this queued notification?')) return
+
+    setSendingNotificationId(notificationId)
+    try {
+      await axios.post(
+        `${API_BASE_URL}/notifications/${notificationId}/cancel`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      refreshTable()
+    } catch (apiError) {
+      console.error('Failed to cancel notification', apiError)
+      alert('Unable to cancel notification. Please try again.')
     } finally {
       setSendingNotificationId(null)
     }
@@ -491,16 +521,26 @@ export default function NotificationsPage() {
                         {notification.status.toLowerCase() === 'sent' ? (
                           <span className="text-success-600 text-sm">Sent</span>
                         ) : (
-                          <button
-                            type="button"
-                            className="btn btn-outline-primary btn-sm"
-                            disabled={sendingNotificationId === notification.id}
-                            onClick={() => handleSendNotification(notification.id)}
-                          >
-                            {sendingNotificationId === notification.id
-                              ? 'Sending...'
-                              : 'Send now'}
-                          </button>
+                          <div className="d-flex gap-2">
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary btn-sm"
+                              disabled={sendingNotificationId === notification.id}
+                              onClick={() => handleSendNotification(notification.id)}
+                            >
+                              {sendingNotificationId === notification.id
+                                ? 'Sending...'
+                                : 'Send now'}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm"
+                              disabled={sendingNotificationId === notification.id}
+                              onClick={() => handleCancelNotification(notification.id)}
+                            >
+                              Cancel
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>
