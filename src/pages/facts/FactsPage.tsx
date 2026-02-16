@@ -25,14 +25,6 @@ type Fact = {
   liked_by_me?: boolean;
 };
 
-type ApiResponse = {
-  success: boolean;
-  data: {
-    facts: Fact[];
-    pagination: { current_page: number; last_page: number; total: number };
-    unread_count: number;
-  };
-};
 
 export default function FactsPage() {
   const [tab, setTab] = useState<'all' | 'saved' | 'admin' | 'superadmin'>('all');
@@ -237,8 +229,7 @@ export default function FactsPage() {
     }
   };
 
-  const canPrev = page > 1;
-  const canNext = page < lastPage;
+  // pagination helpers not used directly; scrolling is automatic
 
   return (
     <div className="container-fluid">
@@ -263,7 +254,7 @@ export default function FactsPage() {
             <div className="text-center p-5">No facts found.</div>
           ) : (
             <div style={{ height: 'calc(100vh - 140px)', overflowY: 'auto', scrollSnapType: 'y mandatory', position: 'relative' }}>
-              {tab === 'superadmin' ? facts.map((f: any, idx: number) => (
+              {tab === 'superadmin' ? facts.map((f: any) => (
                 <div key={f.id} style={{ minHeight: 'calc(100vh - 160px)', scrollSnapAlign: 'start', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12 }}>
                   <div className="card border-0" style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 12px 30px rgba(0,0,0,0.10)', maxWidth: 420, width: '100%' }}>
                     {f.image_url ? (
@@ -308,7 +299,7 @@ export default function FactsPage() {
                     <span style={{ fontSize: 12, color: '#6B7280' }}>Share</span>
                     {f.source_url ? (
                       <>
-                        <button aria-label="Source" onClick={() => window.open(f.source_url, '_blank', 'noopener,noreferrer')} style={{ border: 'none', background: 'transparent', fontSize: 20, lineHeight: 1 }}>🔗</button>
+                        <button aria-label="Source" onClick={() => window.open(resolveAbsoluteUrl(f.source_url), '_blank', 'noopener,noreferrer')} style={{ border: 'none', background: 'transparent', fontSize: 20, lineHeight: 1 }}>🔗</button>
                         <span style={{ fontSize: 12, color: '#6B7280' }}>Source</span>
                       </>
                     ) : null}
@@ -356,7 +347,7 @@ export default function FactsPage() {
                     <span style={{ fontSize: 12, color: '#6B7280' }}>Share</span>
                     {f.source_url ? (
                       <>
-                        <button aria-label="Source" onClick={() => window.open(f.source_url, '_blank', 'noopener,noreferrer')} style={{ border: 'none', background: 'transparent', fontSize: 20, lineHeight: 1 }}>🔗</button>
+                        <button aria-label="Source" onClick={() => window.open(resolveAbsoluteUrl(f.source_url), '_blank', 'noopener,noreferrer')} style={{ border: 'none', background: 'transparent', fontSize: 20, lineHeight: 1 }}>🔗</button>
                         <span style={{ fontSize: 12, color: '#6B7280' }}>Source</span>
                       </>
                     ) : null}

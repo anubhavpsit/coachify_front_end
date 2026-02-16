@@ -363,14 +363,12 @@ export default function ProfilePage() {
                 </span>
 
                 <div className="w-100 mt-8">
-                  {(() => { const sp: any = (profile as any).studentProfile ?? (profile as any).student_profile ?? null; return (
                   <div className="d-flex justify-content-between align-items-center mb-8">
                     <span className="text-secondary-light text-sm">Email</span>
                     <span className="text-sm fw-medium text-break">
                       {profile.email}
                     </span>
                   </div>
-                  )})()}
                   {profile.dob && (
                     <div className="d-flex justify-content-between align-items-center mb-8">
                       <span className="text-secondary-light text-sm">Date of Birth</span>

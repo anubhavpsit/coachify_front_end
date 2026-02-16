@@ -126,7 +126,7 @@ export default function AdminFactsPage() {
                 <h6 className="mb-0">{editingId ? 'Edit Fact' : 'Create Fact'}</h6>
                 <div className="d-flex gap-2">
                   <input className="form-control" placeholder="Search facts" value={search} onChange={(e) => setSearch(e.target.value)} />
-                  {editingId ? <button type="button" className="btn btn-outline-secondary" onClick={() => { setEditingId(null); setForm({ title: '', content: '', content_type: 'text', image_url: '', source_url: '', tags: '', is_published: true, publish_at: '', expire_at: '', target_roles: [] }); }}>Cancel</button> : null}
+                  {editingId ? <button type="button" className="btn btn-outline-secondary" onClick={() => { setEditingId(null); setForm({ title: '', content: '', content_type: 'text', image_url: '', source_url: '', tags: '', target_roles: [] }); }}>Cancel</button> : null}
                 </div>
               </div>
               <div className="col-md-6">
