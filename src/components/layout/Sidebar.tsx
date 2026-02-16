@@ -56,7 +56,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
     }
   }
 
-  const hasPinnedFacts = typeof window !== 'undefined' && window.localStorage.getItem('hasPinnedFacts') === 'true';
+  // Facts link must always be visible
 
   return (
     <aside
@@ -113,17 +113,15 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
             </NavLink>
           </li>
 
-          {hasPinnedFacts && (
-            <li>
-              <NavLink
-                to="/facts"
-                className={({ isActive }) => navLinkClass(isActive)}
-              >
-                <Icon icon="mdi:bookmark-outline" className="menu-icon" />
-                <span>Facts</span>
-              </NavLink>
-            </li>
-          )}
+          <li>
+            <NavLink
+              to="/facts"
+              className={({ isActive }) => navLinkClass(isActive)}
+            >
+              <Icon icon="mdi:bookmark-outline" className="menu-icon" />
+              <span>Facts</span>
+            </NavLink>
+          </li>
           {user.role === ROLES.COACHING_ADMIN && (
             <li>
               <NavLink

@@ -363,12 +363,14 @@ export default function ProfilePage() {
                 </span>
 
                 <div className="w-100 mt-8">
+                  {(() => { const sp: any = (profile as any).studentProfile ?? (profile as any).student_profile ?? null; return (
                   <div className="d-flex justify-content-between align-items-center mb-8">
                     <span className="text-secondary-light text-sm">Email</span>
                     <span className="text-sm fw-medium text-break">
                       {profile.email}
                     </span>
                   </div>
+                  )})()}
                   {profile.dob && (
                     <div className="d-flex justify-content-between align-items-center mb-8">
                       <span className="text-secondary-light text-sm">Date of Birth</span>
@@ -377,30 +379,30 @@ export default function ProfilePage() {
                       </span>
                     </div>
                   )}
-                  {profile.studentProfile?.class && (
+                  {(() => { const sp: any = (profile as any).studentProfile ?? (profile as any).student_profile ?? null; return sp?.class ? (
                     <div className="d-flex justify-content-between align-items-center mb-8">
                       <span className="text-secondary-light text-sm">Class</span>
                       <span className="text-sm fw-medium">
-                        {profile.studentProfile.class}
+                        {sp.class}
                       </span>
                     </div>
-                  )}
-                  {profile.studentProfile?.phone && (
+                  ) : null })()}
+                  {(() => { const sp: any = (profile as any).studentProfile ?? (profile as any).student_profile ?? null; return sp?.phone ? (
                     <div className="d-flex justify-content-between align-items-center mb-8">
                       <span className="text-secondary-light text-sm">Phone</span>
                       <span className="text-sm fw-medium">
-                        {profile.studentProfile.phone}
+                        {sp.phone}
                       </span>
                     </div>
-                  )}
-                  {profile.studentProfile?.address && (
+                  ) : null })()}
+                  {(() => { const sp: any = (profile as any).studentProfile ?? (profile as any).student_profile ?? null; return sp?.address ? (
                     <div className="d-flex justify-content-between align-items-start">
                       <span className="text-secondary-light text-sm">Address</span>
                       <span className="text-sm fw-medium text-end text-break ms-2">
-                        {profile.studentProfile.address}
+                        {sp.address}
                       </span>
                     </div>
-                  )}
+                  ) : null })()}
                 </div>
               </div>
             </div>
