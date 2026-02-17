@@ -130,7 +130,6 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   >([]);
 
   const [userRole, setUserRole] = useState<string>('');
-  const [userId, setUserId] = useState<number | null>(null);
   const isAdmin = userRole === ROLES.COACHING_ADMIN;
 
   const [filesModalAssessment, setFilesModalAssessment] =
@@ -154,9 +153,6 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
       const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
       if (authUser?.role) {
         setUserRole(authUser.role);
-      }
-      if (typeof authUser?.id === 'number') {
-        setUserId(authUser.id);
       }
     } catch {
       // ignore
@@ -1133,7 +1129,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                             </div>
                           </td>
                           <td>
-                            {(isAdmin || (userId && file.uploaded_by === userId)) ? (
+                            {isAdmin ? (
                               <button
                                 type="button"
                                 className="btn btn-outline-danger btn-sm"

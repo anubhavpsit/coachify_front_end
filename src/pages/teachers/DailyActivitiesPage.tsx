@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Button, Modal } from "react-bootstrap";
+import { ROLES } from '../../constants/roles';
 
 type AttachmentFileType = "image" | "pdf" | "other";
 
@@ -126,6 +127,18 @@ export default function DailyActivitiesPage() {
   const STORAGE_BASE_URL =
     import.meta.env.VITE_STORAGE_BASE_URL ?? "http://coachify.local/storage";
   const token = localStorage.getItem("authToken");
+  const [userRole, setUserRole] = useState<string>('');
+
+  useEffect(() => {
+    try {
+      const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+      if (authUser?.role) {
+        setUserRole(authUser.role);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
   const tenantId = localStorage.getItem("tenant_id");
 
   const [previewAttachment, setPreviewAttachment] =
@@ -1011,16 +1024,18 @@ const handleSelectStudent = async (
                         >
                           View
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="outline-danger"
-                          disabled={deletingAttachmentId === file.id}
-                          onClick={() =>
-                            handleDeleteAttachment(activity.id, file.id, index)
-                          }
-                        >
-                          {deletingAttachmentId === file.id ? "Removing" : "Remove"}
-                        </Button>
+                        {userRole === ROLES.COACHING_ADMIN && (
+                          <Button
+                            size="sm"
+                            variant="outline-danger"
+                            disabled={deletingAttachmentId === file.id}
+                            onClick={() =>
+                              handleDeleteAttachment(activity.id, file.id, index)
+                            }
+                          >
+                            {deletingAttachmentId === file.id ? "Removing" : "Remove"}
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
