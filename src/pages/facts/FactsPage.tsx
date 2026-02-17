@@ -191,8 +191,17 @@ export default function FactsPage() {
     }
   };
   const logShare = async (factId: number, channel: string) => {
-    if (!token) return;
-    try { await axios.post(`${API_BASE_URL}/facts/${factId}/share`, { channel }, { headers: { Authorization: `Bearer ${token}` } }); } catch {}
+    if (!token) return null;
+    try {
+      const res = await axios.post(`${API_BASE_URL}/facts/${factId}/share`, { channel }, { headers: { Authorization: `Bearer ${token}` } });
+      const shares_count = res.data?.data?.shares_count;
+      if (typeof shares_count === 'number') {
+        setFacts(prev => prev.map(f => f.id === factId ? { ...f, shares_count } : f));
+      }
+      return shares_count;
+    } catch {
+      return null;
+    }
   };
   const shareTo = async (channel: 'WHATSAPP'|'FACEBOOK'|'TWITTER'|'EMAIL'|'COPY_LINK'|'WEB_SHARE', f: Fact) => {
     const text = shareTextFor(f);
@@ -296,7 +305,7 @@ export default function FactsPage() {
                     <button aria-label="Save" onClick={() => handleSave(f.id)} style={{ border: 'none', background: 'transparent', fontSize: 22, lineHeight: 1 }}>{f.saved_by_me ? '💾' : '💾'}</button>
                     <span style={{ fontSize: 12, color: '#6B7280' }}>{f.saved_by_me ? 'Saved' : 'Save'}</span>
                     <button aria-label="Share" onClick={() => openShare(f)} style={{ border: 'none', background: 'transparent', fontSize: 22, lineHeight: 1 }}>↗️</button>
-                    <span style={{ fontSize: 12, color: '#6B7280' }}>Share</span>
+                    <span style={{ fontSize: 12, color: '#6B7280' }}>{typeof f.shares_count === 'number' ? f.shares_count : 0}</span>
                     {f.source_url ? (
                       <>
                         <button aria-label="Source" onClick={() => window.open(resolveAbsoluteUrl(f.source_url), '_blank', 'noopener,noreferrer')} style={{ border: 'none', background: 'transparent', fontSize: 20, lineHeight: 1 }}>🔗</button>
@@ -344,7 +353,7 @@ export default function FactsPage() {
                     <button aria-label="Save" onClick={() => handleSave(f.id)} style={{ border: 'none', background: 'transparent', fontSize: 22, lineHeight: 1 }}>{f.saved_by_me ? '💾' : '💾'}</button>
                     <span style={{ fontSize: 12, color: '#6B7280' }}>{f.saved_by_me ? 'Saved' : 'Save'}</span>
                     <button aria-label="Share" onClick={() => openShare(f)} style={{ border: 'none', background: 'transparent', fontSize: 22, lineHeight: 1 }}>↗️</button>
-                    <span style={{ fontSize: 12, color: '#6B7280' }}>Share</span>
+                    <span style={{ fontSize: 12, color: '#6B7280' }}>{typeof f.shares_count === 'number' ? f.shares_count : 0}</span>
                     {f.source_url ? (
                       <>
                         <button aria-label="Source" onClick={() => window.open(resolveAbsoluteUrl(f.source_url), '_blank', 'noopener,noreferrer')} style={{ border: 'none', background: 'transparent', fontSize: 20, lineHeight: 1 }}>🔗</button>
