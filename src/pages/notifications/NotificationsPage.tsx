@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
@@ -93,11 +93,11 @@ export default function NotificationsPage() {
   const [pagination, setPagination] = useState<PaginationMeta>({
     current_page: 1,
     last_page: 1,
-    per_page: 25,
+    per_page: 10,
     total: 0,
   })
   const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(25)
+  const [perPage, setPerPage] = useState(10)
   const [statusFilter, setStatusFilter] = useState('all')
   const [typeFilter, setTypeFilter] = useState('all')
   const [search, setSearch] = useState('')
@@ -169,7 +169,8 @@ export default function NotificationsPage() {
         },
       )
       .then((response) => {
-        setRecords(response.data.data.notifications || [])
+        const incoming = response.data.data.notifications || []
+        setRecords((prev) => (page === 1 ? incoming : [...prev, ...incoming]))
         setPagination(response.data.data.pagination)
         setStats(response.data.data.stats)
         setOptions(response.data.data.filters)
@@ -198,6 +199,21 @@ export default function NotificationsPage() {
     sortDirection,
     reloadFlag,
   ])
+
+  // Infinite scroll: observe a sentinel at the bottom and load next page when visible
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  useEffect(() => {
+    const node = sentinelRef.current
+    if (!node) return
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries
+      if (entry.isIntersecting && !loading && page < pagination.last_page) {
+        setPage((prev) => Math.min(pagination.last_page, prev + 1))
+      }
+    }, { root: null, rootMargin: '0px', threshold: 0.1 })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [loading, page, pagination.last_page])
 
   const statusOptions = useMemo<Option[]>(() => {
     const base: Option[] = [{ value: 'all', label: 'All statuses' }]
@@ -547,6 +563,8 @@ export default function NotificationsPage() {
                   ))}
               </tbody>
             </table>
+            {/* Infinite scroll sentinel */}
+            <div ref={sentinelRef} style={{ height: 1 }} />
           </div>
         </div>
       </div>
@@ -557,6 +575,7 @@ export default function NotificationsPage() {
           {pagination.total} entries
         </div>
         <div className="d-flex align-items-center gap-2">
+          {/* Per-page selection kept, default 10 */}
           <select
             className="form-select text-sm"
             value={perPage}
@@ -568,28 +587,7 @@ export default function NotificationsPage() {
               </option>
             ))}
           </select>
-          <div className="btn-group">
-            <button
-              type="button"
-              className="btn btn-outline-secondary"
-              disabled={page <= 1}
-              onClick={() => setPage((previous) => Math.max(1, previous - 1))}
-            >
-              Prev
-            </button>
-            <button
-              type="button"
-              className="btn btn-outline-secondary"
-              disabled={page >= pagination.last_page}
-              onClick={() =>
-                setPage((previous) =>
-                  Math.min(pagination.last_page, previous + 1),
-                )
-              }
-            >
-              Next
-            </button>
-          </div>
+          {/* Paging buttons are optional; infinite scroll will auto-load */}
         </div>
       </div>
     </div>
