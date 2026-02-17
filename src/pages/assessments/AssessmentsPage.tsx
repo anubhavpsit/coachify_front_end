@@ -71,6 +71,7 @@ interface AssessmentFileRow {
   url?: string | null;
   is_admin_approved?: boolean;
   approved_at?: string | null;
+  uploaded_by?: number | null;
 }
 
 export default function AssessmentsPage() {
@@ -129,6 +130,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   >([]);
 
   const [userRole, setUserRole] = useState<string>('');
+  const [userId, setUserId] = useState<number | null>(null);
   const isAdmin = userRole === ROLES.COACHING_ADMIN;
 
   const [filesModalAssessment, setFilesModalAssessment] =
@@ -152,6 +154,9 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
       const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
       if (authUser?.role) {
         setUserRole(authUser.role);
+      }
+      if (typeof authUser?.id === 'number') {
+        setUserId(authUser.id);
       }
     } catch {
       // ignore
@@ -433,6 +438,28 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
     }
 
     await fetchAssessmentFiles(assessment.id);
+  };
+
+  const [deletingAttachmentId, setDeletingAttachmentId] = useState<number | null>(null);
+
+  const handleDeleteAssessmentFile = async (
+    assessmentId: number,
+    attachmentId: number,
+  ) => {
+    if (!token) return;
+    try {
+      setDeletingAttachmentId(attachmentId);
+      await axios.delete(
+        `${API_BASE_URL}/assessments/${assessmentId}/files/${attachmentId}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      await fetchAssessmentFiles(assessmentId);
+    } catch (error) {
+      console.error('Error deleting assessment attachment:', error);
+      alert('Failed to delete attachment.');
+    } finally {
+      setDeletingAttachmentId(null);
+    }
   };
 
   const openResultsModal = async (assessment: Assessment) => {
@@ -1040,6 +1067,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                       <th>Student</th>
                       <th>Uploaded At</th>
                       <th>Approval</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1103,6 +1131,26 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                                 </button>
                               )}
                             </div>
+                          </td>
+                          <td>
+                            {(isAdmin || (userId && file.uploaded_by === userId)) ? (
+                              <button
+                                type="button"
+                                className="btn btn-outline-danger btn-sm"
+                                disabled={deletingAttachmentId === file.id}
+                                onClick={() =>
+                                  filesModalAssessment &&
+                                  handleDeleteAssessmentFile(
+                                    filesModalAssessment.id,
+                                    file.id,
+                                  )
+                                }
+                              >
+                                {deletingAttachmentId === file.id ? 'Removing' : 'Remove'}
+                              </button>
+                            ) : (
+                              <span className="text-muted">-</span>
+                            )}
                           </td>
                         </tr>
                       );
