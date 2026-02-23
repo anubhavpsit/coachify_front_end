@@ -139,6 +139,15 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
             <>
               <li>
                 <NavLink
+                  to="/insights"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:chart-areaspline" className="menu-icon" />
+                  <span>Insights</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
                   to="/students"
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
@@ -172,6 +181,15 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
           )}
           {user?.role === ROLES.STUDENT && (
             <>
+              <li>
+                <NavLink
+                  to="/insights"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:chart-areaspline" className="menu-icon" />
+                  <span>Insights</span>
+                </NavLink>
+              </li>
               <li>
                 <NavLink
                   to="/students/activities"

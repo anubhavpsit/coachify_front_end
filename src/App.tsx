@@ -27,6 +27,7 @@ import DailyActivityApprovalsPage from './pages/approvals/DailyActivityApprovals
 import AdminFactsPage from './pages/facts/AdminFactsPage.tsx'
 import FactsPage from './pages/facts/FactsPage.tsx'
 import AcademicYearsPage from './pages/academicYears/AcademicYearsPage.tsx'
+import InsightsPage from './pages/insights/InsightsPage.tsx'
 
 function App() {
   return (
@@ -86,6 +87,9 @@ function App() {
         </Route>
         <Route path="/facts" element={<DashboardLayout />}>
           <Route index element={<FactsPage />} />
+        </Route>
+        <Route path="/insights" element={<DashboardLayout />}>
+          <Route index element={<InsightsPage />} />
         </Route>
         <Route path="/academic-years" element={<DashboardLayout />}>
           <Route index element={<AcademicYearsPage />} />
