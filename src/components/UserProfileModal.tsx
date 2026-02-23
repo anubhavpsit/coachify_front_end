@@ -16,6 +16,8 @@ interface UserProfile {
   name: string
   email: string
   role: string
+  current_class_id?: number | null
+  current_class_name?: string | null
   attendance_percentage?: number
   not_marked_days?: number
   dob?: string | null
@@ -254,7 +256,7 @@ export default function UserProfileModal({
                 <h6 className="fw-semibold mb-2">Student Details</h6>
                 {user.student_profile && (
                   <>
-                    <div className="text-sm">Class: {user.student_profile.class}</div>
+                    <div className="text-sm">Class: {user.current_class_name ?? user.student_profile.class}</div>
                     <div className="text-sm">Phone: {user.student_profile.phone || '-'}</div>
                   </>
                 )}

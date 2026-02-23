@@ -18,6 +18,8 @@ interface Student {
   name: string;
   email: string;
   tenant_id: number;
+  current_class_id?: number | null;
+  current_class_name?: string | null;
   student_profile?: StudentProfile | null;
   dob?: string | null;
   created_at?: string | null;
@@ -53,6 +55,8 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState(false);
   const [classes, setClasses] = useState<{ id: number; name: string }[]>([]);
+  const [academicYears, setAcademicYears] = useState<Array<{ id: number; name: string; is_current: boolean }>>([]);
+  const [selectedYearId, setSelectedYearId] = useState<number | ''>('');
   const [userRole, setUserRole] = useState<string>('');
   //const [dob, setDob] = useState<string>(getTodayDateValue())
 
@@ -86,6 +90,20 @@ export default function StudentsPage() {
 
   const [viewUserId, setViewUserId] = useState<number | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  // Bulk promote
+  const [showPromoteModal, setShowPromoteModal] = useState(false);
+  const [bulkFromYearId, setBulkFromYearId] = useState<number | ''>('');
+  const [bulkFromClassId, setBulkFromClassId] = useState<number | ''>('');
+  const [bulkToYearId, setBulkToYearId] = useState<number | ''>('');
+  const [bulkToClassId, setBulkToClassId] = useState<number | ''>('');
+  const [promoting, setPromoting] = useState(false);
+
+  // Single-student promote
+  const [showSinglePromoteModal, setShowSinglePromoteModal] = useState(false);
+  const [promoteStudentId, setPromoteStudentId] = useState<number | null>(null);
+  const [singleToYearId, setSingleToYearId] = useState<number | ''>('');
+  const [singleToClassId, setSingleToClassId] = useState<number | ''>('');
+  const [promotingSingle, setPromotingSingle] = useState(false);
 
   const formatAddedOn = (isoString?: string | null) => {
     if (!isoString) return '-';
@@ -139,12 +157,38 @@ export default function StudentsPage() {
     setShowAssignModal(true);
   };
 
+  const handleOpenSinglePromote = (student: Student) => {
+    setPromoteStudentId(student.id);
+    const currentYear = academicYears.find(y => y.is_current);
+    setSingleToYearId(currentYear ? currentYear.id : '');
+    const inferredClass = (student.current_class_id ?? student.student_profile?.class) || '';
+    setSingleToClassId(typeof inferredClass === 'number' ? inferredClass : '');
+    setShowSinglePromoteModal(true);
+  };
+
   const handleViewUser = (id: number) => {
     setViewUserId(id);
     setShowProfileModal(true);
   };
 
   useEffect(() => {
+    // Load academic years
+    const fetchYears = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const res = await axios.get(`${API_BASE_URL}/academic-years`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        });
+        if (res.data?.success && Array.isArray(res.data.data)) {
+          setAcademicYears(res.data.data);
+          const cur = res.data.data.find((y: any) => !!y.is_current);
+          if (cur) setSelectedYearId(cur.id);
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    fetchYears();
     const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
     setUserRole(authUser.role);
   }, []);
@@ -195,12 +239,13 @@ export default function StudentsPage() {
         console.dir("userRole")
         console.dir(userRole)
         console.dir("userRole")
-        let url = `${API_BASE_URL}/students`; 
+        let url = `${API_BASE_URL}/students`;
         if (userRole == 'teacher') {
           url = `${API_BASE_URL}/teachers/students`; // my students for teacher
         }
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+          params: selectedYearId ? { academic_year_id: selectedYearId } : {},
         });
 
         if (response.data.success) {
@@ -216,7 +261,7 @@ export default function StudentsPage() {
       }
     };
     fetchStudents();
-  }, [API_BASE_URL, userRole]);
+  }, [API_BASE_URL, userRole, selectedYearId]);
 
 
   const handleSubjectToggle = (subjectId: number, type: 'add' | 'edit') => {
@@ -362,17 +407,40 @@ export default function StudentsPage() {
 
   return (
     <div>
-
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 className="fw-semibold mb-0">Students</h6>
-        {userRole === ROLES.COACHING_ADMIN ? (
-        <Button variant="primary" onClick={() => setShowAddModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
-          <Icon icon="ic:baseline-plus" className="icon text-xl" />
-          Add New Student
-        </Button>
-        ) : (
-          <></>  
+        <div className="d-flex align-items-center gap-2">
+          <div className="d-flex align-items-center gap-2">
+            <label className="text-sm text-secondary">Year</label>
+            <select
+              className="form-select form-select-sm"
+              value={selectedYearId}
+              onChange={(e) => setSelectedYearId(e.target.value === '' ? '' : Number(e.target.value))}
+            >
+              <option value="">Current</option>
+              {academicYears.map(y => (
+                <option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>
+              ))}
+            </select>
+          </div>
+          {userRole === ROLES.COACHING_ADMIN && (
+            <Button variant="primary" onClick={() => setShowAddModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
+              <Icon icon="ic:baseline-plus" className="icon text-xl" />
+              Add New Student
+            </Button>
           )}
+          {userRole === ROLES.COACHING_ADMIN && (
+            <Button variant="outline-primary" onClick={() => {
+              setBulkFromYearId(selectedYearId || '');
+              const cur = academicYears.find(y => y.is_current);
+              setBulkToYearId(cur?.id || '');
+              setShowPromoteModal(true);
+            }} className="btn btn-outline-primary text-sm btn-sm px-12 py-12 radius-8 ms-2">
+              <Icon icon="mdi:arrow-up-bold" className="icon text-xl" />
+              Bulk Promote
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Students Table */}
@@ -427,7 +495,10 @@ export default function StudentsPage() {
                       </td>
                       <td>{student.email}</td>
                       <td>
-                        {classes.find(c => c.id == student.student_profile?.class)?.name || '-'}
+                        {classes.find(c => c.id == (student.current_class_id ?? student.student_profile?.class))?.name
+                          || (typeof student.current_class_name === 'string' && student.current_class_name.trim() !== ''
+                                ? student.current_class_name
+                                : '-')}
                       </td>
                       <td>
                         {student.student_profile?.subjects
@@ -451,18 +522,19 @@ export default function StudentsPage() {
                             {student.tenant_id !== 0 && (
                               <>
                                 <Button variant="link" onClick={() => handleOpenEditModal(student)}>Edit</Button>
-                                <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>Delete</Button>
-                                <Button variant="link" onClick={() => handleOpenAssignModal(student.id)} >Assign Teachers</Button>
-                                {selectedStudentId && (
-                                  <AssignTeachersModal
-                                    show={showAssignModal}
-                                    onHide={() => setShowAssignModal(false)}
-                                    studentId={selectedStudentId}
-                                    onAssigned={() => {
-                                      // optionally refresh students list or show a success message
-                                    }}
-                                  />
-                                )}
+                        <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>Delete</Button>
+                        <Button variant="link" onClick={() => handleOpenAssignModal(student.id)} >Assign Teachers</Button>
+                        <Button variant="link" onClick={() => handleOpenSinglePromote(student)} >Promote</Button>
+                        {selectedStudentId && (
+                          <AssignTeachersModal
+                            show={showAssignModal}
+                            onHide={() => setShowAssignModal(false)}
+                            studentId={selectedStudentId}
+                            onAssigned={() => {
+                              // optionally refresh students list or show a success message
+                            }}
+                          />
+                        )}
                               </>
                             )}
                           </td>
@@ -684,6 +756,117 @@ export default function StudentsPage() {
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)} disabled={saving}>Cancel</Button>
           <Button variant="danger" onClick={handleDeleteStudent} disabled={saving}>{saving ? 'Deleting...' : 'Delete'}</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Bulk Promote Modal */}
+      <Modal show={showPromoteModal} onHide={() => setShowPromoteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Bulk Promote Students</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">From Academic Year</label>
+            <select className="form-control" value={bulkFromYearId} onChange={(e)=> setBulkFromYearId(e.target.value === '' ? '' : Number(e.target.value))}>
+              <option value="">Current</option>
+              {academicYears.map(y => (<option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">From Class</label>
+            <select className="form-control" value={bulkFromClassId} onChange={(e)=> setBulkFromClassId(e.target.value === '' ? '' : Number(e.target.value))}>
+              <option value="">Select Class</option>
+              {classes.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">To Academic Year</label>
+            <select className="form-control" value={bulkToYearId} onChange={(e)=> setBulkToYearId(e.target.value === '' ? '' : Number(e.target.value))}>
+              <option value="">Current</option>
+              {academicYears.map(y => (<option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">To Class</label>
+            <select className="form-control" value={bulkToClassId} onChange={(e)=> setBulkToClassId(e.target.value === '' ? '' : Number(e.target.value))}>
+              <option value="">Select Class</option>
+              {classes.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
+            </select>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={()=> setShowPromoteModal(false)} disabled={promoting}>Cancel</Button>
+          <Button variant="primary" disabled={promoting || !bulkFromClassId || !bulkToYearId || !bulkToClassId} onClick={async ()=>{
+            setPromoting(true);
+            try {
+              const token = localStorage.getItem('authToken');
+              // Load students for source year
+              const res = await axios.get(`${API_BASE_URL}/students`, {
+                headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+                params: { academic_year_id: bulkFromYearId || undefined },
+              });
+              const list: any[] = Array.isArray(res.data?.data) ? res.data.data : [];
+              const targets = list.filter(s => (s.current_class_id ?? s?.student_profile?.class) == bulkFromClassId);
+              for (const s of targets) {
+                await axios.post(`${API_BASE_URL}/students/${s.id}/promote`, {
+                  to_academic_year_id: bulkToYearId,
+                  to_class_id: bulkToClassId,
+                }, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
+              }
+              // Refresh main list
+              setShowPromoteModal(false);
+              // trigger reload by touching selectedYearId state
+              setSelectedYearId(prev => prev === '' ? '' : Number(prev));
+            } catch (e) {
+              alert('Bulk promote failed.');
+            } finally {
+              setPromoting(false);
+            }
+          }}>{promoting ? 'Promoting...' : 'Promote'}</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Single Promote Modal */}
+      <Modal show={showSinglePromoteModal} onHide={() => setShowSinglePromoteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Promote Student</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">To Academic Year</label>
+            <select className="form-control" value={singleToYearId} onChange={(e)=> setSingleToYearId(e.target.value === '' ? '' : Number(e.target.value))}>
+              <option value="">Current</option>
+              {academicYears.map(y => (<option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">To Class</label>
+            <select className="form-control" value={singleToClassId} onChange={(e)=> setSingleToClassId(e.target.value === '' ? '' : Number(e.target.value))}>
+              <option value="">Select Class</option>
+              {classes.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
+            </select>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={()=> setShowSinglePromoteModal(false)} disabled={promotingSingle}>Cancel</Button>
+          <Button variant="primary" disabled={promotingSingle || !promoteStudentId || !singleToYearId || !singleToClassId} onClick={async ()=>{
+            if (!promoteStudentId) return;
+            setPromotingSingle(true);
+            try {
+              const token = localStorage.getItem('authToken');
+              await axios.post(`${API_BASE_URL}/students/${promoteStudentId}/promote`, {
+                to_academic_year_id: singleToYearId,
+                to_class_id: singleToClassId,
+              }, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
+              setShowSinglePromoteModal(false);
+              // trigger reload by touching selectedYearId state
+              setSelectedYearId(prev => prev === '' ? '' : Number(prev));
+            } catch (e) {
+              alert('Promote failed.');
+            } finally {
+              setPromotingSingle(false);
+            }
+          }}>{promotingSingle ? 'Promoting...' : 'Promote'}</Button>
         </Modal.Footer>
       </Modal>
 

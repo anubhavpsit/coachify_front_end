@@ -248,6 +248,15 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </li>
               <li>
                 <NavLink
+                  to="/academic-years"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:calendar-range" className="menu-icon" />
+                  <span>Academic Years</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
                   to="/fees"
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
