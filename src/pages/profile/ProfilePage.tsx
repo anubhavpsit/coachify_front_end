@@ -66,6 +66,25 @@ export default function ProfilePage() {
     null,
   )
 
+  // Student self fee summary/history
+  const [feeSummary, setFeeSummary] = useState<{
+    last_paid_at: string | null
+    last_paid_amount: number | null
+    last_payment_mode?: string | null
+    next_due_date: string
+    is_overdue: boolean
+    days_overdue: number
+  } | null>(null)
+  const [feeHistory, setFeeHistory] = useState<Array<{
+    id: number
+    from_date: string
+    to_date: string
+    paid_at?: string | null
+    amount: number
+    status?: string
+    payment_mode?: string
+  }>>([])
+
   useEffect(() => {
     const loadProfileAndPerformance = async () => {
       try {
@@ -179,6 +198,22 @@ export default function ProfilePage() {
               setPerformanceError('Unable to load performance data.')
             } finally {
               setLoadingPerformance(false)
+            }
+
+            // Load student self fee summary/history
+            try {
+              const [sumRes, histRes] = await Promise.all([
+                axios.get(`${API_BASE_URL}/student/fees/summary`, {
+                  headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+                }),
+                axios.get(`${API_BASE_URL}/student/fees?limit=10`, {
+                  headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+                }),
+              ])
+              if (sumRes.data?.success) setFeeSummary(sumRes.data.data)
+              if (histRes.data?.success && Array.isArray(histRes.data.items)) setFeeHistory(histRes.data.items)
+            } catch {
+              // ignore
             }
           }
         } else {
@@ -306,6 +341,85 @@ export default function ProfilePage() {
     )
   }
 
+  const renderStudentFeesCard = () => {
+    if (!profile || profile.role !== ROLES.STUDENT) return null
+    const sp: any = (profile as any).studentProfile ?? (profile as any).student_profile ?? null
+    const admission = (profile as any).created_at as string | undefined
+    const trialDays = Number(sp?.trial_days ?? 0)
+    const admissionDate = admission ? new Date(admission) : null
+    const trialEnd = admissionDate ? new Date(admissionDate.getTime() + trialDays*24*3600*1000) : null
+    const feesStart = trialEnd
+    return (
+      <div className="card h-100">
+        <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
+          <span className="text-md fw-medium text-secondary-light">Fees</span>
+        </div>
+        <div className="card-body p-24">
+          <div className="row g-3 mb-2">
+            <div className="col-md-6">
+              <div className="text-sm text-secondary-light">Admission Date</div>
+              <div className="fw-semibold">{formatDate(admission)}</div>
+            </div>
+            <div className="col-md-6">
+              <div className="text-sm text-secondary-light">Trial Classes</div>
+              <div className="fw-semibold">{Number.isNaN(trialDays)? '-' : `${trialDays} day(s)`}</div>
+            </div>
+            <div className="col-md-6">
+              <div className="text-sm text-secondary-light">Trial Ends</div>
+              <div className="fw-semibold">{trialEnd ? formatDate(trialEnd.toISOString().slice(0,10)) : '-'}</div>
+            </div>
+            <div className="col-md-6">
+              <div className="text-sm text-secondary-light">Fees Start From</div>
+              <div className="fw-semibold">{feesStart ? formatDate(feesStart.toISOString().slice(0,10)) : '-'}</div>
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <div className="text-sm text-secondary-light">Next Due Date</div>
+            <div className="fw-semibold">
+              {feeSummary ? formatDate(feeSummary.next_due_date) : '-'}
+              {feeSummary?.is_overdue && (
+                <span className="badge bg-danger-subtle text-danger-600 ms-2">Overdue</span>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <div className="d-flex align-items-center justify-content-between mb-2">
+              <div className="fw-semibold">Recent Payments</div>
+            </div>
+            {feeHistory.length === 0 ? (
+              <div className="text-sm text-secondary-light">No fees history found.</div>
+            ) : (
+              <div className="table-responsive">
+                <table className="table bordered-table mb-0 text-sm">
+                  <thead>
+                    <tr>
+                      <th>Period</th>
+                      <th>Paid On</th>
+                      <th className="text-end">Amount</th>
+                      <th>Mode</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {feeHistory.map((h) => (
+                      <tr key={h.id}>
+                        <td>{formatDate(h.from_date)} → {formatDate(h.to_date)}</td>
+                        <td>{formatDate(h.paid_at)}</td>
+                        <td className="text-end">₹{Number(h.amount).toFixed(2)}</td>
+                        <td>{h.payment_mode || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (loadingProfile && !profile) {
     return (
       <div>
@@ -410,6 +524,7 @@ export default function ProfilePage() {
             <div className="row gy-4">
               <div className="col-md-6">{renderAttendanceCard()}</div>
               <div className="col-md-6">{renderStudentPerformanceCard()}</div>
+              <div className="col-12">{renderStudentFeesCard()}</div>
             </div>
           </div>
         </div>
