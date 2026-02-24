@@ -497,8 +497,9 @@ export default function UserProfileModal({
                             const pct = Math.round((s.activity_count/total)*100)
                             const series = s.series || []
                             const maxVal = series.length ? Math.max(...series) || 1 : 1
+                            const isSelected = selectedSubjectForChapters === s.subject_id
                             return (
-                              <div key={s.subject_id} className="mb-2 p-2 rounded" style={{ border: '1px solid var(--bs-border-color)' }}>
+                              <div key={s.subject_id} className="mb-2 p-2 rounded" style={{ border: `1px solid ${isSelected ? 'var(--bs-primary)' : 'var(--bs-border-color)'}`, background: isSelected ? 'rgba(var(--bs-primary-rgb), 0.04)' : 'transparent' }}>
                                 <div className="d-flex align-items-center justify-content-between mb-1">
                                   <div className="fw-medium">{s.subject}</div>
                                   <div className="text-sm text-secondary-light">{s.activity_count} • {pct}%</div>
@@ -514,7 +515,11 @@ export default function UserProfileModal({
                                   </div>
                                 )}
                                 <div className="text-end mt-1">
-                                  <Button size="sm" variant="link" onClick={()=> loadChapters(s.subject_id)}>Chapters</Button>
+                                  {isSelected ? (
+                                    <span className="badge bg-primary-subtle text-primary">Selected</span>
+                                  ) : (
+                                    <Button size="sm" variant="link" onClick={()=> loadChapters(s.subject_id)}>Chapters</Button>
+                                  )}
                                 </div>
                               </div>
                             )
@@ -522,7 +527,11 @@ export default function UserProfileModal({
                         </div>
                         <div>
                           <div className="d-flex align-items-center justify-content-between mb-2">
-                            <div className="fw-semibold">Chapters {selectedSubjectForChapters? '' : '(select a subject)'}</div>
+                            <div className="fw-semibold">
+                              {selectedSubjectForChapters === null
+                                ? 'Chapters (select a subject)'
+                                : `Chapters — ${insightSubjects.find(it => it.subject_id === selectedSubjectForChapters)?.subject ?? ''}`}
+                            </div>
                           </div>
                           {selectedSubjectForChapters === null ? (
                             <div className="text-sm text-secondary-light">Choose a subject to see chapters.</div>
