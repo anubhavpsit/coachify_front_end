@@ -1,9 +1,29 @@
 import { useEffect, useState } from 'react'
-import { Modal, Button } from 'react-bootstrap'
+import { Modal, Button, Spinner } from 'react-bootstrap'
 import axios from 'axios'
 import Avatar from './common/Avatar'
 import { formatDate } from '../utils/date'
-import { Spinner } from 'react-bootstrap'
+//
+// Student insights types
+type SubjectInsightItem = {
+  subject_id: number
+  subject: string
+  activity_count: number
+  days_count: number
+  share: number
+  dates?: string[]
+  series?: number[]
+}
+
+type SubjectsInsightResp = {
+  from: string
+  to: string
+  window_days: number
+  items: SubjectInsightItem[]
+  focus?: { overfocus: boolean; underfocus: boolean; notes: string[] }
+}
+
+type ChapterInsightItem = { chapter: string; activity_count: number }
 
 interface StudentProfile {
   class?: string
@@ -76,6 +96,15 @@ export default function UserProfileModal({
     payment_mode?: string
   }>>([])
 
+  // Insights state (admin + teacher when viewing a student)
+  const [insightWindowDays, setInsightWindowDays] = useState<number>(7)
+  const [insightsLoading, setInsightsLoading] = useState(false)
+  const [insightSubjects, setInsightSubjects] = useState<SubjectInsightItem[]>([])
+  const [insightFocusNotes, setInsightFocusNotes] = useState<string[]>([])
+  const [selectedSubjectForChapters, setSelectedSubjectForChapters] = useState<number | null>(null)
+  const [chaptersLoading, setChaptersLoading] = useState(false)
+  const [chapterItems, setChapterItems] = useState<ChapterInsightItem[]>([])
+
   useEffect(() => {
     const authUser = JSON.parse(localStorage.getItem('authUser') || '{}')
     setAuthRole(authUser.role || '')
@@ -104,6 +133,55 @@ export default function UserProfileModal({
 
     fetchProfile()
   }, [show, userId])
+
+  // Load insights subjects when viewing a student (admin or teacher)
+  useEffect(() => {
+    const shouldLoad =
+      show && !!userId && user?.role === 'student' && (authRole === 'coaching_admin' || authRole === 'teacher')
+    if (!shouldLoad) return
+
+    const loadSubjects = async () => {
+      setInsightsLoading(true)
+      try {
+        const token = localStorage.getItem('authToken')
+        const res = await axios.get(`${API_BASE_URL}/insights/activities/subjects`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+          params: { window_days: insightWindowDays, student_id: userId },
+        })
+        if (res.data?.success) {
+          const d: SubjectsInsightResp = res.data.data
+          setInsightSubjects(d.items || [])
+          setInsightFocusNotes(d.focus?.notes || [])
+        }
+      } catch {
+        // noop
+      } finally {
+        setInsightsLoading(false)
+      }
+    }
+
+    loadSubjects()
+  }, [show, userId, authRole, user, insightWindowDays])
+
+  const loadChapters = async (subjectId: number) => {
+    if (!userId) return
+    setSelectedSubjectForChapters(subjectId)
+    setChaptersLoading(true)
+    try {
+      const token = localStorage.getItem('authToken')
+      const res = await axios.get(`${API_BASE_URL}/insights/activities/chapters`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        params: { window_days: insightWindowDays, student_id: userId, subject_id: subjectId },
+      })
+      if (res.data?.success) {
+        setChapterItems(res.data.data.items || [])
+      }
+    } catch {
+      // noop
+    } finally {
+      setChaptersLoading(false)
+    }
+  }
 
   // Load fee summary when admin views a student
   useEffect(() => {
@@ -345,6 +423,141 @@ export default function UserProfileModal({
                 {historyError && (
                   <div className="text-sm text-danger-600 mt-1">{historyError}</div>
                 )}
+              </div>
+            )}
+
+            {/* Insights (Admin + Teacher when viewing a student) */}
+            {(user.role === 'student' && (authRole === 'coaching_admin' || authRole === 'teacher')) && (
+              <div className="mt-3">
+                <div className="d-flex align-items-center justify-content-between mb-2">
+                  <h6 className="fw-semibold mb-0">Insights</h6>
+                  <div className="d-flex align-items-center gap-2">
+                    {[1,3,7,14].map((d) => (
+                      <Button
+                        key={d}
+                        size="sm"
+                        variant={insightWindowDays===d? 'primary':'outline-primary'}
+                        onClick={()=> setInsightWindowDays(d)}
+                      >
+                        {d===1? 'Today' : `${d}d`}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="card">
+                  <div className="card-body">
+                    {insightsLoading ? (
+                      <div className="d-flex align-items-center gap-2 text-sm">
+                        <Spinner size="sm" animation="border" />
+                        <span>Loading insights…</span>
+                      </div>
+                    ) : insightSubjects.length === 0 ? (
+                      <div className="text-sm text-secondary-light">No activity in this window.</div>
+                    ) : (
+                      <>
+                        {/* Summary: Top and Least Covered */}
+                        {insightSubjects.length > 0 && (
+                          <div className="mb-3 d-flex gap-2">
+                            {(() => {
+                              const total = insightSubjects.reduce((acc, it) => acc + it.activity_count, 0) || 1
+                              const top = insightSubjects.reduce((a,b)=> (a.activity_count>=b.activity_count? a:b))
+                              const least = insightSubjects.reduce((a,b)=> (a.activity_count<=b.activity_count? a:b))
+                              return (
+                                <>
+                                  <div className="flex-fill p-3 rounded border" style={{ borderColor: 'var(--bs-border-color)' }}>
+                                    <div className="text-sm text-secondary-light mb-1">Top Subject</div>
+                                    <div className="d-flex align-items-baseline justify-content-between">
+                                      <div className="fw-semibold">{top.subject}</div>
+                                      <div className="text-sm text-secondary-light">{Math.round((top.activity_count/total)*100)}%</div>
+                                    </div>
+                                  </div>
+                                  {insightSubjects.length > 1 && (
+                                    <div className="flex-fill p-3 rounded border" style={{ borderColor: 'var(--bs-border-color)' }}>
+                                      <div className="text-sm text-secondary-light mb-1">Least Covered</div>
+                                      <div className="d-flex align-items-baseline justify-content-between">
+                                        <div className="fw-semibold">{least.subject}</div>
+                                        <div className="text-sm text-secondary-light">{Math.round((least.activity_count/total)*100)}%</div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </>
+                              )
+                            })()}
+                          </div>
+                        )}
+                        <div className="mb-2">
+                          {insightFocusNotes.map((n,i)=> (
+                            <div key={i} className="alert alert-warning py-2 px-3 mb-2 text-sm">{n}</div>
+                          ))}
+                        </div>
+                        <div className="mb-2" style={{ maxHeight: 220, overflowY: 'auto' }}>
+                          {insightSubjects.map((s) => {
+                            const total = insightSubjects.reduce((acc, it) => acc + it.activity_count, 0) || 1
+                            const pct = Math.round((s.activity_count/total)*100)
+                            const series = s.series || []
+                            const maxVal = series.length ? Math.max(...series) || 1 : 1
+                            return (
+                              <div key={s.subject_id} className="mb-2 p-2 rounded" style={{ border: '1px solid var(--bs-border-color)' }}>
+                                <div className="d-flex align-items-center justify-content-between mb-1">
+                                  <div className="fw-medium">{s.subject}</div>
+                                  <div className="text-sm text-secondary-light">{s.activity_count} • {pct}%</div>
+                                </div>
+                                <div style={{ height: 8, background: 'var(--bs-secondary-bg)', borderRadius: 8, overflow: 'hidden' }}>
+                                  <div style={{ width: `${pct}%`, height: '100%', background: 'var(--bs-primary)', opacity: 0.8 }} />
+                                </div>
+                                {series.length > 0 && (
+                                  <div className="mt-2" style={{ height: 22, display: 'flex', alignItems: 'flex-end', gap: 2 }}>
+                                    {series.map((v, idx) => (
+                                      <div key={idx} style={{ width: 4, height: Math.max(2, Math.round((v/maxVal)*20)), background: 'var(--bs-primary)', opacity: 0.6, borderRadius: 2 }} />
+                                    ))}
+                                  </div>
+                                )}
+                                <div className="text-end mt-1">
+                                  <Button size="sm" variant="link" onClick={()=> loadChapters(s.subject_id)}>Chapters</Button>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                        <div>
+                          <div className="d-flex align-items-center justify-content-between mb-2">
+                            <div className="fw-semibold">Chapters {selectedSubjectForChapters? '' : '(select a subject)'}</div>
+                          </div>
+                          {selectedSubjectForChapters === null ? (
+                            <div className="text-sm text-secondary-light">Choose a subject to see chapters.</div>
+                          ) : chaptersLoading ? (
+                            <div className="d-flex align-items-center gap-2 text-sm">
+                              <Spinner size="sm" animation="border" />
+                              <span>Loading chapters…</span>
+                            </div>
+                          ) : chapterItems.length === 0 ? (
+                            <div className="text-sm text-secondary-light">No chapter activity in this window.</div>
+                          ) : (
+                            <div className="table-responsive">
+                              <table className="table bordered-table mb-0 text-sm">
+                                <thead>
+                                  <tr>
+                                    <th>Chapter</th>
+                                    <th className="text-end">Count</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {chapterItems.map((c, idx) => (
+                                    <tr key={idx}>
+                                      <td>{c.chapter}</td>
+                                      <td className="text-end">{c.activity_count}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
 
