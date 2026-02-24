@@ -13,6 +13,8 @@ type Fact = {
   tags?: string[] | null;
   is_active?: boolean;
   is_pinned: boolean;
+  is_published?: boolean;
+  publish_at?: string | null;
 };
 
 export default function AdminFactsPage() {
@@ -27,6 +29,8 @@ export default function AdminFactsPage() {
     source_url: '',
     tags: '',
     target_roles: [] as string[],
+    is_published: false,
+    publish_at: '',
   });
   const [editingId, setEditingId] = useState<number | null>(null);
   const [classOptions, setClassOptions] = useState<{ id:number; name:string }[]>([]);
@@ -99,13 +103,15 @@ export default function AdminFactsPage() {
         tags: form.tags ? form.tags.split(',').map(s => s.trim()).filter(Boolean) : [],
         target_roles: form.target_roles,
         class_ids: form.target_roles.includes('student') ? selectedClassIds : [],
+        is_published: form.is_published,
+        publish_at: form.publish_at || undefined,
       };
       if (editingId) {
         await axios.put(`${API_BASE_URL}/facts/${editingId}`, payload, { headers: { Authorization: `Bearer ${token}` } });
       } else {
         await axios.post(`${API_BASE_URL}/facts`, payload, { headers: { Authorization: `Bearer ${token}` } });
       }
-      setForm({ title: '', content: '', content_type: 'text', image_url: '', source_url: '', tags: '', target_roles: [] });
+      setForm({ title: '', content: '', content_type: 'text', image_url: '', source_url: '', tags: '', target_roles: [], is_published: false, publish_at: '' });
       setSelectedClassIds([]);
       setEditingId(null);
       load();
@@ -164,6 +170,23 @@ export default function AdminFactsPage() {
                 <label className="form-label">Tags (comma)</label>
                 <input className="form-control" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="famous_places, capitals" />
               </div>
+
+              <div className="col-md-4">
+                <label className="form-label">Publish Date/Time</label>
+                <input
+                  type="datetime-local"
+                  className="form-control"
+                  value={form.publish_at}
+                  onChange={(e) => setForm({ ...form, publish_at: e.target.value })}
+                />
+                <small className="text-muted">Facts will be visible only after this time when published.</small>
+              </div>
+              <div className="col-md-3 d-flex align-items-end">
+                <div className="form-check">
+                  <input id="is-published" className="form-check-input" type="checkbox" checked={form.is_published} onChange={(e)=> setForm({ ...form, is_published: e.target.checked })} />
+                  <label className="form-check-label" htmlFor="is-published">Published</label>
+                </div>
+              </div>
               
               <div className="col-12 d-flex gap-2">
                 <div className="form-check">
@@ -215,13 +238,14 @@ export default function AdminFactsPage() {
               items.length === 0 ? <p>No facts yet.</p> : (
                 <div className="table-responsive">
                   <table className="table">
-                    <thead><tr><th>Title</th><th>Type</th><th>Active</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Title</th><th>Type</th><th>Active</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody>
                       {items.map((f) => (
                         <tr key={f.id}>
                           <td>{f.title}</td>
                           <td>{f.content_type}</td>
                           <td>{f.is_active ? 'Yes' : 'No'}</td>
+                          <td>{f.is_published ? 'Published' : 'Draft'}{f.publish_at ? ` • ${new Date(f.publish_at).toLocaleString()}` : ''}</td>
                           <td className="d-flex gap-2">
                             <button className="btn btn-sm btn-outline-primary" onClick={() => {
                               setEditingId(f.id);
@@ -233,6 +257,8 @@ export default function AdminFactsPage() {
                                 source_url: f.source_url || '',
                                 tags: (f.tags || []).join(', '),
                                 target_roles: [],
+                                is_published: !!f.is_published,
+                                publish_at: f.publish_at ? new Date(f.publish_at).toISOString().slice(0,16) : '',
                               });
                             }}>Edit</button>
                             <button className="btn btn-sm btn-outline-danger" onClick={async () => {
