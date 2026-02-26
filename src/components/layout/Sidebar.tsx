@@ -122,6 +122,17 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               <span>Facts</span>
             </NavLink>
           </li>
+          {(user.role === ROLES.STUDENT || user.role === ROLES.TEACHER) && (
+            <li>
+              <NavLink
+                to="/my-attendance"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:calendar-check-outline" className="menu-icon" />
+                <span>My Attendance</span>
+              </NavLink>
+            </li>
+          )}
           {user.role === ROLES.COACHING_ADMIN && (
             <li>
               <NavLink
@@ -307,6 +318,15 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
                 >
                   <Icon icon="ic:baseline-check-circle" />
                   <span>Daily Attendance</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/admin/attendance-corrections"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:clipboard-edit-outline" className="menu-icon" />
+                  <span>Attendance Corrections</span>
                 </NavLink>
               </li>
               <li>

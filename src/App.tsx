@@ -28,6 +28,8 @@ import AdminFactsPage from './pages/facts/AdminFactsPage.tsx'
 import FactsPage from './pages/facts/FactsPage.tsx'
 import AcademicYearsPage from './pages/academicYears/AcademicYearsPage.tsx'
 import InsightsPage from './pages/insights/InsightsPage.tsx'
+import MyAttendance from './pages/attendance/MyAttendance.tsx'
+import CorrectionsAdminPage from './pages/attendance/CorrectionsAdminPage.tsx'
 
 function App() {
   return (
@@ -82,8 +84,14 @@ function App() {
         <Route path="/profile" element={<DashboardLayout />}>
           <Route index element={<ProfilePage />} />
         </Route>
+        <Route path="/my-attendance" element={<DashboardLayout />}>
+          <Route index element={<MyAttendance />} />
+        </Route>
         <Route path="/notifications" element={<DashboardLayout />}>
           <Route index element={<NotificationsPage />} />
+        </Route>
+        <Route path="/admin/attendance-corrections" element={<DashboardLayout />}>
+          <Route index element={<CorrectionsAdminPage />} />
         </Route>
         <Route path="/facts" element={<DashboardLayout />}>
           <Route index element={<FactsPage />} />
