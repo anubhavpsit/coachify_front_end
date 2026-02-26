@@ -41,8 +41,7 @@ export default function DashboardPage() {
     }[]
   >([])
   const [loadingTopStudents, setLoadingTopStudents] = useState(false)
-  // Facts discovery overlay
-  const [factOverlay, setFactOverlay] = useState<null | { id: number; title: string; content?: string | null }>(null)
+  // Facts discovery overlay removed per request
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -83,35 +82,7 @@ export default function DashboardPage() {
     fetchStats()
   }, [])
 
-  // Suggest a fact to pin if user has none pinned and we haven't shown the suggestion today
-  useEffect(() => {
-    const maybeShowFact = async () => {
-      const token = localStorage.getItem('authToken')
-      if (!token) return
-      const lastShown = localStorage.getItem('factsDiscoveryLastShown')
-      const today = new Date().toISOString().slice(0, 10)
-      if (lastShown === today) return
-      try {
-        // Check if user already has any pinned facts
-        const check = await axios.get(`${API_BASE_URL}/facts?page=1&per_page=1&pinned_by_me=true`, { headers: { Authorization: `Bearer ${token}` } })
-        const hasPinned = (check.data?.data?.facts?.length ?? 0) > 0
-        if (hasPinned) {
-          localStorage.setItem('hasPinnedFacts', 'true')
-          return
-        }
-        // Fetch one suggestion (unread preferred)
-        const res = await axios.get(`${API_BASE_URL}/facts?page=1&per_page=1&unread_only=true`, { headers: { Authorization: `Bearer ${token}` } })
-        const f = res.data?.data?.facts?.[0]
-        if (f) {
-          setFactOverlay({ id: f.id, title: f.title, content: f.content })
-        }
-      } catch {}
-      finally {
-        localStorage.setItem('factsDiscoveryLastShown', today)
-      }
-    }
-    maybeShowFact()
-  }, [])
+  // Fact discovery overlay and its trigger removed
 
   useEffect(() => {
     const fetchTopStudents = async () => {
@@ -172,31 +143,7 @@ export default function DashboardPage() {
 
   return (
     <div>
-      {factOverlay && (
-        <div className="card position-fixed top-0 start-50 translate-middle-x mt-3 shadow-lg" style={{ zIndex: 2000, maxWidth: 640 }}>
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-center">
-              <h6 className="mb-0">{factOverlay.title}</h6>
-              <span className="badge bg-info">Discover</span>
-            </div>
-            {factOverlay.content ? (
-              <p className="mt-2 mb-1 text-muted" style={{ whiteSpace: 'pre-wrap' }}>{factOverlay.content}</p>
-            ) : null}
-            <div className="d-flex justify-content-end gap-2">
-              <button className="btn btn-outline-secondary" onClick={() => setFactOverlay(null)}>Dismiss</button>
-              <button className="btn btn-primary" onClick={async () => {
-                try {
-                  const token = localStorage.getItem('authToken')
-                  if (!token) return
-                  await axios.post(`${API_BASE_URL}/facts/${factOverlay.id}/pin/me`, { pinned: true }, { headers: { Authorization: `Bearer ${token}` } })
-                  localStorage.setItem('hasPinnedFacts', 'true')
-                } catch {}
-                setFactOverlay(null)
-              }}>Pin for me</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Fact discovery overlay removed */}
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 className="fw-semibold mb-0">Dashboard</h6>
         <ul className="d-flex align-items-center gap-2">
