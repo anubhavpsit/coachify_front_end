@@ -321,11 +321,15 @@ export default function StudentsPage() {
   // Open edit modal
   const handleOpenEditModal = (student: Student) => {
     setEditStudentId(student.id);
+    // Prefer the resolved current_class_id for the selected/current academic year.
+    const inferredClassId = (student.current_class_id ?? (
+      typeof student.student_profile?.class === 'number' ? student.student_profile.class : null
+    )) || '';
     setEditStudentForm({
       name: student.name,
       email: student.email,
       password: '',
-      class: student.student_profile?.class || '',
+      class: inferredClassId,
       subjects: student.student_profile?.subjects || [],
       phone: student.student_profile?.phone || '',
       dob: student.dob || '',

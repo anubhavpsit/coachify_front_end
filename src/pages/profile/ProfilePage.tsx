@@ -51,6 +51,8 @@ type StudentPerformanceSummary = {
   lastPercentage: number | null
 }
 
+type SubjectItem = { id: number; subject: string }
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 
@@ -84,6 +86,10 @@ export default function ProfilePage() {
     status?: string
     payment_mode?: string
   }>>([])
+
+  // Opted subjects (student)
+  const [optedSubjects, setOptedSubjects] = useState<SubjectItem[]>([])
+  const [loadingSubjects, setLoadingSubjects] = useState(false)
 
   useEffect(() => {
     const loadProfileAndPerformance = async () => {
@@ -215,6 +221,21 @@ export default function ProfilePage() {
             } catch {
               // ignore
             }
+
+            // Load opted subjects for the student
+            try {
+              setLoadingSubjects(true)
+              const res = await axios.get<{ data?: SubjectItem[]; subjects?: SubjectItem[] }>(
+                `${API_BASE_URL}/students/${authUser.id}/subjects`,
+                { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } },
+              )
+              const list = res.data?.data || res.data?.subjects || []
+              setOptedSubjects(Array.isArray(list) ? list : [])
+            } catch {
+              setOptedSubjects([])
+            } finally {
+              setLoadingSubjects(false)
+            }
           }
         } else {
           setProfileError('Unable to load profile.')
@@ -340,6 +361,8 @@ export default function ProfilePage() {
       </div>
     )
   }
+
+  // removed separate Opted Subjects card; showing inline under Class
 
   const renderStudentFeesCard = () => {
     if (!profile || profile.role !== ROLES.STUDENT) return null
@@ -499,6 +522,34 @@ export default function ProfilePage() {
                       </span>
                     </div>
                   ) : null })()}
+                  {(() => {
+                    if (profile.role !== ROLES.STUDENT) return null
+                    const sp: any = (profile as any).studentProfile ?? (profile as any).student_profile ?? null
+                    const inlineSubjects = sp?.subjects
+                    let subjectsToShow: string[] = []
+                    if (Array.isArray(optedSubjects) && optedSubjects.length > 0) {
+                      subjectsToShow = optedSubjects.map((s) => s.subject)
+                    } else if (Array.isArray(inlineSubjects) && inlineSubjects.length > 0) {
+                      if (typeof inlineSubjects[0] === 'string') subjectsToShow = inlineSubjects as string[]
+                      else if (typeof inlineSubjects[0] === 'number') subjectsToShow = (inlineSubjects as number[]).map((n) => `Subject #${n}`)
+                    }
+                    return subjectsToShow.length > 0 || loadingSubjects ? (
+                      <div className="mb-8">
+                        <span className="text-secondary-light text-sm">Subjects</span>
+                        <div className="mt-1 d-flex flex-wrap gap-2">
+                          {loadingSubjects ? (
+                            <span className="text-secondary-light text-xs">Loading subjects...</span>
+                          ) : (
+                            subjectsToShow.map((s, idx) => (
+                              <span key={`${s}-${idx}`} className="badge bg-primary-100 text-primary-600 text-xs">
+                                {s}
+                              </span>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    ) : null
+                  })()}
                   {(() => { const sp: any = (profile as any).studentProfile ?? (profile as any).student_profile ?? null; return sp?.phone ? (
                     <div className="d-flex justify-content-between align-items-center mb-8">
                       <span className="text-secondary-light text-sm">Phone</span>
