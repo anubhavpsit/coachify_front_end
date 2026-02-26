@@ -17,12 +17,16 @@ type CorrectionRequest = {
   reason: string
   status: 'pending' | 'approved' | 'rejected'
   created_at: string
+  admin_comment?: string | null
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 
 export default function MyAttendance() {
   const token = window.localStorage.getItem('authToken')
+  const authUser = useMemo(() => {
+    try { return JSON.parse(window.localStorage.getItem('authUser') || '{}') } catch { return {} }
+  }, []) as { id?: number }
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1)
   const [year, setYear] = useState<number>(new Date().getFullYear())
   const [records, setRecords] = useState<Attendance[]>([])
@@ -35,6 +39,15 @@ export default function MyAttendance() {
   const [requestedStatus, setRequestedStatus] = useState<'present' | 'absent' | 'leave'>('present')
   const [reason, setReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [profilePercentage, setProfilePercentage] = useState<number | null>(null)
+  const [profileNotMarked, setProfileNotMarked] = useState<number | null>(null)
+  const [admissionYmd, setAdmissionYmd] = useState<string | null>(null)
+  const [lifetimeCounts, setLifetimeCounts] = useState<{present?: number; absent?: number; leave?: number} | null>(null)
+
+  const normalizeYmd = (value: string) => {
+    const m = value && value.match(/^\d{4}-\d{2}-\d{2}/)
+    return m ? m[0] : value
+  }
 
   const load = async () => {
     setLoading(true)
@@ -43,11 +56,46 @@ export default function MyAttendance() {
       const atts = await axios.get(`${API_BASE_URL}/my/attendance?month=${month}&year=${year}`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       })
-      setRecords(atts.data.data || [])
+      const rawRecs: Attendance[] = atts.data.data || []
+      const normRecs: Attendance[] = rawRecs.map(r => ({
+        ...r,
+        attendance_date: normalizeYmd(String(r.attendance_date)),
+      }))
+      setRecords(normRecs)
       const reqs = await axios.get(`${API_BASE_URL}/attendance-corrections/mine`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
       })
-      setRequests(reqs.data.data || [])
+      const rawReqs: CorrectionRequest[] = reqs.data.data || []
+      const normReqs: CorrectionRequest[] = rawReqs.map(r => ({
+        ...r,
+        attendance_date: normalizeYmd(String(r.attendance_date)),
+      }))
+      setRequests(normReqs)
+      if (authUser?.id) {
+        try {
+          const prof = await axios.get(`${API_BASE_URL}/users/${authUser.id}`, {
+            headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+          })
+          const u = prof.data?.data || {}
+          if (typeof u.attendance_percentage === 'number') setProfilePercentage(u.attendance_percentage)
+          if (typeof u.not_marked_days === 'number') setProfileNotMarked(u.not_marked_days)
+          const adm = u.admission_date || u.created_at
+          if (adm) {
+            const d = new Date(adm)
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0')
+            const day = String(d.getDate()).padStart(2, '0')
+            setAdmissionYmd(`${y}-${m}-${day}`)
+          }
+          if (u.attendance_stats) {
+            setLifetimeCounts({
+              present: typeof u.attendance_stats.present_days === 'number' ? u.attendance_stats.present_days : undefined,
+              absent: typeof u.attendance_stats.absent_days === 'number' ? u.attendance_stats.absent_days : undefined,
+              leave: typeof u.attendance_stats.leave_days === 'number' ? u.attendance_stats.leave_days : undefined,
+            })
+          }
+        } catch {}
+      }
     } catch (e) {
       setError('Failed to load attendance.')
     } finally {
@@ -60,10 +108,80 @@ export default function MyAttendance() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month, year])
 
-  const absentDays = useMemo(
-    () => records.filter(r => r.status === 'absent').map(r => r.attendance_date),
-    [records],
+  const formatYmd = (d: Date) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+
+  const allMonthRecords = useMemo(() => {
+    const first = new Date(year, month - 1, 1)
+    const last = new Date(year, month, 0)
+    const map = new Map(records.map(r => [r.attendance_date, r] as const))
+    const result: Attendance[] = []
+    for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+      const key = formatYmd(d)
+      result.push(map.get(key) ?? { user_id: 0, role: 'student', attendance_date: key, status: 'not_marked' })
+    }
+    return result
+  }, [records, month, year])
+
+  const requestedDates = useMemo(() => new Set(requests.map(r => r.attendance_date)), [requests])
+  const todayYmd = useMemo(() => formatYmd(new Date()), [])
+  const upToTodayRecords = useMemo(
+    () => allMonthRecords.filter(r => r.attendance_date <= todayYmd),
+    [allMonthRecords, todayYmd],
   )
+  const afterAdmissionRecords = useMemo(
+    () => upToTodayRecords.filter(r => !admissionYmd || r.attendance_date >= admissionYmd),
+    [upToTodayRecords, admissionYmd],
+  )
+  const filteredRecords = useMemo(
+    () => afterAdmissionRecords
+      .filter(r => r.status !== 'present') // exclude present days from correction list
+      .filter(r => r.status !== 'not_marked') // exclude not marked days from correction list
+      .filter(r => !requestedDates.has(r.attendance_date))
+      .filter(r => !(r.attendance_date === todayYmd && r.status === 'not_marked')),
+    [afterAdmissionRecords, requestedDates, todayYmd],
+  )
+  const absentDays = useMemo(
+    () => afterAdmissionRecords.filter(r => r.status === 'absent').map(r => r.attendance_date),
+    [afterAdmissionRecords],
+  )
+
+  // Insights computed from all records
+  const insights = useMemo(() => {
+    const present = afterAdmissionRecords.filter(r => r.status === 'present').length
+    const absent = afterAdmissionRecords.filter(r => r.status === 'absent').length
+    const leave = afterAdmissionRecords.filter(r => r.status === 'leave').length
+    const notMarked = afterAdmissionRecords.filter(r => r.status === 'not_marked').length
+    // Match profile formula: present / (present + absent)
+    const workingDays = present + absent
+    const percentage = workingDays > 0 ? Math.round((present / workingDays) * 100) : 0
+
+    // Longest present streak
+    const sorted = [...afterAdmissionRecords].sort((a, b) => new Date(a.attendance_date).getTime() - new Date(b.attendance_date).getTime())
+    let longestPresent = 0
+    let currentPresent = 0
+    let lastDate: Date | null = null
+    for (const r of sorted) {
+      const d = new Date(r.attendance_date)
+      const contiguous = lastDate ? (d.getTime() - lastDate.getTime()) <= 86400000 + 1000 : true
+      if (r.status === 'present' && (contiguous || lastDate === null)) {
+        currentPresent += 1
+        longestPresent = Math.max(longestPresent, currentPresent)
+      } else if (r.status === 'present') {
+        currentPresent = 1
+        longestPresent = Math.max(longestPresent, currentPresent)
+      } else {
+        currentPresent = 0
+      }
+      lastDate = d
+    }
+
+    return { present, absent, leave, notMarked, percentage, longestPresent }
+  }, [afterAdmissionRecords])
 
   const openModal = (date: string) => {
     setModalDate(date)
@@ -117,6 +235,39 @@ export default function MyAttendance() {
         {error && <div className="text-danger">{error}</div>}
         {!loading && !error && (
           <>
+            <div className="row g-2 mb-3">
+              <div className="col-auto">
+                <div className="border rounded px-3 py-2 text-center">
+                  <div className="fw-bold fs-5">{(profilePercentage ?? insights.percentage)}%</div>
+                  <div className="text-muted small">Attendance</div>
+                </div>
+              </div>
+              <div className="col-auto">
+                <div className="border rounded px-3 py-2 text-center">
+                  <div className="fw-bold fs-5">{lifetimeCounts?.present ?? insights.present}</div>
+                  <div className="text-muted small">Present</div>
+                </div>
+              </div>
+              <div className="col-auto">
+                <div className="border rounded px-3 py-2 text-center">
+                  <div className="fw-bold fs-5">{lifetimeCounts?.absent ?? insights.absent}</div>
+                  <div className="text-muted small">Absent</div>
+                </div>
+              </div>
+              <div className="col-auto">
+                <div className="border rounded px-3 py-2 text-center">
+                  <div className="fw-bold fs-5">{lifetimeCounts?.leave ?? insights.leave}</div>
+                  <div className="text-muted small">Leave</div>
+                </div>
+              </div>
+              <div className="col-auto">
+                <div className="border rounded px-3 py-2 text-center">
+                  <div className="fw-bold fs-5">{(profileNotMarked ?? insights.notMarked)}</div>
+                  <div className="text-muted small">Not Marked</div>
+                </div>
+              </div>
+            </div>
+            <div className="mb-3 text-muted small">Longest present streak: {insights.longestPresent} day{insights.longestPresent === 1 ? '' : 's'}</div>
             <div className="table-responsive mb-4">
               <table className="table table-striped align-middle">
                 <thead>
@@ -127,7 +278,7 @@ export default function MyAttendance() {
                   </tr>
                 </thead>
                 <tbody>
-                  {records.map(rec => (
+                  {filteredRecords.map(rec => (
                     <tr key={rec.attendance_date}>
                       <td>{new Date(rec.attendance_date).toLocaleDateString()}</td>
                       <td className="text-capitalize">{rec.status.replace('_', ' ')}</td>
@@ -141,7 +292,7 @@ export default function MyAttendance() {
                       </td>
                     </tr>
                   ))}
-                  {records.length === 0 && (
+                  {filteredRecords.length === 0 && (
                     <tr>
                       <td colSpan={3} className="text-center text-muted">No attendance records.</td>
                     </tr>
@@ -160,6 +311,7 @@ export default function MyAttendance() {
                     <th>To</th>
                     <th>Status</th>
                     <th>Reason</th>
+                    <th>Admin Comment</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -170,11 +322,12 @@ export default function MyAttendance() {
                       <td className="text-capitalize">{r.requested_status}</td>
                       <td className={`text-capitalize ${r.status === 'pending' ? 'text-warning' : r.status === 'approved' ? 'text-success' : 'text-danger'}`}>{r.status}</td>
                       <td>{r.reason}</td>
+                      <td>{r.admin_comment ?? '—'}</td>
                     </tr>
                   ))}
                   {requests.length === 0 && (
                     <tr>
-                      <td colSpan={5} className="text-center text-muted">No requests yet.</td>
+                      <td colSpan={6} className="text-center text-muted">No requests yet.</td>
                     </tr>
                   )}
                 </tbody>
@@ -228,4 +381,3 @@ export default function MyAttendance() {
     </div>
   )
 }
-
