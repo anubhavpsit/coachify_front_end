@@ -31,6 +31,14 @@ interface StudentProfile {
   phone?: string
 }
 
+type RelatedUser = {
+  id: number
+  name: string
+  email: string
+  profile_img?: string | null
+  profile_image?: string | null
+}
+
 interface UserProfile {
   id: number
   name: string
@@ -46,6 +54,7 @@ interface UserProfile {
   profile_image?: string | null
   tenant_id: number
   student_profile?: StudentProfile | null
+  teachers?: RelatedUser[]
 }
 
 interface UserProfileModalProps {
@@ -348,6 +357,28 @@ export default function UserProfileModal({
               </div>
             )}
 
+            {/* Assigned Teachers (when viewing a student) */}
+            {user.role === 'student' && (
+              <div className="mb-3">
+                <h6 className="fw-semibold mb-2">Assigned Teachers</h6>
+                {Array.isArray(user.teachers) && user.teachers.length > 0 ? (
+                  <div className="d-flex flex-column gap-2">
+                    {user.teachers.map((t) => (
+                      <div key={t.id} className="d-flex align-items-center gap-2">
+                        <Avatar user={{ name: t.name, profile_image: t.profile_image ?? t.profile_img ?? undefined }} size={36} />
+                        <div>
+                          <div className="fw-medium">{t.name}</div>
+                          <div className="text-sm text-secondary-light">{t.email}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-secondary-light">No teachers assigned yet.</div>
+                )}
+              </div>
+            )}
+
             {/* Fees (Admin-only) */}
             {authRole === 'coaching_admin' && user.role === 'student' && !feesForbidden && (
               <div className="mb-3">
@@ -569,6 +600,8 @@ export default function UserProfileModal({
                 </div>
               </div>
             )}
+
+            
 
             {canEditImage && (
               <form onSubmit={handleUpload} className="mt-3">
