@@ -43,6 +43,7 @@ export default function MyAttendance() {
   const [profileNotMarked, setProfileNotMarked] = useState<number | null>(null)
   const [admissionYmd, setAdmissionYmd] = useState<string | null>(null)
   const [lifetimeCounts, setLifetimeCounts] = useState<{present?: number; absent?: number; leave?: number} | null>(null)
+  const [holidaySet, setHolidaySet] = useState<Set<string>>(new Set())
 
   const normalizeYmd = (value: string) => {
     const m = value && value.match(/^\d{4}-\d{2}-\d{2}/)
@@ -71,6 +72,20 @@ export default function MyAttendance() {
         attendance_date: normalizeYmd(String(r.attendance_date)),
       }))
       setRequests(normReqs)
+      // Load holidays for this month (inclusive range)
+      try {
+        const first = new Date(year, month - 1, 1)
+        const last = new Date(year, month, 0)
+        const fmt = (d: Date) => {
+          const y = d.getFullYear(); const m = String(d.getMonth() + 1).padStart(2, '0'); const day = String(d.getDate()).padStart(2, '0');
+          return `${y}-${m}-${day}`
+        }
+        const res = await axios.get(`${API_BASE_URL}/admin/holidays?from=${fmt(first)}&to=${fmt(last)}` , {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+        })
+        const hs: string[] = (res.data?.data || []).map((h: any) => normalizeYmd(String(h.holiday_date)))
+        setHolidaySet(new Set(hs))
+      } catch {}
       if (authUser?.id) {
         try {
           const prof = await axios.get(`${API_BASE_URL}/users/${authUser.id}`, {
@@ -122,10 +137,15 @@ export default function MyAttendance() {
     const result: Attendance[] = []
     for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
       const key = formatYmd(d)
-      result.push(map.get(key) ?? { user_id: 0, role: 'student', attendance_date: key, status: 'not_marked' })
+      const rec = map.get(key)
+      if (rec) {
+        result.push(rec)
+      } else if (!holidaySet.has(key)) {
+        result.push({ user_id: 0, role: 'student', attendance_date: key, status: 'not_marked' })
+      }
     }
     return result
-  }, [records, month, year])
+  }, [records, month, year, holidaySet])
 
   const requestedDates = useMemo(() => new Set(requests.map(r => r.attendance_date)), [requests])
   const todayYmd = useMemo(() => formatYmd(new Date()), [])

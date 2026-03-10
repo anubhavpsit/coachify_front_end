@@ -27,6 +27,7 @@ export default function DailyAttendance() {
   const [saving, setSaving] = useState(false);
   const [isHoliday, setIsHoliday] = useState<boolean>(false);
   const [holidayName, setHolidayName] = useState<string>('');
+  const [authRole, setAuthRole] = useState<string>('');
   const [date, setDate] = useState<string>(() => {
     const fromQuery = searchParams.get('date');
 
@@ -41,6 +42,10 @@ export default function DailyAttendance() {
 
   // Fetch users and initialize attendance
   useEffect(() => {
+    try {
+      const authUser = JSON.parse(localStorage.getItem('authUser') || '{}');
+      if (authUser && authUser.role) setAuthRole(authUser.role);
+    } catch {}
     const fetchUsersAndAttendance = async () => {
       setLoading(true);
       try {
@@ -170,9 +175,11 @@ export default function DailyAttendance() {
             onChange={(e) => setDate(e.target.value)}
             style={{ maxWidth: '200px' }}
           />
-          <Button variant={isHoliday ? 'warning' : 'outline-secondary'} size="sm" onClick={toggleHoliday}>
-            {isHoliday ? 'Unmark Holiday' : 'Mark Holiday'}
-          </Button>
+          {authRole === 'coaching_admin' && (
+            <Button variant={isHoliday ? 'warning' : 'outline-secondary'} size="sm" onClick={toggleHoliday}>
+              {isHoliday ? 'Unmark Holiday' : 'Mark Holiday'}
+            </Button>
+          )}
         </div>
       </div>
       <div className="card-body" style={{ maxHeight: '500px', overflowY: 'auto' }}>
