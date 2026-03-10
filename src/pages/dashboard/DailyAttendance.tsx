@@ -25,6 +25,8 @@ export default function DailyAttendance() {
   const [attendance, setAttendance] = useState<Record<number, Attendance>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isHoliday, setIsHoliday] = useState<boolean>(false);
+  const [holidayName, setHolidayName] = useState<string>('');
   const [date, setDate] = useState<string>(() => {
     const fromQuery = searchParams.get('date');
 
@@ -67,6 +69,19 @@ export default function DailyAttendance() {
         });
 
         setAttendance(attendanceMap);
+
+        // Fetch holiday status for this date
+        const holidayRes = await axios.get(`${API_BASE_URL}/admin/holidays?date=${date}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const holidays = holidayRes.data?.data ?? [];
+        if (Array.isArray(holidays) && holidays.length > 0) {
+          setIsHoliday(true);
+          setHolidayName(holidays[0]?.name ?? '');
+        } else {
+          setIsHoliday(false);
+          setHolidayName('');
+        }
       } catch (error) {
         console.error('Error fetching users or attendance:', error);
       } finally {
@@ -93,6 +108,7 @@ export default function DailyAttendance() {
 
   // Save attendance
   const handleSaveAttendance = async () => {
+    if (isHoliday) return;
     setSaving(true);
     try {
       const token = localStorage.getItem('authToken');
@@ -111,6 +127,29 @@ export default function DailyAttendance() {
     }
   };
 
+  const toggleHoliday = async () => {
+    const token = localStorage.getItem('authToken');
+    try {
+      if (!isHoliday) {
+        await axios.post(
+          `${API_BASE_URL}/admin/holidays`,
+          { date, name: holidayName || undefined },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setIsHoliday(true);
+      } else {
+        await axios.delete(`${API_BASE_URL}/admin/holidays`, {
+          headers: { Authorization: `Bearer ${token}` },
+          data: { date },
+        } as any);
+        setIsHoliday(false);
+        setHolidayName('');
+      }
+    } catch (e) {
+      alert('Failed to update holiday');
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-6">
@@ -124,14 +163,26 @@ export default function DailyAttendance() {
     <div className="card">
       <div className="card-header d-flex justify-content-between align-items-center">
         <h6 className="mb-0">Daily Attendance</h6>
-        <Form.Control
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          style={{ maxWidth: '200px' }}
-        />
+        <div className="d-flex align-items-center gap-2">
+          <Form.Control
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            style={{ maxWidth: '200px' }}
+          />
+          <Button variant={isHoliday ? 'warning' : 'outline-secondary'} size="sm" onClick={toggleHoliday}>
+            {isHoliday ? 'Unmark Holiday' : 'Mark Holiday'}
+          </Button>
+        </div>
       </div>
       <div className="card-body" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+        {isHoliday && (
+          <div className="alert alert-info d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Holiday:</strong> Attendance not required for {new Date(date).toLocaleDateString()}.
+            </div>
+          </div>
+        )}
         <Table bordered hover responsive>
           <thead>
             <tr>
@@ -148,7 +199,7 @@ export default function DailyAttendance() {
             {users.map((user, index) => (
               <tr
                 key={user.id}
-                className={attendance[user.id]?.status === 'not_marked' ? 'table-warning' : ''}
+                className={attendance[user.id]?.status === 'not_marked' && !isHoliday ? 'table-warning' : ''}
               >
                 <td>{index + 1}</td>
                 <td>{user.name}</td>
@@ -159,6 +210,7 @@ export default function DailyAttendance() {
                     name={`status_${user.id}`}
                     checked={attendance[user.id]?.status === 'present'}
                     onChange={() => handleStatusChange(user.id, 'present')}
+                    disabled={isHoliday}
                   />
                 </td>
                 <td className="text-center">
@@ -167,6 +219,7 @@ export default function DailyAttendance() {
                     name={`status_${user.id}`}
                     checked={attendance[user.id]?.status === 'absent'}
                     onChange={() => handleStatusChange(user.id, 'absent')}
+                    disabled={isHoliday}
                   />
                 </td>
                 <td className="text-center">
@@ -175,6 +228,7 @@ export default function DailyAttendance() {
                     name={`status_${user.id}`}
                     checked={attendance[user.id]?.status === 'leave'}
                     onChange={() => handleStatusChange(user.id, 'leave')}
+                    disabled={isHoliday}
                   />
                 </td>
                 <td className="text-center">
@@ -183,6 +237,7 @@ export default function DailyAttendance() {
                     name={`status_${user.id}`}
                     checked={attendance[user.id]?.status === 'not_marked'}
                     onChange={() => handleStatusChange(user.id, 'not_marked')}
+                    disabled={isHoliday}
                   />
                 </td>
               </tr>
@@ -190,8 +245,8 @@ export default function DailyAttendance() {
           </tbody>
         </Table>
         <div className="d-flex justify-content-end mt-3">
-          <Button onClick={handleSaveAttendance} disabled={saving}>
-            {saving ? 'Saving...' : 'Save Attendance'}
+          <Button onClick={handleSaveAttendance} disabled={saving || isHoliday}>
+            {isHoliday ? 'Holiday (No Attendance)' : saving ? 'Saving...' : 'Save Attendance'}
           </Button>
         </div>
       </div>
