@@ -114,6 +114,34 @@ export default function UserProfileModal({
   const [chaptersLoading, setChaptersLoading] = useState(false)
   const [chapterItems, setChapterItems] = useState<ChapterInsightItem[]>([])
 
+  // Assessments summary for student (admin/teacher reviewing)
+  const [asmLoading, setAsmLoading] = useState(false)
+  const [asmError, setAsmError] = useState<string | null>(null)
+  const [asmSummary, setAsmSummary] = useState<{
+    completed_count: number
+    average_percentage: number | null
+    last_result: {
+      assignment_id: number
+      title: string
+      subject: string
+      marks_obtained: number
+      total_marks: number
+      percentage: number
+      attempted_at?: string | null
+      graded_at?: string | null
+    } | null
+    recent_results: Array<{
+      assignment_id: number
+      title: string
+      subject: string
+      marks_obtained: number
+      total_marks: number
+      percentage: number
+      attempted_at?: string | null
+      graded_at?: string | null
+    }>
+  } | null>(null)
+
   useEffect(() => {
     const authUser = JSON.parse(localStorage.getItem('authUser') || '{}')
     setAuthRole(authUser.role || '')
@@ -171,6 +199,33 @@ export default function UserProfileModal({
 
     loadSubjects()
   }, [show, userId, authRole, user, insightWindowDays])
+
+  // Load assessment summary for the student (admin/teacher view)
+  useEffect(() => {
+    const shouldLoad = show && !!userId && user?.role === 'student' && (authRole === 'coaching_admin' || authRole === 'teacher')
+    if (!shouldLoad) return
+    const load = async () => {
+      setAsmLoading(true)
+      setAsmError(null)
+      try {
+        const token = localStorage.getItem('authToken')
+        const res = await axios.get(`${API_BASE_URL}/students/${userId}/assessments/summary`, {
+          headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+          params: { limit: 5 },
+        })
+        if (res.data?.success) {
+          setAsmSummary(res.data.data)
+        } else {
+          setAsmError('Unable to load assessments summary.')
+        }
+      } catch (e) {
+        setAsmError('Unable to load assessments summary.')
+      } finally {
+        setAsmLoading(false)
+      }
+    }
+    load()
+  }, [show, userId, authRole, user])
 
   const loadChapters = async (subjectId: number) => {
     if (!userId) return
@@ -352,6 +407,74 @@ export default function UserProfileModal({
                   <>
                     <div className="text-sm">Next Fee Due: {formatDate((user.student_profile as any).fee_due_date as string)}</div>
                     <div className="text-sm">Trial Days: {(user.student_profile as any).trial_days ?? '-'}</div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Assessments summary (admin/teacher viewing a student) */}
+            {user.role === 'student' && (authRole === 'coaching_admin' || authRole === 'teacher') && (
+              <div className="mb-3">
+                <h6 className="fw-semibold mb-2">Assessments</h6>
+                {asmLoading ? (
+                  <div className="d-flex align-items-center gap-2 text-sm"><Spinner size="sm" animation="border" /><span>Loading…</span></div>
+                ) : asmError ? (
+                  <div className="text-sm text-secondary-light">{asmError}</div>
+                ) : !asmSummary ? (
+                  <div className="text-sm text-secondary-light">No data available.</div>
+                ) : (
+                  <>
+                    <div className="d-flex gap-2 mb-2">
+                      <div className="flex-fill p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)' }}>
+                        <div className="text-sm text-secondary-light">Completed</div>
+                        <div className="fw-bold">{asmSummary.completed_count}</div>
+                      </div>
+                      <div className="flex-fill p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)' }}>
+                        <div className="text-sm text-secondary-light">Average</div>
+                        <div className="fw-bold">{typeof asmSummary.average_percentage === 'number' ? `${asmSummary.average_percentage.toFixed(2)}%` : '-'}</div>
+                      </div>
+                    </div>
+                    <div className="mb-2 p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)' }}>
+                      <div className="text-sm text-secondary-light mb-1">Last Result</div>
+                      {!asmSummary.last_result ? (
+                        <div className="text-sm text-secondary-light">—</div>
+                      ) : (
+                        <div className="d-flex align-items-center justify-content-between">
+                          <div>
+                            <div className="fw-medium">{asmSummary.last_result.subject || 'Subject'}</div>
+                            <div className="text-sm text-secondary-light">{asmSummary.last_result.title || '-'}</div>
+                          </div>
+                          <div className="text-end">
+                            <div className="fw-bold">{Math.round(asmSummary.last_result.percentage)}%</div>
+                            <div className="text-sm text-secondary-light">{formatDate(asmSummary.last_result.attempted_at || asmSummary.last_result.graded_at)}</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {Array.isArray(asmSummary.recent_results) && asmSummary.recent_results.length > 0 && (
+                      <div className="table-responsive">
+                        <table className="table bordered-table mb-0 text-sm">
+                          <thead>
+                            <tr>
+                              <th>Subject</th>
+                              <th>Title</th>
+                              <th className="text-end">%</th>
+                              <th className="text-end">Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {asmSummary.recent_results.map((r) => (
+                              <tr key={r.assignment_id}>
+                                <td>{r.subject}</td>
+                                <td>{r.title}</td>
+                                <td className="text-end">{Math.round(r.percentage)}%</td>
+                                <td className="text-end">{formatDate(r.attempted_at || r.graded_at)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
