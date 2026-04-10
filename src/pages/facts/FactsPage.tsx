@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { NavLink } from 'react-router-dom';
 import Icon from '../../components/common/Icon';
@@ -161,8 +161,17 @@ function ReelCard({
   resolveUrl,
 }: ReelCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLParagraphElement | null>(null);
   const hasImage = !!f.image_url;
   const gradient = GRADIENTS[idx % GRADIENTS.length];
+  const [expanded, setExpanded] = useState(false);
+  const [isTruncated, setIsTruncated] = useState(false);
+
+  useLayoutEffect(() => {
+    if (!expanded && contentRef.current) {
+      setIsTruncated(contentRef.current.scrollHeight > contentRef.current.clientHeight);
+    }
+  }, [f.content, expanded]);
 
   // Read tracking — fire once when 70% of the card is visible
   useEffect(() => {
@@ -276,16 +285,24 @@ function ReelCard({
         ) : null}
       </div>
 
-      {/* ── Content overlay (bottom) ── */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 68,  // clear of the action rail
-        padding: '20px 18px 26px',
-        zIndex: 2,
-        color: '#fff',
-      }}>
+      {/* ── Content overlay — full card height, content pushed to bottom ── */}
+      <div
+        className="reel-content-overlay"
+        style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 68,  // clear of the action rail
+          overflowY: expanded ? 'auto' : 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: expanded || !hasImage ? 'flex-start' : 'flex-end',
+          padding: expanded || !hasImage ? '26px 18px 26px' : '0 18px 26px',
+          zIndex: 2,
+          color: '#fff',
+        }}
+      >
         {/* Pinned badge */}
         {f.is_pinned && (
           <span style={{
@@ -340,18 +357,33 @@ function ReelCard({
 
         {/* Content */}
         {f.content && (
-          <p style={{
-            margin: 0,
-            fontSize: 'clamp(13px, 2.5vw, 15px)',
-            lineHeight: 1.55,
-            color: 'rgba(255,255,255,0.88)',
-            display: '-webkit-box',
-            WebkitLineClamp: 4,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}>
-            {f.content}
-          </p>
+          <div>
+            <p
+              ref={contentRef}
+              onClick={() => isTruncated || expanded ? setExpanded(v => !v) : undefined}
+              style={{
+                margin: '0 0 4px',
+                fontSize: 'clamp(13px, 2.5vw, 15px)',
+                lineHeight: 1.55,
+                color: 'rgba(255,255,255,0.88)',
+                cursor: isTruncated || expanded ? 'pointer' : 'default',
+                display: '-webkit-box',
+                WebkitLineClamp: expanded ? undefined : 8,
+                WebkitBoxOrient: 'vertical',
+                overflow: expanded ? 'visible' : 'hidden',
+              }}
+            >
+              {f.content}
+            </p>
+            {(isTruncated || expanded) && (
+              <span
+                onClick={() => setExpanded(v => !v)}
+                style={{ fontSize: 13, fontWeight: 700, color: '#a5b4fc', cursor: 'pointer' }}
+              >
+                {expanded ? 'Show less' : 'Read more'}
+              </span>
+            )}
+          </div>
         )}
 
         {/* Superadmin opt-in / opt-out */}
@@ -620,6 +652,23 @@ export default function FactsPage() {
         }
         .reel-scroll-container::-webkit-scrollbar {
           display: none;
+        }
+        .reel-content-overlay {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255,255,255,0.25) transparent;
+        }
+        .reel-content-overlay::-webkit-scrollbar {
+          width: 3px;
+        }
+        .reel-content-overlay::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .reel-content-overlay::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.25);
+          border-radius: 3px;
+        }
+        .reel-content-overlay::-webkit-scrollbar-thumb:hover {
+          background: rgba(255,255,255,0.45);
         }
       `}</style>
 
