@@ -23,6 +23,7 @@ interface Student {
   student_profile?: StudentProfile | null;
   dob?: string | null;
   created_at?: string | null;
+  status?: string | null;
 }
 
 interface StudentForm {
@@ -104,6 +105,11 @@ export default function StudentsPage() {
   const [singleToYearId, setSingleToYearId] = useState<number | ''>('');
   const [singleToClassId, setSingleToClassId] = useState<number | ''>('');
   const [promotingSingle, setPromotingSingle] = useState(false);
+
+  // Search & filter state
+  const [searchName, setSearchName] = useState('');
+  const [filterClassId, setFilterClassId] = useState<number | ''>('');
+  const [statusFilter, setStatusFilter] = useState<'active' | 'inactive' | 'all'>('active');
 
   const formatAddedOn = (isoString?: string | null) => {
     if (!isoString) return '-';
@@ -233,19 +239,22 @@ export default function StudentsPage() {
   // Fetch students
   useEffect(() => {
     const fetchStudents = async () => {
-      if (!userRole) return; // wait until userRole is set
+      if (!userRole) return;
+      setLoading(true);
       try {
         const token = localStorage.getItem('authToken');
-        console.dir("userRole")
-        console.dir(userRole)
-        console.dir("userRole")
         let url = `${API_BASE_URL}/students`;
-        if (userRole == 'teacher') {
-          url = `${API_BASE_URL}/teachers/students`; // my students for teacher
+        if (userRole === 'teacher') {
+          url = `${API_BASE_URL}/teachers/students`;
+        }
+        const params: Record<string, string | number> = {};
+        if (selectedYearId) params.academic_year_id = selectedYearId;
+        if (userRole === ROLES.COACHING_ADMIN && statusFilter !== 'active') {
+          params.status = statusFilter;
         }
         const response = await axios.get(url, {
           headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-          params: selectedYearId ? { academic_year_id: selectedYearId } : {},
+          params,
         });
 
         if (response.data.success) {
@@ -261,7 +270,7 @@ export default function StudentsPage() {
       }
     };
     fetchStudents();
-  }, [API_BASE_URL, userRole, selectedYearId]);
+  }, [API_BASE_URL, userRole, selectedYearId, statusFilter]);
 
 
   const handleSubjectToggle = (subjectId: number, type: 'add' | 'edit') => {
@@ -409,24 +418,21 @@ export default function StudentsPage() {
     }
   };
 
+  const filteredStudents = students.filter(s => {
+    if (!s) return false;
+    if (searchName.trim() && !s.name.toLowerCase().includes(searchName.trim().toLowerCase())) return false;
+    if (filterClassId !== '') {
+      const studentClass = s.current_class_id ?? s.student_profile?.class ?? null;
+      if (studentClass !== filterClassId) return false;
+    }
+    return true;
+  });
+
   return (
     <div>
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-24">
         <h6 className="fw-semibold mb-0">Students</h6>
-        <div className="d-flex align-items-center gap-2">
-          <div className="d-flex align-items-center gap-2">
-            <label className="text-sm text-secondary">Year</label>
-            <select
-              className="form-select form-select-sm"
-              value={selectedYearId}
-              onChange={(e) => setSelectedYearId(e.target.value === '' ? '' : Number(e.target.value))}
-            >
-              <option value="">Current</option>
-              {academicYears.map(y => (
-                <option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>
-              ))}
-            </select>
-          </div>
+        <div className="d-flex align-items-center gap-2 flex-wrap">
           {userRole === ROLES.COACHING_ADMIN && (
             <Button variant="primary" onClick={() => setShowAddModal(true)} className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
               <Icon icon="ic:baseline-plus" className="icon text-xl" />
@@ -439,7 +445,7 @@ export default function StudentsPage() {
               const cur = academicYears.find(y => y.is_current);
               setBulkToYearId(cur?.id || '');
               setShowPromoteModal(true);
-            }} className="btn btn-outline-primary text-sm btn-sm px-12 py-12 radius-8 ms-2">
+            }} className="btn btn-outline-primary text-sm btn-sm px-12 py-12 radius-8">
               <Icon icon="mdi:arrow-up-bold" className="icon text-xl" />
               Bulk Promote
             </Button>
@@ -447,11 +453,87 @@ export default function StudentsPage() {
         </div>
       </div>
 
+      {/* Search & Filter Bar */}
+      <div className="card mb-16">
+        <div className="card-body py-12 px-24">
+          <div className="d-flex flex-wrap align-items-end gap-3">
+            <div>
+              <label className="form-label text-sm mb-1">Search by Name</label>
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                placeholder="Student name..."
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                style={{ minWidth: 160 }}
+              />
+            </div>
+            <div>
+              <label className="form-label text-sm mb-1">Class</label>
+              <select
+                className="form-select form-select-sm"
+                value={filterClassId}
+                onChange={(e) => setFilterClassId(e.target.value === '' ? '' : Number(e.target.value))}
+                style={{ minWidth: 140 }}
+              >
+                <option value="">All Classes</option>
+                {classes.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="form-label text-sm mb-1">Academic Year</label>
+              <select
+                className="form-select form-select-sm"
+                value={selectedYearId}
+                onChange={(e) => setSelectedYearId(e.target.value === '' ? '' : Number(e.target.value))}
+                style={{ minWidth: 160 }}
+              >
+                <option value="">All Years</option>
+                {academicYears.map(y => (
+                  <option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>
+                ))}
+              </select>
+            </div>
+            {userRole === ROLES.COACHING_ADMIN && (
+              <div>
+                <label className="form-label text-sm mb-1">Status</label>
+                <select
+                  className="form-select form-select-sm"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as 'active' | 'inactive' | 'all')}
+                  style={{ minWidth: 120 }}
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="all">All</option>
+                </select>
+              </div>
+            )}
+            {(searchName || filterClassId !== '') && (
+              <Button
+                variant="outline-secondary"
+                size="sm"
+                onClick={() => { setSearchName(''); setFilterClassId(''); }}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Students Table */}
       <div className="card">
 
         <div className="card-header border-bottom bg-base py-16 px-24">
-          <span className="text-md fw-medium text-secondary-light">Students List</span>
+          <span className="text-md fw-medium text-secondary-light">
+            Students List
+            {filteredStudents.length !== students.length && (
+              <span className="ms-2 text-sm text-secondary">({filteredStudents.length} of {students.length})</span>
+            )}
+          </span>
         </div>
 
         <div className="card-body">
@@ -460,7 +542,7 @@ export default function StudentsPage() {
               <span className="spinner-border spinner-border-sm"></span>
               <span className="ms-2">Loading students...</span>
             </div>
-          ) : students.length === 0 ? (
+          ) : filteredStudents.length === 0 ? (
             <p className="text-center text-muted">No students found.</p>
           ) : (
             <div className="table-responsive">
@@ -476,13 +558,14 @@ export default function StudentsPage() {
                     {userRole === ROLES.COACHING_ADMIN && (
                       <>
                         <th>Phone</th>
+                        <th>Status</th>
                         <th className="text-center">Actions</th>
                       </>
                     )}
                   </tr>
                 </thead>
                 <tbody>
-                  {students.filter(s => s !== null).map(student => (
+                  {filteredStudents.map(student => (
                     <tr key={student.id}>
                       <td>
                         <div className="d-flex align-items-center gap-2">
@@ -522,6 +605,11 @@ export default function StudentsPage() {
                       {userRole === ROLES.COACHING_ADMIN && (
                         <>
                           <td>{student.student_profile?.phone || '-'}</td>
+                          <td>
+                            <span className={`badge ${student.status === 'inactive' ? 'bg-danger-100 text-danger-600' : 'bg-success-100 text-success-600'}`}>
+                              {student.status === 'inactive' ? 'Inactive' : 'Active'}
+                            </span>
+                          </td>
                           <td className="text-center">
                             {student.tenant_id !== 0 && (
                               <>
