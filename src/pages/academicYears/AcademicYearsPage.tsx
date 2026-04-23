@@ -65,8 +65,9 @@ export default function AcademicYearsPage() {
       await axios.put(`${API_BASE_URL}/academic-years/${editId}`, form, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } })
       setShowEdit(false)
       await load()
-    } catch {
-      alert('Failed to update year')
+    } catch (err: any) {
+      const msg = err?.response?.data?.message
+      alert(msg || 'Failed to update year')
     } finally {
       setSaving(false)
     }

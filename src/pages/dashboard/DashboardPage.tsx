@@ -36,6 +36,7 @@ export default function DashboardPage() {
     {
       student_id: number
       student_name: string | null
+      student_status?: string | null
       average_percentage: number
       last_percentage: number
       last_graded_at: string
@@ -333,7 +334,16 @@ export default function DashboardPage() {
                               {topStudents.map((s, index) => (
                                 <tr key={s.student_id}>
                                   <td>{index + 1}</td>
-                                  <td>{s.student_name ?? 'Unknown'}</td>
+                                  <td>
+                                    <div className="d-flex align-items-center gap-2">
+                                      <span>{s.student_name ?? 'Unknown'}</span>
+                                      {s.student_status && (
+                                        <span className={`badge text-xs fw-medium ${s.student_status === 'active' ? 'bg-success-100 text-success-600' : 'bg-secondary-100 text-secondary-600'}`}>
+                                          {s.student_status}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </td>
                                   <td>{s.average_percentage.toFixed(2)}%</td>
                                   <td>{s.last_percentage.toFixed(2)}%</td>
                                   <td>{s.last_graded_at}</td>

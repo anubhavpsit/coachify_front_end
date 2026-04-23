@@ -8,8 +8,9 @@ import "slick-carousel/slick/slick-theme.css";
 interface BirthdayUser {
   id: number;
   name: string;
-  role: string; // student / teacher
+  role: string;
   dob: string;
+  status?: string;
 }
 
 interface BirthdayCardProps {
@@ -91,6 +92,14 @@ export default function TodayBirthdayCard({
                       <p className="text-sm mb-2 text-secondary">
                         Role: {user.role}
                       </p>
+
+                      {user.role === 'student' && user.status && (
+                        <p className="mb-2">
+                          <span className={`badge text-xs fw-medium ${user.status === 'active' ? 'bg-success-100 text-success-600' : 'bg-secondary-100 text-secondary-600'}`}>
+                            {user.status}
+                          </span>
+                        </p>
+                      )}
 
                       <span className="badge bg-primary">
                         🎉 Birthday Today

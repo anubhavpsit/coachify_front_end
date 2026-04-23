@@ -6,6 +6,7 @@ type GhostStudent = {
   name: string;
   email: string;
   class: string | null;
+  status?: string;
 };
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
@@ -91,7 +92,14 @@ export default function GhostStudentsCard() {
                     <tr key={s.id}>
                       <td>
                         <div className="d-flex flex-column">
-                          <span className="fw-medium text-md">{s.name}</span>
+                          <div className="d-flex align-items-center gap-2">
+                            <span className="fw-medium text-md">{s.name}</span>
+                            {s.status && (
+                              <span className={`badge text-xs fw-medium ${s.status === 'active' ? 'bg-success-100 text-success-600' : 'bg-secondary-100 text-secondary-600'}`}>
+                                {s.status}
+                              </span>
+                            )}
+                          </div>
                           <span className="text-sm text-secondary-light">{s.email}</span>
                         </div>
                       </td>

@@ -10,6 +10,7 @@ type PendingFee = {
   student_id: number
   student_name: string
   student_email?: string
+  student_status?: string
   class?: string | null
   phone?: string | null
   last_paid_to_date?: string | null
@@ -142,9 +143,14 @@ export default function PendingFeesCard() {
                     <tr key={item.student_id} onClick={() => openDetails(item.student_id)} style={{ cursor: 'pointer' }}>
                       <td>
                         <div className="d-flex flex-column">
-                          <span className="fw-semibold text-sm">
-                            {item.student_name}
-                          </span>
+                          <div className="d-flex align-items-center gap-2">
+                            <span className="fw-semibold text-sm">{item.student_name}</span>
+                            {item.student_status && (
+                              <span className={`badge text-xs fw-medium ${item.student_status === 'active' ? 'bg-success-100 text-success-600' : 'bg-secondary-100 text-secondary-600'}`}>
+                                {item.student_status}
+                              </span>
+                            )}
+                          </div>
                           {item.student_email && (
                             <span className="text-xs text-secondary-light">
                               {item.student_email}

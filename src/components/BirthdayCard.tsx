@@ -4,8 +4,9 @@ import Avatar from './common/Avatar.tsx';
 interface BirthdayUser {
   id: number;
   name: string;
-  role: string; // 'student' or 'teacher'
+  role: string;
   dob: string;
+  status?: string;
 }
 
 interface BirthdayCardProps {
@@ -76,9 +77,14 @@ export default function BirthdayCard({ title = 'Birthday this month', maxHeight 
                       <h6 className="text-md mb-0 fw-medium">
                         {user.name}
                       </h6>
-                      <span className="text-sm text-secondary-light fw-medium">
-                        {user.role}
-                      </span>
+                      <div className="d-flex align-items-center gap-1">
+                        <span className="text-sm text-secondary-light fw-medium">{user.role}</span>
+                        {user.role === 'student' && user.status && (
+                          <span className={`badge text-xs fw-medium ${user.status === 'active' ? 'bg-success-100 text-success-600' : 'bg-secondary-100 text-secondary-600'}`}>
+                            {user.status}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
