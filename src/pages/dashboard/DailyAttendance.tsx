@@ -52,7 +52,7 @@ export default function DailyAttendance() {
         const token = localStorage.getItem('authToken');
 
         // Fetch users
-        const usersRes = await axios.get(`${API_BASE_URL}/users?roles=student,teacher`, {
+        const usersRes = await axios.get(`${API_BASE_URL}/attendances/markable-users`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const usersData: User[] = usersRes.data.data || [];
