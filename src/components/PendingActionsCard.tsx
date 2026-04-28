@@ -140,31 +140,33 @@ export default function PendingActionsCard() {
                   No pending actions for the selected filters.
                 </p>
               ) : (
-                <ul className="list-unstyled mb-0">
-                  {filteredActions.map((action, index) => (
-                    <li
-                      key={`${action.type}-${action.date ?? index}`}
-                      className="d-flex justify-content-between align-items-center mb-2"
-                    >
-                      <div>
-                        <strong>{action.title}</strong>
-                        <br />
-                        <span className="text-sm text-secondary-light">
-                          {action.description}
-                        </span>
-                      </div>
-                      {action.action_route && (
-                        <button
-                          type="button"
-                          className="btn btn-outline-primary btn-sm"
-                          onClick={() => handleOpen(action)}
-                        >
-                          Open
-                        </button>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+                <div style={{ maxHeight: '300px', overflowY: filteredActions.length > 4 ? 'auto' : 'visible', paddingRight: '8px' }}>
+                  <ul className="list-unstyled mb-0">
+                    {filteredActions.map((action, index) => (
+                      <li
+                        key={`${action.type}-${action.date ?? index}`}
+                        className="d-flex justify-content-between align-items-center mb-2"
+                      >
+                        <div>
+                          <strong>{action.title}</strong>
+                          <br />
+                          <span className="text-sm text-secondary-light">
+                            {action.description}
+                          </span>
+                        </div>
+                        {action.action_route && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary btn-sm"
+                            onClick={() => handleOpen(action)}
+                          >
+                            Open
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </>
           )}

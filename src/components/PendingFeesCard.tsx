@@ -27,10 +27,14 @@ type PendingFeesResponse = {
   }
 }
 
-// Use shared date formatter for consistency
+type CoachingClass = {
+  id: number
+  name: string
+}
 
 export default function PendingFeesCard() {
   const [items, setItems] = useState<PendingFee[]>([])
+  const [classes, setClasses] = useState<CoachingClass[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [asOfDate, setAsOfDate] = useState<string | null>(null)
@@ -40,6 +44,13 @@ export default function PendingFeesCard() {
   const [detailsError, setDetailsError] = useState<string | null>(null)
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+  const tenantId = typeof window !== 'undefined' ? localStorage.getItem('tenant_id') : null
+
+  const getClassName = (classIdOrName: string | null | undefined) => {
+    if (!classIdOrName) return '-'
+    const found = classes.find((c) => String(c.id) === String(classIdOrName))
+    return found ? found.name : classIdOrName
+  }
 
   useEffect(() => {
     const loadPendingFees = async () => {
@@ -53,24 +64,31 @@ export default function PendingFeesCard() {
           return
         }
 
-        const response = await axios.get<PendingFeesResponse>(
-          `${API_BASE_URL}/dashboard/pending-fees`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: 'application/json',
+        const [feesResponse, classRes] = await Promise.all([
+          axios.get<PendingFeesResponse>(
+            `${API_BASE_URL}/dashboard/pending-fees`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+              },
             },
-          },
-        )
+          ),
+          axios.get<{ data: CoachingClass[] }>(
+            `${API_BASE_URL}/classes/${tenantId}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          ),
+        ])
 
-        if (response.data.success) {
-          setItems(response.data.data || [])
-          if (response.data.meta?.today) {
-            setAsOfDate(response.data.meta.today)
+        if (feesResponse.data.success) {
+          setItems(feesResponse.data.data || [])
+          if (feesResponse.data.meta?.today) {
+            setAsOfDate(feesResponse.data.meta.today)
           }
         } else {
           setError('Unable to load pending fees.')
         }
+        setClasses(classRes.data.data || [])
       } catch (err) {
         console.error('Error loading pending fees:', err)
         setError('Unable to load pending fees.')
@@ -126,39 +144,40 @@ export default function PendingFeesCard() {
           )}
 
           {!loading && !error && items.length > 0 && (
-            <div className="table-responsive">
-              <table className="table bordered-table mb-0">
-                <thead>
-                  <tr>
-                    <th>Student</th>
-                    <th>Class</th>
-                    <th>Phone</th>
-                    <th>Last Paid Till</th>
-                    <th>Due Since</th>
-                    <th>Days Overdue</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item) => (
-                    <tr key={item.student_id} onClick={() => openDetails(item.student_id)} style={{ cursor: 'pointer' }}>
-                      <td>
-                        <div className="d-flex flex-column">
-                          <div className="d-flex align-items-center gap-2">
-                            <span className="fw-semibold text-sm">{item.student_name}</span>
-                            {item.student_status && (
-                              <span className={`badge text-xs fw-medium ${item.student_status === 'active' ? 'bg-success-100 text-success-600' : 'bg-secondary-100 text-secondary-600'}`}>
-                                {item.student_status}
+            <div style={{ maxHeight: '350px', overflowY: items.length > 5 ? 'auto' : 'visible' }}>
+              <div className="table-responsive">
+                <table className="table bordered-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Class</th>
+                      <th>Phone</th>
+                      <th>Last Paid Till</th>
+                      <th>Due Since</th>
+                      <th>Days Overdue</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((item) => (
+                      <tr key={item.student_id} onClick={() => openDetails(item.student_id)} style={{ cursor: 'pointer' }}>
+                        <td>
+                          <div className="d-flex flex-column">
+                            <div className="d-flex align-items-center gap-2">
+                              <span className="fw-semibold text-sm">{item.student_name}</span>
+                              {item.student_status && (
+                                <span className={`badge text-xs fw-medium ${item.student_status === 'active' ? 'bg-success-100 text-success-600' : 'bg-secondary-100 text-secondary-600'}`}>
+                                  {item.student_status}
+                                </span>
+                              )}
+                            </div>
+                            {item.student_email && (
+                              <span className="text-xs text-secondary-light">
+                                {item.student_email}
                               </span>
                             )}
                           </div>
-                          {item.student_email && (
-                            <span className="text-xs text-secondary-light">
-                              {item.student_email}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td>{item.class ?? '-'}</td>
+                        </td>
+                        <td>{getClassName(item.class)}</td>
                       <td>{item.phone ?? '-'}</td>
                       <td>
                         {item.last_paid_to_date
@@ -169,8 +188,9 @@ export default function PendingFeesCard() {
                       <td>{item.days_overdue}</td>
                     </tr>
                   ))}
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
