@@ -89,7 +89,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
     if (!isoString) return '-';
     const parsedDate = new Date(isoString);
     if (Number.isNaN(parsedDate.getTime())) return '-';
-    return parsedDate.toLocaleString();
+    return parsedDate.toLocaleDateString();
   };
 
   const [assessments, setAssessments] = useState<Assessment[]>([]);

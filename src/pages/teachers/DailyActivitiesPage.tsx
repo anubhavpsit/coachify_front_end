@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { Button, Modal } from "react-bootstrap";
 import { ROLES } from '../../constants/roles';
+import { formatDate } from '../../utils/date';
 
 type AttachmentFileType = "image" | "pdf" | "other";
 
@@ -35,7 +36,9 @@ type HistoryActivityRow = {
   activity_date: string;
   chapter?: string | null;
   topic?: string | null;
+  notes?: string | null;
   homework?: string | null;
+  remarks?: string | null;
   homework_status?: "not_done" | "partial" | "done" | null;
   student?: { id: number; name: string } | null;
   subject?: { id: number; subject: string } | null;
@@ -63,6 +66,7 @@ type ActivityApiResponse = {
   topic?: string | null;
   notes?: string | null;
   homework?: string | null;
+  remarks?: string | null;
   homework_status?: "not_done" | "partial" | "done" | null;
   attachments?: ActivityAttachment[];
 };
@@ -107,6 +111,8 @@ export default function DailyActivitiesPage() {
   const [historyActivities, setHistoryActivities] = useState<
     HistoryActivityRow[]
   >([]);
+  const [historyRemarks, setHistoryRemarks] = useState<Record<number, string>>({});
+  const [savingRemarkId, setSavingRemarkId] = useState<number | null>(null);
   const [historyDate, setHistoryDate] = useState<string>(() => {
     const fromQuery = searchParams.get("date");
     if (fromQuery && !Number.isNaN(Date.parse(fromQuery))) {
@@ -260,7 +266,11 @@ export default function DailyActivitiesPage() {
         }
       );
 
-      setHistoryActivities(response.data?.data || []);
+      const loaded: HistoryActivityRow[] = response.data?.data || [];
+      setHistoryActivities(loaded);
+      const remarksMap: Record<number, string> = {};
+      loaded.forEach((act) => { remarksMap[act.id] = act.remarks ?? ''; });
+      setHistoryRemarks(remarksMap);
     } catch (error) {
       console.error("Error loading history activities:", error);
     }
@@ -285,6 +295,27 @@ export default function DailyActivitiesPage() {
     } catch (error) {
       console.error("Error updating homework status:", error);
       alert("Failed to update homework status.");
+    }
+  };
+
+  const handleHistoryRemarksSave = async (activityId: number) => {
+    try {
+      setSavingRemarkId(activityId);
+      await axios.patch(
+        `${API_BASE_URL}/daily-activities/${activityId}/status`,
+        { remarks: historyRemarks[activityId] ?? '' },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setHistoryActivities((prev) =>
+        prev.map((act) =>
+          act.id === activityId ? { ...act, remarks: historyRemarks[activityId] } : act
+        )
+      );
+    } catch (error) {
+      console.error("Error saving remarks:", error);
+      alert("Failed to save remarks.");
+    } finally {
+      setSavingRemarkId(null);
     }
   };
 
@@ -714,7 +745,9 @@ const handleSelectStudent = async (
                   <th className="border px-2 py-1">Topic</th>
                   <th className="border px-2 py-1">Homework</th>
                   <th className="border px-2 py-1">Attachments</th>
+                  <th className="border px-2 py-1">Class Notes</th>
                   <th className="border px-2 py-1">Homework Status</th>
+                  <th className="border px-2 py-1">Remarks</th>
                 </tr>
               </thead>
               <tbody>
@@ -722,7 +755,7 @@ const handleSelectStudent = async (
                   <tr>
                     <td
                       className="border px-2 py-2 text-center text-gray-500"
-                      colSpan={7}
+                      colSpan={9}
                     >
                       No activities found.
                     </td>
@@ -731,7 +764,7 @@ const handleSelectStudent = async (
                   historyActivities.map((act) => (
                     <tr key={act.id}>
                       <td className="border px-2 py-1">
-                        {act.activity_date}
+                        {formatDate(act.activity_date)}
                       </td>
                       <td className="border px-2 py-1">
                         {act.student?.name ?? "-"}
@@ -752,6 +785,9 @@ const handleSelectStudent = async (
                         {renderReadOnlyAttachments(act.attachments)}
                       </td>
                       <td className="border px-2 py-1">
+                        {act.notes ?? "-"}
+                      </td>
+                      <td className="border px-2 py-1">
                         <select
                           className="border p-1 text-sm"
                           value={act.homework_status ?? "not_done"}
@@ -766,6 +802,28 @@ const handleSelectStudent = async (
                           <option value="partial">Partial</option>
                           <option value="done">Done</option>
                         </select>
+                      </td>
+                      <td className="border px-2 py-1" style={{ minWidth: '200px' }}>
+                        <textarea
+                          className="border p-1 text-sm w-full"
+                          rows={2}
+                          placeholder="e.g. Good Work! / Improve your writing."
+                          value={historyRemarks[act.id] ?? ''}
+                          onChange={(e) =>
+                            setHistoryRemarks((prev) => ({
+                              ...prev,
+                              [act.id]: e.target.value,
+                            }))
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-success mt-1"
+                          disabled={savingRemarkId === act.id}
+                          onClick={() => handleHistoryRemarksSave(act.id)}
+                        >
+                          {savingRemarkId === act.id ? 'Saving…' : 'Save Remarks'}
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -843,7 +901,7 @@ const handleSelectStudent = async (
 
             <textarea
               className="w-full border p-2 mb-3"
-              placeholder="Notes"
+              placeholder="Class Notes (what was taught today)"
               value={batchForm.notes}
               onChange={(e) =>
                 setBatchForm((prev) => ({ ...prev, notes: e.target.value }))
@@ -989,21 +1047,21 @@ const handleSelectStudent = async (
                 onChange={(e) => handleChange(index, "topic", e.target.value)}
               />
 
-              {/* Notes */}
+              {/* Class Notes */}
               <textarea
                 className="w-full border p-2 mb-3"
-                placeholder="Notes"
+                placeholder="Class Notes (what was taught today)"
                 value={activity.notes ?? ""}
                 onChange={(e) => handleChange(index, "notes", e.target.value)}
               ></textarea>
 
-          {/* Homework */}
-          <textarea
-            className="w-full border p-2 mb-3"
-            placeholder="Homework"
-            value={activity.homework ?? ""}
-            onChange={(e) => handleChange(index, "homework", e.target.value)}
-          ></textarea>
+              {/* Homework */}
+              <textarea
+                className="w-full border p-2 mb-3"
+                placeholder="Homework"
+                value={activity.homework ?? ""}
+                onChange={(e) => handleChange(index, "homework", e.target.value)}
+              ></textarea>
 
               <div className="mb-3">
                 <label className="block font-semibold mb-1">Attachments</label>

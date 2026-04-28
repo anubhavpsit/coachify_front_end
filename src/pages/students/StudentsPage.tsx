@@ -115,7 +115,7 @@ export default function StudentsPage() {
     if (!isoString) return '-';
     const parsedDate = new Date(isoString);
     if (Number.isNaN(parsedDate.getTime())) return '-';
-    return parsedDate.toLocaleString();
+    return parsedDate.toLocaleDateString();
   };
 
   const getStudentTimestamp = (student: Student) => {
