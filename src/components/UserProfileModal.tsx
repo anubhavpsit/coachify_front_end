@@ -55,6 +55,7 @@ interface UserProfile {
   tenant_id: number
   student_profile?: StudentProfile | null
   teachers?: RelatedUser[]
+  students?: RelatedUser[]
 }
 
 interface UserProfileModalProps {
@@ -498,6 +499,28 @@ export default function UserProfileModal({
                   </div>
                 ) : (
                   <div className="text-sm text-secondary-light">No teachers assigned yet.</div>
+                )}
+              </div>
+            )}
+
+            {/* Assigned Students (when viewing a teacher) */}
+            {user.role === 'teacher' && (
+              <div className="mb-3">
+                <h6 className="fw-semibold mb-2">Assigned Students</h6>
+                {Array.isArray(user.students) && user.students.length > 0 ? (
+                  <div className="d-flex flex-column gap-2">
+                    {user.students.map((s) => (
+                      <div key={s.id} className="d-flex align-items-center gap-2">
+                        <Avatar user={{ name: s.name, profile_image: s.profile_image ?? s.profile_img ?? undefined }} size={36} />
+                        <div>
+                          <div className="fw-medium">{s.name}</div>
+                          <div className="text-sm text-secondary-light">{s.email}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-secondary-light">No students assigned yet.</div>
                 )}
               </div>
             )}
