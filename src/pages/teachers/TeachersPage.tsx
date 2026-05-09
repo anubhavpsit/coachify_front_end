@@ -11,6 +11,7 @@ interface Teacher {
   email: string;
   tenant_id: number;
   dob?: string | null;
+  gender?: string | null;
 }
 
 function getTodayDateValue() {
@@ -31,12 +32,14 @@ export default function TeachersPage() {
   const [newTeacherEmail, setNewTeacherEmail] = useState('');
   const [newTeacherPassword, setNewTeacherPassword] = useState('');
   const [newTeacherDob, setNewTeacherDob] = useState<string>(getTodayDateValue()); // initialize with today
+  const [newTeacherGender, setNewTeacherGender] = useState<string>('');
 
   // Edit teacher modal
   const [showEditModal, setShowEditModal] = useState(false);
   const [editTeacher, setEditTeacher] = useState<Teacher & { password?: string } | null>(null);
   const [editTeacherPassword, setEditTeacherPassword] = useState('');
   const [editTeacherDob, setEditTeacherDob] = useState<string>(''); // will populate on edit
+  const [editTeacherGender, setEditTeacherGender] = useState<string>('');
 
   // Delete teacher modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -93,7 +96,7 @@ export default function TeachersPage() {
   /** Create Teacher */
   const handleSaveTeacher = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTeacherName.trim() || !newTeacherEmail.trim() || !newTeacherPassword.trim()) return;
+    if (!newTeacherName.trim() || !newTeacherEmail.trim() || !newTeacherPassword.trim() || !newTeacherGender) return;
 
     setSaving(true);
     try {
@@ -104,7 +107,8 @@ export default function TeachersPage() {
           name: newTeacherName,
           email: newTeacherEmail,
           password: newTeacherPassword,
-          dob: newTeacherDob, // send dob
+          dob: newTeacherDob,
+          gender: newTeacherGender,
         },
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
@@ -114,6 +118,7 @@ export default function TeachersPage() {
         setNewTeacherName('');
         setNewTeacherEmail('');
         setNewTeacherPassword('');
+        setNewTeacherGender('');
         setShowAddModal(false);
       }
     } catch (error) {
@@ -129,6 +134,7 @@ export default function TeachersPage() {
     setEditTeacher(teacher);
     setEditTeacherPassword(''); // reset password field
     setEditTeacherDob(teacher.dob || ''); // populate DOB
+    setEditTeacherGender(teacher.gender || '');
     setShowEditModal(true);
   };
 
@@ -146,7 +152,8 @@ export default function TeachersPage() {
           name: editTeacher.name,
           email: editTeacher.email,
           password: editTeacherPassword || undefined, // send only if changed
-          dob: editTeacherDob, // send updated DOB
+          dob: editTeacherDob,
+          gender: editTeacherGender,
         },
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
@@ -320,6 +327,20 @@ export default function TeachersPage() {
                 onChange={(e) => setNewTeacherDob(e.target.value)}
               />
             </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Gender <span className="text-danger">*</span></label>
+              <select
+                className="form-control"
+                value={newTeacherGender}
+                onChange={(e) => setNewTeacherGender(e.target.value)}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
             <div className="d-flex justify-content-end gap-2 mt-3">
               <Button variant="secondary" onClick={() => setShowAddModal(false)}>Cancel</Button>
               <Button type="submit" variant="primary" disabled={saving}>
@@ -373,6 +394,20 @@ export default function TeachersPage() {
                 value={editTeacherDob}
                 onChange={(e) => setEditTeacherDob(e.target.value)}
               />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Gender <span className="text-danger">*</span></label>
+              <select
+                className="form-control"
+                value={editTeacherGender}
+                onChange={(e) => setEditTeacherGender(e.target.value)}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
             </div>
             <div className="d-flex justify-content-end gap-2 mt-3">
               <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancel</Button>

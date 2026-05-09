@@ -22,6 +22,7 @@ interface Student {
   current_class_name?: string | null;
   student_profile?: StudentProfile | null;
   dob?: string | null;
+  gender?: string | null;
   created_at?: string | null;
   status?: string | null;
 }
@@ -34,6 +35,7 @@ interface StudentForm {
   subjects: number[];
   phone: string;
   dob: string;
+  gender: string;
 }
 
 interface StudentFallbackData {
@@ -74,6 +76,7 @@ export default function StudentsPage() {
     subjects: [],
     phone: '',
     dob: '',
+    gender: '',
   });
 
   // Edit student modal state
@@ -294,7 +297,7 @@ export default function StudentsPage() {
   // Add student
   const handleSaveStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStudentForm.name.trim() || !newStudentForm.email.trim() || !newStudentForm.password.trim()) return;
+    if (!newStudentForm.name.trim() || !newStudentForm.email.trim() || !newStudentForm.password.trim() || !newStudentForm.gender) return;
 
     setSaving(true);
     try {
@@ -316,7 +319,7 @@ export default function StudentsPage() {
         });
 
         setStudents(prev => sortStudentsByCreatedAt([enrichedStudent, ...prev]));
-        setNewStudentForm({ name: '', email: '', password: '', class: '', subjects: [], phone: '', dob: '' });
+        setNewStudentForm({ name: '', email: '', password: '', class: '', subjects: [], phone: '', dob: '', gender: '' });
         setShowAddModal(false);
       }
     } catch (error) {
@@ -342,6 +345,7 @@ export default function StudentsPage() {
       subjects: student.student_profile?.subjects || [],
       phone: student.student_profile?.phone || '',
       dob: student.dob || '',
+      gender: student.gender || '',
     });
     setShowEditModal(true);
   };
@@ -688,6 +692,21 @@ export default function StudentsPage() {
               />
             </div>
             <div className="mb-3">
+              <label className="form-label fw-semibold">Gender <span className="text-danger">*</span></label>
+              <select
+                className="form-control"
+                value={newStudentForm.gender}
+                onChange={(e) => setNewStudentForm({ ...newStudentForm, gender: e.target.value })}
+                required
+                disabled={saving}
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div className="mb-3">
               <label className="form-label fw-semibold">Class</label>
               <select
                 className="form-control"
@@ -786,6 +805,21 @@ export default function StudentsPage() {
                 value={editStudentForm?.dob || ''}
                 onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, dob: e.target.value })}
               />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Gender <span className="text-danger">*</span></label>
+              <select
+                className="form-control"
+                value={editStudentForm?.gender || ''}
+                onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, gender: e.target.value })}
+                required
+                disabled={saving}
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold">Class</label>
