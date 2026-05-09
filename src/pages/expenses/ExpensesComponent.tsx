@@ -57,6 +57,7 @@ export default function ExpensesComponent() {
   const [selectedUserId, setSelectedUserId] = useState<number | ''>('')
 
   const [filterMonth, setFilterMonth] = useState<string>(getCurrentMonthValue())
+  const [filterUserId, setFilterUserId] = useState<number | ''>('')
 
   const [loadingUsers, setLoadingUsers] = useState(false)
   const [loadingExpenses, setLoadingExpenses] = useState(false)
@@ -106,6 +107,7 @@ export default function ExpensesComponent() {
         const params: string[] = []
         if (from) params.push(`from_date=${from}`)
         if (to) params.push(`to_date=${to}`)
+        if (filterUserId !== '') params.push(`user_id=${filterUserId}`)
         if (params.length) {
           url += `?${params.join('&')}`
         }
@@ -128,7 +130,7 @@ export default function ExpensesComponent() {
     }
 
     fetchExpenses()
-  }, [API_BASE_URL, filterMonth])
+  }, [API_BASE_URL, filterMonth, filterUserId])
 
   const handleSaveExpense = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -299,6 +301,22 @@ export default function ExpensesComponent() {
             Expenses (Month-wise)
           </span>
           <div className="d-flex align-items-center gap-2">
+            <select
+              className="form-select"
+              style={{ minWidth: 160 }}
+              value={filterUserId}
+              onChange={(event) =>
+                setFilterUserId(event.target.value ? Number(event.target.value) : '')
+              }
+              disabled={loadingUsers}
+            >
+              <option value="">All Users</option>
+              {users.map((user) => (
+                <option key={user.id} value={user.id}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
             <input
               type="month"
               className="form-control"
