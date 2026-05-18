@@ -22,9 +22,20 @@ type SubjectsResp = {
 
 type ChapterItem = { chapter: string; activity_count: number }
 
+type WindowOption = { label: string; days: number | null }
+
+const WINDOW_OPTIONS: WindowOption[] = [
+  { label: 'Today', days: 1 },
+  { label: '3d', days: 3 },
+  { label: '7d', days: 7 },
+  { label: '14d', days: 14 },
+  { label: '30d', days: 30 },
+  { label: 'All', days: null },
+]
+
 export default function InsightsPage() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
-  const [windowDays, setWindowDays] = useState(7)
+  const [windowDays, setWindowDays] = useState<number | null>(7)
   const [loading, setLoading] = useState(false)
   const [subjects, setSubjects] = useState<SubjectItem[]>([])
   const [focusNotes, setFocusNotes] = useState<string[]>([])
@@ -33,12 +44,17 @@ export default function InsightsPage() {
 
   const token = localStorage.getItem('authToken')
 
-  const loadSubjects = async () => {
+  const buildParams = (days: number | null) => {
+    if (days === null) return { all: 'true' }
+    return { window_days: days }
+  }
+
+  const loadSubjects = async (days: number | null = windowDays) => {
     setLoading(true)
     try {
       const res = await axios.get(`${API_BASE_URL}/insights/activities/subjects`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-        params: { window_days: windowDays },
+        params: buildParams(days),
       })
       if (res.data?.success) {
         const d: SubjectsResp = res.data.data
@@ -55,7 +71,7 @@ export default function InsightsPage() {
     try {
       const res = await axios.get(`${API_BASE_URL}/insights/activities/chapters`, {
         headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-        params: { window_days: windowDays, subject_id: sid },
+        params: { ...buildParams(windowDays), subject_id: sid },
       })
       if (res.data?.success) {
         setChapters(res.data.data.items || [])
@@ -65,21 +81,32 @@ export default function InsightsPage() {
     }
   }
 
-  useEffect(() => { loadSubjects() }, [windowDays])
+  useEffect(() => { loadSubjects(windowDays) }, [windowDays])
 
   const total = useMemo(() => subjects.reduce((s, i) => s + i.activity_count, 0), [subjects])
+
+  const windowLabel = windowDays === null
+    ? 'all time'
+    : windowDays === 1
+    ? 'today'
+    : `last ${windowDays} days`
 
   return (
     <div>
       <div className="d-flex align-items-center justify-content-between mb-24">
-        <h6 className="fw-semibold mb-0">Insights (last {windowDays} days)</h6>
+        <h6 className="fw-semibold mb-0">Insights ({windowLabel})</h6>
         <div className="d-flex align-items-center gap-2">
-          {[1,3,7,14].map((d) => (
-            <Button key={d} size="sm" variant={windowDays===d? 'primary':'outline-primary'} onClick={()=> setWindowDays(d)}>
-              {d===1? 'Today' : `${d}d`}
+          {WINDOW_OPTIONS.map((opt) => (
+            <Button
+              key={opt.label}
+              size="sm"
+              variant={windowDays === opt.days ? 'primary' : 'outline-primary'}
+              onClick={() => setWindowDays(opt.days)}
+            >
+              {opt.label}
             </Button>
           ))}
-          <Button size="sm" variant="outline-secondary" onClick={loadSubjects}>Refresh</Button>
+          <Button size="sm" variant="outline-secondary" onClick={() => loadSubjects(windowDays)}>Refresh</Button>
         </div>
       </div>
 
@@ -165,4 +192,3 @@ export default function InsightsPage() {
     </div>
   )
 }
-

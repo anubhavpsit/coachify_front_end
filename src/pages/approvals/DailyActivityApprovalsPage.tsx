@@ -50,6 +50,11 @@ type ActivityNotification = {
   last_error?: string | null
 }
 
+type StudentOption = {
+  id: number
+  name: string
+}
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 const STORAGE_BASE_URL =
@@ -68,6 +73,8 @@ export default function DailyActivityApprovalsPage() {
   const [error, setError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<ApprovalFilter>('pending')
   const [dateFilter, setDateFilter] = useState('')
+  const [studentFilter, setStudentFilter] = useState('')
+  const [students, setStudents] = useState<StudentOption[]>([])
   const [previewContext, setPreviewContext] =
     useState<AttachmentActionContext | null>(null)
   const [processingActivityId, setProcessingActivityId] = useState<number | null>(
@@ -99,11 +106,31 @@ export default function DailyActivityApprovalsPage() {
     ? window.localStorage.getItem('authToken')
     : null
 
-  const canAccess = authUser?.role === ROLES.COACHING_ADMIN
+  const isAdmin = authUser?.role === ROLES.COACHING_ADMIN
+  const isTeacher = authUser?.role === ROLES.TEACHER
+  const canAccess = isAdmin || isTeacher
+
+  const studentsEndpoint = isAdmin ? '/students' : '/teachers/students'
+
+  useEffect(() => {
+    if (!token || !canAccess) return
+    axios
+      .get<{ success: boolean; data: StudentOption[] }>(
+        `${API_BASE_URL}${studentsEndpoint}`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      .then(res => {
+        if (res.data.success) {
+          setStudents(res.data.data || [])
+        }
+      })
+      .catch(() => {/* non-critical */})
+  }, [token, canAccess, studentsEndpoint])
 
   const loadActivities = async (
     approvalFilter: ApprovalFilter,
     activityDate?: string,
+    studentId?: string,
   ) => {
     if (!token || !canAccess) return
 
@@ -111,15 +138,24 @@ export default function DailyActivityApprovalsPage() {
     setError(null)
 
     try {
-      const params: Record<string, string> = {
-        approved: approvalFilter === 'approved' ? 'true' : 'false',
+      const params: Record<string, string> = {}
+
+      if (isAdmin) {
+        params.approved = approvalFilter === 'approved' ? 'true' : 'false'
       }
       if (activityDate) {
         params.date = activityDate
       }
+      if (studentId) {
+        params.student_id = studentId
+      }
+
+      const endpoint = isAdmin
+        ? `${API_BASE_URL}/admin/daily-activities`
+        : `${API_BASE_URL}/teacher/daily-activities`
 
       const response = await axios.get<{ success: boolean; data: AdminActivity[] }>(
-        `${API_BASE_URL}/admin/daily-activities`,
+        endpoint,
         {
           headers: { Authorization: `Bearer ${token}` },
           params,
@@ -132,7 +168,7 @@ export default function DailyActivityApprovalsPage() {
         setError('Unable to load activities. Please try again later.')
       }
     } catch (err) {
-      console.error('Failed to load admin activities', err)
+      console.error('Failed to load activities', err)
       setError('Unable to load activities. Please try again later.')
     } finally {
       setLoading(false)
@@ -140,12 +176,12 @@ export default function DailyActivityApprovalsPage() {
   }
 
   useEffect(() => {
-    loadActivities(statusFilter, dateFilter || undefined)
+    loadActivities(statusFilter, dateFilter || undefined, studentFilter || undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, dateFilter, canAccess])
+  }, [statusFilter, dateFilter, studentFilter, canAccess])
 
   const refresh = () => {
-    loadActivities(statusFilter, dateFilter || undefined)
+    loadActivities(statusFilter, dateFilter || undefined, studentFilter || undefined)
   }
 
   const approveActivity = async (
@@ -311,16 +347,29 @@ export default function DailyActivityApprovalsPage() {
           </p>
         </div>
         <div className="d-flex flex-wrap gap-2 align-items-center">
+          {isAdmin && (
+            <select
+              className="form-select"
+              value={statusFilter}
+              onChange={(event) =>
+                setStatusFilter(event.target.value as ApprovalFilter)
+              }
+              style={{ minWidth: '180px' }}
+            >
+              <option value="pending">Pending Approval</option>
+              <option value="approved">Recently Approved</option>
+            </select>
+          )}
           <select
             className="form-select"
-            value={statusFilter}
-            onChange={(event) =>
-              setStatusFilter(event.target.value as ApprovalFilter)
-            }
+            value={studentFilter}
+            onChange={(event) => setStudentFilter(event.target.value)}
             style={{ minWidth: '180px' }}
           >
-            <option value="pending">Pending Approval</option>
-            <option value="approved">Recently Approved</option>
+            <option value="">All Students</option>
+            {students.map(s => (
+              <option key={s.id} value={String(s.id)}>{s.name}</option>
+            ))}
           </select>
           <input
             type="date"
@@ -430,28 +479,30 @@ export default function DailyActivityApprovalsPage() {
                   <td>{activity.admin_feedback ?? '—'}</td>
                   <td className="text-center">
                     <div className="d-flex flex-column gap-2 align-items-center">
-                      {activity.is_admin_approved ? (
-                        <button
-                          type="button"
-                          className="btn btn-outline-secondary btn-sm"
-                          disabled={processingActivityId === activity.id}
-                          onClick={() => handleApprovalToggle(activity.id, false)}
-                        >
-                          {processingActivityId === activity.id
-                            ? 'Updating...'
-                            : 'Mark Pending'}
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="btn btn-success btn-sm"
-                          disabled={processingActivityId === activity.id}
-                          onClick={() => handleApprovalToggle(activity.id, true)}
-                        >
-                          {processingActivityId === activity.id
-                            ? 'Updating...'
-                            : 'Approve Activity'}
-                        </button>
+                      {isAdmin && (
+                        activity.is_admin_approved ? (
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary btn-sm"
+                            disabled={processingActivityId === activity.id}
+                            onClick={() => handleApprovalToggle(activity.id, false)}
+                          >
+                            {processingActivityId === activity.id
+                              ? 'Updating...'
+                              : 'Mark Pending'}
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="btn btn-success btn-sm"
+                            disabled={processingActivityId === activity.id}
+                            onClick={() => handleApprovalToggle(activity.id, true)}
+                          >
+                            {processingActivityId === activity.id
+                              ? 'Updating...'
+                              : 'Approve Activity'}
+                          </button>
+                        )
                       )}
                       {renderNotificationMeta(
                         'Student notification',

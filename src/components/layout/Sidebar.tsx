@@ -224,12 +224,21 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
           {user?.role === ROLES.TEACHER && (
             <>
               <li>
-                <NavLink 
+                <NavLink
                   to="/teachers/daily-activities"
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
                   <Icon icon="mdi:calendar-check" className="menu-icon" />
                   <span>Daily Activities</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/approvals"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:check-decagram" className="menu-icon" />
+                  <span>Approvals</span>
                 </NavLink>
               </li>
             </>
