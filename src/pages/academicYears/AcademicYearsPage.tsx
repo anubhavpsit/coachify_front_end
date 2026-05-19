@@ -118,7 +118,7 @@ export default function AcademicYearsPage() {
                       <td className="text-center">
                         <Button variant="link" onClick={() => openEdit(y)}>Edit</Button>
                         {!y.is_current && (
-                          <Button variant="link" onClick={() => setCurrent(y.id)}>Set Current</Button>
+                          <Button variant="link" title="Setting this as current affects which year is used as the default across the app. Only one year can be active at a time." onClick={() => setCurrent(y.id)}>Set Current</Button>
                         )}
                       </td>
                     </tr>

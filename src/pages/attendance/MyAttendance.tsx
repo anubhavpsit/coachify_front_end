@@ -257,7 +257,7 @@ export default function MyAttendance() {
           <>
             <div className="row g-2 mb-3">
               <div className="col-auto">
-                <div className="border rounded px-3 py-2 text-center">
+                <div className="border rounded px-3 py-2 text-center" title="Calculated as: Present ÷ (Present + Absent + Leave) × 100">
                   <div className="fw-bold fs-5">{(profilePercentage ?? insights.percentage)}%</div>
                   <div className="text-muted small">Attendance</div>
                 </div>
@@ -370,6 +370,7 @@ export default function MyAttendance() {
                 <button type="button" className="btn-close" onClick={() => setModalOpen(false)}></button>
               </div>
               <div className="modal-body">
+                <p className="text-xs text-secondary-light mb-2">Corrections can only be requested for Absent or Leave days.</p>
                 <div className="mb-3">
                   <label className="form-label">Date</label>
                   <input className="form-control" value={new Date(modalDate).toLocaleDateString()} readOnly />

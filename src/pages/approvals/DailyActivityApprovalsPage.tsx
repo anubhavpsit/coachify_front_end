@@ -344,6 +344,7 @@ export default function DailyActivityApprovalsPage() {
             type="button"
             className="btn btn-outline-primary btn-sm"
             disabled={isSent || sendingNotificationId === notification.id}
+            title={isSent ? 'Already delivered to the recipient' : 'Send this notification immediately'}
             onClick={() => sendQueuedNotification(notification.id)}
           >
             {sendingNotificationId === notification.id
@@ -425,7 +426,7 @@ export default function DailyActivityApprovalsPage() {
       </div>
 
       {/* Row 2: date range bar */}
-      <div className="d-flex align-items-center justify-content-end gap-2 mb-3">
+      <div className="d-flex align-items-center justify-content-end gap-2 mb-1">
         <div className="btn-group" role="group" aria-label="Quick date filters">
           {QUICK_FILTER_OPTIONS.map(f => (
             <button
@@ -457,6 +458,10 @@ export default function DailyActivityApprovalsPage() {
           style={{ width: '148px' }}
         />
       </div>
+
+      <p className="text-xs text-secondary-light text-end mb-3">
+        Use quick filters to narrow by date range, or pick a custom date. Approving an activity does <strong>not</strong> automatically approve its attachments — those must be approved separately in the Attachments column.
+      </p>
 
       {error && <p className="text-danger-600 mb-3">{error}</p>}
 

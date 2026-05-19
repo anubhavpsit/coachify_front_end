@@ -702,6 +702,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                       <td className="text-center">
                         <Button
                           variant="link"
+                          title="Assign Students"
                           onClick={() => openAssignModal(asm)}
                         >
                           <Icon
@@ -711,6 +712,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                         </Button>
                         <Button
                           variant="link"
+                          title="Enter Results"
                           onClick={() => openResultsModal(asm)}
                         >
                           <Icon
@@ -720,6 +722,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                         </Button>
                         <Button
                           variant="link"
+                          title="Manage Files"
                           onClick={() => openFilesModal(asm)}
                         >
                           <Icon
@@ -1017,6 +1020,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <p className="text-xs text-secondary-light mb-2">Files must be approved separately from the activity itself. Approving an activity does not automatically approve its attachments.</p>
           <div className="mb-3">
             <label className="form-label fw-semibold">Upload Question Paper / Document</label>
             <div className="d-flex flex-wrap gap-2 align-items-center">

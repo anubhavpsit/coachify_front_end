@@ -185,7 +185,13 @@ export default function DailyAttendance() {
             style={{ maxWidth: '200px' }}
           />
           {authRole === 'coaching_admin' && (
-            <Button variant={isHoliday ? 'warning' : 'outline-secondary'} size="sm" onClick={toggleHoliday} style={{ minWidth: '140px' }}>
+            <Button
+              variant={isHoliday ? 'warning' : 'outline-secondary'}
+              size="sm"
+              onClick={toggleHoliday}
+              style={{ minWidth: '140px' }}
+              title={isHoliday ? 'Unmarking will allow attendance to be edited for this day' : 'Mark this day as a holiday — attendance will be disabled'}
+            >
               {isHoliday ? 'Unmark Holiday' : 'Mark Holiday'}
             </Button>
           )}
@@ -214,7 +220,7 @@ export default function DailyAttendance() {
                       checked={allHaveStatus(status)}
                       onChange={() => handleMarkAll(status)}
                       disabled={isHoliday}
-                      title={`Mark all ${status}`}
+                      title={`Check to mark every person as ${status === 'not_marked' ? 'Not Marked' : status} at once`}
                       className="m-0"
                     />
                   </div>
@@ -227,6 +233,7 @@ export default function DailyAttendance() {
               <tr
                 key={user.id}
                 className={attendance[user.id]?.status === 'not_marked' && !isHoliday ? 'table-warning' : ''}
+                title={attendance[user.id]?.status === 'not_marked' && !isHoliday ? 'Attendance not yet marked for this person' : undefined}
               >
                 <td>{index + 1}</td>
                 <td>{user.name}</td>

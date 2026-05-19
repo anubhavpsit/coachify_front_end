@@ -148,8 +148,11 @@ export default function InsightsPage() {
                 </div>
               )}
               {focusNotes.length>0 && (
-                <div className="alert alert-warning mt-3">
-                  {focusNotes.map((n,i)=> <div key={i}>{n}</div>)}
+                <div className="mt-3">
+                  <p className="text-xs text-secondary-light mb-1">AI-generated suggestions based on recent activity patterns.</p>
+                  <div className="alert alert-warning">
+                    {focusNotes.map((n,i)=> <div key={i}>{n}</div>)}
+                  </div>
                 </div>
               )}
             </div>

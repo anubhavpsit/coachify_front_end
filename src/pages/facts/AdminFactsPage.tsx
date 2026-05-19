@@ -200,6 +200,7 @@ export default function AdminFactsPage() {
               </div>
               {form.target_roles.includes('student') && (
                 <div className="col-12">
+                  <p className="text-xs text-secondary-light mb-1">Unchecking the Student role will clear your class selection.</p>
                   <label className="form-label">Target Classes</label>
                   <div className="border rounded p-2" style={{ maxHeight: 200, overflowY: 'auto' }}>
                     {classOptions.length === 0 ? (

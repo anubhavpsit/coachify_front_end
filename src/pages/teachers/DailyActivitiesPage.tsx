@@ -698,26 +698,34 @@ const handleSelectStudent = async (
     <div className="p-4 max-w-3xl mx-auto">
       <h2 className="text-xl font-bold mb-4">Daily Activities</h2>
 
-      <div className="flex gap-3 mb-4">
+      <div className="flex gap-3 mb-1">
         <Button
           variant={mode === "student" ? "primary" : "outline-primary"}
           onClick={() => setMode("student")}
+          title="Log an activity for one or more individual students"
         >
           Per Student
         </Button>
         <Button
           variant={mode === "batch" ? "primary" : "outline-primary"}
           onClick={() => setMode("batch")}
+          title="Log the same activity for every student in a class at once"
         >
           By Class &amp; Subject
         </Button>
         <Button
           variant={mode === "history" ? "primary" : "outline-primary"}
           onClick={() => setMode("history")}
+          title="View and edit previously submitted activities"
         >
           History
         </Button>
       </div>
+      <p className="text-xs text-secondary-light mb-4">
+        {mode === "student" && "Use this mode to log today's activity for one or more specific students."}
+        {mode === "batch" && "Use this mode to log the same lesson for an entire class in one go."}
+        {mode === "history" && "View past activities. You can update homework status and add remarks here."}
+      </p>
 
       {mode === "history" ? (
         <>
@@ -838,10 +846,11 @@ const handleSelectStudent = async (
             <label className="block font-semibold mb-1">Activity Date</label>
             <input
               type="date"
-              className="w-full border p-2 mb-3"
+              className="w-full border p-2 mb-1"
               value={activityDate}
               onChange={(e) => setActivityDate(e.target.value)}
             />
+            <p className="text-xs text-secondary-light">This date will be applied to all students in the selected class.</p>
           </div>
           <div className="border p-4 mb-4 rounded bg-gray-50">
             <label className="block font-semibold mb-1">Class</label>
@@ -987,7 +996,7 @@ const handleSelectStudent = async (
               value={activityDate}
               onChange={(e) => setActivityDate(e.target.value)}
             />
-            <p className="text-sm text-gray-500">Applies to all activities below.</p>
+            <p className="text-sm text-gray-500">This date applies to <strong>all</strong> activity rows below — it is not set per student.</p>
           </div>
           {activities.map((activity, index) => (
             <div
@@ -1013,6 +1022,9 @@ const handleSelectStudent = async (
 
               {/* Subject */}
               <label className="block font-semibold mb-1">Subject</label>
+              {!activity.student_id && (
+                <p className="text-xs text-secondary-light mb-1">Select a student first to load their subjects.</p>
+              )}
               <select
                 className="w-full border p-2 mb-3"
                 value={activity.subject_id ?? ""}
@@ -1065,6 +1077,9 @@ const handleSelectStudent = async (
 
               <div className="mb-3">
                 <label className="block font-semibold mb-1">Attachments</label>
+                {!activity.id && (
+                  <p className="text-xs text-secondary-light mb-1">Save the activity first (click Submit Activities), then you can attach files.</p>
+                )}
                 {activity.attachments?.length ? (
                   <div className="flex flex-wrap gap-2 mb-2">
                     {activity.attachments.map((file) => (

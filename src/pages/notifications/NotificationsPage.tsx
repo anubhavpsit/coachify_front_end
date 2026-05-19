@@ -472,7 +472,7 @@ export default function NotificationsPage() {
                   <th>Sender</th>
                   <th>Type</th>
                   <th>Status</th>
-                  <th>Attempts</th>
+                  <th title="Number of delivery attempts made vs the maximum allowed before the notification is marked as failed">Attempts</th>
                   <th>Created</th>
                   <th>Sent at</th>
                   <th>Last error</th>
@@ -535,7 +535,7 @@ export default function NotificationsPage() {
                       </td>
                       <td>
                         {notification.status.toLowerCase() === 'sent' ? (
-                          <span className="text-success-600 text-sm">Sent</span>
+                          <span className="text-success-600 text-sm" title="Already delivered">Sent</span>
                         ) : (
                           <div className="d-flex gap-2">
                             <button

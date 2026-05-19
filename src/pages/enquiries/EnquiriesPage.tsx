@@ -601,7 +601,7 @@ export default function EnquiriesPage() {
                       <td>{enquiry.contact_number}</td>
                       <td>{enquiry.email || '-'}</td>
                       <td className="text-capitalize">{enquiry.status}</td>
-                      <td>{formatDateTime(enquiry.last_communication_at)}</td>
+                      <td>{enquiry.last_communication_at ? formatDateTime(enquiry.last_communication_at) : <span title="No communications logged yet">—</span>}</td>
                       <td>{formatDateTime(enquiry.created_at)}</td>
                       <td>
                         <div className="d-flex gap-2">

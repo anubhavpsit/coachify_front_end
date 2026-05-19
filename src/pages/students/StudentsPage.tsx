@@ -499,6 +499,7 @@ export default function StudentsPage() {
                   <option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>
                 ))}
               </select>
+              <div className="text-xs text-secondary-light mt-1">Showing students enrolled in the selected year.</div>
             </div>
             {userRole === ROLES.COACHING_ADMIN && (
               <div>
@@ -943,6 +944,7 @@ export default function StudentsPage() {
           <Modal.Title>Promote Student</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          <p className="text-xs text-secondary-light mb-3">From and To fields are pre-filled from the student's current enrolment. Adjust as needed.</p>
           <div className="mb-3">
             <label className="form-label fw-semibold">To Academic Year</label>
             <select className="form-control" value={singleToYearId} onChange={(e)=> setSingleToYearId(e.target.value === '' ? '' : Number(e.target.value))}>
