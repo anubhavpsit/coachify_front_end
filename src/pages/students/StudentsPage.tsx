@@ -449,7 +449,7 @@ export default function StudentsPage() {
               const cur = academicYears.find(y => y.is_current);
               setBulkToYearId(cur?.id || '');
               setShowPromoteModal(true);
-            }} className="btn btn-outline-primary text-sm btn-sm px-12 py-12 radius-8">
+            }} className="btn btn-outline-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
               <Icon icon="mdi:arrow-up-bold" className="icon text-xl" />
               Bulk Promote
             </Button>
@@ -888,7 +888,12 @@ export default function StudentsPage() {
       {/* Bulk Promote Modal */}
       <Modal show={showPromoteModal} onHide={() => setShowPromoteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Bulk Promote Students</Modal.Title>
+          <Modal.Title>
+            Bulk Promote Students{' '}
+            <span className="badge bg-warning-subtle text-warning fw-normal ms-1" style={{ fontSize: '0.7rem', verticalAlign: 'middle' }}>
+              Coming soon
+            </span>
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="mb-3">
@@ -921,34 +926,14 @@ export default function StudentsPage() {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={()=> setShowPromoteModal(false)} disabled={promoting}>Cancel</Button>
-          <Button variant="primary" disabled={promoting || !bulkFromClassId || !bulkToYearId || !bulkToClassId} onClick={async ()=>{
-            setPromoting(true);
-            try {
-              const token = localStorage.getItem('authToken');
-              // Load students for source year
-              const res = await axios.get(`${API_BASE_URL}/students`, {
-                headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
-                params: { academic_year_id: bulkFromYearId || undefined },
-              });
-              const list: any[] = Array.isArray(res.data?.data) ? res.data.data : [];
-              const targets = list.filter(s => (s.current_class_id ?? s?.student_profile?.class) == bulkFromClassId);
-              for (const s of targets) {
-                await axios.post(`${API_BASE_URL}/students/${s.id}/promote`, {
-                  to_academic_year_id: bulkToYearId,
-                  to_class_id: bulkToClassId,
-                }, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } });
-              }
-              // Refresh main list
-              setShowPromoteModal(false);
-              // trigger reload by touching selectedYearId state
-              setSelectedYearId(prev => prev === '' ? '' : Number(prev));
-            } catch (e) {
-              alert('Bulk promote failed.');
-            } finally {
-              setPromoting(false);
-            }
-          }}>{promoting ? 'Promoting...' : 'Promote'}</Button>
+          <Button variant="secondary" onClick={()=> setShowPromoteModal(false)}>Cancel</Button>
+          <Button
+            variant="primary"
+            style={{ minWidth: '160px' }}
+            onClick={() => alert('Coming soon! Bulk promote will be available in a future update.')}
+          >
+            Promote
+          </Button>
         </Modal.Footer>
       </Modal>
 
