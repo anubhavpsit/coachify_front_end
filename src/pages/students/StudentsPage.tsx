@@ -100,8 +100,6 @@ export default function StudentsPage() {
   const [bulkFromClassId, setBulkFromClassId] = useState<number | ''>('');
   const [bulkToYearId, setBulkToYearId] = useState<number | ''>('');
   const [bulkToClassId, setBulkToClassId] = useState<number | ''>('');
-  const [promoting, setPromoting] = useState(false);
-
   // Single-student promote
   const [showSinglePromoteModal, setShowSinglePromoteModal] = useState(false);
   const [promoteStudentId, setPromoteStudentId] = useState<number | null>(null);
