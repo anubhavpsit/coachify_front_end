@@ -97,19 +97,28 @@ export default function DailyAttendance() {
     fetchUsersAndAttendance();
   }, [API_BASE_URL, date]);
 
-  // Handle status change
   const handleStatusChange = (
     userId: number,
     status: 'present' | 'absent' | 'leave' | 'not_marked'
   ) => {
     setAttendance((prev) => ({
       ...prev,
-      [userId]: {
-        ...prev[userId],
-        status,
-      },
+      [userId]: { ...prev[userId], status },
     }));
   };
+
+  const handleMarkAll = (status: 'present' | 'absent' | 'leave' | 'not_marked') => {
+    setAttendance((prev) => {
+      const updated = { ...prev };
+      users.forEach((u) => {
+        updated[u.id] = { ...updated[u.id], status };
+      });
+      return updated;
+    });
+  };
+
+  const allHaveStatus = (status: 'present' | 'absent' | 'leave' | 'not_marked') =>
+    users.length > 0 && users.every((u) => attendance[u.id]?.status === status);
 
   // Save attendance
   const handleSaveAttendance = async () => {
@@ -196,10 +205,21 @@ export default function DailyAttendance() {
               <th>S.no</th>
               <th>Name</th>
               <th>Role</th>
-              <th className="text-center">Present</th>
-              <th className="text-center">Absent</th>
-              <th className="text-center">Leave</th>
-              <th className="text-center">Not Marked</th>
+              {(['present', 'absent', 'leave', 'not_marked'] as const).map((status) => (
+                <th key={status} className="text-center" style={{ whiteSpace: 'nowrap' }}>
+                  <div className="d-flex flex-column align-items-center gap-1">
+                    <span>{status === 'not_marked' ? 'Not Marked' : status.charAt(0).toUpperCase() + status.slice(1)}</span>
+                    <Form.Check
+                      type="checkbox"
+                      checked={allHaveStatus(status)}
+                      onChange={() => handleMarkAll(status)}
+                      disabled={isHoliday}
+                      title={`Mark all ${status}`}
+                      className="m-0"
+                    />
+                  </div>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
