@@ -185,7 +185,7 @@ export default function DailyAttendance() {
             style={{ maxWidth: '200px' }}
           />
           {authRole === 'coaching_admin' && (
-            <Button variant={isHoliday ? 'warning' : 'outline-secondary'} size="sm" onClick={toggleHoliday}>
+            <Button variant={isHoliday ? 'warning' : 'outline-secondary'} size="sm" onClick={toggleHoliday} style={{ minWidth: '140px' }}>
               {isHoliday ? 'Unmark Holiday' : 'Mark Holiday'}
             </Button>
           )}
