@@ -62,6 +62,34 @@ const STORAGE_BASE_URL =
 
 type ApprovalFilter = 'pending' | 'approved'
 
+type QuickFilter = 'today' | '3d' | '7d' | '14d' | '30d' | 'all' | 'custom'
+
+const QUICK_FILTER_OPTIONS: { label: string; value: QuickFilter }[] = [
+  { label: 'Today', value: 'today' },
+  { label: '3d', value: '3d' },
+  { label: '7d', value: '7d' },
+  { label: '14d', value: '14d' },
+  { label: '30d', value: '30d' },
+  { label: 'All', value: 'all' },
+]
+
+const toDateStr = (d: Date) => d.toISOString().split('T')[0]
+
+const getQuickFilterDates = (
+  filter: QuickFilter,
+  customDate: string,
+): { date?: string; date_from?: string; date_to?: string } => {
+  if (filter === 'custom') return customDate ? { date: customDate } : {}
+  if (filter === 'today') return { date: toDateStr(new Date()) }
+  if (filter === 'all') return {}
+  const days = { '3d': 3, '7d': 7, '14d': 14, '30d': 30 }[filter as string]
+  if (!days) return {}
+  const to = new Date()
+  const from = new Date()
+  from.setDate(from.getDate() - days + 1)
+  return { date_from: toDateStr(from), date_to: toDateStr(to) }
+}
+
 type AttachmentActionContext = {
   activityId: number
   attachment: ActivityAttachment
@@ -73,6 +101,7 @@ export default function DailyActivityApprovalsPage() {
   const [error, setError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<ApprovalFilter>('pending')
   const [dateFilter, setDateFilter] = useState('')
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>('today')
   const [studentFilter, setStudentFilter] = useState('')
   const [students, setStudents] = useState<StudentOption[]>([])
   const [previewContext, setPreviewContext] =
@@ -129,7 +158,7 @@ export default function DailyActivityApprovalsPage() {
 
   const loadActivities = async (
     approvalFilter: ApprovalFilter,
-    activityDate?: string,
+    dateParams: { date?: string; date_from?: string; date_to?: string },
     studentId?: string,
   ) => {
     if (!token || !canAccess) return
@@ -143,8 +172,14 @@ export default function DailyActivityApprovalsPage() {
       if (isAdmin) {
         params.approved = approvalFilter === 'approved' ? 'true' : 'false'
       }
-      if (activityDate) {
-        params.date = activityDate
+      if (dateParams.date) {
+        params.date = dateParams.date
+      }
+      if (dateParams.date_from) {
+        params.date_from = dateParams.date_from
+      }
+      if (dateParams.date_to) {
+        params.date_to = dateParams.date_to
       }
       if (studentId) {
         params.student_id = studentId
@@ -176,12 +211,21 @@ export default function DailyActivityApprovalsPage() {
   }
 
   useEffect(() => {
-    loadActivities(statusFilter, dateFilter || undefined, studentFilter || undefined)
+    const dateParams = getQuickFilterDates(quickFilter, dateFilter)
+    loadActivities(statusFilter, dateParams, studentFilter || undefined)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter, dateFilter, studentFilter, canAccess])
+  }, [statusFilter, quickFilter, dateFilter, studentFilter, canAccess])
 
   const refresh = () => {
-    loadActivities(statusFilter, dateFilter || undefined, studentFilter || undefined)
+    const dateParams = getQuickFilterDates(quickFilter, dateFilter)
+    loadActivities(statusFilter, dateParams, studentFilter || undefined)
+  }
+
+  const applyQuickFilter = (filter: QuickFilter) => {
+    setQuickFilter(filter)
+    if (filter !== 'custom') {
+      setDateFilter('')
+    }
   }
 
   const approveActivity = async (
@@ -338,46 +382,80 @@ export default function DailyActivityApprovalsPage() {
   }
 
   return (
-    <div className="p-4">
-      <div className="d-flex flex-wrap justify-content-between gap-3 mb-4 align-items-center">
+    <div>
+      {/* Row 1: title + dropdowns */}
+      <div className="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-2">
         <div>
-          <h6 className="fw-semibold mb-1">Activity Approvals</h6>
-          <p className="text-secondary-light mb-0 text-sm">
-            Review and approve teacher submitted activities and attachments.
+          <h6 className="fw-semibold mb-0">Activity Approvals</h6>
+          <p className="text-secondary-light mb-0 text-xs">
+            Review and approve teacher submitted activities.
           </p>
         </div>
-        <div className="d-flex flex-wrap gap-2 align-items-center">
+
+        <div className="d-flex align-items-end gap-2">
           {isAdmin && (
-            <select
-              className="form-select"
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as ApprovalFilter)
-              }
-              style={{ minWidth: '180px' }}
-            >
-              <option value="pending">Pending Approval</option>
-              <option value="approved">Recently Approved</option>
-            </select>
+            <div>
+              <div className="text-xs text-secondary-light mb-1">Status</div>
+              <select
+                className="form-select form-select-sm"
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value as ApprovalFilter)}
+                style={{ minWidth: '150px' }}
+              >
+                <option value="pending">Pending Approval</option>
+                <option value="approved">Recently Approved</option>
+              </select>
+            </div>
           )}
-          <select
-            className="form-select"
-            value={studentFilter}
-            onChange={(event) => setStudentFilter(event.target.value)}
-            style={{ minWidth: '180px' }}
-          >
-            <option value="">All Students</option>
-            {students.map(s => (
-              <option key={s.id} value={String(s.id)}>{s.name}</option>
-            ))}
-          </select>
-          <input
-            type="date"
-            className="form-control"
-            value={dateFilter}
-            onChange={(event) => setDateFilter(event.target.value)}
-          />
+          <div>
+            <div className="text-xs text-secondary-light mb-1">Student</div>
+            <select
+              className="form-select form-select-sm"
+              value={studentFilter}
+              onChange={(event) => setStudentFilter(event.target.value)}
+              style={{ minWidth: '155px' }}
+            >
+              <option value="">All Students</option>
+              {students.map(s => (
+                <option key={s.id} value={String(s.id)}>{s.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
+      </div>
+
+      {/* Row 2: date range bar */}
+      <div className="d-flex align-items-center justify-content-end gap-2 mb-3">
+        <div className="btn-group" role="group" aria-label="Quick date filters">
+          {QUICK_FILTER_OPTIONS.map(f => (
+            <button
+              key={f.value}
+              type="button"
+              className={`btn btn-sm ${quickFilter === f.value ? 'btn-primary' : 'btn-outline-secondary'}`}
+              onClick={() => applyQuickFilter(f.value)}
+            >
+              {f.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-secondary"
+            onClick={refresh}
+            title="Refresh"
+          >
+            ↻
+          </button>
+        </div>
+        <input
+          type="date"
+          className={`form-control form-control-sm${quickFilter === 'custom' ? ' border-primary' : ''}`}
+          value={dateFilter}
+          onChange={(event) => {
+            setDateFilter(event.target.value)
+            setQuickFilter(event.target.value ? 'custom' : 'all')
+          }}
+          style={{ width: '148px' }}
+        />
       </div>
 
       {error && <p className="text-danger-600 mb-3">{error}</p>}
