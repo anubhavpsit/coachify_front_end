@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Modal } from 'react-bootstrap';
 import { formatDate } from '../../utils/date';
+import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal';
 
 type ActivityAttachment = {
   id: number;
@@ -182,34 +182,11 @@ export default function StudentActivitiesPage() {
         </div>
       )}
 
-      {/* Attachment preview modal */}
-      <Modal show={!!previewAttachment} onHide={() => setPreviewAttachment(null)} centered size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title style={{ fontSize: '15px' }}>Attachment Preview</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {previewAttachment ? (
-            previewAttachment.file_type === 'pdf' ? (
-              <iframe
-                title="Attachment PDF"
-                src={`${getAttachmentUrl(previewAttachment)}#toolbar=0`}
-                className="w-full h-[70vh]"
-              />
-            ) : (
-              <img
-                src={getAttachmentUrl(previewAttachment)}
-                alt={previewAttachment.original_name}
-                className="max-h-[70vh] w-full object-contain"
-              />
-            )
-          ) : null}
-        </Modal.Body>
-        <Modal.Footer>
-          <button type="button" className="btn btn-secondary btn-sm" onClick={() => setPreviewAttachment(null)}>
-            Close
-          </button>
-        </Modal.Footer>
-      </Modal>
+      <AttachmentPreviewModal
+        attachment={previewAttachment}
+        url={previewAttachment ? getAttachmentUrl(previewAttachment) : null}
+        onHide={() => setPreviewAttachment(null)}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Button, Modal } from 'react-bootstrap';
 import Icon from '../../components/common/Icon.tsx';
 import { ROLES } from '../../constants/roles';
+import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal';
 
 interface AssessmentResultRow {
   marks_obtained: number;
@@ -1168,43 +1169,11 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
         </Modal.Footer>
       </Modal>
 
-      <Modal
-        show={!!previewAssessmentFile}
+      <AttachmentPreviewModal
+        attachment={previewAssessmentFile}
+        url={previewAssessmentFile ? getAssessmentFileUrl(previewAssessmentFile) : null}
         onHide={() => setPreviewAssessmentFile(null)}
-        centered
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Attachment Preview</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {previewAssessmentFile ? (
-            previewAssessmentFile.file_type === 'pdf' ? (
-              <iframe
-                title="Assessment File PDF"
-                src={`${getAssessmentFileUrl(previewAssessmentFile)}#toolbar=0`}
-                className="w-100"
-                style={{ minHeight: '70vh' }}
-              ></iframe>
-            ) : (
-              <img
-                src={getAssessmentFileUrl(previewAssessmentFile)}
-                alt={previewAssessmentFile.original_name}
-                className="w-100"
-                style={{ maxHeight: '70vh', objectFit: 'contain' }}
-              />
-            )
-          ) : null}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setPreviewAssessmentFile(null)}
-          >
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      />
     </div>
   );
 }

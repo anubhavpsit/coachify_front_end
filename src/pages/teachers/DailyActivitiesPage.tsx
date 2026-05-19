@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { Button, Modal } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { ROLES } from '../../constants/roles';
 import { formatDate } from '../../utils/date';
+import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal';
 
 type AttachmentFileType = "image" | "pdf" | "other";
 
@@ -609,16 +610,17 @@ const handleSelectStudent = async (
     attachments?: ActivityAttachment[],
   ) => {
     if (!attachments || attachments.length === 0) {
-      return <span className="text-sm text-gray-500">-</span>;
+      return <span className="text-secondary small">-</span>;
     }
 
     return (
-      <div className="flex flex-wrap gap-2">
+      <div className="d-flex flex-wrap gap-1">
         {attachments.map((file) => (
           <button
             key={file.id}
             type="button"
-            className="text-blue-600 underline text-xs"
+            className="btn btn-link btn-sm p-0 text-decoration-underline"
+            style={{ fontSize: '0.75rem' }}
             onClick={() => setPreviewAttachment(file)}
           >
             {file.original_name}
@@ -695,115 +697,113 @@ const handleSelectStudent = async (
   };
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">Daily Activities</h2>
-
-      <div className="flex gap-3 mb-1">
-        <Button
-          variant={mode === "student" ? "primary" : "outline-primary"}
-          onClick={() => setMode("student")}
-          title="Log an activity for one or more individual students"
-        >
-          Per Student
-        </Button>
-        <Button
-          variant={mode === "batch" ? "primary" : "outline-primary"}
-          onClick={() => setMode("batch")}
-          title="Log the same activity for every student in a class at once"
-        >
-          By Class &amp; Subject
-        </Button>
-        <Button
-          variant={mode === "history" ? "primary" : "outline-primary"}
-          onClick={() => setMode("history")}
-          title="View and edit previously submitted activities"
-        >
-          History
-        </Button>
+    <div>
+      {/* Page header */}
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h6 className="fw-semibold mb-0">Daily Activities</h6>
+          <p className="text-secondary-light text-xs mb-0">Log what you taught today for each student.</p>
+        </div>
       </div>
+
+      {/* Mode tabs */}
+      <ul className="nav nav-tabs mb-1">
+        <li className="nav-item">
+          <button
+            className={`nav-link${mode === "student" ? " active" : ""}`}
+            onClick={() => setMode("student")}
+            title="Log an activity for one or more individual students"
+          >
+            Per Student
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link${mode === "batch" ? " active" : ""}`}
+            onClick={() => setMode("batch")}
+            title="Log the same activity for every student in a class at once"
+          >
+            By Class &amp; Subject
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link${mode === "history" ? " active" : ""}`}
+            onClick={() => setMode("history")}
+            title="View and edit previously submitted activities"
+          >
+            History
+          </button>
+        </li>
+      </ul>
       <p className="text-xs text-secondary-light mb-4">
-        {mode === "student" && "Use this mode to log today's activity for one or more specific students."}
-        {mode === "batch" && "Use this mode to log the same lesson for an entire class in one go."}
-        {mode === "history" && "View past activities. You can update homework status and add remarks here."}
+        {mode === "student" && "Log today's activity for one or more specific students."}
+        {mode === "batch" && "Log the same lesson for an entire class in one go."}
+        {mode === "history" && "View past activities. Update homework status and add remarks here."}
       </p>
 
       {mode === "history" ? (
         <>
-          <div className="border p-4 mb-4 rounded bg-gray-50">
-            <label className="block font-semibold mb-1">Filter by Date</label>
-            <input
-              type="date"
-              className="w-full border p-2 mb-3"
-              value={historyDate}
-              onChange={(e) => setHistoryDate(e.target.value)}
-            />
-            <p className="text-sm text-gray-500">
-              Clear the date to see all records.
-            </p>
+          {/* History date filter */}
+          <div className="card mb-3">
+            <div className="card-body py-2 d-flex align-items-center gap-3">
+              <label className="form-label fw-semibold mb-0 text-nowrap">Filter by Date</label>
+              <input
+                type="date"
+                className="form-control form-control-sm"
+                style={{ maxWidth: 200 }}
+                value={historyDate}
+                onChange={(e) => setHistoryDate(e.target.value)}
+              />
+              {historyDate && (
+                <button className="btn btn-sm btn-outline-secondary" onClick={() => setHistoryDate("")}>
+                  Clear
+                </button>
+              )}
+              <span className="text-xs text-secondary-light">Leave empty to show all records.</span>
+            </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full border text-sm">
-              <thead>
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover table-sm align-middle">
+              <thead className="table-light">
                 <tr>
-                  <th className="border px-2 py-1">Date</th>
-                  <th className="border px-2 py-1">Student</th>
-                  <th className="border px-2 py-1">Subject</th>
-                  <th className="border px-2 py-1">Chapter</th>
-                  <th className="border px-2 py-1">Topic</th>
-                  <th className="border px-2 py-1">Homework</th>
-                  <th className="border px-2 py-1">Attachments</th>
-                  <th className="border px-2 py-1">Class Notes</th>
-                  <th className="border px-2 py-1">Homework Status</th>
-                  <th className="border px-2 py-1">Remarks</th>
+                  <th>Date</th>
+                  <th>Student</th>
+                  <th>Subject</th>
+                  <th>Chapter</th>
+                  <th>Topic</th>
+                  <th>Class Notes</th>
+                  <th>Homework</th>
+                  <th>Attachments</th>
+                  <th>HW Status</th>
+                  <th style={{ minWidth: 220 }}>Remarks</th>
                 </tr>
               </thead>
               <tbody>
                 {historyActivities.length === 0 ? (
                   <tr>
-                    <td
-                      className="border px-2 py-2 text-center text-gray-500"
-                      colSpan={9}
-                    >
+                    <td colSpan={10} className="text-center text-secondary-light py-4">
                       No activities found.
                     </td>
                   </tr>
                 ) : (
                   historyActivities.map((act) => (
                     <tr key={act.id}>
-                      <td className="border px-2 py-1">
-                        {formatDate(act.activity_date)}
-                      </td>
-                      <td className="border px-2 py-1">
-                        {act.student?.name ?? "-"}
-                      </td>
-                      <td className="border px-2 py-1">
-                        {act.subject?.subject ?? "-"}
-                      </td>
-                      <td className="border px-2 py-1">
-                        {act.chapter ?? "-"}
-                      </td>
-                      <td className="border px-2 py-1">
-                        {act.topic ?? "-"}
-                      </td>
-                      <td className="border px-2 py-1">
-                        {act.homework ?? "-"}
-                      </td>
-                      <td className="border px-2 py-1">
-                        {renderReadOnlyAttachments(act.attachments)}
-                      </td>
-                      <td className="border px-2 py-1">
-                        {act.notes ?? "-"}
-                      </td>
-                      <td className="border px-2 py-1">
+                      <td className="text-nowrap">{formatDate(act.activity_date)}</td>
+                      <td>{act.student?.name ?? "-"}</td>
+                      <td>{act.subject?.subject ?? "-"}</td>
+                      <td>{act.chapter ?? "-"}</td>
+                      <td>{act.topic ?? "-"}</td>
+                      <td>{act.notes ?? "-"}</td>
+                      <td>{act.homework ?? "-"}</td>
+                      <td>{renderReadOnlyAttachments(act.attachments)}</td>
+                      <td>
                         <select
-                          className="border p-1 text-sm"
+                          className="form-select form-select-sm"
                           value={act.homework_status ?? "not_done"}
                           onChange={(e) =>
-                            handleHistoryStatusChange(
-                              act.id,
-                              e.target.value as "not_done" | "partial" | "done"
-                            )
+                            handleHistoryStatusChange(act.id, e.target.value as "not_done" | "partial" | "done")
                           }
                         >
                           <option value="not_done">Not done</option>
@@ -811,26 +811,23 @@ const handleSelectStudent = async (
                           <option value="done">Done</option>
                         </select>
                       </td>
-                      <td className="border px-2 py-1" style={{ minWidth: '200px' }}>
+                      <td>
                         <textarea
-                          className="border p-1 text-sm w-full"
+                          className="form-control form-control-sm mb-1"
                           rows={2}
                           placeholder="e.g. Good Work! / Improve your writing."
-                          value={historyRemarks[act.id] ?? ''}
+                          value={historyRemarks[act.id] ?? ""}
                           onChange={(e) =>
-                            setHistoryRemarks((prev) => ({
-                              ...prev,
-                              [act.id]: e.target.value,
-                            }))
+                            setHistoryRemarks((prev) => ({ ...prev, [act.id]: e.target.value }))
                           }
                         />
                         <button
                           type="button"
-                          className="btn btn-sm btn-outline-success mt-1"
+                          className="btn btn-sm btn-outline-success w-100"
                           disabled={savingRemarkId === act.id}
                           onClick={() => handleHistoryRemarksSave(act.id)}
                         >
-                          {savingRemarkId === act.id ? 'Saving…' : 'Save Remarks'}
+                          {savingRemarkId === act.id ? "Saving…" : "Save Remarks"}
                         </button>
                       </td>
                     </tr>
@@ -842,143 +839,136 @@ const handleSelectStudent = async (
         </>
       ) : mode === "batch" ? (
         <>
-          <div className="border p-4 mb-4 rounded bg-gray-50">
-            <label className="block font-semibold mb-1">Activity Date</label>
-            <input
-              type="date"
-              className="w-full border p-2 mb-1"
-              value={activityDate}
-              onChange={(e) => setActivityDate(e.target.value)}
-            />
-            <p className="text-xs text-secondary-light">This date will be applied to all students in the selected class.</p>
-          </div>
-          <div className="border p-4 mb-4 rounded bg-gray-50">
-            <label className="block font-semibold mb-1">Class</label>
-            <select
-              className="w-full border p-2 mb-3"
-              value={batchForm.class_id}
-              onChange={(e) =>
-                setBatchForm((prev) => ({ ...prev, class_id: e.target.value }))
-              }
-            >
-              <option value="">Select Class</option>
-              {classes.map((cls) => (
-                <option key={cls.id} value={cls.id}>
-                  {cls.name}
-                </option>
-              ))}
-            </select>
-
-            <label className="block font-semibold mb-1">Subject</label>
-            <select
-              className="w-full border p-2 mb-3"
-              value={batchForm.subject_id}
-              onChange={(e) =>
-                setBatchForm((prev) => ({
-                  ...prev,
-                  subject_id: e.target.value,
-                }))
-              }
-            >
-              <option value="">Select Subject</option>
-              {allSubjects.map((sub) => (
-                <option key={sub.id} value={sub.id}>
-                  {sub.subject}
-                </option>
-              ))}
-            </select>
-
-            <input
-              className="w-full border p-2 mb-3"
-              type="text"
-              placeholder="Chapter"
-              value={batchForm.chapter}
-              onChange={(e) =>
-                setBatchForm((prev) => ({ ...prev, chapter: e.target.value }))
-              }
-            />
-
-            <input
-              className="w-full border p-2 mb-3"
-              type="text"
-              placeholder="Topic"
-              value={batchForm.topic}
-              onChange={(e) =>
-                setBatchForm((prev) => ({ ...prev, topic: e.target.value }))
-              }
-            />
-
-            <textarea
-              className="w-full border p-2 mb-3"
-              placeholder="Class Notes (what was taught today)"
-              value={batchForm.notes}
-              onChange={(e) =>
-                setBatchForm((prev) => ({ ...prev, notes: e.target.value }))
-              }
-            ></textarea>
-
-            <textarea
-              className="w-full border p-2 mb-3"
-              placeholder="Homework"
-              value={batchForm.homework}
-              onChange={(e) =>
-                setBatchForm((prev) => ({ ...prev, homework: e.target.value }))
-              }
-            ></textarea>
-
-            <div className="mb-4">
-              <label className="block font-semibold mb-1">Attachments</label>
-              {batchAttachments.length ? (
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {batchAttachments.map((file, index) => (
-                    <div
-                      key={`${file.name}-${index}`}
-                      className="flex items-center gap-2 border rounded px-2 py-1 bg-white"
-                    >
-                      <span className="text-sm truncate max-w-[160px]">
-                        {file.name}
-                      </span>
-                      <Button
-                        size="sm"
-                        variant="outline-danger"
-                        onClick={() =>
-                          setBatchAttachments((prev) =>
-                            prev.filter((_, idx) => idx !== index),
-                          )
-                        }
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
+          <div className="card mb-3">
+            <div className="card-header fw-semibold py-2">Class Details</div>
+            <div className="card-body">
+              {/* Date + Class + Subject in one row */}
+              <div className="row g-3 mb-3">
+                <div className="col-sm-4">
+                  <label className="form-label fw-semibold">Activity Date</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={activityDate}
+                    onChange={(e) => setActivityDate(e.target.value)}
+                  />
+                  <div className="form-text">Applied to all students in the class.</div>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-500 mb-2">
-                  No attachments yet.
-                </p>
-              )}
+                <div className="col-sm-4">
+                  <label className="form-label fw-semibold">Class</label>
+                  <select
+                    className="form-select"
+                    value={batchForm.class_id}
+                    onChange={(e) => setBatchForm((prev) => ({ ...prev, class_id: e.target.value }))}
+                  >
+                    <option value="">Select Class</option>
+                    {classes.map((cls) => (
+                      <option key={cls.id} value={cls.id}>{cls.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="col-sm-4">
+                  <label className="form-label fw-semibold">Subject</label>
+                  <select
+                    className="form-select"
+                    value={batchForm.subject_id}
+                    onChange={(e) => setBatchForm((prev) => ({ ...prev, subject_id: e.target.value }))}
+                  >
+                    <option value="">Select Subject</option>
+                    {allSubjects.map((sub) => (
+                      <option key={sub.id} value={sub.id}>{sub.subject}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-              <input
-                type="file"
-                multiple
-                accept="image/*,.pdf"
-                className="w-full border p-2"
-                onChange={(e) => {
-                  const files = e.target.files ? Array.from(e.target.files) : [];
-                  if (files.length) {
-                    setBatchAttachments((prev) => [...files, ...prev]);
-                  }
-                  e.target.value = "";
-                }}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Supported formats: images or PDFs up to 10&nbsp;MB.
-              </p>
+              {/* Chapter + Topic */}
+              <div className="row g-3 mb-3">
+                <div className="col-sm-6">
+                  <label className="form-label fw-semibold">Chapter</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="e.g. Chapter 5 — Photosynthesis"
+                    value={batchForm.chapter}
+                    onChange={(e) => setBatchForm((prev) => ({ ...prev, chapter: e.target.value }))}
+                  />
+                </div>
+                <div className="col-sm-6">
+                  <label className="form-label fw-semibold">Topic</label>
+                  <input
+                    className="form-control"
+                    type="text"
+                    placeholder="e.g. Light-dependent reactions"
+                    value={batchForm.topic}
+                    onChange={(e) => setBatchForm((prev) => ({ ...prev, topic: e.target.value }))}
+                  />
+                </div>
+              </div>
+
+              {/* Class Notes */}
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Class Notes</label>
+                <textarea
+                  className="form-control"
+                  rows={3}
+                  placeholder="What was taught today? Key points covered in class."
+                  value={batchForm.notes}
+                  onChange={(e) => setBatchForm((prev) => ({ ...prev, notes: e.target.value }))}
+                />
+              </div>
+
+              {/* Homework */}
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Homework</label>
+                <textarea
+                  className="form-control"
+                  rows={2}
+                  placeholder="e.g. Complete exercises 1–5 on page 48."
+                  value={batchForm.homework}
+                  onChange={(e) => setBatchForm((prev) => ({ ...prev, homework: e.target.value }))}
+                />
+              </div>
+
+              {/* Attachments */}
+              <div className="mb-2">
+                <label className="form-label fw-semibold">Attachments</label>
+                {batchAttachments.length > 0 && (
+                  <div className="d-flex flex-wrap gap-2 mb-2">
+                    {batchAttachments.map((file, index) => (
+                      <span key={`${file.name}-${index}`} className="badge bg-secondary-subtle text-secondary d-flex align-items-center gap-1 px-2 py-1">
+                        {file.name}
+                        <button
+                          type="button"
+                          className="btn-close btn-close-sm ms-1"
+                          style={{ fontSize: '0.6rem' }}
+                          onClick={() => setBatchAttachments((prev) => prev.filter((_, idx) => idx !== index))}
+                          aria-label="Remove"
+                        />
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf"
+                  className="form-control"
+                  onChange={(e) => {
+                    const files = e.target.files ? Array.from(e.target.files) : [];
+                    if (files.length) setBatchAttachments((prev) => [...files, ...prev]);
+                    e.target.value = "";
+                  }}
+                />
+                <div className="form-text">Images or PDFs, up to 10 MB each.</div>
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-3 my-3">
+          <div className="d-flex justify-content-end">
             <Button
+              variant="primary"
+              className="px-4"
               onClick={submitBatchActivity}
               disabled={!batchForm.class_id || !batchForm.subject_id}
             >
@@ -988,212 +978,198 @@ const handleSelectStudent = async (
         </>
       ) : (
         <>
-          <div className="border p-4 mb-4 rounded bg-gray-50">
-            <label className="block font-semibold mb-1">Activity Date</label>
-            <input
-              type="date"
-              className="w-full border p-2 mb-1"
-              value={activityDate}
-              onChange={(e) => setActivityDate(e.target.value)}
-            />
-            <p className="text-sm text-gray-500">This date applies to <strong>all</strong> activity rows below — it is not set per student.</p>
+          {/* Activity Date — shared across all rows */}
+          <div className="card mb-3">
+            <div className="card-body py-2 d-flex align-items-center gap-3">
+              <label className="form-label fw-semibold mb-0 text-nowrap">Activity Date</label>
+              <input
+                type="date"
+                className="form-control form-control-sm"
+                style={{ maxWidth: 200 }}
+                value={activityDate}
+                onChange={(e) => setActivityDate(e.target.value)}
+              />
+              <span className="text-xs text-secondary-light">
+                This date applies to <strong>all</strong> students below.
+              </span>
+            </div>
           </div>
-          {activities.map((activity, index) => (
-            <div
-              key={index}
-              className="border p-4 mb-4 rounded bg-gray-50"
-            >
-              {/* Student */}
-              <label className="block font-semibold mb-1">Student</label>
-              <select
-                className="w-full border p-2 mb-3"
-                value={activity.student_id ?? ""}
-                onChange={(e) =>
-                  handleSelectStudent(index, Number(e.target.value))
-                }
-              >
-                <option value="">Select Student</option>
-                {students.map((st) => (
-                  <option key={st.id} value={st.id}>
-                    {st.name}
-                  </option>
-                ))}
-              </select>
 
-              {/* Subject */}
-              <label className="block font-semibold mb-1">Subject</label>
-              {!activity.student_id && (
-                <p className="text-xs text-secondary-light mb-1">Select a student first to load their subjects.</p>
-              )}
-              <select
-                className="w-full border p-2 mb-3"
-                value={activity.subject_id ?? ""}
-                disabled={!activity.student_id}
-                onChange={(e) =>
-                  handleChange(index, "subject_id", Number(e.target.value))
-                }
-              >
-                <option value="">Select Subject</option>
-                {activity.subjects?.map((sub) => (
-                  <option key={sub.id} value={sub.id}>
-                    {sub.subject}
-                  </option>
-                ))}
-              </select>
-
-              {/* Chapter */}
-              <input
-                className="w-full border p-2 mb-3"
-                type="text"
-                placeholder="Chapter"
-                value={activity.chapter ?? ""}
-                onChange={(e) => handleChange(index, "chapter", e.target.value)}
-              />
-
-              {/* Topic */}
-              <input
-                className="w-full border p-2 mb-3"
-                type="text"
-                placeholder="Topic"
-                value={activity.topic ?? ""}
-                onChange={(e) => handleChange(index, "topic", e.target.value)}
-              />
-
-              {/* Class Notes */}
-              <textarea
-                className="w-full border p-2 mb-3"
-                placeholder="Class Notes (what was taught today)"
-                value={activity.notes ?? ""}
-                onChange={(e) => handleChange(index, "notes", e.target.value)}
-              ></textarea>
-
-              {/* Homework */}
-              <textarea
-                className="w-full border p-2 mb-3"
-                placeholder="Homework"
-                value={activity.homework ?? ""}
-                onChange={(e) => handleChange(index, "homework", e.target.value)}
-              ></textarea>
-
-              <div className="mb-3">
-                <label className="block font-semibold mb-1">Attachments</label>
-                {!activity.id && (
-                  <p className="text-xs text-secondary-light mb-1">Save the activity first (click Submit Activities), then you can attach files.</p>
-                )}
-                {activity.attachments?.length ? (
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {activity.attachments.map((file) => (
-                      <div
-                        key={file.id}
-                        className="flex items-center gap-2 border rounded px-2 py-1 bg-white"
+          {/* Per-student activity cards */}
+          {activities.map((activity, index) => {
+            const studentName = activity.student_id
+              ? students.find((s) => s.id === activity.student_id)?.name
+              : null;
+            return (
+              <div key={index} className="card mb-3">
+                <div className="card-header d-flex align-items-center justify-content-between py-2">
+                  <span className="fw-semibold">
+                    {studentName
+                      ? `Activity — ${studentName}`
+                      : `Activity ${index + 1}`}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => removeActivityRow(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+                <div className="card-body">
+                  {/* Student + Subject */}
+                  <div className="row g-3 mb-3">
+                    <div className="col-sm-6">
+                      <label className="form-label fw-semibold">Student <span className="text-danger">*</span></label>
+                      <select
+                        className="form-select"
+                        value={activity.student_id ?? ""}
+                        onChange={(e) => handleSelectStudent(index, Number(e.target.value))}
                       >
-                        <span className="text-sm truncate max-w-[140px]">
-                          {file.original_name}
-                        </span>
-                        <Button
-                          size="sm"
-                          variant="link"
-                          onClick={() => setPreviewAttachment(file)}
-                        >
-                          View
-                        </Button>
-                        {userRole === ROLES.COACHING_ADMIN && (
-                          <Button
-                            size="sm"
-                            variant="outline-danger"
-                            disabled={deletingAttachmentId === file.id}
-                            onClick={() =>
-                              handleDeleteAttachment(activity.id, file.id, index)
-                            }
-                          >
-                            {deletingAttachmentId === file.id ? "Removing" : "Remove"}
-                          </Button>
-                        )}
-                      </div>
-                    ))}
+                        <option value="">Select Student</option>
+                        {students.map((st) => (
+                          <option key={st.id} value={st.id}>{st.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-sm-6">
+                      <label className="form-label fw-semibold">Subject <span className="text-danger">*</span></label>
+                      {!activity.student_id && (
+                        <div className="form-text mb-1">Select a student first to load their subjects.</div>
+                      )}
+                      <select
+                        className="form-select"
+                        value={activity.subject_id ?? ""}
+                        disabled={!activity.student_id}
+                        onChange={(e) => handleChange(index, "subject_id", Number(e.target.value))}
+                      >
+                        <option value="">Select Subject</option>
+                        {activity.subjects?.map((sub) => (
+                          <option key={sub.id} value={sub.id}>{sub.subject}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                ) : (
-                  <p className="text-sm text-gray-500 mb-2">
-                    No attachments yet.
-                  </p>
-                )}
 
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*,.pdf"
-                  className="w-full border p-2"
-                  disabled={
-                    !activity.student_id ||
-                    !activity.subject_id ||
-                    (activity.id !== null && uploadingAttachmentId === activity.id)
-                  }
-                  onChange={(e) => {
-                    const files = e.target.files
-                      ? Array.from(e.target.files)
-                      : [];
-                    if (files.length) {
-                      handleActivityAttachmentUpload(index, files);
-                    }
-                    e.target.value = "";
-                  }}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Supported formats: images or PDFs up to 10&nbsp;MB.
-                </p>
+                  {/* Chapter + Topic */}
+                  <div className="row g-3 mb-3">
+                    <div className="col-sm-6">
+                      <label className="form-label fw-semibold">Chapter</label>
+                      <input
+                        className="form-control"
+                        type="text"
+                        placeholder="e.g. Chapter 5 — Photosynthesis"
+                        value={activity.chapter ?? ""}
+                        onChange={(e) => handleChange(index, "chapter", e.target.value)}
+                      />
+                    </div>
+                    <div className="col-sm-6">
+                      <label className="form-label fw-semibold">Topic</label>
+                      <input
+                        className="form-control"
+                        type="text"
+                        placeholder="e.g. Light-dependent reactions"
+                        value={activity.topic ?? ""}
+                        onChange={(e) => handleChange(index, "topic", e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Class Notes */}
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Class Notes</label>
+                    <textarea
+                      className="form-control"
+                      rows={3}
+                      placeholder="What was taught today? Key points covered in class."
+                      value={activity.notes ?? ""}
+                      onChange={(e) => handleChange(index, "notes", e.target.value)}
+                    />
+                  </div>
+
+                  {/* Homework */}
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Homework</label>
+                    <textarea
+                      className="form-control"
+                      rows={2}
+                      placeholder="e.g. Complete exercises 1–5 on page 48."
+                      value={activity.homework ?? ""}
+                      onChange={(e) => handleChange(index, "homework", e.target.value)}
+                    />
+                  </div>
+
+                  {/* Attachments */}
+                  <div>
+                    <label className="form-label fw-semibold">Attachments</label>
+                    {!activity.id && (
+                      <div className="form-text mb-1">Save the activity first, then you can attach files.</div>
+                    )}
+                    {activity.attachments?.length ? (
+                      <div className="d-flex flex-wrap gap-2 mb-2">
+                        {activity.attachments.map((file) => (
+                          <span key={file.id} className="badge bg-secondary-subtle text-secondary d-flex align-items-center gap-2 px-2 py-1">
+                            <button
+                              type="button"
+                              className="btn btn-link btn-sm p-0 text-secondary text-decoration-none"
+                              onClick={() => setPreviewAttachment(file)}
+                            >
+                              {file.original_name}
+                            </button>
+                            {userRole === ROLES.COACHING_ADMIN && (
+                              <button
+                                type="button"
+                                className="btn-close"
+                                style={{ fontSize: '0.6rem' }}
+                                disabled={deletingAttachmentId === file.id}
+                                onClick={() => handleDeleteAttachment(activity.id, file.id, index)}
+                                aria-label="Remove"
+                              />
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,.pdf"
+                      className="form-control form-control-sm"
+                      disabled={
+                        !activity.student_id ||
+                        !activity.subject_id ||
+                        (activity.id !== null && uploadingAttachmentId === activity.id)
+                      }
+                      onChange={(e) => {
+                        const files = e.target.files ? Array.from(e.target.files) : [];
+                        if (files.length) handleActivityAttachmentUpload(index, files);
+                        e.target.value = "";
+                      }}
+                    />
+                    <div className="form-text">Images or PDFs, up to 10 MB each.</div>
+                  </div>
+                </div>
               </div>
+            );
+          })}
 
-          <div className="flex justify-end mt-2">
-            <Button
-              variant="outline-danger"
-              size="sm"
-              onClick={() => removeActivityRow(index)}
-            >
-              Remove Activity
+          {/* Bottom action bar */}
+          <div className="d-flex align-items-center justify-content-between mt-2 mb-4">
+            <Button variant="outline-primary" onClick={addNewActivityRow}>
+              + Add Another Student
             </Button>
-          </div>
-        </div>
-      ))}
-
-          <div className="flex gap-3 my-3">
-            <Button onClick={addNewActivityRow}>+ Add New Activity</Button>
-            <Button onClick={submitActivities}>Submit Activities</Button>
+            <Button variant="primary" className="px-4" onClick={submitActivities}>
+              Submit Activities
+            </Button>
           </div>
         </>
       )}
 
-      <Modal
-        show={!!previewAttachment}
+      <AttachmentPreviewModal
+        attachment={previewAttachment}
+        url={previewAttachment ? getAttachmentUrl(previewAttachment) : null}
         onHide={() => setPreviewAttachment(null)}
-        centered
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Attachment Preview</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {previewAttachment ? (
-            previewAttachment.file_type === "pdf" ? (
-              <iframe
-                title="Attachment PDF"
-                src={`${getAttachmentUrl(previewAttachment)}#toolbar=0`}
-                className="w-full h-[70vh]"
-              ></iframe>
-            ) : (
-              <img
-                src={getAttachmentUrl(previewAttachment)}
-                alt={previewAttachment.original_name}
-                className="max-h-[70vh] w-full object-contain"
-              />
-            )
-          ) : null}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setPreviewAttachment(null)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      />
     </div>
   );
 }

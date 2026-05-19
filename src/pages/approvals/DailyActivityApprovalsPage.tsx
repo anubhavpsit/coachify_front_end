@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
-import { Modal } from 'react-bootstrap'
 import { ROLES } from '../../constants/roles'
+import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal'
 
 interface ActivityAttachment {
   id: number
@@ -604,34 +604,11 @@ export default function DailyActivityApprovalsPage() {
         </div>
       )}
 
-      <Modal
-        show={!!previewContext}
+      <AttachmentPreviewModal
+        attachment={previewContext?.attachment ?? null}
+        url={previewContext ? getAttachmentUrl(previewContext.attachment) : null}
         onHide={() => setPreviewContext(null)}
-        centered
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Attachment Preview</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {previewContext ? (
-            previewContext.attachment.file_type === 'pdf' ? (
-              <iframe
-                title="Attachment preview"
-                src={`${getAttachmentUrl(previewContext.attachment)}#toolbar=0`}
-                className="w-100"
-                style={{ minHeight: '70vh' }}
-              ></iframe>
-            ) : (
-              <img
-                src={getAttachmentUrl(previewContext.attachment)}
-                alt={previewContext.attachment.original_name}
-                className="img-fluid"
-              />
-            )
-          ) : null}
-        </Modal.Body>
-      </Modal>
+      />
     </div>
   )
 }
