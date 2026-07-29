@@ -107,6 +107,14 @@ export default function StudentsPage() {
   const [singleToClassId, setSingleToClassId] = useState<number | ''>('');
   const [promotingSingle, setPromotingSingle] = useState(false);
 
+  // Reactivate (rejoin) student
+  const [showReactivateModal, setShowReactivateModal] = useState(false);
+  const [reactivateStudent, setReactivateStudent] = useState<Student | null>(null);
+  const [reactivateDate, setReactivateDate] = useState<string>(getTodayDateValue());
+  const [reactivateYearId, setReactivateYearId] = useState<number | ''>('');
+  const [reactivateClassId, setReactivateClassId] = useState<number | ''>('');
+  const [reactivating, setReactivating] = useState(false);
+
   // Search & filter state
   const [searchName, setSearchName] = useState('');
   const [filterClassId, setFilterClassId] = useState<number | ''>('');
@@ -176,6 +184,46 @@ export default function StudentsPage() {
   const handleViewUser = (id: number) => {
     setViewUserId(id);
     setShowProfileModal(true);
+  };
+
+  const handleOpenReactivateModal = (student: Student) => {
+    setReactivateStudent(student);
+    setReactivateDate(getTodayDateValue());
+    const currentYear = academicYears.find(y => y.is_current);
+    setReactivateYearId(currentYear ? currentYear.id : '');
+    const inferredClass = (student.current_class_id ?? student.student_profile?.class) || '';
+    setReactivateClassId(typeof inferredClass === 'number' ? inferredClass : '');
+    setShowReactivateModal(true);
+  };
+
+  const handleReactivateStudent = async () => {
+    if (!reactivateStudent) return;
+    setReactivating(true);
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await axios.post(
+        `${API_BASE_URL}/students/${reactivateStudent.id}/reactivate`,
+        {
+          rejoined_date: reactivateDate || undefined,
+          academic_year_id: reactivateYearId || undefined,
+          class_id: reactivateClassId || undefined,
+        },
+        { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
+      );
+      const updatedStatus = response.data?.data?.student?.status ?? 'active';
+      setStudents(prev =>
+        statusFilter === 'inactive'
+          ? prev.filter(s => s.id !== reactivateStudent.id)
+          : prev.map(s => s.id === reactivateStudent.id ? { ...s, status: updatedStatus } : s)
+      );
+      setShowReactivateModal(false);
+      setReactivateStudent(null);
+    } catch (error) {
+      console.error('Error reactivating student:', error);
+      alert('Reactivate failed.');
+    } finally {
+      setReactivating(false);
+    }
   };
 
   useEffect(() => {
@@ -620,6 +668,9 @@ export default function StudentsPage() {
                         <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>Delete</Button>
                         <Button variant="link" onClick={() => handleOpenAssignModal(student.id)} >Assign Teachers</Button>
                         <Button variant="link" onClick={() => handleOpenSinglePromote(student)} >Promote</Button>
+                        {student.status === 'inactive' && (
+                          <Button variant="link" onClick={() => handleOpenReactivateModal(student)}>Reactivate</Button>
+                        )}
                         {selectedStudentId && (
                           <AssignTeachersModal
                             show={showAssignModal}
@@ -978,6 +1029,62 @@ export default function StudentsPage() {
               setPromotingSingle(false);
             }
           }}>{promotingSingle ? 'Promoting...' : 'Promote'}</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Reactivate Student Modal */}
+      <Modal show={showReactivateModal} onHide={() => setShowReactivateModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Reactivate Student</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p className="text-xs text-secondary-light mb-3">
+            Reactivating <strong>{reactivateStudent?.name}</strong> resets their fee cycle from the rejoin date and creates a new enrollment for the selected academic year.
+          </p>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Rejoined Date</label>
+            <input
+              type="date"
+              className="form-control"
+              value={reactivateDate}
+              onChange={(e) => setReactivateDate(e.target.value)}
+              disabled={reactivating}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Academic Year</label>
+            <select
+              className="form-control"
+              value={reactivateYearId}
+              onChange={(e) => setReactivateYearId(e.target.value === '' ? '' : Number(e.target.value))}
+              disabled={reactivating}
+            >
+              <option value="">Current</option>
+              {academicYears.map(y => (
+                <option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>
+              ))}
+            </select>
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Class</label>
+            <select
+              className="form-control"
+              value={reactivateClassId}
+              onChange={(e) => setReactivateClassId(e.target.value === '' ? '' : Number(e.target.value))}
+              disabled={reactivating}
+            >
+              <option value="">Select Class</option>
+              {classes.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowReactivateModal(false)} disabled={reactivating}>Cancel</Button>
+          <Button variant="primary" onClick={handleReactivateStudent} disabled={reactivating}>
+            {reactivating ? 'Reactivating...' : 'Reactivate'}
+          </Button>
         </Modal.Footer>
       </Modal>
 
