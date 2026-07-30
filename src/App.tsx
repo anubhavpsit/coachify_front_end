@@ -25,6 +25,7 @@ import ProfilePage from './pages/profile/ProfilePage.tsx'
 import SearchResultsPage from './pages/search/SearchResultsPage.tsx'
 import NotificationsPage from './pages/notifications/NotificationsPage.tsx'
 import DailyActivityApprovalsPage from './pages/approvals/DailyActivityApprovalsPage.tsx'
+import GeneratedContentApprovalsPage from './pages/approvals/GeneratedContentApprovalsPage.tsx'
 import AdminFactsPage from './pages/facts/AdminFactsPage.tsx'
 import FactsPage from './pages/facts/FactsPage.tsx'
 import AcademicYearsPage from './pages/academicYears/AcademicYearsPage.tsx'
@@ -82,6 +83,9 @@ function App() {
           </Route>
           <Route path="/approvals" element={<DashboardLayout />}>
             <Route index element={<DailyActivityApprovalsPage />} />
+          </Route>
+          <Route path="/approvals/generated-content" element={<DashboardLayout />}>
+            <Route index element={<GeneratedContentApprovalsPage />} />
           </Route>
           <Route path="/profile" element={<DashboardLayout />}>
             <Route index element={<ProfilePage />} />

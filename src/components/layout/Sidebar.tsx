@@ -255,6 +255,15 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
                   <span>Approvals</span>
                 </NavLink>
               </li>
+              <li>
+                <NavLink
+                  to="/approvals/generated-content"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:robot-outline" className="menu-icon" />
+                  <span>AI Content</span>
+                </NavLink>
+              </li>
               {/*
               <li>
                 <NavLink

@@ -7,6 +7,8 @@ export default defineConfig({
     host: true,
     allowedHosts: [
       'howk.coachify.local',
+      'elite.coachify.local',
+      'rrclasses.coachify.local',
       '*.coachify.local'     // optional wildcard
     ]
   },
