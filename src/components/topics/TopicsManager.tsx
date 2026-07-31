@@ -279,7 +279,6 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Explanation</label>
               <RichTextEditor value={formExplanation} onChange={setFormExplanation} disabled={saving} />
-              <small className="text-muted">Save the topic first, then edit it to add images to the explanation.</small>
             </div>
             <div className="d-flex justify-content-end gap-3 mt-3">
               <Button variant="secondary" onClick={() => { setShowAddModal(false); resetForm(); }} disabled={saving}>Cancel</Button>
@@ -318,12 +317,7 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Explanation</label>
-              <RichTextEditor
-                value={formExplanation}
-                onChange={setFormExplanation}
-                disabled={saving}
-                imageUploadUrl={editTopic ? `${apiBasePath}/${editTopic.id}/image` : undefined}
-              />
+              <RichTextEditor value={formExplanation} onChange={setFormExplanation} disabled={saving} />
             </div>
             <div className="d-flex justify-content-end gap-3 mt-3">
               <Button variant="secondary" onClick={() => { setShowEditModal(false); setEditTopic(null); }} disabled={saving}>Cancel</Button>
