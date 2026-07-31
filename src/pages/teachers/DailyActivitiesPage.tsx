@@ -5,6 +5,9 @@ import { Button } from "react-bootstrap";
 import { ROLES } from '../../constants/roles';
 import { formatDate } from '../../utils/date';
 import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal';
+import TopicAutocomplete from '../../components/topics/TopicAutocomplete.tsx';
+
+const CHAPTER_NUMBERS = Array.from({ length: 20 }, (_, i) => i + 1);
 
 type AttachmentFileType = "image" | "pdf" | "other";
 
@@ -37,6 +40,8 @@ type HistoryActivityRow = {
   activity_date: string;
   chapter?: string | null;
   topic?: string | null;
+  chapter_number?: number | null;
+  topic_model?: { id: number; name: string } | null;
   notes?: string | null;
   homework?: string | null;
   remarks?: string | null;
@@ -51,8 +56,9 @@ type ActivityFormRow = {
   student_id: number | "";
   subjects: SubjectOption[];
   subject_id: number | "";
-  chapter: string;
-  topic: string;
+  chapter_number: number | null;
+  topic_id: number | null;
+  topic_name: string;
   notes: string;
   homework: string;
   homework_status?: "not_done" | "partial" | "done";
@@ -65,6 +71,9 @@ type ActivityApiResponse = {
   subject_id: number;
   chapter?: string | null;
   topic?: string | null;
+  chapter_number?: number | null;
+  topic_id?: number | null;
+  topic_model?: { id: number; name: string } | null;
   notes?: string | null;
   homework?: string | null;
   remarks?: string | null;
@@ -81,8 +90,9 @@ export default function DailyActivitiesPage() {
       student_id: "",
       subjects: [],
       subject_id: "",
-      chapter: "",
-      topic: "",
+      chapter_number: null,
+      topic_id: null,
+      topic_name: "",
       notes: "",
       homework: "",
       homework_status: "not_done",
@@ -99,11 +109,20 @@ export default function DailyActivitiesPage() {
   });
   const [classes, setClasses] = useState<ClassOption[]>([]);
   const [allSubjects, setAllSubjects] = useState<SubjectOption[]>([]);
-  const [batchForm, setBatchForm] = useState({
+  const [batchForm, setBatchForm] = useState<{
+    class_id: string;
+    subject_id: string;
+    chapter_number: number | null;
+    topic_id: number | null;
+    topic_name: string;
+    notes: string;
+    homework: string;
+  }>({
     class_id: "",
     subject_id: "",
-    chapter: "",
-    topic: "",
+    chapter_number: null,
+    topic_id: null,
+    topic_name: "",
     notes: "",
     homework: "",
   });
@@ -235,8 +254,9 @@ export default function DailyActivitiesPage() {
             student_id: act.student_id,
             subjects: subjectResponse.data?.data || [],
             subject_id: act.subject_id,
-            chapter: act.chapter ?? "",
-            topic: act.topic ?? "",
+            chapter_number: act.chapter_number ?? null,
+            topic_id: act.topic_id ?? null,
+            topic_name: act.topic_model?.name ?? "",
             notes: act.notes ?? "",
             homework: act.homework ?? "",
             homework_status: act.homework_status ?? "not_done",
@@ -387,8 +407,9 @@ const handleSelectStudent = async (
         student_id: "",
         subjects: [],
         subject_id: "",
-        chapter: "",
-        topic: "",
+        chapter_number: null,
+        topic_id: null,
+        topic_name: "",
         notes: "",
         homework: "",
         attachments: [],
@@ -407,8 +428,8 @@ const handleSelectStudent = async (
           activity.student_id !== "" ? Number(activity.student_id) : undefined,
         subject_id:
           activity.subject_id !== "" ? Number(activity.subject_id) : undefined,
-        chapter: activity.chapter || null,
-        topic: activity.topic || null,
+        chapter_number: activity.chapter_number || null,
+        topic_id: activity.topic_id || null,
         notes: activity.notes || null,
         homework: activity.homework || null,
         homework_status: activity.homework_status ?? undefined,
@@ -489,8 +510,8 @@ const handleSelectStudent = async (
             id: activity.id,
             student_id: Number(activity.student_id),
             subject_id: Number(activity.subject_id),
-            chapter: activity.chapter || null,
-            topic: activity.topic || null,
+            chapter_number: activity.chapter_number || null,
+            topic_id: activity.topic_id || null,
             notes: activity.notes || null,
             homework: activity.homework || null,
             homework_status: activity.homework_status ?? undefined,
@@ -641,8 +662,8 @@ const handleSelectStudent = async (
         const formData = new FormData();
         formData.append("class_id", batchForm.class_id);
         formData.append("subject_id", batchForm.subject_id);
-        if (batchForm.chapter) formData.append("chapter", batchForm.chapter);
-        if (batchForm.topic) formData.append("topic", batchForm.topic);
+        if (batchForm.chapter_number) formData.append("chapter_number", String(batchForm.chapter_number));
+        if (batchForm.topic_id) formData.append("topic_id", String(batchForm.topic_id));
         if (batchForm.notes) formData.append("notes", batchForm.notes);
         if (batchForm.homework) formData.append("homework", batchForm.homework);
 
@@ -662,8 +683,8 @@ const handleSelectStudent = async (
           {
             class_id: batchForm.class_id,
             subject_id: batchForm.subject_id,
-            chapter: batchForm.chapter || null,
-            topic: batchForm.topic || null,
+            chapter_number: batchForm.chapter_number || null,
+            topic_id: batchForm.topic_id || null,
             notes: batchForm.notes || null,
             homework: batchForm.homework || null,
             activity_date: activityDate || undefined,
@@ -677,8 +698,9 @@ const handleSelectStudent = async (
       setBatchForm({
         class_id: "",
         subject_id: "",
-        chapter: "",
-        topic: "",
+        chapter_number: null,
+        topic_id: null,
+        topic_name: "",
         notes: "",
         homework: "",
       });
@@ -793,8 +815,8 @@ const handleSelectStudent = async (
                       <td className="text-nowrap">{formatDate(act.activity_date)}</td>
                       <td>{act.student?.name ?? "-"}</td>
                       <td>{act.subject?.subject ?? "-"}</td>
-                      <td>{act.chapter ?? "-"}</td>
-                      <td>{act.topic ?? "-"}</td>
+                      <td>{act.chapter_number ?? act.chapter ?? "-"}</td>
+                      <td>{act.topic_model?.name ?? act.topic ?? "-"}</td>
                       <td>{act.notes ?? "-"}</td>
                       <td>{act.homework ?? "-"}</td>
                       <td>{renderReadOnlyAttachments(act.attachments)}</td>
@@ -885,23 +907,35 @@ const handleSelectStudent = async (
               {/* Chapter + Topic */}
               <div className="row g-3 mb-3">
                 <div className="col-sm-6">
-                  <label className="form-label fw-semibold">Chapter</label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    placeholder="e.g. Chapter 5 — Photosynthesis"
-                    value={batchForm.chapter}
-                    onChange={(e) => setBatchForm((prev) => ({ ...prev, chapter: e.target.value }))}
-                  />
+                  <label className="form-label fw-semibold">Chapter (optional)</label>
+                  <select
+                    className="form-select"
+                    value={batchForm.chapter_number ?? ""}
+                    onChange={(e) =>
+                      setBatchForm((prev) => ({
+                        ...prev,
+                        chapter_number: e.target.value ? Number(e.target.value) : null,
+                      }))
+                    }
+                  >
+                    <option value="">Select chapter</option>
+                    {CHAPTER_NUMBERS.map((n) => (
+                      <option key={n} value={n}>Chapter {n}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className="col-sm-6">
                   <label className="form-label fw-semibold">Topic</label>
-                  <input
-                    className="form-control"
-                    type="text"
-                    placeholder="e.g. Light-dependent reactions"
-                    value={batchForm.topic}
-                    onChange={(e) => setBatchForm((prev) => ({ ...prev, topic: e.target.value }))}
+                  <TopicAutocomplete
+                    subjectId={batchForm.subject_id ? Number(batchForm.subject_id) : null}
+                    value={batchForm.topic_id ? { id: batchForm.topic_id, name: batchForm.topic_name } : null}
+                    onChange={(topic) =>
+                      setBatchForm((prev) => ({
+                        ...prev,
+                        topic_id: topic?.id ?? null,
+                        topic_name: topic?.name ?? "",
+                      }))
+                    }
                   />
                 </div>
               </div>
@@ -1054,23 +1088,29 @@ const handleSelectStudent = async (
                   {/* Chapter + Topic */}
                   <div className="row g-3 mb-3">
                     <div className="col-sm-6">
-                      <label className="form-label fw-semibold">Chapter</label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        placeholder="e.g. Chapter 5 — Photosynthesis"
-                        value={activity.chapter ?? ""}
-                        onChange={(e) => handleChange(index, "chapter", e.target.value)}
-                      />
+                      <label className="form-label fw-semibold">Chapter (optional)</label>
+                      <select
+                        className="form-select"
+                        value={activity.chapter_number ?? ""}
+                        onChange={(e) =>
+                          handleChange(index, "chapter_number", e.target.value ? Number(e.target.value) : null)
+                        }
+                      >
+                        <option value="">Select chapter</option>
+                        {CHAPTER_NUMBERS.map((n) => (
+                          <option key={n} value={n}>Chapter {n}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col-sm-6">
                       <label className="form-label fw-semibold">Topic</label>
-                      <input
-                        className="form-control"
-                        type="text"
-                        placeholder="e.g. Light-dependent reactions"
-                        value={activity.topic ?? ""}
-                        onChange={(e) => handleChange(index, "topic", e.target.value)}
+                      <TopicAutocomplete
+                        subjectId={activity.subject_id ? Number(activity.subject_id) : null}
+                        value={activity.topic_id ? { id: activity.topic_id, name: activity.topic_name } : null}
+                        onChange={(topic) => {
+                          handleChange(index, "topic_id", topic?.id ?? null);
+                          handleChange(index, "topic_name", topic?.name ?? "");
+                        }}
                       />
                     </div>
                   </div>
