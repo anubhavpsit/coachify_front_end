@@ -155,17 +155,6 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </NavLink>
             </li>
           )}
-          {user.role === ROLES.SUPER_ADMIN && (
-            <li>
-              <NavLink
-                to="/superadmin/topics"
-                className={({ isActive }) => navLinkClass(isActive)}
-              >
-                <Icon icon="mdi:shield-crown-outline" className="menu-icon" />
-                <span>Base Content Library</span>
-              </NavLink>
-            </li>
-          )}
 
           {/* <li className="sidebar-menu-group-title">Settings</li> */}
           {(user.role === ROLES.TEACHER || user.role === ROLES.COACHING_ADMIN) && (

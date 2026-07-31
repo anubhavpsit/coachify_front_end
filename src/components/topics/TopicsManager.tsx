@@ -20,11 +20,11 @@ interface Topic {
 }
 
 interface TopicsManagerProps {
-  /** e.g. '/superadmin/topics' or '/admin/topics' */
+  /** e.g. '/admin/topics' — base (tenant_id 0) topics are managed separately in the server-rendered super admin panel */
   apiBasePath: string;
-  /** '0' for the shared base-content pool, or the tenant's own id */
+  /** the tenant's own id, used to fetch its subject list */
   subjectsTenantId: string;
-  /** Route to the question bank for a given topic, e.g. `/superadmin/topics/${id}/questions` */
+  /** Route to the question bank for a given topic, e.g. `/topics/${id}/questions` */
   questionsRoute: (topicId: number) => string;
   ownTenantId: number;
 }

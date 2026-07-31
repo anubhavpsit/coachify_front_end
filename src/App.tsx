@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
-import SuperAdminRoute from './components/SuperAdminRoute.tsx'
 import DashboardLayout from './layouts/DashboardLayout.tsx'
 import DashboardPage from './pages/dashboard/DashboardPage.tsx'
 import DailyAttendance from './pages/dashboard/DailyAttendance.tsx'
@@ -35,8 +34,6 @@ import MyAttendance from './pages/attendance/MyAttendance.tsx'
 import CorrectionsAdminPage from './pages/attendance/CorrectionsAdminPage.tsx'
 import TopicsPage from './pages/topics/TopicsPage.tsx'
 import TopicQuestionsPage from './pages/topics/TopicQuestionsPage.tsx'
-import SuperAdminTopicsPage from './pages/superadmin/TopicsPage.tsx'
-import SuperAdminTopicQuestionsPage from './pages/superadmin/TopicQuestionsPage.tsx'
 
 function App() {
   return (
@@ -119,12 +116,6 @@ function App() {
           <Route path="/topics" element={<DashboardLayout />}>
             <Route index element={<TopicsPage />} />
             <Route path=":topicId/questions" element={<TopicQuestionsPage />} />
-          </Route>
-          <Route element={<SuperAdminRoute />}>
-            <Route path="/superadmin/topics" element={<DashboardLayout />}>
-              <Route index element={<SuperAdminTopicsPage />} />
-              <Route path=":topicId/questions" element={<SuperAdminTopicQuestionsPage />} />
-            </Route>
           </Route>
         </Route>
         <Route path="*" element={<NotFoundPage />} />

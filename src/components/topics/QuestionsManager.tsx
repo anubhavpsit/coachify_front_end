@@ -15,7 +15,7 @@ interface Question {
 }
 
 interface QuestionsManagerProps {
-  /** e.g. '/superadmin/topics' or '/admin/topics' */
+  /** e.g. '/admin/topics' */
   apiBasePath: string;
   /** Back link to the topics list */
   topicsRoute: string;
