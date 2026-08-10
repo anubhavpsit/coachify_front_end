@@ -10,8 +10,17 @@ interface Question {
   tenant_id: number;
   grade: number;
   difficulty: string | null;
+  question_type: string | null;
   question_html: string;
   solution_html: string | null;
+  option_a: string | null;
+  option_b: string | null;
+  option_c: string | null;
+  option_d: string | null;
+  correct_answer: string | null;
+  answer_key: string | null;
+  needs_image: boolean;
+  image_note: string | null;
 }
 
 interface QuestionsManagerProps {
@@ -24,8 +33,40 @@ interface QuestionsManagerProps {
 
 const GRADES = Array.from({ length: 12 }, (_, i) => i + 1);
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
+const QUESTION_TYPES = [
+  { value: '', label: 'Not set' },
+  { value: 'mcq', label: 'Multiple Choice' },
+  { value: 'true_false', label: 'True / False' },
+  { value: 'short_answer', label: 'Short Answer' },
+  { value: 'long_answer', label: 'Long Answer' },
+  { value: 'fill_in_the_blank', label: 'Fill in the Blank' },
+  { value: 'match_the_following', label: 'Match the Following' },
+];
+const SUBJECTIVE_TYPES = ['short_answer', 'long_answer', 'fill_in_the_blank', 'match_the_following'];
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
+
+interface QuestionFormState {
+  grade: string;
+  difficulty: string;
+  questionType: string;
+  questionHtml: string;
+  solutionHtml: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
+  correctAnswer: string;
+  answerKey: string;
+  needsImage: boolean;
+  imageNote: string;
+}
+
+const emptyForm: QuestionFormState = {
+  grade: '', difficulty: '', questionType: '', questionHtml: '', solutionHtml: '',
+  optionA: '', optionB: '', optionC: '', optionD: '', correctAnswer: '', answerKey: '',
+  needsImage: false, imageNote: '',
+};
 
 export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId }: QuestionsManagerProps) {
   const { topicId } = useParams<{ topicId: string }>();
@@ -33,15 +74,14 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
   const [gradeFilter, setGradeFilter] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedUrl, setUploadedUrl] = useState('');
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const [formGrade, setFormGrade] = useState('');
-  const [formDifficulty, setFormDifficulty] = useState('');
-  const [formQuestionHtml, setFormQuestionHtml] = useState('');
-  const [formSolutionHtml, setFormSolutionHtml] = useState('');
+  const [form, setForm] = useState<QuestionFormState>(emptyForm);
   const [editQuestion, setEditQuestion] = useState<Question | null>(null);
   const [deleteQuestion, setDeleteQuestion] = useState<Question | null>(null);
 
@@ -70,22 +110,32 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
   }, [topicId, gradeFilter]);
 
   const resetForm = () => {
-    setFormGrade('');
-    setFormDifficulty('');
-    setFormQuestionHtml('');
-    setFormSolutionHtml('');
+    setForm(emptyForm);
+    setUploadedUrl('');
   };
+
+  const buildPayload = () => ({
+    grade: form.grade,
+    difficulty: form.difficulty || null,
+    question_type: form.questionType || null,
+    question_html: form.questionHtml,
+    solution_html: form.solutionHtml || null,
+    option_a: form.questionType === 'mcq' ? form.optionA : null,
+    option_b: form.questionType === 'mcq' ? form.optionB : null,
+    option_c: form.questionType === 'mcq' ? form.optionC : null,
+    option_d: form.questionType === 'mcq' ? form.optionD : null,
+    correct_answer: (form.questionType === 'mcq' || form.questionType === 'true_false') ? form.correctAnswer : null,
+    answer_key: SUBJECTIVE_TYPES.includes(form.questionType) ? form.answerKey : null,
+    needs_image: form.needsImage,
+    image_note: form.imageNote || null,
+  });
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formGrade || !formQuestionHtml.trim()) return;
+    if (!form.grade || !form.questionHtml.trim()) return;
     setSaving(true);
     try {
-      await axios.post(
-        questionsUrl,
-        { grade: formGrade, difficulty: formDifficulty || null, question_html: formQuestionHtml, solution_html: formSolutionHtml },
-        { headers: authHeaders },
-      );
+      await axios.post(questionsUrl, buildPayload(), { headers: authHeaders });
       setShowAddModal(false);
       resetForm();
       fetchQuestions();
@@ -99,10 +149,22 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
 
   const openEdit = (question: Question) => {
     setEditQuestion(question);
-    setFormGrade(String(question.grade));
-    setFormDifficulty(question.difficulty ?? '');
-    setFormQuestionHtml(question.question_html ?? '');
-    setFormSolutionHtml(question.solution_html ?? '');
+    setForm({
+      grade: String(question.grade),
+      difficulty: question.difficulty ?? '',
+      questionType: question.question_type ?? '',
+      questionHtml: question.question_html ?? '',
+      solutionHtml: question.solution_html ?? '',
+      optionA: question.option_a ?? '',
+      optionB: question.option_b ?? '',
+      optionC: question.option_c ?? '',
+      optionD: question.option_d ?? '',
+      correctAnswer: question.correct_answer ?? '',
+      answerKey: question.answer_key ?? '',
+      needsImage: question.needs_image ?? false,
+      imageNote: question.image_note ?? '',
+    });
+    setUploadedUrl('');
     setShowEditModal(true);
   };
 
@@ -111,11 +173,7 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
     if (!editQuestion) return;
     setSaving(true);
     try {
-      await axios.put(
-        `${questionsUrl}/${editQuestion.id}`,
-        { grade: formGrade, difficulty: formDifficulty || null, question_html: formQuestionHtml, solution_html: formSolutionHtml },
-        { headers: authHeaders },
-      );
+      await axios.put(`${questionsUrl}/${editQuestion.id}`, buildPayload(), { headers: authHeaders });
       setShowEditModal(false);
       setEditQuestion(null);
       resetForm();
@@ -144,7 +202,121 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
     }
   };
 
+  const handleImageUpload = async (file: File) => {
+    if (!editQuestion) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await axios.post(`${questionsUrl}/${editQuestion.id}/image`, formData, {
+        headers: { ...authHeaders, 'Content-Type': 'multipart/form-data' },
+      });
+      setUploadedUrl(response.data?.url ?? '');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const canManage = (question: Question) => question.tenant_id === ownTenantId;
+
+  const questionTypeFields = (
+    <>
+      <div className="mb-3">
+        <label className="form-label fw-semibold text-primary-light text-sm mb-2">Question Type (optional)</label>
+        <select
+          className="form-select radius-8"
+          value={form.questionType}
+          onChange={(e) => setForm({ ...form, questionType: e.target.value, correctAnswer: '' })}
+          disabled={saving}
+        >
+          {QUESTION_TYPES.map((t) => (
+            <option key={t.value} value={t.value}>{t.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {form.questionType === 'mcq' && (
+        <div className="row">
+          <div className="col-6 mb-3">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-2">Option A</label>
+            <input type="text" className="form-control radius-8" value={form.optionA} onChange={(e) => setForm({ ...form, optionA: e.target.value })} disabled={saving} required />
+          </div>
+          <div className="col-6 mb-3">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-2">Option B</label>
+            <input type="text" className="form-control radius-8" value={form.optionB} onChange={(e) => setForm({ ...form, optionB: e.target.value })} disabled={saving} required />
+          </div>
+          <div className="col-6 mb-3">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-2">Option C</label>
+            <input type="text" className="form-control radius-8" value={form.optionC} onChange={(e) => setForm({ ...form, optionC: e.target.value })} disabled={saving} required />
+          </div>
+          <div className="col-6 mb-3">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-2">Option D</label>
+            <input type="text" className="form-control radius-8" value={form.optionD} onChange={(e) => setForm({ ...form, optionD: e.target.value })} disabled={saving} required />
+          </div>
+          <div className="col-6 mb-3">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-2">Correct Answer</label>
+            <select className="form-select radius-8" value={form.correctAnswer} onChange={(e) => setForm({ ...form, correctAnswer: e.target.value })} disabled={saving} required>
+              <option value="">Select correct option</option>
+              <option value="a">A</option>
+              <option value="b">B</option>
+              <option value="c">C</option>
+              <option value="d">D</option>
+            </select>
+          </div>
+        </div>
+      )}
+
+      {form.questionType === 'true_false' && (
+        <div className="mb-3">
+          <label className="form-label fw-semibold text-primary-light text-sm mb-2">Correct Answer</label>
+          <select className="form-select radius-8" value={form.correctAnswer} onChange={(e) => setForm({ ...form, correctAnswer: e.target.value })} disabled={saving} required>
+            <option value="">Select correct answer</option>
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        </div>
+      )}
+
+      {SUBJECTIVE_TYPES.includes(form.questionType) && (
+        <div className="mb-3">
+          <label className="form-label fw-semibold text-primary-light text-sm mb-2">Answer Key</label>
+          <textarea
+            className="form-control radius-8"
+            rows={3}
+            value={form.answerKey}
+            onChange={(e) => setForm({ ...form, answerKey: e.target.value })}
+            disabled={saving}
+            required
+          />
+        </div>
+      )}
+
+      <div className="row align-items-center">
+        <div className="col-4 mb-3">
+          <div className="form-check mt-4">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="needsImage"
+              checked={form.needsImage}
+              onChange={(e) => setForm({ ...form, needsImage: e.target.checked })}
+              disabled={saving}
+            />
+            <label className="form-check-label" htmlFor="needsImage">Needs Image</label>
+          </div>
+        </div>
+        {form.needsImage && (
+          <div className="col-8 mb-3">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-2">Image Note</label>
+            <input type="text" className="form-control radius-8" value={form.imageNote} onChange={(e) => setForm({ ...form, imageNote: e.target.value })} disabled={saving} placeholder="What image is needed?" />
+          </div>
+        )}
+      </div>
+    </>
+  );
 
   return (
     <div>
@@ -189,6 +361,7 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
                     <tr>
                       <th scope="col" className="text-center">Grade</th>
                       <th scope="col" className="text-center">Difficulty</th>
+                      <th scope="col" className="text-center">Q. Type</th>
                       <th scope="col">Question</th>
                       <th scope="col" className="text-center">Type</th>
                       <th scope="col" className="text-center">Actions</th>
@@ -199,10 +372,16 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
                       <tr key={question.id}>
                         <td className="text-center">{question.grade}</td>
                         <td className="text-center text-capitalize">{question.difficulty ?? '-'}</td>
+                        <td className="text-center">
+                          {QUESTION_TYPES.find((t) => t.value === question.question_type)?.label ?? '-'}
+                          {question.needs_image && (
+                            <div><span className="badge bg-danger-subtle text-danger-emphasis mt-1">Needs image</span></div>
+                          )}
+                        </td>
                         <td>
                           <div
                             className="text-truncate"
-                            style={{ maxWidth: 400 }}
+                            style={{ maxWidth: 350 }}
                             dangerouslySetInnerHTML={{ __html: question.question_html }}
                           />
                         </td>
@@ -247,7 +426,7 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
             <div className="row">
               <div className="col-6 mb-3">
                 <label className="form-label fw-semibold text-primary-light text-sm mb-2">Grade</label>
-                <select className="form-select radius-8" value={formGrade} onChange={(e) => setFormGrade(e.target.value)} disabled={saving} required>
+                <select className="form-select radius-8" value={form.grade} onChange={(e) => setForm({ ...form, grade: e.target.value })} disabled={saving} required>
                   <option value="">Select grade</option>
                   {GRADES.map((g) => (
                     <option key={g} value={g}>Grade {g}</option>
@@ -256,7 +435,7 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
               </div>
               <div className="col-6 mb-3">
                 <label className="form-label fw-semibold text-primary-light text-sm mb-2">Difficulty (optional)</label>
-                <select className="form-select radius-8" value={formDifficulty} onChange={(e) => setFormDifficulty(e.target.value)} disabled={saving}>
+                <select className="form-select radius-8" value={form.difficulty} onChange={(e) => setForm({ ...form, difficulty: e.target.value })} disabled={saving}>
                   <option value="">None</option>
                   {DIFFICULTIES.map((d) => (
                     <option key={d} value={d} className="text-capitalize">{d}</option>
@@ -266,12 +445,14 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Question</label>
-              <RichTextEditor value={formQuestionHtml} onChange={setFormQuestionHtml} disabled={saving} />
+              <RichTextEditor value={form.questionHtml} onChange={(html) => setForm({ ...form, questionHtml: html })} disabled={saving} />
             </div>
+            {questionTypeFields}
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Solution (hidden from students until unlock delay)</label>
-              <RichTextEditor value={formSolutionHtml} onChange={setFormSolutionHtml} disabled={saving} />
+              <RichTextEditor value={form.solutionHtml} onChange={(html) => setForm({ ...form, solutionHtml: html })} disabled={saving} />
             </div>
+            <p className="text-xs text-muted">Image upload becomes available once the question is first saved.</p>
             <div className="d-flex justify-content-end gap-3 mt-3">
               <Button variant="secondary" onClick={() => { setShowAddModal(false); resetForm(); }} disabled={saving}>Cancel</Button>
               <Button type="submit" variant="primary" disabled={saving}>{saving ? 'Saving...' : 'Save'}</Button>
@@ -281,7 +462,7 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
       </Modal>
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setEditQuestion(null); }} centered size="lg">
+      <Modal show={showEditModal} onHide={() => { setShowEditModal(false); setEditQuestion(null); resetForm(); }} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Edit Question</Modal.Title>
         </Modal.Header>
@@ -290,7 +471,7 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
             <div className="row">
               <div className="col-6 mb-3">
                 <label className="form-label fw-semibold text-primary-light text-sm mb-2">Grade</label>
-                <select className="form-select radius-8" value={formGrade} onChange={(e) => setFormGrade(e.target.value)} disabled={saving} required>
+                <select className="form-select radius-8" value={form.grade} onChange={(e) => setForm({ ...form, grade: e.target.value })} disabled={saving} required>
                   <option value="">Select grade</option>
                   {GRADES.map((g) => (
                     <option key={g} value={g}>Grade {g}</option>
@@ -299,7 +480,7 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
               </div>
               <div className="col-6 mb-3">
                 <label className="form-label fw-semibold text-primary-light text-sm mb-2">Difficulty (optional)</label>
-                <select className="form-select radius-8" value={formDifficulty} onChange={(e) => setFormDifficulty(e.target.value)} disabled={saving}>
+                <select className="form-select radius-8" value={form.difficulty} onChange={(e) => setForm({ ...form, difficulty: e.target.value })} disabled={saving}>
                   <option value="">None</option>
                   {DIFFICULTIES.map((d) => (
                     <option key={d} value={d} className="text-capitalize">{d}</option>
@@ -309,14 +490,34 @@ export default function QuestionsManager({ apiBasePath, topicsRoute, ownTenantId
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Question</label>
-              <RichTextEditor value={formQuestionHtml} onChange={setFormQuestionHtml} disabled={saving} />
+              <RichTextEditor value={form.questionHtml} onChange={(html) => setForm({ ...form, questionHtml: html })} disabled={saving} />
             </div>
+            {questionTypeFields}
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Solution</label>
-              <RichTextEditor value={formSolutionHtml} onChange={setFormSolutionHtml} disabled={saving} />
+              <RichTextEditor value={form.solutionHtml} onChange={(html) => setForm({ ...form, solutionHtml: html })} disabled={saving} />
             </div>
+
+            <div className="mb-3 p-3 border radius-8 bg-neutral-50">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">Upload Image</label>
+              <input
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                className="form-control radius-8"
+                disabled={uploading}
+                onChange={(e) => { const file = e.target.files?.[0]; if (file) handleImageUpload(file); }}
+              />
+              {uploading && <p className="text-xs text-muted mt-2 mb-0">Uploading...</p>}
+              {uploadedUrl && (
+                <div className="mt-2">
+                  <p className="text-xs text-muted mb-1">Uploaded — copy this into the Question or Solution as an image:</p>
+                  <input type="text" readOnly className="form-control form-control-sm" value={uploadedUrl} onFocus={(e) => e.target.select()} />
+                </div>
+              )}
+            </div>
+
             <div className="d-flex justify-content-end gap-3 mt-3">
-              <Button variant="secondary" onClick={() => { setShowEditModal(false); setEditQuestion(null); }} disabled={saving}>Cancel</Button>
+              <Button variant="secondary" onClick={() => { setShowEditModal(false); setEditQuestion(null); resetForm(); }} disabled={saving}>Cancel</Button>
               <Button type="submit" variant="primary" disabled={saving}>{saving ? 'Updating...' : 'Update'}</Button>
             </div>
           </form>

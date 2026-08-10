@@ -9,6 +9,7 @@ import UserProfileModal from '../../components/UserProfileModal';
 
 interface StudentProfile {
   class: number | null;
+  grade?: number | null;
   subjects: number[];
   phone: string;
 }
@@ -32,6 +33,7 @@ interface StudentForm {
   email: string;
   password: string;
   class: number | '';
+  grade: number | '';
   subjects: number[];
   phone: string;
   dob: string;
@@ -40,10 +42,13 @@ interface StudentForm {
 
 interface StudentFallbackData {
   classId: number | null;
+  grade: number | null;
   subjects: number[];
   phone: string;
   createdAt?: string;
 }
+
+const GRADES = Array.from({ length: 12 }, (_, i) => i + 1);
 
 function getTodayDateValue() {
   const today = new Date()
@@ -73,6 +78,7 @@ export default function StudentsPage() {
     email: '',
     password: '',
     class: '',
+    grade: '',
     subjects: [],
     phone: '',
     dob: '',
@@ -142,6 +148,10 @@ export default function StudentsPage() {
       typeof student.student_profile?.class === 'number'
         ? student.student_profile.class
         : fallback.classId;
+    const normalizedGrade =
+      typeof student.student_profile?.grade === 'number'
+        ? student.student_profile.grade
+        : fallback.grade;
     const serverSubjects = student.student_profile?.subjects;
     const normalizedSubjects =
       Array.isArray(serverSubjects) && serverSubjects.length > 0
@@ -161,6 +171,7 @@ export default function StudentsPage() {
       student_profile: {
         ...(student.student_profile ?? {}),
         class: normalizedClass,
+        grade: normalizedGrade,
         subjects: normalizedSubjects,
         phone: normalizedPhone,
       } as StudentProfile,
@@ -357,15 +368,17 @@ export default function StudentsPage() {
       if (response.data.success) {
         const createdStudent: Student = response.data.data;
         const fallbackClass = newStudentForm.class === '' ? null : Number(newStudentForm.class);
+        const fallbackGrade = newStudentForm.grade === '' ? null : Number(newStudentForm.grade);
         const enrichedStudent = enrichStudentData(createdStudent, {
           classId: fallbackClass,
+          grade: fallbackGrade,
           subjects: newStudentForm.subjects,
           phone: newStudentForm.phone,
           createdAt: createdStudent.created_at ?? new Date().toISOString(),
         });
 
         setStudents(prev => sortStudentsByCreatedAt([enrichedStudent, ...prev]));
-        setNewStudentForm({ name: '', email: '', password: '', class: '', subjects: [], phone: '', dob: '', gender: '' });
+        setNewStudentForm({ name: '', email: '', password: '', class: '', grade: '', subjects: [], phone: '', dob: '', gender: '' });
         setShowAddModal(false);
       }
     } catch (error) {
@@ -388,6 +401,7 @@ export default function StudentsPage() {
       email: student.email,
       password: '',
       class: inferredClassId,
+      grade: typeof student.student_profile?.grade === 'number' ? student.student_profile.grade : '',
       subjects: student.student_profile?.subjects || [],
       phone: student.student_profile?.phone || '',
       dob: student.dob || '',
@@ -413,9 +427,11 @@ export default function StudentsPage() {
       if (response.data.success && editStudentForm) {
         const updatedStudent: Student = response.data.data;
         const fallbackClass = editStudentForm.class === '' ? null : Number(editStudentForm.class);
+        const fallbackGrade = editStudentForm.grade === '' ? null : Number(editStudentForm.grade);
         const existingStudent = students.find(s => s.id === editStudentId);
         const enrichedStudent = enrichStudentData(updatedStudent, {
           classId: fallbackClass,
+          grade: fallbackGrade,
           subjects: editStudentForm.subjects,
           phone: editStudentForm.phone,
           createdAt: existingStudent?.created_at ?? undefined,
@@ -776,6 +792,26 @@ export default function StudentsPage() {
               </select>
             </div>
             <div className="mb-3">
+              <label className="form-label fw-semibold">Grade</label>
+              <select
+                className="form-control"
+                value={newStudentForm.grade}
+                onChange={(e) =>
+                  setNewStudentForm({
+                    ...newStudentForm,
+                    grade: e.target.value === '' ? '' : Number(e.target.value),
+                  })
+                }
+                disabled={saving}
+              >
+                <option value="">Not set</option>
+                {GRADES.map((g) => (
+                  <option key={g} value={g}>Grade {g}</option>
+                ))}
+              </select>
+              <div className="form-text">Used to filter content-library questions and practice material to the right difficulty.</div>
+            </div>
+            <div className="mb-3">
               <label className="form-label fw-semibold">Subjects</label>
               <div className="d-flex flex-wrap gap-2">
                 {subjects.map((sub, index) => (
@@ -885,6 +921,21 @@ export default function StudentsPage() {
                 ))}
               </select>
 
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Grade</label>
+              <select
+                className="form-control"
+                value={editStudentForm?.grade ?? ''}
+                onChange={(e) => editStudentForm && setEditStudentForm({ ...editStudentForm, grade: e.target.value === '' ? '' : Number(e.target.value) })}
+                disabled={saving}
+              >
+                <option value="">Not set</option>
+                {GRADES.map((g) => (
+                  <option key={g} value={g}>Grade {g}</option>
+                ))}
+              </select>
+              <div className="form-text">Used to filter content-library questions and practice material to the right difficulty.</div>
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold">Subjects</label>

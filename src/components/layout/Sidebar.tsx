@@ -147,6 +147,17 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
           {user.role === ROLES.COACHING_ADMIN && (
             <li>
               <NavLink
+                to="/chapters"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:book-open-outline" className="menu-icon" />
+                <span>Chapters</span>
+              </NavLink>
+            </li>
+          )}
+          {user.role === ROLES.COACHING_ADMIN && (
+            <li>
+              <NavLink
                 to="/topics"
                 className={({ isActive }) => navLinkClass(isActive)}
               >
@@ -154,6 +165,28 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
                 <span>Topics</span>
               </NavLink>
             </li>
+          )}
+          {user.role === ROLES.TEACHER && (
+            <>
+              <li>
+                <NavLink
+                  to="/library/chapters"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:book-open-outline" className="menu-icon" />
+                  <span>Chapters</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/library/topics"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:notebook-outline" className="menu-icon" />
+                  <span>Topics</span>
+                </NavLink>
+              </li>
+            </>
           )}
 
           {/* <li className="sidebar-menu-group-title">Settings</li> */}

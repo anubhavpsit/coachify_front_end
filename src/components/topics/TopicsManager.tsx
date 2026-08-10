@@ -10,13 +10,23 @@ interface Subject {
   subject: string;
 }
 
+interface Chapter {
+  id: number;
+  subject_id: number;
+  tenant_id: number;
+  name: string;
+}
+
 interface Topic {
   id: number;
   tenant_id: number;
   subject_id: number;
+  chapter_id: number | null;
+  grade: number | null;
   name: string;
   explanation_html: string | null;
   subject?: Subject;
+  chapter?: Chapter | null;
 }
 
 interface TopicsManagerProps {
@@ -29,6 +39,8 @@ interface TopicsManagerProps {
   ownTenantId: number;
 }
 
+const GRADES = Array.from({ length: 12 }, (_, i) => i + 1);
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
 
 export default function TopicsManager({ apiBasePath, subjectsTenantId, questionsRoute, ownTenantId }: TopicsManagerProps) {
@@ -36,6 +48,9 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [subjectFilter, setSubjectFilter] = useState<string>('');
+  const [chapterFilter, setChapterFilter] = useState<string>('');
+  const [gradeFilter, setGradeFilter] = useState<string>('');
+  const [filterChapters, setFilterChapters] = useState<Chapter[]>([]);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -43,8 +58,11 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
   const [saving, setSaving] = useState(false);
 
   const [formSubjectId, setFormSubjectId] = useState('');
+  const [formChapterId, setFormChapterId] = useState('');
+  const [formGrade, setFormGrade] = useState('');
   const [formName, setFormName] = useState('');
   const [formExplanation, setFormExplanation] = useState('');
+  const [formChapters, setFormChapters] = useState<Chapter[]>([]);
   const [editTopic, setEditTopic] = useState<Topic | null>(null);
   const [deleteTopic, setDeleteTopic] = useState<Topic | null>(null);
 
@@ -64,11 +82,54 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subjectsTenantId]);
 
+  // Chapters for the list filter — follows the selected subject filter (or all if none selected)
+  useEffect(() => {
+    const fetchFilterChapters = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/admin/chapters`, {
+          params: subjectFilter ? { subject_id: subjectFilter } : undefined,
+          headers: authHeaders,
+        });
+        setFilterChapters(response.data?.data ?? []);
+      } catch (error) {
+        console.error('Error fetching chapters:', error);
+      }
+    };
+    fetchFilterChapters();
+    setChapterFilter('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subjectFilter]);
+
+  // Chapters for the Add/Edit form — follows the selected form subject
+  useEffect(() => {
+    const fetchFormChapters = async () => {
+      if (!formSubjectId) {
+        setFormChapters([]);
+        return;
+      }
+      try {
+        const response = await axios.get(`${API_BASE_URL}/admin/chapters`, {
+          params: { subject_id: formSubjectId },
+          headers: authHeaders,
+        });
+        setFormChapters(response.data?.data ?? []);
+      } catch (error) {
+        console.error('Error fetching chapters:', error);
+      }
+    };
+    fetchFormChapters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formSubjectId]);
+
   const fetchTopics = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API_BASE_URL}${apiBasePath}`, {
-        params: subjectFilter ? { subject_id: subjectFilter } : undefined,
+        params: {
+          ...(subjectFilter ? { subject_id: subjectFilter } : {}),
+          ...(chapterFilter ? { chapter_id: chapterFilter } : {}),
+          ...(gradeFilter ? { grade: gradeFilter } : {}),
+        },
         headers: authHeaders,
       });
       setTopics(response.data?.data ?? []);
@@ -82,24 +143,30 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
   useEffect(() => {
     fetchTopics();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiBasePath, subjectFilter]);
+  }, [apiBasePath, subjectFilter, chapterFilter, gradeFilter]);
 
   const resetForm = () => {
     setFormSubjectId('');
+    setFormChapterId('');
+    setFormGrade('');
     setFormName('');
     setFormExplanation('');
   };
+
+  const buildPayload = () => ({
+    subject_id: formSubjectId,
+    chapter_id: formChapterId || null,
+    grade: formGrade || null,
+    name: formName,
+    explanation_html: formExplanation,
+  });
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formSubjectId || !formName.trim()) return;
     setSaving(true);
     try {
-      await axios.post(
-        `${API_BASE_URL}${apiBasePath}`,
-        { subject_id: formSubjectId, name: formName, explanation_html: formExplanation },
-        { headers: authHeaders },
-      );
+      await axios.post(`${API_BASE_URL}${apiBasePath}`, buildPayload(), { headers: authHeaders });
       setShowAddModal(false);
       resetForm();
       fetchTopics();
@@ -114,6 +181,8 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
   const openEdit = (topic: Topic) => {
     setEditTopic(topic);
     setFormSubjectId(String(topic.subject_id));
+    setFormChapterId(topic.chapter_id ? String(topic.chapter_id) : '');
+    setFormGrade(topic.grade ? String(topic.grade) : '');
     setFormName(topic.name);
     setFormExplanation(topic.explanation_html ?? '');
     setShowEditModal(true);
@@ -124,11 +193,7 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
     if (!editTopic) return;
     setSaving(true);
     try {
-      await axios.put(
-        `${API_BASE_URL}${apiBasePath}/${editTopic.id}`,
-        { subject_id: formSubjectId, name: formName, explanation_html: formExplanation },
-        { headers: authHeaders },
-      );
+      await axios.put(`${API_BASE_URL}${apiBasePath}/${editTopic.id}`, buildPayload(), { headers: authHeaders });
       setShowEditModal(false);
       setEditTopic(null);
       resetForm();
@@ -169,16 +234,40 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
         <div className="card">
           <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
             <span className="text-md fw-medium text-secondary-light mb-0">Topics List</span>
-            <div className="d-flex align-items-center gap-3">
+            <div className="d-flex align-items-center flex-wrap gap-3">
               <select
                 className="form-select radius-8"
-                style={{ minWidth: 180 }}
+                style={{ minWidth: 160 }}
                 value={subjectFilter}
                 onChange={(e) => setSubjectFilter(e.target.value)}
               >
                 <option value="">All Subjects</option>
                 {subjects.map((s) => (
                   <option key={s.id} value={s.id}>{s.subject}</option>
+                ))}
+              </select>
+              <select
+                className="form-select radius-8"
+                style={{ minWidth: 160 }}
+                value={chapterFilter}
+                onChange={(e) => setChapterFilter(e.target.value)}
+              >
+                <option value="">All Chapters</option>
+                <option value="none">No chapter</option>
+                {filterChapters.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+              <select
+                className="form-select radius-8"
+                style={{ minWidth: 140 }}
+                value={gradeFilter}
+                onChange={(e) => setGradeFilter(e.target.value)}
+              >
+                <option value="">All Grades</option>
+                <option value="none">All grades (shared)</option>
+                {GRADES.map((g) => (
+                  <option key={g} value={g}>Grade {g}</option>
                 ))}
               </select>
               <Button variant="primary" onClick={() => setShowAddModal(true)} className="text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2">
@@ -201,6 +290,8 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
                   <thead>
                     <tr>
                       <th scope="col">Topic</th>
+                      <th scope="col">Chapter</th>
+                      <th scope="col" className="text-center">Grade</th>
                       <th scope="col">Subject</th>
                       <th scope="col" className="text-center">Type</th>
                       <th scope="col" className="text-center">Questions</th>
@@ -211,6 +302,8 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
                     {topics.map((topic) => (
                       <tr key={topic.id}>
                         <td>{topic.name}</td>
+                        <td>{topic.chapter?.name ?? '-'}</td>
+                        <td className="text-center">{topic.grade ? `Grade ${topic.grade}` : 'All'}</td>
                         <td>{topic.subject?.subject ?? subjects.find((s) => s.id === topic.subject_id)?.subject ?? '-'}</td>
                         <td className="text-center">
                           {topic.tenant_id === 0 ? (
@@ -257,12 +350,32 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
           <form onSubmit={handleAdd}>
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Subject</label>
-              <select className="form-select radius-8" value={formSubjectId} onChange={(e) => setFormSubjectId(e.target.value)} disabled={saving} required>
+              <select className="form-select radius-8" value={formSubjectId} onChange={(e) => { setFormSubjectId(e.target.value); setFormChapterId(''); }} disabled={saving} required>
                 <option value="">Select subject</option>
                 {subjects.map((s) => (
                   <option key={s.id} value={s.id}>{s.subject}</option>
                 ))}
               </select>
+            </div>
+            <div className="row">
+              <div className="col-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">Chapter (optional)</label>
+                <select className="form-select radius-8" value={formChapterId} onChange={(e) => setFormChapterId(e.target.value)} disabled={saving || !formSubjectId}>
+                  <option value="">No chapter</option>
+                  {formChapters.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">Grade (optional)</label>
+                <select className="form-select radius-8" value={formGrade} onChange={(e) => setFormGrade(e.target.value)} disabled={saving}>
+                  <option value="">All grades (shared)</option>
+                  {GRADES.map((g) => (
+                    <option key={g} value={g}>Grade {g}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Topic Name</label>
@@ -297,12 +410,32 @@ export default function TopicsManager({ apiBasePath, subjectsTenantId, questions
           <form onSubmit={handleUpdate}>
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Subject</label>
-              <select className="form-select radius-8" value={formSubjectId} onChange={(e) => setFormSubjectId(e.target.value)} disabled={saving} required>
+              <select className="form-select radius-8" value={formSubjectId} onChange={(e) => { setFormSubjectId(e.target.value); setFormChapterId(''); }} disabled={saving} required>
                 <option value="">Select subject</option>
                 {subjects.map((s) => (
                   <option key={s.id} value={s.id}>{s.subject}</option>
                 ))}
               </select>
+            </div>
+            <div className="row">
+              <div className="col-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">Chapter (optional)</label>
+                <select className="form-select radius-8" value={formChapterId} onChange={(e) => setFormChapterId(e.target.value)} disabled={saving || !formSubjectId}>
+                  <option value="">No chapter</option>
+                  {formChapters.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">Grade (optional)</label>
+                <select className="form-select radius-8" value={formGrade} onChange={(e) => setFormGrade(e.target.value)} disabled={saving}>
+                  <option value="">All grades (shared)</option>
+                  {GRADES.map((g) => (
+                    <option key={g} value={g}>Grade {g}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">Topic Name</label>

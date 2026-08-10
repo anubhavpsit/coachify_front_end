@@ -9,6 +9,7 @@ import TeachersPage from './pages/teachers/TeachersPage.tsx'
 import DailyActivitiesPage from './pages/teachers/DailyActivitiesPage.tsx'
 import StudentsPage from './pages/students/StudentsPage.tsx'
 import StudentActivitiesPage from './pages/students/StudentActivitiesPage.tsx'
+import StudentTopicContentPage from './pages/students/StudentTopicContentPage.tsx'
 import StudentAssessmentsPage from './pages/students/StudentAssessmentsPage.tsx'
 import FeeComponent from './pages/fees/FeeComponent.tsx'
 import ExpensesComponent from './pages/expenses/ExpensesComponent.tsx'
@@ -34,6 +35,12 @@ import MyAttendance from './pages/attendance/MyAttendance.tsx'
 import CorrectionsAdminPage from './pages/attendance/CorrectionsAdminPage.tsx'
 import TopicsPage from './pages/topics/TopicsPage.tsx'
 import TopicQuestionsPage from './pages/topics/TopicQuestionsPage.tsx'
+import ChaptersPage from './pages/topics/ChaptersPage.tsx'
+import ChapterDetailPage from './pages/topics/ChapterDetailPage.tsx'
+import LibraryChaptersPage from './pages/library/LibraryChaptersPage.tsx'
+import LibraryChapterDetailPage from './pages/library/LibraryChapterDetailPage.tsx'
+import LibraryTopicsPage from './pages/library/LibraryTopicsPage.tsx'
+import LibraryTopicDetailPage from './pages/library/LibraryTopicDetailPage.tsx'
 
 function App() {
   return (
@@ -75,6 +82,7 @@ function App() {
           <Route path="/students" element={<DashboardLayout />}>
             <Route index element={<StudentsPage />} />
             <Route path="activities" element={<StudentActivitiesPage />} />
+            <Route path="activities/:activityId/topic" element={<StudentTopicContentPage />} />
             <Route path="assessments" element={<StudentAssessmentsPage />} />
           </Route>
           <Route path="/assessments" element={<DashboardLayout />}>
@@ -116,6 +124,18 @@ function App() {
           <Route path="/topics" element={<DashboardLayout />}>
             <Route index element={<TopicsPage />} />
             <Route path=":topicId/questions" element={<TopicQuestionsPage />} />
+          </Route>
+          <Route path="/chapters" element={<DashboardLayout />}>
+            <Route index element={<ChaptersPage />} />
+            <Route path=":chapterId" element={<ChapterDetailPage />} />
+          </Route>
+          <Route path="/library/chapters" element={<DashboardLayout />}>
+            <Route index element={<LibraryChaptersPage />} />
+            <Route path=":chapterId" element={<LibraryChapterDetailPage />} />
+          </Route>
+          <Route path="/library/topics" element={<DashboardLayout />}>
+            <Route index element={<LibraryTopicsPage />} />
+            <Route path=":topicId" element={<LibraryTopicDetailPage />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFoundPage />} />

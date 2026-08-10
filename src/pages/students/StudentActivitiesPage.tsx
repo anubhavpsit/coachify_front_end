@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { formatDate } from '../../utils/date';
 import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal';
 
@@ -16,6 +17,7 @@ interface Activity {
   activity_date: string;
   chapter: string | null;
   topic: string | null;
+  topic_id: number | null;
   notes: string | null;
   homework: string | null;
   remarks: string | null;
@@ -102,7 +104,7 @@ export default function StudentActivitiesPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {activities.map((act) => {
             const status = act.homework_status ? statusConfig[act.homework_status] : null;
-            const hasTaught = act.chapter || act.topic || act.notes;
+            const hasTaught = act.chapter || act.topic || act.notes || act.topic_id;
             const hasHomework = act.homework || act.homework_status || (act.attachments && act.attachments.length > 0);
 
             return (
@@ -132,6 +134,14 @@ export default function StudentActivitiesPage() {
                         {act.chapter && <p style={{ margin: 0, fontSize: '13px', color: '#374151' }}><span style={{ color: '#9CA3AF' }}>Chapter </span>{act.chapter}</p>}
                         {act.topic && <p style={{ margin: 0, fontSize: '13px', color: '#374151' }}><span style={{ color: '#9CA3AF' }}>Topic </span>{act.topic}</p>}
                         {act.notes && <p style={{ margin: 0, fontSize: '13px', color: '#374151' }}><span style={{ color: '#9CA3AF' }}>Notes </span>{act.notes}</p>}
+                        {act.topic_id && (
+                          <Link
+                            to={`/students/activities/${act.id}/topic`}
+                            style={{ fontSize: '12px', color: '#2563EB', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '5px', padding: '3px 8px', display: 'inline-flex', alignItems: 'center', gap: '4px', width: 'fit-content', marginTop: '4px', textDecoration: 'none' }}
+                          >
+                            View Explanation &amp; Practice Questions
+                          </Link>
+                        )}
                       </div>
                     </div>
                   )}
