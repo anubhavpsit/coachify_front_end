@@ -22,6 +22,15 @@ function getTodayDateValue() {
   return `${year}-${month}-${day}`
 }
 
+function getErrorMessage(error: unknown, fallback: string): string {
+  if (axios.isAxiosError(error)) {
+    const data = error.response?.data as { message?: string; errors?: Record<string, string[]> } | undefined;
+    const firstFieldError = data?.errors ? Object.values(data.errors)[0]?.[0] : undefined;
+    return firstFieldError || data?.message || fallback;
+  }
+  return fallback;
+}
+
 export default function StaffPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -118,7 +127,7 @@ export default function StaffPage() {
       }
     } catch (error) {
       console.error('Error adding staff:', error);
-      alert('Failed to save staff member.');
+      alert(getErrorMessage(error, 'Failed to save staff member.'));
     } finally {
       setSaving(false);
     }
@@ -161,7 +170,7 @@ export default function StaffPage() {
       }
     } catch (error) {
       console.error('Error updating staff:', error);
-      alert('Failed to update staff member.');
+      alert(getErrorMessage(error, 'Failed to update staff member.'));
     } finally {
       setSaving(false);
     }
@@ -188,7 +197,7 @@ export default function StaffPage() {
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Error deleting staff:', error);
-      alert('Failed to delete staff member.');
+      alert(getErrorMessage(error, 'Failed to delete staff member.'));
     } finally {
       setSaving(false);
     }
