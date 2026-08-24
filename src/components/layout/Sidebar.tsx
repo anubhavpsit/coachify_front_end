@@ -234,6 +234,39 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </li>
             </>
           )}
+          {user.role === ROLES.COACHING_ADMIN && (
+            <li>
+              <NavLink
+                to="/staff"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:account-tie-outline" className="menu-icon" />
+                <span>Staff</span>
+              </NavLink>
+            </li>
+          )}
+          {(user.role === ROLES.COACHING_ADMIN || user.role === ROLES.STAFF) && (
+            <>
+              <li>
+                <NavLink
+                  to="/expenses"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="mdi:cash-multiple" className="menu-icon" />
+                  <span>Expenses</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/dashboard/attendance"
+                  className={({ isActive }) => navLinkClass(isActive)}
+                >
+                  <Icon icon="ic:baseline-check-circle" />
+                  <span>Daily Attendance</span>
+                </NavLink>
+              </li>
+            </>
+          )}
           {user?.role === ROLES.STUDENT && (
             <>
               <li>
@@ -357,29 +390,11 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </li>
               <li>
                 <NavLink
-                  to="/expenses"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:cash-multiple" className="menu-icon" />
-                  <span>Expenses</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
                   to="/enquiries"
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
                   <Icon icon="mdi:account-question-outline" className="menu-icon" />
                   <span>Enquiries</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/dashboard/attendance"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="ic:baseline-check-circle" />
-                  <span>Daily Attendance</span>
                 </NavLink>
               </li>
               <li>

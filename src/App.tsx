@@ -6,6 +6,7 @@ import DailyAttendance from './pages/dashboard/DailyAttendance.tsx'
 import SubjectsPage from './pages/subjects/SubjectsPage.tsx'
 import ClassesPage from './pages/classes/ClassesPage.tsx'
 import TeachersPage from './pages/teachers/TeachersPage.tsx'
+import StaffPage from './pages/staff/StaffPage.tsx'
 import DailyActivitiesPage from './pages/teachers/DailyActivitiesPage.tsx'
 import StudentsPage from './pages/students/StudentsPage.tsx'
 import StudentActivitiesPage from './pages/students/StudentActivitiesPage.tsx'
@@ -78,6 +79,9 @@ function App() {
           <Route path="/teachers" element={<DashboardLayout />}>
             <Route index element={<TeachersPage />} />
             <Route path="daily-activities" element={<DailyActivitiesPage />} />
+          </Route>
+          <Route path="/staff" element={<DashboardLayout />}>
+            <Route index element={<StaffPage />} />
           </Route>
           <Route path="/students" element={<DashboardLayout />}>
             <Route index element={<StudentsPage />} />

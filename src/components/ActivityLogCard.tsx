@@ -39,7 +39,7 @@ type DashboardUser = {
 };
 
 type Filters = {
-  role: 'all' | 'coaching_admin' | 'teacher' | 'student';
+  role: 'all' | 'coaching_admin' | 'teacher' | 'student' | 'staff';
   userId: string;
   startDate: string;
   endDate: string;
@@ -227,6 +227,7 @@ export default function ActivityLogCard() {
             <option value="coaching_admin">Admins</option>
             <option value="teacher">Teachers</option>
             <option value="student">Students</option>
+            <option value="staff">Staff</option>
           </select>
           <select
             className="form-select text-sm"
