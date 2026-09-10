@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import StudentQuestionPaperModal from '../../components/assessments/StudentQuestionPaperModal';
 
 interface AssessmentAssignment {
   id: number;
@@ -10,6 +11,8 @@ interface AssessmentAssignment {
     id: number;
     title: string;
     total_marks: number;
+    source?: string | null;
+    question_paper_released_at?: string | null;
     subject?: { id: number; subject: string };
     teacher?: { id: number; name: string };
   };
@@ -39,6 +42,8 @@ export default function StudentAssessmentsPage() {
   const [upcoming, setUpcoming] = useState<AssessmentAssignment[]>([]);
   const [history, setHistory] = useState<AssessmentAssignment[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [paperModal, setPaperModal] = useState<{ id: number; title: string } | null>(null);
 
   const [filesByAssessment, setFilesByAssessment] = useState<
     Record<
@@ -200,6 +205,20 @@ export default function StudentAssessmentsPage() {
                         </td>
                         <td>{a.result?.teacher_notes ?? '-'}</td>
                         <td>
+                          {a.assessment.question_paper_released_at && (
+                            <button
+                              type="button"
+                              className="btn btn-link p-0 text-decoration-none d-block mb-1"
+                              onClick={() =>
+                                setPaperModal({
+                                  id: a.assessment.id,
+                                  title: a.assessment.title,
+                                })
+                              }
+                            >
+                              View Question Paper
+                            </button>
+                          )}
                           {filesByAssessment[a.assessment.id] ? (
                             <div className="d-flex flex-column gap-1">
                               {filesByAssessment[a.assessment.id].question_papers
@@ -274,6 +293,13 @@ export default function StudentAssessmentsPage() {
           </div>
         </>
       )}
+
+      <StudentQuestionPaperModal
+        show={paperModal !== null}
+        assessmentId={paperModal?.id ?? null}
+        title={paperModal?.title}
+        onHide={() => setPaperModal(null)}
+      />
     </div>
   );
 }

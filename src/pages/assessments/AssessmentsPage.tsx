@@ -4,6 +4,7 @@ import { Button, Modal } from 'react-bootstrap';
 import Icon from '../../components/common/Icon.tsx';
 import { ROLES } from '../../constants/roles';
 import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal';
+import QuestionPaperModal from '../../components/assessments/QuestionPaperModal';
 
 interface AssessmentResultRow {
   marks_obtained: number;
@@ -33,6 +34,11 @@ interface Assessment {
   status: string;
   is_admin_approved?: boolean;
   approved_at?: string | null;
+  source?: string | null;
+  topic_id?: number | null;
+  paper_questions_count?: number;
+  question_paper_approved_at?: string | null;
+  question_paper_released_at?: string | null;
   subject?: { id: number; subject: string };
   class?: { id: number; name: string };
   teacher?: { id: number; name: string };
@@ -133,6 +139,12 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   const [userRole, setUserRole] = useState<string>('');
   const isAdmin = userRole === ROLES.COACHING_ADMIN;
 
+  // Auto-generated assessments toggle (coaching admin only)
+  const [autoAssessmentEnabled, setAutoAssessmentEnabled] = useState(false);
+  const [autoAssessmentSaving, setAutoAssessmentSaving] = useState(false);
+
+  const [paperModalAssessmentId, setPaperModalAssessmentId] = useState<number | null>(null);
+
   const [filesModalAssessment, setFilesModalAssessment] =
     useState<Assessment | null>(null);
   const [assessmentFiles, setAssessmentFiles] = useState<AssessmentFileRow[]>(
@@ -159,6 +171,38 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
       // ignore
     }
   }, []);
+
+  // Load the auto-assessment toggle state.
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/tenant/auto-assessment`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      })
+      .then((res) => {
+        if (res.data?.success) setAutoAssessmentEnabled(!!res.data.data.enabled);
+      })
+      .catch((err) => console.error('Error loading auto-assessment setting:', err));
+  }, [API_BASE_URL, token]);
+
+  const handleToggleAutoAssessment = async (next: boolean) => {
+    setAutoAssessmentSaving(true);
+    const prev = autoAssessmentEnabled;
+    setAutoAssessmentEnabled(next); // optimistic
+    try {
+      const res = await axios.put(
+        `${API_BASE_URL}/tenant/auto-assessment`,
+        { enabled: next },
+        { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } },
+      );
+      setAutoAssessmentEnabled(!!res.data.data.enabled);
+    } catch (err) {
+      console.error('Error updating auto-assessment setting:', err);
+      setAutoAssessmentEnabled(prev); // revert
+      alert('Failed to update the setting.');
+    } finally {
+      setAutoAssessmentSaving(false);
+    }
+  };
 
   const fetchAssessments = async () => {
     setLoading(true);
@@ -629,6 +673,36 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
         </Button>
       </div>
 
+      {isAdmin && (
+        <div className="card mb-24">
+          <div className="card-body py-16 px-24 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+              <div className="fw-semibold text-md">Auto-generate assessments</div>
+              <div className="text-sm text-secondary-light">
+                When on, the system creates an assessment for any topic taught more than 10 days ago
+                that has no assessment yet, drafts a question paper for the teacher to review, and
+                notifies the teacher and students.
+              </div>
+            </div>
+            <div className="form-switch d-flex align-items-center gap-2">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="auto-assessment-toggle"
+                checked={autoAssessmentEnabled}
+                disabled={autoAssessmentSaving}
+                onChange={(e) => handleToggleAutoAssessment(e.target.checked)}
+                style={{ width: '2.5rem', height: '1.25rem' }}
+              />
+              <label htmlFor="auto-assessment-toggle" className="form-check-label text-sm fw-medium">
+                {autoAssessmentSaving ? 'Saving…' : autoAssessmentEnabled ? 'On' : 'Off'}
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="card">
         <div className="card-header border-bottom bg-base py-16 px-24">
           <span className="text-md fw-medium text-secondary-light">
@@ -661,7 +735,14 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                 <tbody>
                   {assessments.map(asm => (
                     <tr key={asm.id}>
-                      <td>{asm.title}</td>
+                      <td>
+                        {asm.title}
+                        {asm.source === 'auto' && (
+                          <span className="badge bg-primary-subtle text-primary text-xs ms-2">
+                            Auto
+                          </span>
+                        )}
+                      </td>
                       <td>{asm.subject?.subject ?? '-'}</td>
                       <td>{asm.class?.name ?? '-'}</td>
                       <td>{asm.teacher?.name ?? '-'}</td>
@@ -731,6 +812,24 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                             className="text-secondary text-lg"
                           />
                         </Button>
+                        {(isAdmin || userRole === 'teacher') && (
+                          <Button
+                            variant="link"
+                            title="Question Paper"
+                            onClick={() => setPaperModalAssessmentId(asm.id)}
+                          >
+                            <Icon
+                              icon="mdi:file-document-edit-outline"
+                              className="text-info text-lg"
+                            />
+                            {typeof asm.paper_questions_count === 'number' &&
+                              asm.paper_questions_count > 0 && (
+                                <span className="badge bg-info-subtle text-info text-xs ms-1">
+                                  {asm.paper_questions_count}
+                                </span>
+                              )}
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -1173,6 +1272,13 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
         attachment={previewAssessmentFile}
         url={previewAssessmentFile ? getAssessmentFileUrl(previewAssessmentFile) : null}
         onHide={() => setPreviewAssessmentFile(null)}
+      />
+
+      <QuestionPaperModal
+        show={paperModalAssessmentId !== null}
+        assessmentId={paperModalAssessmentId}
+        onHide={() => setPaperModalAssessmentId(null)}
+        onChanged={fetchAssessments}
       />
     </div>
   );
