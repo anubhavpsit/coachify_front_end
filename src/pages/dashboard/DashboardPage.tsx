@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
+import { can } from '../../lib/auth'
 import BirthdayCard from '../../components/BirthdayCard';
 import TodayBirthdayCard from '../../components/TodayBirthdayCard';
 import LowAttendanceCard from '../../components/LowAttendanceCard';
@@ -47,6 +48,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchStats = async () => {
+      // Staff without the summary-cards permission simply don't load stats.
+      if (!can('dashboard.view')) {
+        setLoading(false)
+        return
+      }
+
       setLoading(true)
       setError(null)
 
@@ -88,6 +95,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchTopStudents = async () => {
+      if (!can('dashboard.top_students')) return
       setLoadingTopStudents(true)
       try {
         const token = localStorage.getItem('authToken')
@@ -166,10 +174,12 @@ export default function DashboardPage() {
         <p className="text-danger-600 text-sm mb-16">{error}</p>
       )}
 
-      {!loading && !error && stats && (
+      {!loading && !error && (
         <div className="row gy-4 mb-24">
-          {role === ROLES.COACHING_ADMIN && (
+          {(role === ROLES.COACHING_ADMIN || role === ROLES.STAFF) && (
             <>
+              {stats && can('dashboard.view') && (
+              <>
               <div className="col-xxl-3 col-md-6">
                 <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-1">
                   <div className="d-flex align-items-center justify-content-between mb-12">
@@ -281,25 +291,29 @@ export default function DashboardPage() {
               </div>
 
 
-              <PendingActionsCard />
+              </>
+              )}
 
-              {role === ROLES.COACHING_ADMIN && <PendingFeesCard />}
+              {can('dashboard.pending_actions') && <PendingActionsCard />}
 
-              <TeacherActivityGapsCard />
+              {can('fees.view') && <PendingFeesCard />}
 
-              <TodayBirthdayCard />
+              {can('dashboard.activity_gaps') && <TeacherActivityGapsCard />}
+
+              {can('dashboard.birthdays') && <TodayBirthdayCard />}
 
               <div className="row g-3 mt-2">
-                <BirthdayCard />
-                <LowAttendanceCard />
-                <EnquiriesFollowUpCard />
+                {can('dashboard.birthdays') && <BirthdayCard />}
+                {can('attendance.view') && <LowAttendanceCard />}
+                {can('enquiries.view') && <EnquiriesFollowUpCard />}
               </div>
 
               <div className="row g-3 mt-2">
-                <GhostStudentsCard />
+                {can('dashboard.ghost_students') && <GhostStudentsCard />}
               </div>
-              
 
+
+              {can('dashboard.top_students') && (
               <div className="row g-3 mt-2">
                 <div className="col-12">
                   <div className="card">
@@ -357,11 +371,12 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
+              )}
 
             </>
           )}
 
-      {role === ROLES.TEACHER && (
+      {stats && role === ROLES.TEACHER && (
         <>
               <div className="col-xxl-3 col-md-6">
                 <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-1">
@@ -435,7 +450,7 @@ export default function DashboardPage() {
             </>
           )}
 
-          {role === ROLES.STUDENT && (
+          {stats && role === ROLES.STUDENT && (
             <>
               <div className="col-xxl-3 col-md-6">
                 <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-1">
@@ -529,7 +544,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {role === ROLES.COACHING_ADMIN && <ActivityLogCard />}
+      {(role === ROLES.COACHING_ADMIN || can('activity_logs.view')) && <ActivityLogCard />}
     </div>
   )
 }

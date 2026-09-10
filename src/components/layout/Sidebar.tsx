@@ -2,6 +2,7 @@ import type { MouseEvent } from 'react'
 import { NavLink } from 'react-router-dom'
 import Icon from '../common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
+import { can } from '../../lib/auth'
 import { getTenantBrandName, getTenantPrimaryLogoUrl } from '../../utils/branding'
 
 type SidebarProps = {
@@ -133,7 +134,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </NavLink>
             </li>
           )}
-          {user.role === ROLES.COACHING_ADMIN && (
+          {can('facts.manage') && (
             <li>
               <NavLink
                 to="/admin/facts"
@@ -144,7 +145,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </NavLink>
             </li>
           )}
-          {user.role === ROLES.COACHING_ADMIN && (
+          {can('content_library.manage') && (
             <li>
               <NavLink
                 to="/chapters"
@@ -155,7 +156,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </NavLink>
             </li>
           )}
-          {user.role === ROLES.COACHING_ADMIN && (
+          {can('content_library.manage') && (
             <li>
               <NavLink
                 to="/topics"
@@ -190,38 +191,40 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
           )}
 
           {/* <li className="sidebar-menu-group-title">Settings</li> */}
-          {(user.role === ROLES.TEACHER || user.role === ROLES.COACHING_ADMIN) && (
-            <>
-              <li>
-                <NavLink
-                  to="/insights"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:chart-areaspline" className="menu-icon" />
-                  <span>Insights</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/students"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:account-school" className="menu-icon" />
-                  <span>Students</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/assessments"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:file-document-edit-outline" className="menu-icon" />
-                  <span>Assessments</span>
-                </NavLink>
-              </li>
-            </>
+          {(user.role === ROLES.TEACHER || can('insights.view')) && (
+            <li>
+              <NavLink
+                to="/insights"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:chart-areaspline" className="menu-icon" />
+                <span>Insights</span>
+              </NavLink>
+            </li>
           )}
-          {(user.role === ROLES.STUDENT || user.role === ROLES.COACHING_ADMIN) && (
+          {(user.role === ROLES.TEACHER || can('students.view') || can('students.manage')) && (
+            <li>
+              <NavLink
+                to="/students"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:account-school" className="menu-icon" />
+                <span>Students</span>
+              </NavLink>
+            </li>
+          )}
+          {(user.role === ROLES.TEACHER || can('assessments.view') || can('assessments.manage') || can('assessments.grade')) && (
+            <li>
+              <NavLink
+                to="/assessments"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:file-document-edit-outline" className="menu-icon" />
+                <span>Assessments</span>
+              </NavLink>
+            </li>
+          )}
+          {(user.role === ROLES.STUDENT || can('teachers.view') || can('teachers.manage')) && (
             <>
               <li>
                 <NavLink
@@ -234,7 +237,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </li>
             </>
           )}
-          {user.role === ROLES.COACHING_ADMIN && (
+          {can('staff.manage') && (
             <li>
               <NavLink
                 to="/staff"
@@ -245,27 +248,27 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </NavLink>
             </li>
           )}
-          {(user.role === ROLES.COACHING_ADMIN || user.role === ROLES.STAFF) && (
-            <>
-              <li>
-                <NavLink
-                  to="/expenses"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:cash-multiple" className="menu-icon" />
-                  <span>Expenses</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/dashboard/attendance"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="ic:baseline-check-circle" />
-                  <span>Daily Attendance</span>
-                </NavLink>
-              </li>
-            </>
+          {(can('expenses.view') || can('expenses.manage')) && (
+            <li>
+              <NavLink
+                to="/expenses"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:cash-multiple" className="menu-icon" />
+                <span>Expenses</span>
+              </NavLink>
+            </li>
+          )}
+          {can('attendance.mark') && (
+            <li>
+              <NavLink
+                to="/dashboard/attendance"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="ic:baseline-check-circle" />
+                <span>Daily Attendance</span>
+              </NavLink>
+            </li>
           )}
           {user?.role === ROLES.STUDENT && (
             <>
@@ -320,122 +323,105 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               </li>
             </>
           )}
-          {/* Show Company only for coaching_admin */}
-          {user.role === ROLES.COACHING_ADMIN && (
-            <>
-              <li>
-                <NavLink
-                  to="/approvals"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:check-decagram" className="menu-icon" />
-                  <span>Approvals</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/approvals/generated-content"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:robot-outline" className="menu-icon" />
-                  <span>AI Content</span>
-                </NavLink>
-              </li>
-              {/*
-              <li>
-                <NavLink
-                  to="/dashboard/settings/company"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="icon-park-outline:setting-two" className="menu-icon" />
-                  <span>Company</span>
-                </NavLink>
-              </li>
-              */}
-              <li>
-                <NavLink
-                  to="/subjects"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:book-outline" className="menu-icon" />
-                  <span>Subjects</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/classes"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:library-outline" className="menu-icon" />
-                  <span>Classes</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/academic-years"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:calendar-range" className="menu-icon" />
-                  <span>Academic Years</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/fees"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:currency-inr" className="menu-icon" />
-                  <span>Fees</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/enquiries"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:account-question-outline" className="menu-icon" />
-                  <span>Enquiries</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/admin/attendance-corrections"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:clipboard-edit-outline" className="menu-icon" />
-                  <span>Attendance Corrections</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/notifications"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="solar:bell-bing-outline" className="menu-icon" />
-                  <span>Notifications</span>
-                </NavLink>
-              </li>
-              {/*
-              <li>
-                <NavLink
-                  to="/teachers"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:book-outline" className="menu-icon" />
-                  <span>Teachers</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/students"
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  <Icon icon="mdi:book-outline" className="menu-icon" />
-                  <span>Students</span>
-                </NavLink>
-              </li>
-              */}
-            </>
+          {/* Admin / staff — each item gated by its own permission */}
+          {can('daily_activities.approve') && (
+            <li>
+              <NavLink
+                to="/approvals"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:check-decagram" className="menu-icon" />
+                <span>Approvals</span>
+              </NavLink>
+            </li>
+          )}
+          {can('generated_content.approve') && (
+            <li>
+              <NavLink
+                to="/approvals/generated-content"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:robot-outline" className="menu-icon" />
+                <span>AI Content</span>
+              </NavLink>
+            </li>
+          )}
+          {can('subjects.manage') && (
+            <li>
+              <NavLink
+                to="/subjects"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:book-outline" className="menu-icon" />
+                <span>Subjects</span>
+              </NavLink>
+            </li>
+          )}
+          {can('classes.manage') && (
+            <li>
+              <NavLink
+                to="/classes"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:library-outline" className="menu-icon" />
+                <span>Classes</span>
+              </NavLink>
+            </li>
+          )}
+          {can('academic_years.manage') && (
+            <li>
+              <NavLink
+                to="/academic-years"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:calendar-range" className="menu-icon" />
+                <span>Academic Years</span>
+              </NavLink>
+            </li>
+          )}
+          {(can('fees.view') || can('fees.manage')) && (
+            <li>
+              <NavLink
+                to="/fees"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:currency-inr" className="menu-icon" />
+                <span>Fees</span>
+              </NavLink>
+            </li>
+          )}
+          {(can('enquiries.view') || can('enquiries.manage')) && (
+            <li>
+              <NavLink
+                to="/enquiries"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:account-question-outline" className="menu-icon" />
+                <span>Enquiries</span>
+              </NavLink>
+            </li>
+          )}
+          {can('attendance.corrections') && (
+            <li>
+              <NavLink
+                to="/admin/attendance-corrections"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="mdi:clipboard-edit-outline" className="menu-icon" />
+                <span>Attendance Corrections</span>
+              </NavLink>
+            </li>
+          )}
+          {can('notifications.manage') && (
+            <li>
+              <NavLink
+                to="/notifications"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                <Icon icon="solar:bell-bing-outline" className="menu-icon" />
+                <span>Notifications</span>
+              </NavLink>
+            </li>
           )}
           {/*
           <li>

@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
+import RequirePermission from './components/RequirePermission.tsx'
 import DashboardLayout from './layouts/DashboardLayout.tsx'
 import DashboardPage from './pages/dashboard/DashboardPage.tsx'
 import DailyAttendance from './pages/dashboard/DailyAttendance.tsx'
@@ -52,7 +53,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<DashboardPage />} />
-            <Route path="attendance" element={<DailyAttendance />} />
+            <Route path="attendance" element={<RequirePermission anyOf={['attendance.mark']}><DailyAttendance /></RequirePermission>} />
             <Route path="settings/company" element={<CompanyPage />} />
             <Route path="settings/notification" element={<NotificationPage />} />
             <Route
@@ -62,44 +63,44 @@ function App() {
             <Route path="settings/theme" element={<ThemePage />} />
           </Route>
           <Route path="/subjects" element={<DashboardLayout />}>
-            <Route index element={<SubjectsPage />} />
+            <Route index element={<RequirePermission anyOf={['subjects.manage']}><SubjectsPage /></RequirePermission>} />
           </Route>
           <Route path="/classes" element={<DashboardLayout />}>
-            <Route index element={<ClassesPage />} />
+            <Route index element={<RequirePermission anyOf={['classes.manage']}><ClassesPage /></RequirePermission>} />
           </Route>
           <Route path="/fees" element={<DashboardLayout />}>
-            <Route index element={<FeeComponent />} />
+            <Route index element={<RequirePermission anyOf={['fees.view', 'fees.manage']}><FeeComponent /></RequirePermission>} />
           </Route>
           <Route path="/expenses" element={<DashboardLayout />}>
-            <Route index element={<ExpensesComponent />} />
+            <Route index element={<RequirePermission anyOf={['expenses.view', 'expenses.manage']}><ExpensesComponent /></RequirePermission>} />
           </Route>
           <Route path="/enquiries" element={<DashboardLayout />}>
-            <Route index element={<EnquiriesPage />} />
+            <Route index element={<RequirePermission anyOf={['enquiries.view', 'enquiries.manage']}><EnquiriesPage /></RequirePermission>} />
           </Route>
           <Route path="/teachers" element={<DashboardLayout />}>
-            <Route index element={<TeachersPage />} />
+            <Route index element={<RequirePermission anyOf={['teachers.view', 'teachers.manage']} orRoles={['student']}><TeachersPage /></RequirePermission>} />
             <Route path="daily-activities" element={<DailyActivitiesPage />} />
           </Route>
           <Route path="/staff" element={<DashboardLayout />}>
-            <Route index element={<StaffPage />} />
+            <Route index element={<RequirePermission anyOf={['staff.manage']}><StaffPage /></RequirePermission>} />
           </Route>
           <Route path="/students" element={<DashboardLayout />}>
-            <Route index element={<StudentsPage />} />
+            <Route index element={<RequirePermission anyOf={['students.view', 'students.manage']} orRoles={['teacher']}><StudentsPage /></RequirePermission>} />
             <Route path="activities" element={<StudentActivitiesPage />} />
             <Route path="activities/:activityId/topic" element={<StudentTopicContentPage />} />
             <Route path="assessments" element={<StudentAssessmentsPage />} />
           </Route>
           <Route path="/assessments" element={<DashboardLayout />}>
-            <Route index element={<AssessmentsPage />} />
+            <Route index element={<RequirePermission anyOf={['assessments.view', 'assessments.manage', 'assessments.grade']} orRoles={['teacher']}><AssessmentsPage /></RequirePermission>} />
           </Route>
           <Route path="/search" element={<DashboardLayout />}>
             <Route index element={<SearchResultsPage />} />
           </Route>
           <Route path="/approvals" element={<DashboardLayout />}>
-            <Route index element={<DailyActivityApprovalsPage />} />
+            <Route index element={<RequirePermission anyOf={['daily_activities.approve']} orRoles={['teacher']}><DailyActivityApprovalsPage /></RequirePermission>} />
           </Route>
           <Route path="/approvals/generated-content" element={<DashboardLayout />}>
-            <Route index element={<GeneratedContentApprovalsPage />} />
+            <Route index element={<RequirePermission anyOf={['generated_content.approve']}><GeneratedContentApprovalsPage /></RequirePermission>} />
           </Route>
           <Route path="/profile" element={<DashboardLayout />}>
             <Route index element={<ProfilePage />} />
@@ -111,27 +112,27 @@ function App() {
             <Route index element={<NotificationsPage />} />
           </Route>
           <Route path="/admin/attendance-corrections" element={<DashboardLayout />}>
-            <Route index element={<CorrectionsAdminPage />} />
+            <Route index element={<RequirePermission anyOf={['attendance.corrections']}><CorrectionsAdminPage /></RequirePermission>} />
           </Route>
           <Route path="/facts" element={<DashboardLayout />}>
             <Route index element={<FactsPage />} />
           </Route>
           <Route path="/insights" element={<DashboardLayout />}>
-            <Route index element={<InsightsPage />} />
+            <Route index element={<RequirePermission anyOf={['insights.view']} orRoles={['teacher', 'student']}><InsightsPage /></RequirePermission>} />
           </Route>
           <Route path="/academic-years" element={<DashboardLayout />}>
-            <Route index element={<AcademicYearsPage />} />
+            <Route index element={<RequirePermission anyOf={['academic_years.manage']}><AcademicYearsPage /></RequirePermission>} />
           </Route>
           <Route path="/admin/facts" element={<DashboardLayout />}>
-            <Route index element={<AdminFactsPage />} />
+            <Route index element={<RequirePermission anyOf={['facts.manage']}><AdminFactsPage /></RequirePermission>} />
           </Route>
           <Route path="/topics" element={<DashboardLayout />}>
-            <Route index element={<TopicsPage />} />
-            <Route path=":topicId/questions" element={<TopicQuestionsPage />} />
+            <Route index element={<RequirePermission anyOf={['content_library.manage']} orRoles={['teacher']}><TopicsPage /></RequirePermission>} />
+            <Route path=":topicId/questions" element={<RequirePermission anyOf={['content_library.manage']} orRoles={['teacher']}><TopicQuestionsPage /></RequirePermission>} />
           </Route>
           <Route path="/chapters" element={<DashboardLayout />}>
-            <Route index element={<ChaptersPage />} />
-            <Route path=":chapterId" element={<ChapterDetailPage />} />
+            <Route index element={<RequirePermission anyOf={['content_library.manage']} orRoles={['teacher']}><ChaptersPage /></RequirePermission>} />
+            <Route path=":chapterId" element={<RequirePermission anyOf={['content_library.manage']} orRoles={['teacher']}><ChapterDetailPage /></RequirePermission>} />
           </Route>
           <Route path="/library/chapters" element={<DashboardLayout />}>
             <Route index element={<LibraryChaptersPage />} />

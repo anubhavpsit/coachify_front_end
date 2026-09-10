@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Modal, Button } from 'react-bootstrap';
 import Avatar from '../../components/common/Avatar.tsx';
 import Icon from '../../components/common/Icon.tsx';
 import UserProfileModal from '../../components/UserProfileModal';
+import { can } from '../../lib/auth';
 
 interface Staff {
   id: number;
@@ -12,6 +13,110 @@ interface Staff {
   tenant_id: number;
   dob?: string | null;
   gender?: string | null;
+  permissions?: string[];
+}
+
+interface PermissionGroup {
+  group: string;
+  permissions: { key: string; label: string }[];
+}
+
+/** Grouped permission checkboxes with a filter box, shared by Add and Edit modals. */
+function PermissionPicker({
+  groups,
+  selected,
+  onChange,
+}: {
+  groups: PermissionGroup[];
+  selected: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [query, setQuery] = useState('');
+
+  if (groups.length === 0) {
+    return <p className="text-muted small mb-0">Loading permissions…</p>;
+  }
+
+  const toggle = (key: string) => {
+    onChange(
+      selected.includes(key)
+        ? selected.filter((k) => k !== key)
+        : [...selected, key],
+    );
+  };
+
+  const toggleGroup = (keys: string[], allOn: boolean) => {
+    onChange(
+      allOn
+        ? selected.filter((k) => !keys.includes(k))
+        : Array.from(new Set([...selected, ...keys])),
+    );
+  };
+
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? groups
+        .map((g) => ({
+          ...g,
+          permissions: g.permissions.filter(
+            (p) =>
+              p.label.toLowerCase().includes(q) ||
+              p.key.toLowerCase().includes(q) ||
+              g.group.toLowerCase().includes(q),
+          ),
+        }))
+        .filter((g) => g.permissions.length > 0)
+    : groups;
+
+  return (
+    <div>
+      <input
+        type="search"
+        className="form-control form-control-sm mb-2"
+        placeholder="Search permissions…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      <div className="border rounded p-2" style={{ maxHeight: 300, overflowY: 'auto' }}>
+        {filtered.length === 0 ? (
+          <p className="text-muted small mb-0">No permissions match “{query}”.</p>
+        ) : (
+          filtered.map((g) => {
+            const keys = g.permissions.map((p) => p.key);
+            const allOn = keys.every((k) => selected.includes(k));
+            return (
+              <div key={g.group} className="mb-2">
+                <div className="d-flex justify-content-between align-items-center">
+                  <span className="fw-semibold text-sm">{g.group}</span>
+                  <button
+                    type="button"
+                    className="btn btn-link btn-sm p-0 text-decoration-none"
+                    onClick={() => toggleGroup(keys, allOn)}
+                  >
+                    {allOn ? 'Clear' : 'Select all'}
+                  </button>
+                </div>
+                {g.permissions.map((p) => (
+                  <div className="form-check" key={p.key}>
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id={`perm-${p.key}`}
+                      checked={selected.includes(p.key)}
+                      onChange={() => toggle(p.key)}
+                    />
+                    <label className="form-check-label text-sm" htmlFor={`perm-${p.key}`}>
+                      {p.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
 }
 
 function getTodayDateValue() {
@@ -35,6 +140,20 @@ export default function StaffPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Permission catalog (grouped)
+  const [permissionGroups, setPermissionGroups] = useState<PermissionGroup[]>([]);
+
+  // key -> human label, for the list column
+  const permissionLabels = useMemo(() => {
+    const map: Record<string, string> = {};
+    permissionGroups.forEach((g) =>
+      g.permissions.forEach((p) => {
+        map[p.key] = p.label;
+      }),
+    );
+    return map;
+  }, [permissionGroups]);
+
   // Add staff modal
   const [showAddModal, setShowAddModal] = useState(false);
   const [newStaffName, setNewStaffName] = useState('');
@@ -42,6 +161,7 @@ export default function StaffPage() {
   const [newStaffPassword, setNewStaffPassword] = useState('');
   const [newStaffDob, setNewStaffDob] = useState<string>(getTodayDateValue()); // initialize with today
   const [newStaffGender, setNewStaffGender] = useState<string>('');
+  const [newStaffPermissions, setNewStaffPermissions] = useState<string[]>([]);
 
   // Edit staff modal
   const [showEditModal, setShowEditModal] = useState(false);
@@ -49,6 +169,7 @@ export default function StaffPage() {
   const [editStaffPassword, setEditStaffPassword] = useState('');
   const [editStaffDob, setEditStaffDob] = useState<string>(''); // will populate on edit
   const [editStaffGender, setEditStaffGender] = useState<string>('');
+  const [editStaffPermissions, setEditStaffPermissions] = useState<string[]>([]);
 
   // Delete staff modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -97,6 +218,20 @@ export default function StaffPage() {
     fetchStaff();
   }, [API_BASE_URL, userRole]);
 
+  /** Fetch the permission catalog once */
+  useEffect(() => {
+    if (!userRole) return;
+    const token = localStorage.getItem('authToken');
+    axios
+      .get(`${API_BASE_URL}/staff/permissions/catalog`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      })
+      .then((res) => {
+        if (res.data.success) setPermissionGroups(res.data.data);
+      })
+      .catch((error) => console.error('Error fetching permission catalog:', error));
+  }, [API_BASE_URL, userRole]);
+
   /** Create Staff */
   const handleSaveStaff = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +248,7 @@ export default function StaffPage() {
           password: newStaffPassword,
           dob: newStaffDob,
           gender: newStaffGender,
+          permissions: newStaffPermissions,
         },
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
@@ -123,6 +259,7 @@ export default function StaffPage() {
         setNewStaffEmail('');
         setNewStaffPassword('');
         setNewStaffGender('');
+        setNewStaffPermissions([]);
         setShowAddModal(false);
       }
     } catch (error) {
@@ -134,12 +271,24 @@ export default function StaffPage() {
   };
 
   /** Open Edit Modal */
-  const handleOpenEditModal = (member: Staff) => {
+  const handleOpenEditModal = async (member: Staff) => {
     setEditStaff(member);
     setEditStaffPassword(''); // reset password field
     setEditStaffDob(member.dob || ''); // populate DOB
     setEditStaffGender(member.gender || '');
+    setEditStaffPermissions(member.permissions ?? []);
     setShowEditModal(true);
+
+    // Pull the authoritative set in case the list row is stale
+    try {
+      const token = localStorage.getItem('authToken');
+      const res = await axios.get(`${API_BASE_URL}/staff/${member.id}/permissions`, {
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      });
+      if (res.data.success) setEditStaffPermissions(res.data.data.permissions ?? []);
+    } catch (error) {
+      console.error('Error fetching staff permissions:', error);
+    }
   };
 
   /** Update Staff */
@@ -158,13 +307,14 @@ export default function StaffPage() {
           password: editStaffPassword || undefined, // send only if changed
           dob: editStaffDob,
           gender: editStaffGender,
+          permissions: editStaffPermissions,
         },
         { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } }
       );
 
       if (response.data.success) {
         setStaff(prev =>
-          prev.map(s => (s.id === editStaff.id ? { ...editStaff } : s))
+          prev.map(s => (s.id === editStaff.id ? { ...editStaff, permissions: editStaffPermissions } : s))
         );
         setShowEditModal(false);
       }
@@ -234,6 +384,7 @@ export default function StaffPage() {
                   <tr>
                     <th>Name</th>
                     <th>Email</th>
+                    <th className="text-center">Permissions</th>
                     <th className="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -254,6 +405,23 @@ export default function StaffPage() {
                         </div>
                       </td>
                       <td>{member.email}</td>
+                      <td style={{ maxWidth: 320 }}>
+                        {!member.permissions || member.permissions.length === 0 ? (
+                          <span className="text-muted text-sm">No permissions</span>
+                        ) : (
+                          <div className="d-flex flex-wrap gap-1">
+                            {member.permissions.map((key) => (
+                              <span
+                                key={key}
+                                className="badge bg-primary-50 text-primary-600 text-xs fw-medium"
+                                title={key}
+                              >
+                                {permissionLabels[key] ?? key}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </td>
                       <td className="text-center">
                         <Button
                           variant="link"
@@ -261,7 +429,7 @@ export default function StaffPage() {
                         >
                           View
                         </Button>
-                        {userRole === 'coaching_admin' && (
+                        {can('staff.manage') && (
                           <>
                             <Button variant="link" onClick={() => handleOpenEditModal(member)}>
                               <Icon icon="ic:baseline-edit" className="text-primary text-lg" />
@@ -341,6 +509,14 @@ export default function StaffPage() {
                 <option value="other">Other</option>
               </select>
             </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Permissions</label>
+              <PermissionPicker
+                groups={permissionGroups}
+                selected={newStaffPermissions}
+                onChange={setNewStaffPermissions}
+              />
+            </div>
             <div className="d-flex justify-content-end gap-2 mt-3">
               <Button variant="secondary" onClick={() => setShowAddModal(false)}>Cancel</Button>
               <Button type="submit" variant="primary" disabled={saving}>
@@ -409,6 +585,14 @@ export default function StaffPage() {
                 <option value="other">Other</option>
               </select>
             </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Permissions</label>
+              <PermissionPicker
+                groups={permissionGroups}
+                selected={editStaffPermissions}
+                onChange={setEditStaffPermissions}
+              />
+            </div>
             <div className="d-flex justify-content-end gap-2 mt-3">
               <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancel</Button>
               <Button type="submit" variant="primary" disabled={saving}>
@@ -439,7 +623,7 @@ export default function StaffPage() {
         show={showProfileModal}
         onHide={() => setShowProfileModal(false)}
         userId={viewUserId}
-        canEditImage={userRole === 'coaching_admin'}
+        canEditImage={can('staff.manage')}
       />
     </div>
   );

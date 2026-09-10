@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { can } from '../lib/auth'
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
@@ -21,6 +22,8 @@ type GapsResponse = {
   }
 }
 
+type NotifyState = 'idle' | 'sending' | 'sent' | 'error'
+
 function formatDate(value: string): string {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
@@ -31,6 +34,10 @@ export default function TeacherActivityGapsCard() {
   const [data, setData] = useState<GapsResponse['data'] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notify, setNotify] = useState<Record<number, NotifyState>>({})
+  const [notifyMsg, setNotifyMsg] = useState<Record<number, string>>({})
+
+  const canNotify = can('dashboard.notify_activity_gaps')
 
   useEffect(() => {
     const loadGaps = async () => {
@@ -66,6 +73,28 @@ export default function TeacherActivityGapsCard() {
     loadGaps()
   }, [])
 
+  const handleNotify = async (teacherId: number) => {
+    setNotify((s) => ({ ...s, [teacherId]: 'sending' }))
+    setNotifyMsg((s) => ({ ...s, [teacherId]: '' }))
+    try {
+      const token = localStorage.getItem('authToken')
+      const response = await axios.post<{ success: boolean; message: string }>(
+        `${API_BASE_URL}/dashboard/teacher-activity-gaps/${teacherId}/notify`,
+        {},
+        { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } },
+      )
+      setNotify((s) => ({ ...s, [teacherId]: 'sent' }))
+      setNotifyMsg((s) => ({ ...s, [teacherId]: response.data.message }))
+    } catch (err) {
+      const message =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? (err.response.data.message as string)
+          : 'Failed to send the reminder.'
+      setNotify((s) => ({ ...s, [teacherId]: 'error' }))
+      setNotifyMsg((s) => ({ ...s, [teacherId]: message }))
+    }
+  }
+
   const teachers = data?.teachers ?? []
 
   if (!loading && !error && (!data || teachers.length === 0)) {
@@ -91,34 +120,70 @@ export default function TeacherActivityGapsCard() {
 
           {!loading && !error && teachers.length > 0 && (
             <ul className="list-unstyled mb-0">
-              {teachers.map((teacher) => (
-                <li
-                  key={teacher.teacher_id}
-                  className="d-flex justify-content-between align-items-start mb-2"
-                >
-                  <div>
-                    <strong>{teacher.teacher_name}</strong>
-                    {teacher.teacher_email && (
-                      <div className="text-xs text-secondary-light">
-                        {teacher.teacher_email}
+              {teachers.map((teacher) => {
+                const state = notify[teacher.teacher_id] ?? 'idle'
+                return (
+                  <li
+                    key={teacher.teacher_id}
+                    className="d-flex justify-content-between align-items-start mb-2"
+                  >
+                    <div>
+                      <div className="d-flex align-items-center gap-2 flex-wrap">
+                        <strong>{teacher.teacher_name}</strong>
+                        {canNotify && (
+                          <button
+                            type="button"
+                            className={`btn btn-sm py-0 px-2 ${
+                              state === 'sent'
+                                ? 'btn-success'
+                                : state === 'error'
+                                  ? 'btn-outline-danger'
+                                  : 'btn-outline-primary'
+                            }`}
+                            disabled={state === 'sending' || state === 'sent'}
+                            onClick={() => handleNotify(teacher.teacher_id)}
+                          >
+                            {state === 'sending'
+                              ? 'Sending…'
+                              : state === 'sent'
+                                ? 'Notified'
+                                : state === 'error'
+                                  ? 'Retry'
+                                  : 'Notify'}
+                          </button>
+                        )}
                       </div>
-                    )}
-                    <div className="text-xs text-secondary-light mt-1">
-                      Missing days: {teacher.missing_days_count}
-                      {teacher.missing_dates.length > 0 && (
-                        <>
-                          {' '}
-                          ({teacher.missing_dates
-                            .slice(0, 3)
-                            .map(formatDate)
-                            .join(', ')}
-                          {teacher.missing_dates.length > 3 && ' ...'})
-                        </>
+                      {teacher.teacher_email && (
+                        <div className="text-xs text-secondary-light">
+                          {teacher.teacher_email}
+                        </div>
+                      )}
+                      <div className="text-xs text-secondary-light mt-1">
+                        Missing days: {teacher.missing_days_count}
+                        {teacher.missing_dates.length > 0 && (
+                          <>
+                            {' '}
+                            ({teacher.missing_dates
+                              .slice(0, 3)
+                              .map(formatDate)
+                              .join(', ')}
+                            {teacher.missing_dates.length > 3 && ' ...'})
+                          </>
+                        )}
+                      </div>
+                      {notifyMsg[teacher.teacher_id] && (
+                        <div
+                          className={`text-xs mt-1 ${
+                            state === 'error' ? 'text-danger-600' : 'text-success-600'
+                          }`}
+                        >
+                          {notifyMsg[teacher.teacher_id]}
+                        </div>
                       )}
                     </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                )
+              })}
             </ul>
           )}
         </div>
