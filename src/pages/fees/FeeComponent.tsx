@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 import { Button } from 'react-bootstrap'
 import { formatDate } from '../../utils/date'
@@ -25,6 +25,7 @@ interface StudentFee {
   to_date: string
   amount: string | number
   payment_mode: string
+  submitted_on: string
   created_at: string
   student?: Student
 }
@@ -37,6 +38,14 @@ interface FeeHistoryItem {
   amount: number
   status?: string
   payment_mode?: string
+}
+
+function getTodayValue() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }
 
 function getCurrentMonthValue() {
@@ -71,6 +80,7 @@ export default function FeeComponent() {
   const [toDate, setToDate] = useState('')
   const [amount, setAmount] = useState('')
   const [paymentMode, setPaymentMode] = useState('cash')
+  const [submittedOn, setSubmittedOn] = useState(getTodayValue())
   const [suggestLoading, setSuggestLoading] = useState(false)
   const [suggestNote, setSuggestNote] = useState<string | null>(null)
 
@@ -147,16 +157,17 @@ export default function FeeComponent() {
     fetchFees()
   }, [API_BASE_URL, filterMonth])
 
-  // Auto-fill From/To Date based on student selection
-  useEffect(() => {
-    const fetchSuggest = async () => {
-      if (!selectedStudentId) return
+  // Auto-fill From/To Date based on student selection. Also called again
+  // after saving a fee so the next period is suggested without a reselect.
+  const fetchSuggestPeriod = useCallback(
+    async (studentId: number | '') => {
+      if (!studentId) return
       setSuggestLoading(true)
       setSuggestNote(null)
       try {
         const token = localStorage.getItem('authToken')
         const res = await axios.get(
-          `${API_BASE_URL}/students/${selectedStudentId}/fees/suggest-period`,
+          `${API_BASE_URL}/students/${studentId}/fees/suggest-period`,
           { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } },
         )
         if (res.data?.success) {
@@ -171,22 +182,26 @@ export default function FeeComponent() {
       } finally {
         setSuggestLoading(false)
       }
-    }
+    },
+    [API_BASE_URL],
+  )
 
-    fetchSuggest()
-  }, [selectedStudentId])
-
-  // Load fee history for selected student
   useEffect(() => {
-    const fetchHistory = async () => {
+    fetchSuggestPeriod(selectedStudentId)
+  }, [selectedStudentId, fetchSuggestPeriod])
+
+  // Load fee history for selected student. Also called again after saving a
+  // fee so the list reflects the new entry without requiring a reselect.
+  const fetchHistory = useCallback(
+    async (studentId: number | '') => {
       setHistoryItems([])
       setHistoryError(null)
-      if (!selectedStudentId) return
+      if (!studentId) return
       setHistoryLoading(true)
       try {
         const token = localStorage.getItem('authToken')
         const res = await axios.get(
-          `${API_BASE_URL}/students/${selectedStudentId}/fees?limit=10`,
+          `${API_BASE_URL}/students/${studentId}/fees?limit=10`,
           { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' } },
         )
         if (res.data?.success && Array.isArray(res.data.items)) {
@@ -201,15 +216,24 @@ export default function FeeComponent() {
       } finally {
         setHistoryLoading(false)
       }
-    }
-    fetchHistory()
-  }, [selectedStudentId])
+    },
+    [API_BASE_URL],
+  )
+
+  useEffect(() => {
+    fetchHistory(selectedStudentId)
+  }, [selectedStudentId, fetchHistory])
 
   const handleSaveFee = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    if (!selectedStudentId || !fromDate || !toDate || !amount || !paymentMode) {
+    if (!selectedStudentId || !fromDate || !toDate || !amount || !paymentMode || !submittedOn) {
       alert('Please fill all required fields.')
+      return
+    }
+
+    if (submittedOn > getTodayValue()) {
+      alert('Submitted On date cannot be in the future.')
       return
     }
 
@@ -222,6 +246,7 @@ export default function FeeComponent() {
         to_date: toDate,
         amount: Number(amount),
         payment_mode: paymentMode,
+        submitted_on: submittedOn,
       }
 
       const response = await axios.post(
@@ -236,14 +261,17 @@ export default function FeeComponent() {
       )
 
       if (response.data.success) {
-        setSelectedStudentId('')
-        setFromDate('')
-        setToDate('')
         setAmount('')
         setPaymentMode('cash')
+        setSubmittedOn(getTodayValue())
 
         const createdFee: StudentFee = response.data.data
         setFees((previous) => [createdFee, ...previous])
+
+        // Keep the student selected and refresh their history + next
+        // suggested period in place, instead of forcing a reselect.
+        fetchHistory(selectedStudentId)
+        fetchSuggestPeriod(selectedStudentId)
       }
     } catch (error) {
       console.error('Error saving fee:', error)
@@ -348,6 +376,21 @@ export default function FeeComponent() {
                 <option value="upi">UPI</option>
                 <option value="other">Other</option>
               </select>
+            </div>
+
+            <div className="col-md-4">
+              <label className="form-label fw-semibold">Submitted On</label>
+              <input
+                type="date"
+                className="form-control"
+                value={submittedOn}
+                max={getTodayValue()}
+                onChange={(event) => setSubmittedOn(event.target.value)}
+                disabled={saving}
+              />
+              <div className="text-xs text-secondary-light mt-1">
+                Defaults to today. Set a past date if fees were paid online but entered late.
+              </div>
             </div>
 
             <div className="col-md-4 d-flex align-items-end">
@@ -458,7 +501,7 @@ export default function FeeComponent() {
                       <td>{formatDate(fee.to_date)}</td>
                       <td>{fee.amount}</td>
                       <td>{fee.payment_mode}</td>
-                      <td>{formatDate(fee.created_at)}</td>
+                      <td>{formatDate(fee.submitted_on || fee.created_at)}</td>
                     </tr>
                   ))}
                 </tbody>

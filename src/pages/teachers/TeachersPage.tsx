@@ -51,6 +51,9 @@ export default function TeachersPage() {
   const [viewUserId, setViewUserId] = useState<number | null>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
+  // Search & filter state
+  const [searchName, setSearchName] = useState('');
+
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
 
   useEffect(() => {
@@ -199,6 +202,11 @@ export default function TeachersPage() {
     }
   };
 
+  const filteredTeachers = teachers.filter(t => {
+    if (searchName.trim() && !t.name.toLowerCase().includes(searchName.trim().toLowerCase())) return false;
+    return true;
+  });
+
   return (
     <div>
       {/* Header */}
@@ -210,10 +218,46 @@ export default function TeachersPage() {
         </Button>
       </div>
 
+      {/* Search & Filter Bar */}
+      <div className="card mb-16">
+        <div className="card-body py-16 px-24">
+          <div className="row g-3 align-items-end">
+            <div className="col-12 col-sm-6 col-lg-3">
+              <label className="form-label text-sm mb-1">Search by Name</label>
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                placeholder="Teacher name..."
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+              />
+            </div>
+            {searchName && (
+              <div className="col-auto">
+                {/* Invisible label keeps the button on the same baseline as the fields above */}
+                <label className="form-label text-sm mb-1 d-block invisible" aria-hidden="true">Clear</label>
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  onClick={() => setSearchName('')}
+                >
+                  Clear
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Teachers Table */}
       <div className="card">
         <div className="card-header border-bottom bg-base py-16 px-24">
-          <span className="text-md fw-medium text-secondary-light">Teachers List</span>
+          <span className="text-md fw-medium text-secondary-light">
+            Teachers List
+            {filteredTeachers.length !== teachers.length && (
+              <span className="ms-2 text-sm text-secondary">({filteredTeachers.length} of {teachers.length})</span>
+            )}
+          </span>
         </div>
         <div className="card-body">
           {loading ? (
@@ -221,7 +265,7 @@ export default function TeachersPage() {
               <span className="spinner-border spinner-border-sm"></span>
               <span className="ms-2">Loading teachers...</span>
             </div>
-          ) : teachers.length === 0 ? (
+          ) : filteredTeachers.length === 0 ? (
             <p className="text-center text-muted">No teachers found.</p>
           ) : (
             <div className="table-responsive">
@@ -234,10 +278,22 @@ export default function TeachersPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {teachers.map(teacher => (
+                  {filteredTeachers.map(teacher => (
                     <tr key={teacher.id}>
                       <td>
-                        <div className="d-flex align-items-center gap-2">
+                        <div
+                          className="d-flex align-items-center gap-2 cursor-pointer"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => handleViewUser(teacher.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              handleViewUser(teacher.id)
+                            }
+                          }}
+                          title="View profile"
+                        >
                           <Avatar
                             user={teacher}
                             size={32}

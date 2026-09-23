@@ -121,6 +121,8 @@ export default function UserProfileModal({
   const [asmSummary, setAsmSummary] = useState<{
     completed_count: number
     average_percentage: number | null
+    last_assessment_date?: string | null
+    next_assessment_date?: string | null
     last_result: {
       assignment_id: number
       title: string
@@ -349,7 +351,7 @@ export default function UserProfileModal({
   }
 
   return (
-    <Modal show={show} onHide={onHide} centered>
+    <Modal show={show} onHide={onHide} centered size="xl" fullscreen="md-down" scrollable>
       <Modal.Header closeButton>
         <Modal.Title>User Profile</Modal.Title>
       </Modal.Header>
@@ -358,56 +360,179 @@ export default function UserProfileModal({
           <div className="text-center py-4">Loading...</div>
         ) : (
           <>
-            <div className="d-flex align-items-center gap-3 mb-3">
+            <div className="d-flex flex-wrap align-items-center gap-3 mb-3">
               <Avatar
                 user={{
                   name: user.name,
                   profile_image: user.profile_image ?? undefined,
                 }}
-                size={64}
+                size={56}
               />
-              <div>
+              <div className="flex-grow-1" style={{ minWidth: 0 }}>
                 <h6 className="mb-1">{user.name}</h6>
-                <div className="text-sm text-secondary-light">{user.email}</div>
                 <div className="text-sm text-secondary-light">
+                  {user.email}
+                  <span className="mx-2">•</span>
                   Role: {user.role}
                 </div>
-                {user.dob && (
-                  <div className="text-sm text-secondary-light">
-                    DOB: {formatDate(user.dob)}
-                  </div>
-                )}
               </div>
             </div>
 
-            {(typeof user.attendance_percentage === 'number' || typeof user.not_marked_days === 'number') && (
-              <div className="mb-3">
-                <h6 className="fw-semibold mb-1">Attendance</h6>
-                <div className="fw-bold">
-                  {typeof user.attendance_percentage === 'number' ? `${user.attendance_percentage.toFixed(2)}%` : '—'}
+            {/* Main info first: the at-a-glance status a viewer actually
+                came here for, as cards that fill the row on wider screens
+                instead of stacking the whole way down a narrow modal. */}
+            <div className="row g-3 mb-3">
+              {(typeof user.attendance_percentage === 'number' || typeof user.not_marked_days === 'number') && (
+                <div className="col-12 col-md-6 col-xl-4">
+                  <div className="border rounded-3 p-3 h-100" style={{ borderColor: 'var(--bs-border-color)' }}>
+                    <h6 className="fw-semibold mb-1">Attendance</h6>
+                    <div className="fw-bold">
+                      {typeof user.attendance_percentage === 'number' ? `${user.attendance_percentage.toFixed(2)}%` : '—'}
+                    </div>
+                    {typeof user.not_marked_days === 'number' && (
+                      <div className="text-sm text-secondary-light">
+                        {Math.round(user.not_marked_days)} day(s) yet to be marked.
+                      </div>
+                    )}
+                  </div>
                 </div>
-                {typeof user.not_marked_days === 'number' && (
-                  <div className="text-sm text-secondary-light">
-                    {Math.round(user.not_marked_days)} day(s) yet to be marked.
+              )}
+
+              {authRole === 'coaching_admin' && user.role === 'student' && !feesForbidden && (
+                <div className="col-12 col-md-6 col-xl-4">
+                  <div className="border rounded-3 p-3 h-100" style={{ borderColor: 'var(--bs-border-color)' }}>
+                    <h6 className="fw-semibold mb-2">Fees</h6>
+                    {feesLoading ? (
+                      <div className="d-flex align-items-center gap-2 text-sm">
+                        <Spinner size="sm" animation="border" />
+                        <span>Loading fees…</span>
+                      </div>
+                    ) : feesError ? (
+                      <div className="text-sm text-secondary-light">{feesError}</div>
+                    ) : feeSummary ? (
+                      <>
+                        <div className="text-sm mb-1">
+                          Last fees paid: {feeSummary.last_paid_at ? formatDate(feeSummary.last_paid_at) : 'No fee history'}
+                          {typeof feeSummary.last_paid_amount === 'number' && !Number.isNaN(feeSummary.last_paid_amount) && (
+                            <> (₹{Number(feeSummary.last_paid_amount).toFixed(2)})</>
+                          )}
+                        </div>
+                        <div className="text-sm mb-1">Next fees due: {formatDate(feeSummary.next_due_date)}</div>
+                        <div className="text-sm">
+                          {feeSummary.is_overdue ? (
+                            <span className="badge bg-danger-subtle text-danger-600">
+                              ⚠ Fees overdue: Due on {formatDate(feeSummary.next_due_date)}{feeSummary.days_overdue ? ` (${feeSummary.days_overdue} days overdue)` : ''}
+                            </span>
+                          ) : (
+                            <span className="badge bg-success-subtle text-success-600">
+                              {new Date(feeSummary.next_due_date).toDateString() === new Date().toDateString()
+                                ? 'Due today'
+                                : `Paid - Next due on ${formatDate(feeSummary.next_due_date)}`}
+                            </span>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-sm text-secondary-light">No fee history available.</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {user.role === 'student' && (
+                <div className="col-12 col-md-6 col-xl-4">
+                  <div className="border rounded-3 p-3 h-100" style={{ borderColor: 'var(--bs-border-color)' }}>
+                    <h6 className="fw-semibold mb-2">Assigned Teachers</h6>
+                    {Array.isArray(user.teachers) && user.teachers.length > 0 ? (
+                      <div className="d-flex flex-column gap-2" style={{ maxHeight: 160, overflowY: 'auto' }}>
+                        {user.teachers.map((t) => (
+                          <div key={t.id} className="d-flex align-items-center gap-2">
+                            <Avatar user={{ name: t.name, profile_image: t.profile_image ?? t.profile_img ?? undefined }} size={36} />
+                            <div>
+                              <div className="fw-medium">{t.name}</div>
+                              <div className="text-sm text-secondary-light">{t.email}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-secondary-light">No teachers assigned yet.</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {user.role === 'teacher' && (
+                <div className="col-12 col-md-6 col-xl-4">
+                  <div className="border rounded-3 p-3 h-100" style={{ borderColor: 'var(--bs-border-color)' }}>
+                    <h6 className="fw-semibold mb-2">Assigned Students</h6>
+                    {Array.isArray(user.students) && user.students.length > 0 ? (
+                      <div className="d-flex flex-column gap-2" style={{ maxHeight: 160, overflowY: 'auto' }}>
+                        {user.students.map((s) => (
+                          <div key={s.id} className="d-flex align-items-center gap-2">
+                            <Avatar user={{ name: s.name, profile_image: s.profile_image ?? s.profile_img ?? undefined }} size={36} />
+                            <div>
+                              <div className="fw-medium">{s.name}</div>
+                              <div className="text-sm text-secondary-light">{s.email}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-secondary-light">No students assigned yet.</div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Secondary details: reference facts (DOB, admission, etc.) that
+                matter less than the status cards above, laid out as an even
+                grid so they fill the row instead of bunching to one side. */}
+            {(user.dob || user.role === 'student') && (
+              <div
+                className="mb-3 pb-3"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))',
+                  gap: '0.75rem 1rem',
+                  borderBottom: '1px solid var(--bs-border-color)',
+                }}
+              >
+                {user.dob && (
+                  <div>
+                    <div className="text-xs text-secondary-light">DOB</div>
+                    <div className="text-sm">{formatDate(user.dob)}</div>
                   </div>
                 )}
-              </div>
-            )}
-
-            {user.role === 'student' && (
-              <div className="mb-3">
-                <h6 className="fw-semibold mb-2">Student Details</h6>
-                {user.student_profile && (
+                {user.role === 'student' && user.student_profile && (
                   <>
-                    <div className="text-sm">Class: {user.current_class_name ?? user.student_profile.class}</div>
-                    <div className="text-sm">Phone: {user.student_profile.phone || '-'}</div>
+                    <div>
+                      <div className="text-xs text-secondary-light">Class</div>
+                      <div className="text-sm">{user.current_class_name ?? user.student_profile.class ?? '-'}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-secondary-light">Phone</div>
+                      <div className="text-sm">{user.student_profile.phone || '-'}</div>
+                    </div>
                   </>
                 )}
-                <div className="text-sm">Admission: {formatDate(user.created_at)}</div>
-                {authRole === 'coaching_admin' && user.student_profile && (
+                {user.role === 'student' && (
+                  <div>
+                    <div className="text-xs text-secondary-light">Admission</div>
+                    <div className="text-sm">{formatDate(user.created_at)}</div>
+                  </div>
+                )}
+                {user.role === 'student' && authRole === 'coaching_admin' && user.student_profile && (
                   <>
-                    <div className="text-sm">Next Fee Due: {formatDate((user.student_profile as any).fee_due_date as string)}</div>
-                    <div className="text-sm">Trial Days: {(user.student_profile as any).trial_days ?? '-'}</div>
+                    <div>
+                      <div className="text-xs text-secondary-light">Next Fee Due</div>
+                      <div className="text-sm">{formatDate((user.student_profile as any).fee_due_date as string)}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-secondary-light">Trial Days</div>
+                      <div className="text-sm">{(user.student_profile as any).trial_days ?? '-'}</div>
+                    </div>
                   </>
                 )}
               </div>
@@ -425,14 +550,22 @@ export default function UserProfileModal({
                   <div className="text-sm text-secondary-light">No data available.</div>
                 ) : (
                   <>
-                    <div className="d-flex gap-2 mb-2">
-                      <div className="flex-fill p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)' }}>
+                    <div className="d-flex flex-wrap gap-2 mb-2">
+                      <div className="flex-fill p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)', minWidth: 120 }}>
                         <div className="text-sm text-secondary-light">Completed</div>
                         <div className="fw-bold">{asmSummary.completed_count}</div>
                       </div>
-                      <div className="flex-fill p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)' }}>
+                      <div className="flex-fill p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)', minWidth: 120 }}>
                         <div className="text-sm text-secondary-light">Average</div>
                         <div className="fw-bold">{typeof asmSummary.average_percentage === 'number' ? `${asmSummary.average_percentage.toFixed(2)}%` : '-'}</div>
+                      </div>
+                      <div className="flex-fill p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)', minWidth: 120 }}>
+                        <div className="text-sm text-secondary-light">Last Assessment</div>
+                        <div className="fw-bold">{formatDate(asmSummary.last_assessment_date, 'NA')}</div>
+                      </div>
+                      <div className="flex-fill p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)', minWidth: 120 }}>
+                        <div className="text-sm text-secondary-light">Next Assessment</div>
+                        <div className="fw-bold">{formatDate(asmSummary.next_assessment_date, 'NA')}</div>
                       </div>
                     </div>
                     <div className="mb-2 p-2 rounded border" style={{ borderColor: 'var(--bs-border-color)' }}>
@@ -477,90 +610,6 @@ export default function UserProfileModal({
                       </div>
                     )}
                   </>
-                )}
-              </div>
-            )}
-
-            {/* Assigned Teachers (when viewing a student) */}
-            {user.role === 'student' && (
-              <div className="mb-3">
-                <h6 className="fw-semibold mb-2">Assigned Teachers</h6>
-                {Array.isArray(user.teachers) && user.teachers.length > 0 ? (
-                  <div className="d-flex flex-column gap-2">
-                    {user.teachers.map((t) => (
-                      <div key={t.id} className="d-flex align-items-center gap-2">
-                        <Avatar user={{ name: t.name, profile_image: t.profile_image ?? t.profile_img ?? undefined }} size={36} />
-                        <div>
-                          <div className="fw-medium">{t.name}</div>
-                          <div className="text-sm text-secondary-light">{t.email}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-sm text-secondary-light">No teachers assigned yet.</div>
-                )}
-              </div>
-            )}
-
-            {/* Assigned Students (when viewing a teacher) */}
-            {user.role === 'teacher' && (
-              <div className="mb-3">
-                <h6 className="fw-semibold mb-2">Assigned Students</h6>
-                {Array.isArray(user.students) && user.students.length > 0 ? (
-                  <div className="d-flex flex-column gap-2">
-                    {user.students.map((s) => (
-                      <div key={s.id} className="d-flex align-items-center gap-2">
-                        <Avatar user={{ name: s.name, profile_image: s.profile_image ?? s.profile_img ?? undefined }} size={36} />
-                        <div>
-                          <div className="fw-medium">{s.name}</div>
-                          <div className="text-sm text-secondary-light">{s.email}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-sm text-secondary-light">No students assigned yet.</div>
-                )}
-              </div>
-            )}
-
-            {/* Fees (Admin-only) */}
-            {authRole === 'coaching_admin' && user.role === 'student' && !feesForbidden && (
-              <div className="mb-3">
-                <h6 className="fw-semibold mb-2">Fees</h6>
-                {feesLoading ? (
-                  <div className="d-flex align-items-center gap-2 text-sm">
-                    <Spinner size="sm" animation="border" />
-                    <span>Loading fees…</span>
-                  </div>
-                ) : feesError ? (
-                  <div className="text-sm text-secondary-light">{feesError}</div>
-                ) : feeSummary ? (
-                  <>
-                    <div className="text-sm mb-1">
-                      Last fees paid: {feeSummary.last_paid_at ? formatDate(feeSummary.last_paid_at) : 'No fee history'}
-                      {typeof feeSummary.last_paid_amount === 'number' && !Number.isNaN(feeSummary.last_paid_amount) && (
-                        <> (₹{Number(feeSummary.last_paid_amount).toFixed(2)})</>
-                      )}
-                    </div>
-                    <div className="text-sm mb-1">Next fees due: {formatDate(feeSummary.next_due_date)}</div>
-                    <div className="text-sm">
-                      {feeSummary.is_overdue ? (
-                        <span className="badge bg-danger-subtle text-danger-600">
-                          ⚠ Fees overdue: Due on {formatDate(feeSummary.next_due_date)}{feeSummary.days_overdue ? ` (${feeSummary.days_overdue} days overdue)` : ''}
-                        </span>
-                      ) : (
-                        <span className="badge bg-success-subtle text-success-600">
-                          {new Date(feeSummary.next_due_date).toDateString() === new Date().toDateString()
-                            ? 'Due today'
-                            : `Paid - Next due on ${formatDate(feeSummary.next_due_date)}`}
-                        </span>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-sm text-secondary-light">No fee history available.</div>
                 )}
               </div>
             )}

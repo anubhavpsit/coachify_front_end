@@ -12,6 +12,7 @@ import TeacherActivityGapsCard from '../../components/TeacherActivityGapsCard';
 import PendingFeesCard from '../../components/PendingFeesCard';
 import ActivityLogCard from '../../components/ActivityLogCard';
 import GhostStudentsCard from '../../components/GhostStudentsCard';
+import UnassignedStudentsCard from '../../components/UnassignedStudentsCard';
 
 type DashboardStats = {
   role: string
@@ -310,6 +311,7 @@ export default function DashboardPage() {
 
               <div className="row g-3 mt-2">
                 {can('dashboard.ghost_students') && <GhostStudentsCard />}
+                {can('dashboard.unassigned_students') && <UnassignedStudentsCard />}
               </div>
 
 

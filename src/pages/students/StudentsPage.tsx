@@ -1,11 +1,31 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import axios from 'axios';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Dropdown } from 'react-bootstrap';
 import AssignTeachersModal from '../../components/AssignTeachersModal';
 import Avatar from '../../components/common/Avatar.tsx';
 import Icon from '../../components/common/Icon.tsx';
 import { ROLES } from '../../constants/roles'
 import UserProfileModal from '../../components/UserProfileModal';
+
+// Compact "⋮" trigger for the row-actions dropdown, so 5 actions no longer
+// need 5 separate link buttons stretching the Actions column (and the whole
+// table) off-screen.
+const RowActionsToggle = forwardRef<HTMLButtonElement, { onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void }>(
+  ({ onClick }, ref) => (
+    <button
+      ref={ref}
+      type="button"
+      className="btn btn-sm btn-outline-secondary-light border-0 px-8"
+      aria-label="Row actions"
+      onClick={(e) => {
+        e.preventDefault();
+        onClick?.(e);
+      }}
+    >
+      <Icon icon="mdi:dots-vertical" className="icon text-lg" />
+    </button>
+  ),
+);
 
 interface StudentProfile {
   class: number | null;
@@ -521,9 +541,9 @@ export default function StudentsPage() {
 
       {/* Search & Filter Bar */}
       <div className="card mb-16">
-        <div className="card-body py-12 px-24">
-          <div className="d-flex flex-wrap align-items-end gap-3">
-            <div>
+        <div className="card-body py-16 px-24">
+          <div className="row g-3 align-items-end">
+            <div className="col-12 col-sm-6 col-lg-3">
               <label className="form-label text-sm mb-1">Search by Name</label>
               <input
                 type="text"
@@ -531,16 +551,14 @@ export default function StudentsPage() {
                 placeholder="Student name..."
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
-                style={{ minWidth: 160 }}
               />
             </div>
-            <div>
+            <div className="col-6 col-sm-3 col-lg-2">
               <label className="form-label text-sm mb-1">Class</label>
               <select
                 className="form-select form-select-sm"
                 value={filterClassId}
                 onChange={(e) => setFilterClassId(e.target.value === '' ? '' : Number(e.target.value))}
-                style={{ minWidth: 140 }}
               >
                 <option value="">All Classes</option>
                 {classes.map(c => (
@@ -548,29 +566,26 @@ export default function StudentsPage() {
                 ))}
               </select>
             </div>
-            <div>
+            <div className="col-6 col-sm-3 col-lg-3">
               <label className="form-label text-sm mb-1">Academic Year</label>
               <select
                 className="form-select form-select-sm"
                 value={selectedYearId}
                 onChange={(e) => setSelectedYearId(e.target.value === '' ? '' : Number(e.target.value))}
-                style={{ minWidth: 160 }}
               >
                 <option value="">All Years</option>
                 {academicYears.map(y => (
                   <option key={y.id} value={y.id}>{y.name}{y.is_current ? ' (current)' : ''}</option>
                 ))}
               </select>
-              <div className="text-xs text-secondary-light mt-1">Showing students enrolled in the selected year.</div>
             </div>
             {userRole === ROLES.COACHING_ADMIN && (
-              <div>
+              <div className="col-6 col-sm-3 col-lg-2">
                 <label className="form-label text-sm mb-1">Status</label>
                 <select
                   className="form-select form-select-sm"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as 'active' | 'inactive' | 'all')}
-                  style={{ minWidth: 120 }}
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
@@ -579,15 +594,20 @@ export default function StudentsPage() {
               </div>
             )}
             {(searchName || filterClassId !== '') && (
-              <Button
-                variant="outline-secondary"
-                size="sm"
-                onClick={() => { setSearchName(''); setFilterClassId(''); }}
-              >
-                Clear
-              </Button>
+              <div className="col-auto">
+                {/* Invisible label keeps the button on the same baseline as the fields above */}
+                <label className="form-label text-sm mb-1 d-block invisible" aria-hidden="true">Clear</label>
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  onClick={() => { setSearchName(''); setFilterClassId(''); }}
+                >
+                  Clear
+                </Button>
+              </div>
             )}
           </div>
+          <div className="text-xs text-secondary-light mt-2">Showing students enrolled in the selected year.</div>
         </div>
       </div>
 
@@ -613,7 +633,7 @@ export default function StudentsPage() {
             <p className="text-center text-muted">No students found.</p>
           ) : (
             <div className="table-responsive">
-              <table className="table bordered-table mb-0">
+              <table className="table bordered-table table-sm mb-0">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -621,21 +641,30 @@ export default function StudentsPage() {
                     <th>Class</th>
                     <th>Subjects</th>
                     <th>Added On</th>
-                    <th className="text-center">Profile</th>
-                    {userRole === ROLES.COACHING_ADMIN && (
-                      <>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th className="text-center">Actions</th>
-                      </>
-                    )}
+                    {userRole === ROLES.COACHING_ADMIN && <th>Phone</th>}
+                    {userRole === ROLES.COACHING_ADMIN && <th>Status</th>}
+                    <th className="text-center text-nowrap" style={{ width: 80 }}>
+                      {userRole === ROLES.COACHING_ADMIN ? 'Actions' : 'Profile'}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredStudents.map(student => (
                     <tr key={student.id}>
                       <td>
-                        <div className="d-flex align-items-center gap-2">
+                        <div
+                          className="d-flex align-items-center gap-2 cursor-pointer"
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => handleViewUser(student.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              handleViewUser(student.id)
+                            }
+                          }}
+                          title="View profile"
+                        >
                           <Avatar
                             user={student}
                             size={32}
@@ -647,7 +676,15 @@ export default function StudentsPage() {
                           <span>{student.name}</span>
                         </div>
                       </td>
-                      <td>{student.email}</td>
+                      <td>
+                        <span
+                          className="d-inline-block text-truncate align-middle"
+                          style={{ maxWidth: 150 }}
+                          title={student.email}
+                        >
+                          {student.email}
+                        </span>
+                      </td>
                       <td>
                         {classes.find(c => c.id == (student.current_class_id ?? student.student_profile?.class))?.name
                           || (typeof student.current_class_name === 'string' && student.current_class_name.trim() !== ''
@@ -655,58 +692,76 @@ export default function StudentsPage() {
                                 : '-')}
                       </td>
                       <td>
-                        {student.student_profile?.subjects
-                          ?.map((subId) => subjects.find(s => s.id === subId)?.subject)
-                          .filter(Boolean) // remove undefined if subject not found
-                          .join(', ') || '-'}
+                        {(() => {
+                          const subjectNames = student.student_profile?.subjects
+                            ?.map((subId) => subjects.find(s => s.id === subId)?.subject)
+                            .filter(Boolean) as string[] | undefined;
+                          if (!subjectNames || subjectNames.length === 0) return '-';
+                          const shown = subjectNames.slice(0, 2);
+                          const extra = subjectNames.length - shown.length;
+                          return (
+                            <span title={subjectNames.join(', ')}>
+                              {shown.join(', ')}
+                              {extra > 0 && (
+                                <span className="badge bg-neutral-200 text-secondary-light ms-1">+{extra}</span>
+                              )}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td>{formatAddedOn(student.created_at)}</td>
-                      <td className="text-center">
-                        <Button
-                          variant="link"
-                          onClick={() => handleViewUser(student.id)}
-                        >
-                          View
-                        </Button>
-                      </td>
                       {userRole === ROLES.COACHING_ADMIN && (
-                        <>
-                          <td>{student.student_profile?.phone || '-'}</td>
-                          <td>
-                            <span className={`badge ${student.status === 'inactive' ? 'bg-danger-100 text-danger-600' : 'bg-success-100 text-success-600'}`}>
-                              {student.status === 'inactive' ? 'Inactive' : 'Active'}
-                            </span>
-                          </td>
-                          <td className="text-center">
-                            {student.tenant_id !== 0 && (
-                              <>
-                                <Button variant="link" onClick={() => handleOpenEditModal(student)}>Edit</Button>
-                        <Button variant="link" onClick={() => handleOpenDeleteModal(student)}>Delete</Button>
-                        <Button variant="link" onClick={() => handleOpenAssignModal(student.id)} >Assign Teachers</Button>
-                        <Button variant="link" onClick={() => handleOpenSinglePromote(student)} >Promote</Button>
-                        {student.status === 'inactive' && (
-                          <Button variant="link" onClick={() => handleOpenReactivateModal(student)}>Reactivate</Button>
-                        )}
-                        {selectedStudentId && (
-                          <AssignTeachersModal
-                            show={showAssignModal}
-                            onHide={() => setShowAssignModal(false)}
-                            studentId={selectedStudentId}
-                            onAssigned={() => {
-                              // optionally refresh students list or show a success message
-                            }}
-                          />
-                        )}
-                              </>
-                            )}
-                          </td>
-                        </>
+                        <td>{student.student_profile?.phone || '-'}</td>
                       )}
+                      {userRole === ROLES.COACHING_ADMIN && (
+                        <td>
+                          <span className={`badge ${student.status === 'inactive' ? 'bg-danger-100 text-danger-600' : 'bg-success-100 text-success-600'}`}>
+                            {student.status === 'inactive' ? 'Inactive' : 'Active'}
+                          </span>
+                        </td>
+                      )}
+                      <td className="text-center">
+                        {userRole === ROLES.COACHING_ADMIN ? (
+                          student.tenant_id !== 0 && (
+                            <Dropdown align="end">
+                              <Dropdown.Toggle as={RowActionsToggle} id={`student-actions-${student.id}`} />
+                              <Dropdown.Menu>
+                                <Dropdown.Item onClick={() => handleViewUser(student.id)}>View Profile</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleOpenEditModal(student)}>Edit</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleOpenAssignModal(student.id)}>Assign Teachers</Dropdown.Item>
+                                <Dropdown.Item onClick={() => handleOpenSinglePromote(student)}>Promote</Dropdown.Item>
+                                {student.status === 'inactive' && (
+                                  <Dropdown.Item onClick={() => handleOpenReactivateModal(student)}>Reactivate</Dropdown.Item>
+                                )}
+                                <Dropdown.Divider />
+                                <Dropdown.Item className="text-danger-600" onClick={() => handleOpenDeleteModal(student)}>Delete</Dropdown.Item>
+                              </Dropdown.Menu>
+                            </Dropdown>
+                          )
+                        ) : (
+                          <Button variant="link" className="p-0" onClick={() => handleViewUser(student.id)}>
+                            View
+                          </Button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+          )}
+
+          {/* Mounted once (not per row) — opens against whichever student's
+              "Assign Teachers" action was last clicked. */}
+          {selectedStudentId && (
+            <AssignTeachersModal
+              show={showAssignModal}
+              onHide={() => setShowAssignModal(false)}
+              studentId={selectedStudentId}
+              onAssigned={() => {
+                // optionally refresh students list or show a success message
+              }}
+            />
           )}
         </div>
       </div>

@@ -206,6 +206,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
             <li>
               <NavLink
                 to="/students"
+                end
                 className={({ isActive }) => navLinkClass(isActive)}
               >
                 <Icon icon="mdi:account-school" className="menu-icon" />
@@ -229,6 +230,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               <li>
                 <NavLink
                   to="/teachers"
+                  end
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
                   <Icon icon="mdi:human-male-board" className="menu-icon" />
@@ -315,6 +317,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
               <li>
                 <NavLink
                   to="/approvals"
+                  end
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
                   <Icon icon="mdi:check-decagram" className="menu-icon" />
@@ -328,6 +331,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
             <li>
               <NavLink
                 to="/approvals"
+                end
                 className={({ isActive }) => navLinkClass(isActive)}
               >
                 <Icon icon="mdi:check-decagram" className="menu-icon" />

@@ -17,9 +17,12 @@ type PendingAction = {
   severity?: 'low' | 'medium' | 'high'
   for_teacher_id?: number
   for_teacher_name?: string
+  student_id?: number
   student_name?: string
   subject_name?: string
 }
+
+type RoleFilter = 'all' | 'teacher' | 'student'
 
 type NotifyState = 'idle' | 'sending' | 'sent' | 'error'
 
@@ -29,6 +32,8 @@ export default function PendingActionsCard() {
   const [error, setError] = useState<string | null>(null)
   const [filterType, setFilterType] = useState<string>('all')
   const [filterDate, setFilterDate] = useState<string>('')
+  const [filterRole, setFilterRole] = useState<RoleFilter>('all')
+  const [filterUserId, setFilterUserId] = useState<string>('')
   const [notify, setNotify] = useState<Record<string, NotifyState>>({})
   const [notifyMsg, setNotifyMsg] = useState<Record<string, string>>({})
 
@@ -119,6 +124,34 @@ export default function PendingActionsCard() {
     new Set(actions.map((action) => action.type)),
   )
 
+  // Teachers/students named as the responsible party on at least one pending
+  // action, so admins can narrow the list down to a specific person.
+  const teacherOptions = Array.from(
+    new Map(
+      actions
+        .filter((action): action is PendingAction & { for_teacher_id: number } =>
+          !!action.for_teacher_id,
+        )
+        .map((action) => [action.for_teacher_id, action.for_teacher_name || `Teacher #${action.for_teacher_id}`]),
+    ),
+  ).map(([id, name]) => ({ id, name }))
+
+  const studentOptions = Array.from(
+    new Map(
+      actions
+        .filter((action): action is PendingAction & { student_id: number } => !!action.student_id)
+        .map((action) => [action.student_id, action.student_name || `Student #${action.student_id}`]),
+    ),
+  ).map(([id, name]) => ({ id, name }))
+
+  const hasUserAttribution = teacherOptions.length > 0 || studentOptions.length > 0
+  const userOptions = filterRole === 'teacher' ? teacherOptions : filterRole === 'student' ? studentOptions : []
+
+  const handleRoleChange = (role: RoleFilter) => {
+    setFilterRole(role)
+    setFilterUserId('')
+  }
+
   const filteredActions = actions.filter((action) => {
     if (filterType !== 'all' && action.type !== filterType) {
       return false
@@ -130,6 +163,16 @@ export default function PendingActionsCard() {
 
     if (filterDate && !action.date) {
       return false
+    }
+
+    if (filterRole === 'teacher') {
+      if (!action.for_teacher_id) return false
+      if (filterUserId && String(action.for_teacher_id) !== filterUserId) return false
+    }
+
+    if (filterRole === 'student') {
+      if (!action.student_id) return false
+      if (filterUserId && String(action.student_id) !== filterUserId) return false
     }
 
     return true
@@ -183,6 +226,45 @@ export default function PendingActionsCard() {
                     style={{ maxWidth: '180px' }}
                   />
                 </div>
+
+                {hasUserAttribution && (
+                  <>
+                    <div className="d-flex align-items-center gap-2">
+                      <span className="text-sm text-secondary-light">Role</span>
+                      <select
+                        className="form-select form-select-sm"
+                        value={filterRole}
+                        onChange={(event) => handleRoleChange(event.target.value as RoleFilter)}
+                        style={{ minWidth: '140px' }}
+                      >
+                        <option value="all">All roles</option>
+                        {teacherOptions.length > 0 && <option value="teacher">Teacher</option>}
+                        {studentOptions.length > 0 && <option value="student">Student</option>}
+                      </select>
+                    </div>
+
+                    {filterRole !== 'all' && (
+                      <div className="d-flex align-items-center gap-2">
+                        <span className="text-sm text-secondary-light">User</span>
+                        <select
+                          className="form-select form-select-sm"
+                          value={filterUserId}
+                          onChange={(event) => setFilterUserId(event.target.value)}
+                          style={{ minWidth: '160px' }}
+                        >
+                          <option value="">
+                            {filterRole === 'teacher' ? 'All teachers' : 'All students'}
+                          </option>
+                          {userOptions.map((option) => (
+                            <option key={option.id} value={option.id}>
+                              {option.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
 
               {filteredActions.length === 0 ? (
