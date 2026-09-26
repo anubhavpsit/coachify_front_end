@@ -9,6 +9,7 @@ interface Teacher {
   id: number;
   name: string;
   email: string;
+  phone?: string | null;
   tenant_id: number;
   dob?: string | null;
   gender?: string | null;
@@ -30,6 +31,7 @@ export default function TeachersPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTeacherName, setNewTeacherName] = useState('');
   const [newTeacherEmail, setNewTeacherEmail] = useState('');
+  const [newTeacherPhone, setNewTeacherPhone] = useState('');
   const [newTeacherPassword, setNewTeacherPassword] = useState('');
   const [newTeacherDob, setNewTeacherDob] = useState<string>(getTodayDateValue()); // initialize with today
   const [newTeacherGender, setNewTeacherGender] = useState<string>('');
@@ -109,6 +111,7 @@ export default function TeachersPage() {
         {
           name: newTeacherName,
           email: newTeacherEmail,
+          phone: newTeacherPhone.trim() || null,
           password: newTeacherPassword,
           dob: newTeacherDob,
           gender: newTeacherGender,
@@ -120,6 +123,7 @@ export default function TeachersPage() {
         setTeachers(prev => [...prev, response.data.data]);
         setNewTeacherName('');
         setNewTeacherEmail('');
+        setNewTeacherPhone('');
         setNewTeacherPassword('');
         setNewTeacherGender('');
         setShowAddModal(false);
@@ -154,6 +158,7 @@ export default function TeachersPage() {
         {
           name: editTeacher.name,
           email: editTeacher.email,
+          phone: editTeacher.phone?.trim() || null,
           password: editTeacherPassword || undefined, // send only if changed
           dob: editTeacherDob,
           gender: editTeacherGender,
@@ -274,6 +279,7 @@ export default function TeachersPage() {
                   <tr>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Phone</th>
                     <th className="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -306,6 +312,7 @@ export default function TeachersPage() {
                         </div>
                       </td>
                       <td>{teacher.email}</td>
+                      <td>{teacher.phone || '—'}</td>
                       <td className="text-center">
                         {teacher.tenant_id !== 0 && (
                           <>
@@ -362,6 +369,17 @@ export default function TeachersPage() {
                 placeholder="Enter Teacher Email"
                 value={newTeacherEmail}
                 onChange={(e) => setNewTeacherEmail(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Phone</label>
+              <input
+                type="tel"
+                className="form-control"
+                placeholder="Enter Phone Number"
+                maxLength={20}
+                value={newTeacherPhone}
+                onChange={(e) => setNewTeacherPhone(e.target.value)}
               />
             </div>
             <div className="mb-3">
@@ -430,6 +448,17 @@ export default function TeachersPage() {
                 className="form-control"
                 value={editTeacher?.email || ''}
                 onChange={(e) => editTeacher && setEditTeacher({ ...editTeacher, email: e.target.value })}
+              />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Phone</label>
+              <input
+                type="tel"
+                className="form-control"
+                placeholder="Enter Phone Number"
+                maxLength={20}
+                value={editTeacher?.phone || ''}
+                onChange={(e) => editTeacher && setEditTeacher({ ...editTeacher, phone: e.target.value })}
               />
             </div>
             <div className="mb-3">
