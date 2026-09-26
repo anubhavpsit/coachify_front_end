@@ -13,6 +13,7 @@ import PendingFeesCard from '../../components/PendingFeesCard';
 import ActivityLogCard from '../../components/ActivityLogCard';
 import GhostStudentsCard from '../../components/GhostStudentsCard';
 import UnassignedStudentsCard from '../../components/UnassignedStudentsCard';
+import NoticeBoardCard from '../../components/notices/NoticeBoardCard';
 
 type DashboardStats = {
   role: string
@@ -178,6 +179,9 @@ export default function DashboardPage() {
           </li>
         </ul>
       </div>
+
+      {/* Every role — independent of the stats request */}
+      <NoticeBoardCard />
 
       {loading && <p>Loading stats...</p>}
       {error && !loading && (
