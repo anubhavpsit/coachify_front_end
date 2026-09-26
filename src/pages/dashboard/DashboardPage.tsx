@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Icon from '../../components/common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
-import { can } from '../../lib/auth'
+import { can, canAny } from '../../lib/auth'
 import BirthdayCard from '../../components/BirthdayCard';
 import TodayBirthdayCard from '../../components/TodayBirthdayCard';
 import LowAttendanceCard from '../../components/LowAttendanceCard';
@@ -30,6 +30,15 @@ type DashboardStats = {
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 
+// One key per admin summary card (staff); coaching_admin holds all of them.
+const DASHBOARD_STAT_KEYS = [
+  'dashboard.stats.students',
+  'dashboard.stats.teachers',
+  'dashboard.stats.activities',
+  'dashboard.stats.earnings',
+  'dashboard.stats.expenses',
+]
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [loading, setLoading] = useState(false)
@@ -49,8 +58,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      // Staff without the summary-cards permission simply don't load stats.
-      if (!can('dashboard.view')) {
+      // teacher/student use dashboard.view; staff need at least one card key.
+      if (!canAny(['dashboard.view', ...DASHBOARD_STAT_KEYS])) {
         setLoading(false)
         return
       }
@@ -179,118 +188,128 @@ export default function DashboardPage() {
         <div className="row gy-4 mb-24">
           {(role === ROLES.COACHING_ADMIN || role === ROLES.STAFF) && (
             <>
-              {stats && can('dashboard.view') && (
+              {stats && (
               <>
-              <div className="col-xxl-3 col-md-6">
-                <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-1">
-                  <div className="d-flex align-items-center justify-content-between mb-12">
-                    <div className="d-flex align-items-center gap-2">
-                      <span className="mb-0 w-48-px h-48-px bg-base text-pink text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-graduation-cap-line"></i>
-                      </span>
-                      <div>
-                        <span className="mb-0 fw-medium text-secondary-light text-lg">
-                          Total Students
+              {can('dashboard.stats.students') && (
+                <div className="col-xxl-3 col-md-6">
+                  <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-1">
+                    <div className="d-flex align-items-center justify-content-between mb-12">
+                      <div className="d-flex align-items-center gap-2">
+                        <span className="mb-0 w-48-px h-48-px bg-base text-pink text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                          <i className="ri-graduation-cap-line"></i>
                         </span>
+                        <div>
+                          <span className="mb-0 fw-medium text-secondary-light text-lg">
+                            Total Students
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                    <h5 className="fw-semibold mb-0">
-                      {formatNumber(stats.total_students)}
-                    </h5>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-xxl-3 col-md-6">
-                <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-2">
-                  <div className="d-flex align-items-center justify-content-between mb-12">
-                    <div className="d-flex align-items-center gap-2">
-                      <span className="mb-0 w-48-px h-48-px bg-base text-purple text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-presentation-line"></i>
-                      </span>
-                      <div>
-                        <span className="mb-0 fw-medium text-secondary-light text-lg">
-                          Total Teachers
-                        </span>
-                      </div>
+                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                      <h5 className="fw-semibold mb-0">
+                        {formatNumber(stats.total_students)}
+                      </h5>
                     </div>
                   </div>
-                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                    <h5 className="fw-semibold mb-0">
-                      {formatNumber(stats.total_teachers)}
-                    </h5>
-                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="col-xxl-3 col-md-6">
-                <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-3">
-                  <div className="d-flex align-items-center justify-content-between mb-12">
-                    <div className="d-flex align-items-center gap-2">
-                      <span className="mb-0 w-48-px h-48-px bg-base text-info-main text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-book-open-line"></i>
-                      </span>
-                      <div>
-                        <span className="mb-0 fw-medium text-secondary-light text-lg">
-                          Total Activities
+              {can('dashboard.stats.teachers') && (
+                <div className="col-xxl-3 col-md-6">
+                  <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-2">
+                    <div className="d-flex align-items-center justify-content-between mb-12">
+                      <div className="d-flex align-items-center gap-2">
+                        <span className="mb-0 w-48-px h-48-px bg-base text-purple text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                          <i className="ri-presentation-line"></i>
                         </span>
+                        <div>
+                          <span className="mb-0 fw-medium text-secondary-light text-lg">
+                            Total Teachers
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                    <h5 className="fw-semibold mb-0">
-                      {formatNumber(stats.total_activities)}
-                    </h5>
-                  </div>
-                </div>
-              </div>
-
-              <div className="col-xxl-3 col-md-6">
-                <div className="card p-20 radius-12 h-100">
-                  <div className="d-flex align-items-center justify-content-between mb-12">
-                    <div className="d-flex align-items-center gap-2">
-                      <span className="mb-0 w-48-px h-48-px bg-primary-50 text-primary-600 text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-arrow-up-circle-line"></i>
-                      </span>
-                      <div>
-                        <span className="mb-0 fw-medium text-secondary-light text-lg">
-                          Total Earnings
-                        </span>
-                      </div>
+                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                      <h5 className="fw-semibold mb-0">
+                        {formatNumber(stats.total_teachers)}
+                      </h5>
                     </div>
                   </div>
-                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                    <h5 className="fw-semibold mb-0">
-                      {formatCurrency(stats.total_earnings)}
-                    </h5>
-                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="col-xxl-3 col-md-6">
-                <div className="card p-20 radius-12 h-100">
-                  <div className="d-flex align-items-center justify-content-between mb-12">
-                    <div className="d-flex align-items-center gap-2">
-                      <span className="mb-0 w-48-px h-48-px bg-danger-50 text-danger-600 text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
-                        <i className="ri-arrow-down-circle-line"></i>
-                      </span>
-                      <div>
-                        <span className="mb-0 fw-medium text-secondary-light text-lg">
-                          Total Expenses
+              {can('dashboard.stats.activities') && (
+                <div className="col-xxl-3 col-md-6">
+                  <div className="card p-20 radius-12 h-100 bg-gradient-dark-start-3">
+                    <div className="d-flex align-items-center justify-content-between mb-12">
+                      <div className="d-flex align-items-center gap-2">
+                        <span className="mb-0 w-48-px h-48-px bg-base text-info-main text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                          <i className="ri-book-open-line"></i>
                         </span>
+                        <div>
+                          <span className="mb-0 fw-medium text-secondary-light text-lg">
+                            Total Activities
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
-                    <h5 className="fw-semibold mb-0">
-                      {formatCurrency(stats.total_expenses)}
-                    </h5>
+                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                      <h5 className="fw-semibold mb-0">
+                        {formatNumber(stats.total_activities)}
+                      </h5>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
+              {can('dashboard.stats.earnings') && (
+                <div className="col-xxl-3 col-md-6">
+                  <div className="card p-20 radius-12 h-100">
+                    <div className="d-flex align-items-center justify-content-between mb-12">
+                      <div className="d-flex align-items-center gap-2">
+                        <span className="mb-0 w-48-px h-48-px bg-primary-50 text-primary-600 text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                          <i className="ri-arrow-up-circle-line"></i>
+                        </span>
+                        <div>
+                          <span className="mb-0 fw-medium text-secondary-light text-lg">
+                            Total Earnings
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                      <h5 className="fw-semibold mb-0">
+                        {formatCurrency(stats.total_earnings)}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {can('dashboard.stats.expenses') && (
+                <div className="col-xxl-3 col-md-6">
+                  <div className="card p-20 radius-12 h-100">
+                    <div className="d-flex align-items-center justify-content-between mb-12">
+                      <div className="d-flex align-items-center gap-2">
+                        <span className="mb-0 w-48-px h-48-px bg-danger-50 text-danger-600 text-2xl flex-shrink-0 d-flex justify-content-center align-items-center rounded-circle h6">
+                          <i className="ri-arrow-down-circle-line"></i>
+                        </span>
+                        <div>
+                          <span className="mb-0 fw-medium text-secondary-light text-lg">
+                            Total Expenses
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-8">
+                      <h5 className="fw-semibold mb-0">
+                        {formatCurrency(stats.total_expenses)}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+
+              )}
 
               </>
               )}
