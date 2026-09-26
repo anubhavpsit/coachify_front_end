@@ -530,12 +530,19 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   };
 
   const handleAssign = async () => {
-    if (!assignModalAssessment || !assignDate || selectedStudentIds.length === 0)
+    // Only send students shown in the list. Pre-selected ids can include
+    // students assigned by someone else (admin / another teacher / auto
+    // generator) that this user can't see or untick — a teacher sending those
+    // gets a 403. Their existing assignments are untouched either way.
+    const visibleIds = new Set(students.map(st => st.id));
+    const studentIds = selectedStudentIds.filter(id => visibleIds.has(id));
+
+    if (!assignModalAssessment || !assignDate || studentIds.length === 0)
       return;
 
     setSaving(true);
     try {
-      const assignments = selectedStudentIds.map(studentId => ({
+      const assignments = studentIds.map(studentId => ({
         student_id: studentId,
         scheduled_date: assignDate,
       }));
