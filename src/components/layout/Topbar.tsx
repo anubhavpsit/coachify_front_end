@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Icon from '../common/Icon.tsx'
 import Avatar from '../common/Avatar.tsx';
+import NotificationBell from './NotificationBell.tsx';
 
 type TopbarUser = {
   name: string;
@@ -157,6 +158,7 @@ export default function Topbar({
               onClick={onToggleTheme}
             >
             </button>
+            <NotificationBell role={user.role} />
             <div className={`dropdown${isProfileOpen ? ' show' : ''}`}>
               <button
                 className="d-flex justify-content-center align-items-center rounded-circle border-0 bg-transparent"

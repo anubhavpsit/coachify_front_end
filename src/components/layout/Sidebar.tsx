@@ -4,6 +4,7 @@ import Icon from '../common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
 import { can } from '../../lib/auth'
 import { getTenantBrandName, getTenantPrimaryLogoUrl } from '../../utils/branding'
+import { InboxUnreadBadge, NoticeUnreadBadge } from './SidebarBadge'
 
 type SidebarProps = {
   isCollapsed: boolean
@@ -111,6 +112,28 @@ export default function Sidebar({ isCollapsed, isOpen, onClose }: SidebarProps) 
             >
               <Icon icon="solar:home-smile-angle-outline" className="menu-icon" />
               <span>Dashboard</span>
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink
+              to="/notices"
+              className={({ isActive }) => navLinkClass(isActive)}
+            >
+              <Icon icon="mdi:bulletin-board" className="menu-icon" />
+              <span>Notice Board</span>
+              <NoticeUnreadBadge />
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink
+              to="/my-notifications"
+              className={({ isActive }) => navLinkClass(isActive)}
+            >
+              <Icon icon="iconoir:bell" className="menu-icon" />
+              <span>My Notifications</span>
+              <InboxUnreadBadge />
             </NavLink>
           </li>
 

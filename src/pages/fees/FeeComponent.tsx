@@ -25,6 +25,7 @@ interface StudentFee {
   to_date: string
   amount: string | number
   payment_mode: string
+  notes?: string | null
   submitted_on: string
   created_at: string
   student?: Student
@@ -38,7 +39,10 @@ interface FeeHistoryItem {
   amount: number
   status?: string
   payment_mode?: string
+  notes?: string | null
 }
+
+const NOTES_MAX = 1000
 
 function getTodayValue() {
   const today = new Date()
@@ -55,22 +59,6 @@ function getCurrentMonthValue() {
   return `${year}-${month}`
 }
 
-function getMonthDateRange(monthValue: string) {
-  if (!monthValue) {
-    return { from: undefined, to: undefined }
-  }
-
-  const [yearStr, monthStr] = monthValue.split('-')
-  const year = Number(yearStr)
-  const month = Number(monthStr)
-
-  const from = `${monthValue}-01`
-  const lastDay = new Date(year, month, 0).getDate()
-  const to = `${monthValue}-${String(lastDay).padStart(2, '0')}`
-
-  return { from, to }
-}
-
 export default function FeeComponent() {
   const [students, setStudents] = useState<Student[]>([])
   const [fees, setFees] = useState<StudentFee[]>([])
@@ -81,10 +69,13 @@ export default function FeeComponent() {
   const [amount, setAmount] = useState('')
   const [paymentMode, setPaymentMode] = useState('cash')
   const [submittedOn, setSubmittedOn] = useState(getTodayValue())
+  const [notes, setNotes] = useState('')
   const [suggestLoading, setSuggestLoading] = useState(false)
   const [suggestNote, setSuggestNote] = useState<string | null>(null)
 
   const [filterMonth, setFilterMonth] = useState<string>(getCurrentMonthValue())
+  const [feesMeta, setFeesMeta] = useState<{ count: number; total_amount: number; students_count: number } | null>(null)
+  const [feesReloadKey, setFeesReloadKey] = useState(0)
 
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [loadingFees, setLoadingFees] = useState(false)
@@ -127,17 +118,13 @@ export default function FeeComponent() {
       setLoadingFees(true)
       try {
         const token = localStorage.getItem('authToken')
-        const { from, to } = getMonthDateRange(filterMonth)
+        // Fees *submitted* in the month; all students unless one is selected.
+        const params: Record<string, string> = {}
+        if (filterMonth) params.month = filterMonth
+        if (selectedStudentId) params.student_id = String(selectedStudentId)
 
-        let url = `${API_BASE_URL}/student-fees`
-        const params: string[] = []
-        if (from) params.push(`from_date=${from}`)
-        if (to) params.push(`to_date=${to}`)
-        if (params.length) {
-          url += `?${params.join('&')}`
-        }
-
-        const response = await axios.get(url, {
+        const response = await axios.get(`${API_BASE_URL}/student-fees`, {
+          params,
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
@@ -146,6 +133,7 @@ export default function FeeComponent() {
 
         if (response.data.success) {
           setFees(response.data.data || [])
+          setFeesMeta(response.data.meta ?? null)
         }
       } catch (error) {
         console.error('Error fetching fees:', error)
@@ -155,7 +143,7 @@ export default function FeeComponent() {
     }
 
     fetchFees()
-  }, [API_BASE_URL, filterMonth])
+  }, [API_BASE_URL, filterMonth, selectedStudentId, feesReloadKey])
 
   // Auto-fill From/To Date based on student selection. Also called again
   // after saving a fee so the next period is suggested without a reselect.
@@ -247,6 +235,7 @@ export default function FeeComponent() {
         amount: Number(amount),
         payment_mode: paymentMode,
         submitted_on: submittedOn,
+        notes: notes.trim() || null,
       }
 
       const response = await axios.post(
@@ -264,9 +253,11 @@ export default function FeeComponent() {
         setAmount('')
         setPaymentMode('cash')
         setSubmittedOn(getTodayValue())
+        setNotes('')
 
-        const createdFee: StudentFee = response.data.data
-        setFees((previous) => [createdFee, ...previous])
+        // Refetch rather than prepend: the new fee belongs in the list only
+        // if its submitted-on date falls in the month being viewed.
+        setFeesReloadKey((k) => k + 1)
 
         // Keep the student selected and refresh their history + next
         // suggested period in place, instead of forcing a reselect.
@@ -393,6 +384,22 @@ export default function FeeComponent() {
               </div>
             </div>
 
+            <div className="col-md-8">
+              <label className="form-label fw-semibold">Notes</label>
+              <textarea
+                className="form-control"
+                rows={2}
+                maxLength={NOTES_MAX}
+                placeholder="Optional — e.g. half paid, balance next week; paid by father via UPI"
+                value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+                disabled={saving}
+              />
+              <div className="text-xs text-secondary-light mt-1 text-end">
+                {notes.length}/{NOTES_MAX} · Visible to admins/staff only
+              </div>
+            </div>
+
             <div className="col-md-4 d-flex align-items-end">
               <Button
                 type="submit"
@@ -434,6 +441,7 @@ export default function FeeComponent() {
                           <th>Paid On</th>
                           <th>Amount</th>
                           <th>Mode</th>
+                          <th>Notes</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -443,6 +451,7 @@ export default function FeeComponent() {
                             <td>{item.paid_at ? formatDate(item.paid_at) : '-'}</td>
                             <td>₹{Number(item.amount).toFixed(2)}</td>
                             <td>{item.payment_mode || '-'}</td>
+                            <td style={{ whiteSpace: 'pre-wrap', minWidth: 160 }}>{item.notes || '-'}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -460,9 +469,24 @@ export default function FeeComponent() {
 
       <div className="card">
         <div className="card-header border-bottom bg-base py-16 px-24 d-flex justify-content-between align-items-center">
-          <span className="text-md fw-medium text-secondary-light">
-            Fees Submitted (Month-wise)
-          </span>
+          <div>
+            <span className="text-md fw-medium text-secondary-light d-block">
+              Fees Submitted (Month-wise)
+              {' · '}
+              {selectedStudent ? selectedStudent.name : 'All students'}
+            </span>
+            {feesMeta && feesMeta.count > 0 && (
+              <span className="text-sm text-secondary-light">
+                {feesMeta.count} payment{feesMeta.count === 1 ? '' : 's'}
+                {!selectedStudent && ` from ${feesMeta.students_count} student${feesMeta.students_count === 1 ? '' : 's'}`}
+                {' · '}
+                <strong className="text-primary-light">
+                  ₹{feesMeta.total_amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
+                </strong>{' '}
+                collected
+              </span>
+            )}
+          </div>
           <div className="d-flex align-items-center gap-2">
             <input
               type="month"
@@ -479,7 +503,11 @@ export default function FeeComponent() {
               <span className="ms-2">Loading fees...</span>
             </div>
           ) : fees.length === 0 ? (
-            <p className="text-center text-muted">No fees found for this period.</p>
+            <p className="text-center text-muted">
+              {selectedStudent
+                ? `${selectedStudent.name} has no fees submitted in this month.`
+                : 'No fees submitted in this month.'}
+            </p>
           ) : (
             <div className="table-responsive">
               <table className="table bordered-table mb-0">
@@ -491,6 +519,7 @@ export default function FeeComponent() {
                     <th>Amount</th>
                     <th>Mode</th>
                     <th>Submitted On</th>
+                    <th>Notes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -502,6 +531,7 @@ export default function FeeComponent() {
                       <td>{fee.amount}</td>
                       <td>{fee.payment_mode}</td>
                       <td>{formatDate(fee.submitted_on || fee.created_at)}</td>
+                      <td style={{ whiteSpace: 'pre-wrap', minWidth: 160 }}>{fee.notes || '-'}</td>
                     </tr>
                   ))}
                 </tbody>

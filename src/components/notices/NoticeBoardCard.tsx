@@ -6,6 +6,13 @@ import NoticeBadges from './NoticeBadges'
 import NoticeDetailModal from './NoticeDetailModal'
 import NoticeFormModal from './NoticeFormModal'
 import {
+  getNoticeUnreadCount,
+  refreshNoticeUnread,
+  setNoticeUnreadCount,
+  subscribeNoticeUnread,
+} from '../../lib/noticeUnread'
+import { fetchUnreadCount } from '../../lib/myNotifications'
+import {
   API_BASE_URL,
   ROLE_LABELS,
   authHeaders,
@@ -17,16 +24,17 @@ import {
 const PAGE_SIZE = 15
 
 /**
- * Dashboard Notice Board — every role. Pinned notices first, then the feed
- * (newest first) with cursor-based infinite scroll inside the card.
- * Opening `/dashboard?notice=<id>` opens that notice directly.
+ * Notice Board — every role. Pinned notices first, then the feed (newest
+ * first) with cursor-based infinite scroll. On the dashboard it scrolls
+ * inside the card; `fullPage` (the /notices page) scrolls with the page.
+ * `?notice=<id>` in the URL opens that notice directly.
  */
-export default function NoticeBoardCard() {
+export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boolean }) {
   const [pinned, setPinned] = useState<Notice[]>([])
   const [items, setItems] = useState<Notice[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
   const [hasMore, setHasMore] = useState(false)
-  const [unread, setUnread] = useState(0)
+  const [unread, setUnread] = useState(getNoticeUnreadCount)
   const [canManage, setCanManage] = useState(false)
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -42,9 +50,12 @@ export default function NoticeBoardCard() {
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
   const fetchingRef = useRef(false)
+  const unreadRef = useRef(unread) // what this card last showed
+  const itemCountRef = useRef(0)
 
-  const loadFirstPage = useCallback(async () => {
-    setLoading(true)
+  // silent = background re-sync (no spinner, keeps the list on screen)
+  const loadFirstPage = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true)
     setError(null)
     try {
       const res = await axios.get<NoticeListResponse>(`${API_BASE_URL}/notices`, {
@@ -55,13 +66,15 @@ export default function NoticeBoardCard() {
       setItems(res.data.data)
       setCursor(res.data.meta.next_cursor)
       setHasMore(res.data.meta.has_more)
-      setUnread(res.data.meta.unread_count ?? 0)
+      unreadRef.current = res.data.meta.unread_count ?? 0
+      setUnread(unreadRef.current)
+      setNoticeUnreadCount(res.data.meta.unread_count) // sidebar badge
       setCanManage(!!res.data.meta.can_manage)
     } catch (err) {
       console.error('Error loading notices:', err)
-      setError('Unable to load notices.')
+      if (!silent) setError('Unable to load notices.')
     } finally {
-      setLoading(false)
+      if (!silent) setLoading(false)
     }
   }, [])
 
@@ -93,6 +106,24 @@ export default function NoticeBoardCard() {
     loadFirstPage()
   }, [loadFirstPage])
 
+  useEffect(() => {
+    itemCountRef.current = items.length
+  }, [items])
+
+  // Shared count changed elsewhere (sidebar poll found a new notice, a
+  // notice's notification was read from the bell) → follow it. Re-sync the
+  // list quietly too, unless the user has scrolled past the first page.
+  useEffect(
+    () =>
+      subscribeNoticeUnread(count => {
+        if (count === unreadRef.current) return // our own update echoing back
+        unreadRef.current = count
+        setUnread(count)
+        if (itemCountRef.current <= PAGE_SIZE) loadFirstPage(true)
+      }),
+    [loadFirstPage],
+  )
+
   // Infinite scroll: fetch the next page when the sentinel nears view.
   useEffect(() => {
     const sentinel = sentinelRef.current
@@ -101,18 +132,25 @@ export default function NoticeBoardCard() {
       entries => {
         if (entries[0]?.isIntersecting) loadMore()
       },
-      { root: scrollRef.current, rootMargin: '120px' },
+      // Full page: watch the viewport. A non-scrolling root would report
+      // the sentinel as always visible and fetch every page at once.
+      { root: fullPage ? null : scrollRef.current, rootMargin: '120px' },
     )
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [hasMore, loadMore])
+  }, [hasMore, loadMore, fullPage])
 
   const markReadLocally = (opened: Notice) => {
     const wasUnread = [...pinned, ...items].some(n => n.id === opened.id && !n.is_read)
     const mark = (list: Notice[]) => list.map(n => (n.id === opened.id ? { ...n, is_read: true } : n))
     setPinned(mark)
     setItems(mark)
-    if (wasUnread) setUnread(u => Math.max(0, u - 1))
+    if (wasUnread) {
+      unreadRef.current = Math.max(0, unreadRef.current - 1)
+      setUnread(unreadRef.current)
+      refreshNoticeUnread() // opening it marked it read server-side
+      fetchUnreadCount().catch(() => undefined) // ...and its notification (bell)
+    }
   }
 
   const closeDetail = () => {
@@ -203,7 +241,11 @@ export default function NoticeBoardCard() {
         )}
       </div>
 
-      <div className="card-body p-0" ref={scrollRef} style={{ maxHeight: 480, overflowY: 'auto' }}>
+      <div
+        className="card-body p-0"
+        ref={scrollRef}
+        style={fullPage ? undefined : { maxHeight: 480, overflowY: 'auto' }}
+      >
         {loading && (
           <div className="text-center py-24">
             <span className="spinner-border spinner-border-sm" />
@@ -214,7 +256,7 @@ export default function NoticeBoardCard() {
         {error && !loading && (
           <div className="px-24 py-16 text-sm">
             <span className="text-danger-600">{error}</span>{' '}
-            <Button variant="link" size="sm" className="p-0 align-baseline" onClick={loadFirstPage}>
+            <Button variant="link" size="sm" className="p-0 align-baseline" onClick={() => loadFirstPage()}>
               Retry
             </Button>
           </div>

@@ -27,6 +27,8 @@ import AssessmentsPage from './pages/assessments/AssessmentsPage.tsx'
 import ProfilePage from './pages/profile/ProfilePage.tsx'
 import SearchResultsPage from './pages/search/SearchResultsPage.tsx'
 import NotificationsPage from './pages/notifications/NotificationsPage.tsx'
+import MyNotificationsPage from './pages/notifications/MyNotificationsPage.tsx'
+import NoticesPage from './pages/notices/NoticesPage.tsx'
 import DailyActivityApprovalsPage from './pages/approvals/DailyActivityApprovalsPage.tsx'
 import GeneratedContentApprovalsPage from './pages/approvals/GeneratedContentApprovalsPage.tsx'
 import AdminFactsPage from './pages/facts/AdminFactsPage.tsx'
@@ -107,6 +109,14 @@ function App() {
           </Route>
           <Route path="/my-attendance" element={<DashboardLayout />}>
             <Route index element={<MyAttendance />} />
+          </Route>
+          {/* Every role: full-page Notice Board */}
+          <Route path="/notices" element={<DashboardLayout />}>
+            <Route index element={<NoticesPage />} />
+          </Route>
+          {/* Every role: the signed-in user's own notification history */}
+          <Route path="/my-notifications" element={<DashboardLayout />}>
+            <Route index element={<MyNotificationsPage />} />
           </Route>
           <Route path="/notifications" element={<DashboardLayout />}>
             <Route index element={<NotificationsPage />} />
