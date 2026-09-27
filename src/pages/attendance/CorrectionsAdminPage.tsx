@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { formatDate } from '../../utils/date'
 
 type RequestItem = {
   id: number
@@ -88,7 +89,7 @@ export default function CorrectionsAdminPage() {
               <tbody>
                 {items.map(it => (
                   <tr key={it.id}>
-                    <td>{new Date(it.attendance_date).toLocaleDateString()}</td>
+                    <td>{formatDate(it.attendance_date)}</td>
                     <td>
                       <div className="d-flex align-items-center gap-2">
                         {it.user?.profile_img && <img src={it.user.profile_img} width={24} height={24} style={{ borderRadius: 999 }} />}

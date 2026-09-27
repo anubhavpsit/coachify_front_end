@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { formatDateTime } from '../../utils/date'
 import Icon from '../../components/common/Icon.tsx'
 import { ROLES } from '../../constants/roles'
 import { can, canAny } from '../../lib/auth'
@@ -385,7 +386,7 @@ export default function DashboardPage() {
                                   </td>
                                   <td>{s.average_percentage.toFixed(2)}%</td>
                                   <td>{s.last_percentage.toFixed(2)}%</td>
-                                  <td>{s.last_graded_at}</td>
+                                  <td>{formatDateTime(s.last_graded_at)}</td>
                                 </tr>
                               ))}
                             </tbody>

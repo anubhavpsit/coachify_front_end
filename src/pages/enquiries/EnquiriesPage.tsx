@@ -323,8 +323,11 @@ export default function EnquiriesPage() {
       const payload = {
         channel: communicationForm.channel,
         notes: communicationForm.notes.trim() || null,
-        communicated_at:
-          communicationForm.communicated_at.trim() || undefined,
+        // datetime-local is local time without a zone; send real UTC so the
+        // API (which runs in UTC) stores the right moment.
+        communicated_at: communicationForm.communicated_at.trim()
+          ? new Date(communicationForm.communicated_at).toISOString()
+          : undefined,
       }
 
       const response = await axios.post<{

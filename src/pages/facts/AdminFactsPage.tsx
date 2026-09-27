@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { formatDateTime } from '../../utils/date';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
 
@@ -246,7 +247,7 @@ export default function AdminFactsPage() {
                           <td>{f.title}</td>
                           <td>{f.content_type}</td>
                           <td>{f.is_active ? 'Yes' : 'No'}</td>
-                          <td>{f.is_published ? 'Published' : 'Draft'}{f.publish_at ? ` • ${new Date(f.publish_at).toLocaleString()}` : ''}</td>
+                          <td>{f.is_published ? 'Published' : 'Draft'}{f.publish_at ? ` • ${formatDateTime(f.publish_at)}` : ''}</td>
                           <td className="d-flex gap-2">
                             <button className="btn btn-sm btn-outline-primary" onClick={() => {
                               setEditingId(f.id);

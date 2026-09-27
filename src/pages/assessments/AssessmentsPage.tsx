@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { formatDate } from '../../utils/date';
 import { Button, Modal } from 'react-bootstrap';
 import Icon from '../../components/common/Icon.tsx';
 import { ROLES } from '../../constants/roles';
@@ -92,12 +93,7 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
   return `${STORAGE_BASE_URL}/${file.path}`;
 };
 
-  const formatAddedOn = (isoString?: string | null) => {
-    if (!isoString) return '-';
-    const parsedDate = new Date(isoString);
-    if (Number.isNaN(parsedDate.getTime())) return '-';
-    return parsedDate.toLocaleDateString();
-  };
+  const formatAddedOn = (isoString?: string | null) => formatDate(isoString);
 
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);

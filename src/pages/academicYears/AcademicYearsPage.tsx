@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { formatDate } from '../../utils/date'
 import { Button, Modal } from 'react-bootstrap'
 
 type Year = {
@@ -112,8 +113,8 @@ export default function AcademicYearsPage() {
                   {years.map(y => (
                     <tr key={y.id}>
                       <td>{y.name}</td>
-                      <td>{y.starts_on?.slice(0,10)}</td>
-                      <td>{y.ends_on?.slice(0,10)}</td>
+                      <td>{formatDate(y.starts_on)}</td>
+                      <td>{formatDate(y.ends_on)}</td>
                       <td>{y.is_current ? 'Yes' : 'No'}</td>
                       <td className="text-center">
                         <Button variant="link" onClick={() => openEdit(y)}>Edit</Button>

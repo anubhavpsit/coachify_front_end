@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import axios from 'axios'
+import { formatDateTime } from '../../utils/date'
 import Icon from '../../components/common/Icon.tsx'
 
 const API_BASE_URL =
@@ -70,13 +71,6 @@ const statusClassMap: Record<string, string> = {
   retrying: 'badge bg-purple-100 text-purple-600',
   sent: 'badge bg-success-100 text-success-600',
   failed: 'badge bg-danger-100 text-danger-600',
-}
-
-const formatDateTime = (value: string | null) => {
-  if (!value) return '—'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleString()
 }
 
 const truncate = (value: string | null | undefined, length = 120) => {

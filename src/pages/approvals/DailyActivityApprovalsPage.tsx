@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
+import { formatDate as formatDisplayDate, formatDateTime, toDateInputValue } from '../../utils/date'
 import { ROLES } from '../../constants/roles'
 import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal'
 
@@ -73,7 +74,7 @@ const QUICK_FILTER_OPTIONS: { label: string; value: QuickFilter }[] = [
   { label: 'All', value: 'all' },
 ]
 
-const toDateStr = (d: Date) => d.toISOString().split('T')[0]
+const toDateStr = (d: Date) => toDateInputValue(d)
 
 const getQuickFilterDates = (
   filter: QuickFilter,
@@ -113,12 +114,7 @@ export default function DailyActivityApprovalsPage() {
     null,
   )
 
-  const formatAddedOn = (isoString?: string | null) => {
-    if (!isoString) return '-';
-    const parsedDate = new Date(isoString);
-    if (Number.isNaN(parsedDate.getTime())) return '-';
-    return parsedDate.toLocaleString();
-  };
+  const formatAddedOn = (isoString?: string | null) => formatDisplayDate(isoString);
 
   const authUserRaw = typeof window !== 'undefined'
     ? window.localStorage.getItem('authUser')
@@ -317,12 +313,7 @@ export default function DailyActivityApprovalsPage() {
     return 'badge bg-warning-subtle text-warning'
   }
 
-  const formatDate = (value?: string | null) => {
-    if (!value) return '—'
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return value
-    return date.toLocaleString()
-  }
+  const formatDate = (value?: string | null) => formatDateTime(value)
 
   const renderNotificationMeta = (
     label: string,

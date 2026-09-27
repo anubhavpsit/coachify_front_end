@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { formatDate } from '../utils/date'
 import { can } from '../lib/auth'
 
 const API_BASE_URL =
@@ -23,12 +24,6 @@ type GapsResponse = {
 }
 
 type NotifyState = 'idle' | 'sending' | 'sent' | 'error'
-
-function formatDate(value: string): string {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return date.toLocaleDateString()
-}
 
 export default function TeacherActivityGapsCard() {
   const [data, setData] = useState<GapsResponse['data'] | null>(null)
@@ -165,7 +160,7 @@ export default function TeacherActivityGapsCard() {
                             {' '}
                             ({teacher.missing_dates
                               .slice(0, 3)
-                              .map(formatDate)
+                              .map((d) => formatDate(d))
                               .join(', ')}
                             {teacher.missing_dates.length > 3 && ' ...'})
                           </>

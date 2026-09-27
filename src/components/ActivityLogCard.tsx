@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
+import { formatDate, formatTime, toDateInputValue } from '../utils/date';
 import Icon from './common/Icon.tsx';
 
 const API_BASE_URL =
@@ -45,7 +46,7 @@ type Filters = {
   endDate: string;
 };
 
-const dateToInputValue = (date: Date) => date.toISOString().slice(0, 10);
+const dateToInputValue = (date: Date) => toDateInputValue(date);
 
 const createDefaultRange = () => {
   const end = new Date();
@@ -179,7 +180,7 @@ export default function ActivityLogCard() {
   const groupedLogs = useMemo(() => {
     const groups = new Map<string, ActivityLog[]>();
     logs.forEach(log => {
-      const key = new Date(log.created_at).toDateString();
+      const key = formatDate(log.created_at);
       if (!groups.has(key)) {
         groups.set(key, []);
       }
@@ -314,10 +315,7 @@ export default function ActivityLogCard() {
                           <span className="text-secondary">({item.user_role || 'N/A'})</span>
                         </p>
                         <p className="text-xs text-secondary mb-0">
-                          {new Date(item.created_at).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {formatTime(item.created_at)}
                         </p>
                       </div>
                     </div>

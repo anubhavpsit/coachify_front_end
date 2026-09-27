@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { formatDate } from '../../utils/date';
 import StudentQuestionPaperModal from '../../components/assessments/StudentQuestionPaperModal';
 
 interface AssessmentAssignment {
@@ -133,7 +134,7 @@ export default function StudentAssessmentsPage() {
                         <td>{a.assessment.title}</td>
                         <td>{a.assessment.subject?.subject ?? '-'}</td>
                         <td>{a.assessment.teacher?.name ?? '-'}</td>
-                        <td>{a.scheduled_date}</td>
+                        <td>{formatDate(a.scheduled_date)}</td>
                         <td>
                           {filesByAssessment[a.assessment.id] ? (
                             <div className="d-flex flex-column gap-1">
@@ -192,7 +193,7 @@ export default function StudentAssessmentsPage() {
                       <tr key={a.id}>
                         <td>{a.assessment.title}</td>
                         <td>{a.assessment.subject?.subject ?? '-'}</td>
-                        <td>{a.attempted_at ?? '-'}</td>
+                        <td>{formatDate(a.attempted_at)}</td>
                         <td>
                           {a.result
                             ? `${a.result.marks_obtained}/${a.result.total_marks}`

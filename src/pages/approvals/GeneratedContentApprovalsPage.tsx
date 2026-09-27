@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
+import { formatDateTime, toDateInputValue } from '../../utils/date'
 import DOMPurify from 'dompurify'
 import { ROLES } from '../../constants/roles'
 
@@ -65,7 +66,7 @@ const QUICK_FILTER_OPTIONS: { label: string; value: QuickFilter }[] = [
   { label: 'All', value: 'all' },
 ]
 
-const toDateStr = (d: Date) => d.toISOString().split('T')[0]
+const toDateStr = (d: Date) => toDateInputValue(d)
 
 const getQuickFilterDates = (
   filter: QuickFilter,
@@ -261,12 +262,7 @@ export default function GeneratedContentApprovalsPage() {
     setApproval(id, false, remark.trim())
   }
 
-  const formatDate = (value?: string | null) => {
-    if (!value) return '—'
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return value
-    return date.toLocaleString()
-  }
+  const formatDate = (value?: string | null) => formatDateTime(value)
 
   if (!isAdmin) {
     return (

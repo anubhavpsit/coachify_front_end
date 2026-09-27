@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useState } from 'react';
 import axios from 'axios';
+import { formatDate } from '../../utils/date';
 import { Modal, Button, Dropdown } from 'react-bootstrap';
 import AssignTeachersModal from '../../components/AssignTeachersModal';
 import Avatar from '../../components/common/Avatar.tsx';
@@ -146,12 +147,7 @@ export default function StudentsPage() {
   const [filterClassId, setFilterClassId] = useState<number | ''>('');
   const [statusFilter, setStatusFilter] = useState<'active' | 'inactive' | 'all'>('active');
 
-  const formatAddedOn = (isoString?: string | null) => {
-    if (!isoString) return '-';
-    const parsedDate = new Date(isoString);
-    if (Number.isNaN(parsedDate.getTime())) return '-';
-    return parsedDate.toLocaleDateString();
-  };
+  const formatAddedOn = (isoString?: string | null) => formatDate(isoString);
 
   const getStudentTimestamp = (student: Student) => {
     if (!student.created_at) return 0;

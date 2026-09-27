@@ -389,11 +389,11 @@ export default function ProfilePage() {
             </div>
             <div className="col-md-6">
               <div className="text-sm text-secondary-light">Trial Ends</div>
-              <div className="fw-semibold">{trialEnd ? formatDate(trialEnd.toISOString().slice(0,10)) : '-'}</div>
+              <div className="fw-semibold">{trialEnd ? formatDate(trialEnd) : '-'}</div>
             </div>
             <div className="col-md-6">
               <div className="text-sm text-secondary-light">Fees Start From</div>
-              <div className="fw-semibold">{feesStart ? formatDate(feesStart.toISOString().slice(0,10)) : '-'}</div>
+              <div className="fw-semibold">{feesStart ? formatDate(feesStart) : '-'}</div>
             </div>
           </div>
 

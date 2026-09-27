@@ -1,3 +1,5 @@
+import { formatDateTime } from '../../utils/date'
+
 export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 
@@ -56,17 +58,9 @@ export function authHeaders() {
   return { Authorization: `Bearer ${token}`, Accept: 'application/json' }
 }
 
+/** DD/MM/YYYY HH:mm:ss (shared app-wide format). */
 export function formatNoticeDate(iso: string | null | undefined) {
-  if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  return d.toLocaleString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  })
+  return formatDateTime(iso, '')
 }
 
 /** ISO string -> value for <input type="datetime-local"> in the browser's zone. */

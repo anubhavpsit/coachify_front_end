@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { refreshNoticeUnread } from './noticeUnread'
+import { formatDate, formatDateTime } from '../utils/date'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
 
@@ -187,12 +188,9 @@ export function timeAgo(iso: string) {
   if (h < 24) return `${h} hr${h === 1 ? '' : 's'} ago`
   const days = Math.round(h / 24)
   if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`
-  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+  return formatDate(iso)
 }
 
 export function fullDate(iso: string) {
-  const d = new Date(iso)
-  return Number.isNaN(d.getTime())
-    ? ''
-    : d.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' })
+  return formatDateTime(iso, '')
 }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
+import { formatDate } from '../../utils/date'
 
 type Attendance = {
   id?: number
@@ -300,7 +301,7 @@ export default function MyAttendance() {
                 <tbody>
                   {filteredRecords.map(rec => (
                     <tr key={rec.attendance_date}>
-                      <td>{new Date(rec.attendance_date).toLocaleDateString()}</td>
+                      <td>{formatDate(rec.attendance_date)}</td>
                       <td className="text-capitalize">{rec.status.replace('_', ' ')}</td>
                       <td>
                         <button
@@ -337,7 +338,7 @@ export default function MyAttendance() {
                 <tbody>
                   {requests.map(r => (
                     <tr key={r.id}>
-                      <td>{new Date(r.attendance_date).toLocaleDateString()}</td>
+                      <td>{formatDate(r.attendance_date)}</td>
                       <td className="text-capitalize">{r.current_status ?? '—'}</td>
                       <td className="text-capitalize">{r.requested_status}</td>
                       <td className={`text-capitalize ${r.status === 'pending' ? 'text-warning' : r.status === 'approved' ? 'text-success' : 'text-danger'}`}>{r.status}</td>
@@ -355,7 +356,7 @@ export default function MyAttendance() {
             </div>
 
             {absentDays.length > 0 && (
-              <div className="mt-3 small text-muted">Absent days this month: {absentDays.map(d => new Date(d).toLocaleDateString()).join(', ')}</div>
+              <div className="mt-3 small text-muted">Absent days this month: {absentDays.map(d => formatDate(d)).join(', ')}</div>
             )}
           </>
         )}
@@ -373,7 +374,7 @@ export default function MyAttendance() {
                 <p className="text-xs text-secondary-light mb-2">Corrections can only be requested for Absent or Leave days.</p>
                 <div className="mb-3">
                   <label className="form-label">Date</label>
-                  <input className="form-control" value={new Date(modalDate).toLocaleDateString()} readOnly />
+                  <input className="form-control" value={formatDate(modalDate)} readOnly />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Requested Status</label>

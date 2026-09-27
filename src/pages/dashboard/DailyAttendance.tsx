@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
+import { formatDate, toDateInputValue } from '../../utils/date';
 import { Table, Button, Form, Spinner } from 'react-bootstrap';
 
 interface User {
@@ -35,7 +36,7 @@ export default function DailyAttendance() {
       return fromQuery;
     }
 
-    return new Date().toISOString().split('T')[0];
+    return toDateInputValue();
   });
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1';
@@ -201,7 +202,7 @@ export default function DailyAttendance() {
         {isHoliday && (
           <div className="alert alert-info d-flex justify-content-between align-items-center">
             <div>
-              <strong>Holiday:</strong> Attendance not required for {new Date(date).toLocaleDateString()}.
+              <strong>Holiday:</strong> Attendance not required for {formatDate(date)}.
             </div>
           </div>
         )}
