@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { formatDate } from '../../utils/date';
+import { FOCUS_ROW_STYLE, useFocusRow } from '../../utils/useFocusRow';
 import { Button, Modal } from 'react-bootstrap';
 import Icon from '../../components/common/Icon.tsx';
 import { ROLES } from '../../constants/roles';
@@ -97,6 +98,8 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
 
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(true);
+  // ?assessment=<id> (e.g. from the dashboard) → scroll to + highlight that row
+  const focusAssessmentId = useFocusRow('assessment', 'assessment-row-', !loading);
   const [saving, setSaving] = useState(false);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -737,7 +740,11 @@ const getAssessmentFileUrl = (file: AssessmentFileRow) => {
                 </thead>
                 <tbody>
                   {assessments.map(asm => (
-                    <tr key={asm.id}>
+                    <tr
+                      key={asm.id}
+                      id={`assessment-row-${asm.id}`}
+                      style={asm.id === focusAssessmentId ? FOCUS_ROW_STYLE : undefined}
+                    >
                       <td>
                         {asm.title}
                         {asm.source === 'auto' && (

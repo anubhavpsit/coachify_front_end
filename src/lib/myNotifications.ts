@@ -148,7 +148,14 @@ export function notificationLink(n: InboxNotification, role: string | undefined)
     case 'assessment_auto_scheduled':
     case 'assessment_paper_needs_approval':
     case 'assessment_results_published':
-      return role === 'student' ? '/students/assessments' : '/assessments'
+    case 'assessment_assigned':
+    case 'assessment_rescheduled':
+    case 'assessment_reminder':
+    case 'assessment_result_out': {
+      const id = Number(d.assessment_id)
+      const q = Number.isInteger(id) && id > 0 ? `?assessment=${id}` : ''
+      return role === 'student' ? `/students/assessments${q}` : `/assessments${q}`
+    }
     case 'generated_content_ready_for_review':
     case 'generated_content_reopened_for_review':
       return '/approvals/generated-content'

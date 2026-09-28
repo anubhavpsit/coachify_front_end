@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { formatDate } from '../../utils/date';
+import { FOCUS_ROW_STYLE, useFocusRow } from '../../utils/useFocusRow';
 import StudentQuestionPaperModal from '../../components/assessments/StudentQuestionPaperModal';
 
 interface AssessmentAssignment {
@@ -43,6 +44,8 @@ export default function StudentAssessmentsPage() {
   const [upcoming, setUpcoming] = useState<AssessmentAssignment[]>([]);
   const [history, setHistory] = useState<AssessmentAssignment[]>([]);
   const [loading, setLoading] = useState(true);
+  // ?assessment=<id> (e.g. from the dashboard) → scroll to + highlight that row
+  const focusAssessmentId = useFocusRow('assessment', 'student-assessment-row-', !loading);
 
   const [paperModal, setPaperModal] = useState<{ id: number; title: string } | null>(null);
 
@@ -80,6 +83,14 @@ export default function StudentAssessmentsPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Opened from the dashboard → show its files straight away
+  useEffect(() => {
+    if (!loading && focusAssessmentId !== null && upcoming.some(a => a.assessment.id === focusAssessmentId)) {
+      loadFilesForAssessment(focusAssessmentId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, focusAssessmentId]);
 
   const loadFilesForAssessment = async (assessmentId: number) => {
     try {
@@ -130,7 +141,11 @@ export default function StudentAssessmentsPage() {
                   </thead>
                   <tbody>
                     {upcoming.map(a => (
-                      <tr key={a.id}>
+                      <tr
+                        key={a.id}
+                        id={`student-assessment-row-${a.assessment.id}`}
+                        style={a.assessment.id === focusAssessmentId ? FOCUS_ROW_STYLE : undefined}
+                      >
                         <td>{a.assessment.title}</td>
                         <td>{a.assessment.subject?.subject ?? '-'}</td>
                         <td>{a.assessment.teacher?.name ?? '-'}</td>

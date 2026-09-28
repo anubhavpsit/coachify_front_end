@@ -15,6 +15,7 @@ import ActivityLogCard from '../../components/ActivityLogCard';
 import GhostStudentsCard from '../../components/GhostStudentsCard';
 import UnassignedStudentsCard from '../../components/UnassignedStudentsCard';
 import NoticeBoardCard from '../../components/notices/NoticeBoardCard';
+import SmartDashboard from '../../components/overview/SmartDashboard';
 
 type DashboardStats = {
   role: string
@@ -568,12 +569,10 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Teachers/students: Notice Board below their stats cards (admins/staff
-          get it in the widget row above). Outside the stats gate on purpose. */}
+      {/* Teachers/students: smart alerts + widgets (+ Notice Board) below their
+          stats cards. Outside the stats gate on purpose. */}
       {(role === ROLES.TEACHER || role === ROLES.STUDENT) && (
-        <div className="row g-3 mb-24">
-          <NoticeBoardCard compact />
-        </div>
+        <SmartDashboard role={role === ROLES.TEACHER ? 'teacher' : 'student'} />
       )}
 
       {(role === ROLES.COACHING_ADMIN || can('activity_logs.view')) && <ActivityLogCard />}
