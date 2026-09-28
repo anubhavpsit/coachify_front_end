@@ -29,7 +29,19 @@ const PAGE_SIZE = 15
  * inside the card; `fullPage` (the /notices page) scrolls with the page.
  * `?notice=<id>` in the URL opens that notice directly.
  */
-export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boolean }) {
+/**
+ * compact: dashboard widget — a col-xxl-4/col-md-6 card with a 300px scroll
+ * area, styled like the other dashboard cards (Low Attendance, Birthdays).
+ */
+export default function NoticeBoardCard({
+  fullPage = false,
+  compact = false,
+}: {
+  fullPage?: boolean
+  compact?: boolean
+}) {
+  // "Active" = live notices (the normal Notice Board); "Expired" = past expiry
+  const [tab, setTab] = useState<'active' | 'expired'>('active')
   const [pinned, setPinned] = useState<Notice[]>([])
   const [items, setItems] = useState<Notice[]>([])
   const [cursor, setCursor] = useState<string | null>(null)
@@ -59,7 +71,7 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
     setError(null)
     try {
       const res = await axios.get<NoticeListResponse>(`${API_BASE_URL}/notices`, {
-        params: { limit: PAGE_SIZE },
+        params: { limit: PAGE_SIZE, status: tab },
         headers: authHeaders(),
       })
       setPinned(res.data.pinned ?? [])
@@ -76,7 +88,7 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
     } finally {
       if (!silent) setLoading(false)
     }
-  }, [])
+  }, [tab])
 
   const loadMore = useCallback(async () => {
     if (!cursor || fetchingRef.current) return
@@ -84,7 +96,7 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
     setLoadingMore(true)
     try {
       const res = await axios.get<NoticeListResponse>(`${API_BASE_URL}/notices`, {
-        params: { limit: PAGE_SIZE, cursor },
+        params: { limit: PAGE_SIZE, cursor, status: tab },
         headers: authHeaders(),
       })
       setItems(prev => {
@@ -100,7 +112,7 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
       fetchingRef.current = false
       setLoadingMore(false)
     }
-  }, [cursor])
+  }, [cursor, tab])
 
   useEffect(() => {
     loadFirstPage()
@@ -188,7 +200,7 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
       key={n.id}
       type="button"
       onClick={() => setOpenId(n.id)}
-      className={`w-100 text-start border-0 border-bottom px-24 py-16 d-block ${n.is_read ? 'bg-base' : 'bg-primary-50'}`}
+      className={`w-100 text-start border-0 border-bottom ${compact ? 'px-16 py-12' : 'px-24 py-16'} d-block ${n.is_read ? 'bg-base' : 'bg-primary-50'}`}
     >
       <div className="d-flex align-items-start justify-content-between gap-2 mb-4">
         <span className={`text-md ${n.is_read ? 'fw-medium' : 'fw-semibold'} text-primary-light`}>
@@ -206,7 +218,12 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
           {n.has_attachment && <i className="ri-attachment-2 text-secondary-light" title="Has attachment" />}
         </span>
       </div>
-      <p className="text-sm text-secondary-light mb-4">{n.body_preview}</p>
+      <p
+        className="text-sm text-secondary-light mb-4"
+        style={compact ? { display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' } : undefined}
+      >
+        {n.body_preview}
+      </p>
       <span className="text-xs text-secondary-light">
         {formatNoticeDate(n.published_at)}
         {n.posted_by && ` · ${n.posted_by.name} (${ROLE_LABELS[n.posted_by.role] ?? n.posted_by.role})`}
@@ -216,27 +233,64 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
 
   const isEmpty = !loading && !error && pinned.length === 0 && items.length === 0
 
-  return (
-    <div className="card mb-24">
-      <div className="card-header border-bottom bg-base py-16 px-24 d-flex justify-content-between align-items-center">
-        <span className="text-md fw-medium text-secondary-light d-flex align-items-center gap-2">
-          <Icon icon="mdi:bulletin-board" className="text-xl" />
-          Notice Board
-          {unread > 0 && (
-            <span className="badge bg-danger-600 text-white rounded-pill text-xs" title="Unread notices">
-              {unread}
-            </span>
-          )}
-        </span>
+  const content = (
+    <div className={compact ? 'card h-100' : 'card mb-24'}>
+      <div
+        className={
+          compact
+            ? 'card-header d-flex flex-wrap justify-content-between align-items-center gap-2'
+            : 'card-header border-bottom bg-base py-16 px-24 d-flex flex-wrap justify-content-between align-items-center gap-2'
+        }
+      >
+        <div className="d-flex flex-wrap align-items-center gap-2">
+          <span
+            className={
+              compact
+                ? 'fw-bold text-lg mb-0 d-flex align-items-center gap-2'
+                : 'text-md fw-medium text-secondary-light d-flex align-items-center gap-2'
+            }
+          >
+            {!compact && <Icon icon="mdi:bulletin-board" className="text-xl" />}
+            Notice Board
+            {unread > 0 && (
+              <span className="badge bg-danger-600 text-white rounded-pill text-xs" title="Unread notices">
+                {unread}
+              </span>
+            )}
+          </span>
+          {/* Active / Expired — compact pill toggle in the header (no extra row) */}
+          <div className="notice-tabs d-inline-flex p-1 rounded-pill bg-neutral-100" role="tablist" aria-label="Notice filter">
+            {(['active', 'expired'] as const).map(t => (
+              <button
+                key={t}
+                type="button"
+                role="tab"
+                aria-selected={tab === t}
+                onClick={() => setTab(t)}
+                className={`border-0 rounded-pill px-12 py-4 text-xs fw-semibold ${
+                  tab === t ? 'bg-primary-600 text-white shadow-sm' : 'bg-transparent text-secondary-light'
+                }`}
+              >
+                {t === 'active' ? 'Active' : 'Expired'}
+              </button>
+            ))}
+          </div>
+        </div>
         {canManage && (
           <Button
             variant="primary"
             size="sm"
             onClick={openCreate}
-            className="btn btn-primary text-sm btn-sm px-12 py-8 radius-8 d-flex align-items-center gap-1"
+            title="Add Notice"
+            aria-label="Add Notice"
+            className={
+              compact
+                ? 'btn btn-primary btn-sm radius-8 d-flex align-items-center justify-content-center p-6'
+                : 'btn btn-primary text-sm btn-sm px-12 py-8 radius-8 d-flex align-items-center gap-1'
+            }
           >
             <Icon icon="ic:baseline-plus" className="icon text-lg" />
-            Add Notice
+            {!compact && 'Add Notice'}
           </Button>
         )}
       </div>
@@ -244,7 +298,7 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
       <div
         className="card-body p-0"
         ref={scrollRef}
-        style={fullPage ? undefined : { maxHeight: 480, overflowY: 'auto' }}
+        style={fullPage ? undefined : { maxHeight: compact ? 300 : 480, overflowY: 'auto' }}
       >
         {loading && (
           <div className="text-center py-24">
@@ -265,7 +319,7 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
         {isEmpty && (
           <div className="text-center py-32 text-secondary-light">
             <i className="ri-notification-off-line text-3xl d-block mb-8" />
-            No notices yet
+            {tab === 'expired' ? 'No expired notices' : 'No notices yet'}
           </div>
         )}
 
@@ -281,7 +335,7 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
         )}
 
         {!loading && !isEmpty && !hasMore && !error && (
-          <div className="text-center text-xs text-secondary-light py-12">You're all caught up — no older notices.</div>
+          <div className="text-center text-xs text-secondary-light py-12">{tab === 'expired' ? 'No older expired notices.' : "You're all caught up — no older notices."}</div>
         )}
       </div>
 
@@ -299,4 +353,6 @@ export default function NoticeBoardCard({ fullPage = false }: { fullPage?: boole
       )}
     </div>
   )
+
+  return compact ? <div className="col-xxl-4 col-md-6">{content}</div> : content
 }

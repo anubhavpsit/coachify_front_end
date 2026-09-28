@@ -181,9 +181,6 @@ export default function DashboardPage() {
         </ul>
       </div>
 
-      {/* Every role — independent of the stats request */}
-      <NoticeBoardCard />
-
       {loading && <p>Loading stats...</p>}
       {error && !loading && (
         <p className="text-danger-600 text-sm mb-16">{error}</p>
@@ -328,6 +325,7 @@ export default function DashboardPage() {
               {can('dashboard.birthdays') && <TodayBirthdayCard />}
 
               <div className="row g-3 mt-2">
+                <NoticeBoardCard compact />
                 {can('dashboard.birthdays') && <BirthdayCard />}
                 {can('attendance.view') && <LowAttendanceCard />}
                 {can('enquiries.view') && <EnquiriesFollowUpCard />}
@@ -567,6 +565,14 @@ export default function DashboardPage() {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* Teachers/students: Notice Board below their stats cards (admins/staff
+          get it in the widget row above). Outside the stats gate on purpose. */}
+      {(role === ROLES.TEACHER || role === ROLES.STUDENT) && (
+        <div className="row g-3 mb-24">
+          <NoticeBoardCard compact />
         </div>
       )}
 

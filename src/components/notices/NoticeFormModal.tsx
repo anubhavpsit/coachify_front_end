@@ -89,6 +89,18 @@ export default function NoticeFormModal({ show, notice, onHide, onSaved }: Props
       setError('Choose at least one audience.')
       return
     }
+    // Every notice must expire, after it's published (API enforces the same)
+    if (!expiresAt) {
+      setError('Please set an expiry date — every notice must expire.')
+      return
+    }
+    const publishMoment = publishAt && isScheduled
+      ? new Date(publishAt)
+      : isEdit && notice ? new Date(notice.published_at) : new Date()
+    if (new Date(expiresAt) <= publishMoment) {
+      setError('Expiry must be after the publish time.')
+      return
+    }
 
     const form = new FormData()
     form.append('title', title.trim())
@@ -208,14 +220,18 @@ export default function NoticeFormModal({ show, notice, onHide, onSaved }: Props
               </div>
             </div>
             <div className="col-md-6">
-              <label className="form-label fw-semibold">Expires at</label>
+              <label className="form-label fw-semibold">
+                Expires at <span className="text-danger">*</span>
+              </label>
               <input
                 type="datetime-local"
                 className="form-control"
                 value={expiresAt}
+                min={publishAt || toLocalInputValue(new Date().toISOString())}
                 onChange={e => setExpiresAt(e.target.value)}
+                required
               />
-              <div className="form-text">Optional. Hidden from users after this time.</div>
+              <div className="form-text">Required. Moves to the Expired tab after this time.</div>
             </div>
           </div>
 

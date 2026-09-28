@@ -11,7 +11,7 @@ export default function NoticeBadges({ notice }: { notice: Notice }) {
       )}
       {notice.is_important && <span className="badge bg-danger-100 text-danger-600 text-xs">Important</span>}
       {notice.status === 'scheduled' && <span className="badge bg-warning-100 text-warning-600 text-xs">Scheduled</span>}
-      {notice.status === 'expired' && <span className="badge bg-neutral-200 text-secondary-light text-xs">Expired</span>}
+      {(notice.status === 'expired' || notice.is_expired) && <span className="badge bg-neutral-200 text-secondary-light text-xs">Expired</span>}
     </>
   )
 }

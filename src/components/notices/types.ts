@@ -16,6 +16,7 @@ export type Notice = {
   is_read: boolean
   published_at: string
   expires_at: string | null
+  is_expired?: boolean
   has_attachment: boolean
   attachment?: { url: string; name: string; mime: string; size: number } | null
   posted_by: { id: number; name: string; role: string } | null
@@ -36,6 +37,7 @@ export type NoticeListResponse = {
     next_cursor: string | null
     unread_count?: number
     can_manage?: boolean
+    status?: 'active' | 'expired'
   }
 }
 
