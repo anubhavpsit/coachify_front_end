@@ -2,6 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 import { Button } from 'react-bootstrap'
 import { formatDate } from '../../utils/date'
+import { getAuthUser } from '../../lib/auth'
+import { ROLES } from '../../constants/roles'
+import FeeEditModal, { type EditableFee } from './FeeEditModal'
+import Icon from '../../components/common/Icon.tsx'
 
 interface StudentProfile {
   class?: string | number
@@ -76,6 +80,9 @@ export default function FeeComponent() {
   const [filterMonth, setFilterMonth] = useState<string>(getCurrentMonthValue())
   const [feesMeta, setFeesMeta] = useState<{ count: number; total_amount: number; students_count: number } | null>(null)
   const [feesReloadKey, setFeesReloadKey] = useState(0)
+  // Correcting a mistaken entry — coaching admin only (API enforces the same)
+  const canEditFees = getAuthUser()?.role === ROLES.COACHING_ADMIN
+  const [editingFee, setEditingFee] = useState<EditableFee | null>(null)
 
   const [loadingStudents, setLoadingStudents] = useState(false)
   const [loadingFees, setLoadingFees] = useState(false)
@@ -442,6 +449,7 @@ export default function FeeComponent() {
                           <th>Amount</th>
                           <th>Mode</th>
                           <th>Notes</th>
+                          {canEditFees && <th className="text-center">Edit</th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -452,6 +460,30 @@ export default function FeeComponent() {
                             <td>₹{Number(item.amount).toFixed(2)}</td>
                             <td>{item.payment_mode || '-'}</td>
                             <td style={{ whiteSpace: 'pre-wrap', minWidth: 160 }}>{item.notes || '-'}</td>
+                            {canEditFees && (
+                              <td className="text-center">
+                                <Button
+                                  variant="link"
+                                  className="p-0"
+                                  title="Edit this fee entry"
+                                  aria-label="Edit this fee entry"
+                                  onClick={() =>
+                                    setEditingFee({
+                                      id: item.id,
+                                      student_id: Number(selectedStudentId),
+                                      from_date: item.from_date,
+                                      to_date: item.to_date,
+                                      amount: item.amount,
+                                      payment_mode: item.payment_mode || 'cash',
+                                      submitted_on: item.paid_at ?? null,
+                                      notes: item.notes,
+                                    })
+                                  }
+                                >
+                                  <Icon icon="ic:baseline-edit" className="text-primary text-lg" />
+                                </Button>
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>
@@ -520,6 +552,7 @@ export default function FeeComponent() {
                     <th>Mode</th>
                     <th>Submitted On</th>
                     <th>Notes</th>
+                    {canEditFees && <th className="text-center">Edit</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -532,6 +565,19 @@ export default function FeeComponent() {
                       <td>{fee.payment_mode}</td>
                       <td>{formatDate(fee.submitted_on || fee.created_at)}</td>
                       <td style={{ whiteSpace: 'pre-wrap', minWidth: 160 }}>{fee.notes || '-'}</td>
+                      {canEditFees && (
+                        <td className="text-center">
+                          <Button
+                            variant="link"
+                            className="p-0"
+                            title="Edit this fee entry"
+                            aria-label="Edit this fee entry"
+                            onClick={() => setEditingFee({ ...fee, submitted_on: fee.submitted_on || fee.created_at })}
+                          >
+                            <Icon icon="ic:baseline-edit" className="text-primary text-lg" />
+                          </Button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -540,6 +586,22 @@ export default function FeeComponent() {
           )}
         </div>
       </div>
+
+      {canEditFees && (
+        <FeeEditModal
+          fee={editingFee}
+          students={students}
+          onHide={() => setEditingFee(null)}
+          onSaved={() => {
+            setEditingFee(null)
+            setFeesReloadKey((k) => k + 1)
+            if (selectedStudentId) {
+              fetchHistory(selectedStudentId)
+              fetchSuggestPeriod(selectedStudentId)
+            }
+          }}
+        />
+      )}
     </div>
   )
 }

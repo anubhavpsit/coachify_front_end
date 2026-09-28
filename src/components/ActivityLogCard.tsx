@@ -24,6 +24,7 @@ type ActivityLog = {
 
 type PaginatedResponse = {
   logs: ActivityLog[];
+  modules?: string[];
   pagination: {
     current_page: number;
     last_page: number;
@@ -41,12 +42,19 @@ type DashboardUser = {
 
 type Filters = {
   role: 'all' | 'coaching_admin' | 'teacher' | 'student' | 'staff';
+  module: string; // 'all' or an activity_logs.module value
   userId: string;
   startDate: string;
   endDate: string;
 };
 
 const dateToInputValue = (date: Date) => toDateInputValue(date);
+
+/** "daily_activities" → "Daily activities" */
+const moduleLabel = (m: string) => {
+  const text = m.replace(/_/g, ' ');
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
 
 const createDefaultRange = () => {
   const end = new Date();
@@ -71,8 +79,10 @@ export default function ActivityLogCard() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [modules, setModules] = useState<string[]>([]);
   const [filters, setFilters] = useState<Filters>({
     role: 'all',
+    module: 'all',
     userId: 'all',
     startDate: initialRange.start,
     endDate: initialRange.end,
@@ -105,6 +115,13 @@ export default function ActivityLogCard() {
     if (filters.role !== 'all') {
       params.append('user_role', filters.role);
     }
+    if (filters.module !== 'all') {
+      params.append('module', filters.module);
+    }
+    // Module list for the dropdown — fetched once, with the first page
+    if (modules.length === 0) {
+      params.append('with_modules', '1');
+    }
     if (filters.userId !== 'all') {
       params.append('user_id', filters.userId);
     }
@@ -125,6 +142,9 @@ export default function ActivityLogCard() {
       )
       .then(response => {
         setLogs(response.data.data.logs || []);
+        if (response.data.data.modules) {
+          setModules(response.data.data.modules);
+        }
         setPagination(prev => ({
           ...prev,
           ...response.data.data.pagination,
@@ -141,6 +161,8 @@ export default function ActivityLogCard() {
       });
 
     return () => controller.abort();
+    // `modules` only decides whether to ask for the list; not a refetch trigger
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, page, pagination.per_page]);
 
   useEffect(() => {
@@ -198,6 +220,7 @@ export default function ActivityLogCard() {
     const range = createDefaultRange();
     updateFilters({
       role: 'all',
+      module: 'all',
       userId: 'all',
       startDate: range.start,
       endDate: range.end,
@@ -216,7 +239,20 @@ export default function ActivityLogCard() {
             Track who did what across your coaching in real time.
           </p>
         </div>
-        <div className="d-flex align-items-center gap-2">
+        <div className="d-flex align-items-center gap-2 flex-wrap">
+          <select
+            className="form-select text-sm"
+            value={filters.module}
+            onChange={event => updateFilters({ module: event.target.value })}
+            aria-label="Filter by module"
+          >
+            <option value="all">All modules</option>
+            {modules.map(m => (
+              <option key={m} value={m}>
+                {moduleLabel(m)}
+              </option>
+            ))}
+          </select>
           <select
             className="form-select text-sm"
             value={filters.role}
