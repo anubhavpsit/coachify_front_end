@@ -229,19 +229,22 @@ export default function ActivityLogCard() {
 
   return (
     <div className="card p-20 radius-12 mt-4">
-      <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-16">
-        <div>
-          <h6 className="fw-semibold mb-2 d-flex align-items-center gap-2">
-            <Icon icon="solar:clock-outline" className="icon text-primary-600" />
-            Recent Activity Logs
-          </h6>
-          <p className="text-secondary-light text-sm mb-0">
-            Track who did what across your coaching in real time.
-          </p>
-        </div>
-        <div className="d-flex align-items-center gap-2 flex-wrap">
+      <div className="mb-16">
+        <h6 className="fw-semibold mb-2 d-flex align-items-center gap-2">
+          <Icon icon="solar:clock-outline" className="icon text-primary-600" />
+          Recent Activity Logs
+        </h6>
+        <p className="text-secondary-light text-sm mb-0">
+          Track who did what across your coaching in real time.
+        </p>
+      </div>
+
+      {/* Filters: one row on wide screens, 3 / 2 / 1 per row as it narrows */}
+      <div className="row g-3 mb-16 align-items-end">
+        <div className="col-12 col-sm-6 col-lg-4 col-xxl-2">
+          <label className="form-label text-sm fw-medium">Module</label>
           <select
-            className="form-select text-sm"
+            className="form-select"
             value={filters.module}
             onChange={event => updateFilters({ module: event.target.value })}
             aria-label="Filter by module"
@@ -253,12 +256,16 @@ export default function ActivityLogCard() {
               </option>
             ))}
           </select>
+        </div>
+        <div className="col-12 col-sm-6 col-lg-4 col-xxl-2">
+          <label className="form-label text-sm fw-medium">Role</label>
           <select
-            className="form-select text-sm"
+            className="form-select"
             value={filters.role}
             onChange={event =>
               updateFilters({ role: event.target.value as Filters['role'] })
             }
+            aria-label="Filter by role"
           >
             <option value="all">All roles</option>
             <option value="coaching_admin">Admins</option>
@@ -266,10 +273,14 @@ export default function ActivityLogCard() {
             <option value="student">Students</option>
             <option value="staff">Staff</option>
           </select>
+        </div>
+        <div className="col-12 col-sm-6 col-lg-4 col-xxl-2">
+          <label className="form-label text-sm fw-medium">User</label>
           <select
-            className="form-select text-sm"
+            className="form-select"
             value={filters.userId}
             onChange={event => updateFilters({ userId: event.target.value })}
+            aria-label="Filter by user"
           >
             <option value="all">All users</option>
             {users.map(user => (
@@ -279,10 +290,7 @@ export default function ActivityLogCard() {
             ))}
           </select>
         </div>
-      </div>
-
-      <div className="row g-3 mb-16">
-        <div className="col-md-3">
+        <div className="col-12 col-sm-6 col-lg-4 col-xxl-2">
           <label className="form-label text-sm fw-medium">From</label>
           <input
             type="date"
@@ -292,7 +300,7 @@ export default function ActivityLogCard() {
             onChange={event => updateFilters({ startDate: event.target.value })}
           />
         </div>
-        <div className="col-md-3">
+        <div className="col-12 col-sm-6 col-lg-4 col-xxl-2">
           <label className="form-label text-sm fw-medium">To</label>
           <input
             type="date"
@@ -302,7 +310,7 @@ export default function ActivityLogCard() {
             onChange={event => updateFilters({ endDate: event.target.value })}
           />
         </div>
-        <div className="col-md-3 d-flex align-items-end">
+        <div className="col-12 col-sm-6 col-lg-4 col-xxl-2">
           <button className="btn btn-light w-100" onClick={resetFilters}>
             Reset Filters
           </button>

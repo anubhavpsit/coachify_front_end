@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { formatDate as formatDisplayDate, formatDateTime, toDateInputValue } from '../../utils/date'
 import { ROLES } from '../../constants/roles'
+import { can } from '../../lib/auth'
 import AttachmentPreviewModal from '../../components/common/AttachmentPreviewModal'
 
 interface ActivityAttachment {
@@ -61,7 +62,7 @@ const API_BASE_URL =
 const STORAGE_BASE_URL =
   import.meta.env.VITE_STORAGE_BASE_URL ?? 'http://coachify.local/storage'
 
-type ApprovalFilter = 'pending' | 'approved'
+type ApprovalFilter = 'pending' | 'approved' | 'all'
 
 type QuickFilter = 'today' | '3d' | '7d' | '14d' | '30d' | 'all' | 'custom'
 
@@ -131,9 +132,19 @@ export default function DailyActivityApprovalsPage() {
     ? window.localStorage.getItem('authToken')
     : null
 
-  const isAdmin = authUser?.role === ROLES.COACHING_ADMIN
+  // Approver = coaching admin, or staff granted "Approve / reject daily
+  // activities". (Variable kept as `isAdmin`: it gates the admin view.)
+  const isAdmin =
+    authUser?.role === ROLES.COACHING_ADMIN ||
+    (authUser?.role === ROLES.STAFF && can('daily_activities.approve'))
   const isTeacher = authUser?.role === ROLES.TEACHER
   const canAccess = isAdmin || isTeacher
+
+  // Bulk approval
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [includeAttachments, setIncludeAttachments] = useState(true)
+  const [bulkBusy, setBulkBusy] = useState(false)
+  const [bulkMessage, setBulkMessage] = useState<string | null>(null)
 
   const studentsEndpoint = isAdmin ? '/students' : '/teachers/students'
 
@@ -165,7 +176,7 @@ export default function DailyActivityApprovalsPage() {
     try {
       const params: Record<string, string> = {}
 
-      if (isAdmin) {
+      if (approvalFilter !== 'all') {
         params.approved = approvalFilter === 'approved' ? 'true' : 'false'
       }
       if (dateParams.date) {
@@ -215,6 +226,57 @@ export default function DailyActivityApprovalsPage() {
   const refresh = () => {
     const dateParams = getQuickFilterDates(quickFilter, dateFilter)
     loadActivities(statusFilter, dateParams, studentFilter || undefined)
+  }
+
+  // Selection only ever holds pending activities that are on screen —
+  // excluding ones sent back to the teacher and not yet fixed.
+  const pendingIds = useMemo(
+    () => activities.filter(a => !a.is_admin_approved && !a.admin_feedback).map(a => a.id),
+    [activities],
+  )
+  useEffect(() => {
+    setSelectedIds(prev => new Set([...prev].filter(id => pendingIds.includes(id))))
+  }, [pendingIds])
+
+  const toggleSelected = (id: number) =>
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+
+  const allPendingSelected = pendingIds.length > 0 && pendingIds.every(id => selectedIds.has(id))
+  const toggleAllPending = () => setSelectedIds(allPendingSelected ? new Set() : new Set(pendingIds))
+
+  const bulkApprove = async (ids: number[]) => {
+    if (ids.length === 0) return
+    const withFiles = includeAttachments ? ' and their attachments' : ''
+    if (!window.confirm(`Approve ${ids.length} activit${ids.length === 1 ? 'y' : 'ies'}${withFiles}? Students will be notified.`)) {
+      return
+    }
+    setBulkBusy(true)
+    setBulkMessage(null)
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/daily-activities/approve-bulk`,
+        { ids, include_attachments: includeAttachments },
+        { headers: { Authorization: `Bearer ${token}` } },
+      )
+      const d = res.data?.data ?? {}
+      setBulkMessage(
+        `Approved ${d.approved ?? 0} activit${d.approved === 1 ? 'y' : 'ies'}` +
+          (includeAttachments ? ` and ${d.attachments_approved ?? 0} attachment${d.attachments_approved === 1 ? '' : 's'}` : '') +
+          `; ${d.students_notified ?? 0} student${d.students_notified === 1 ? '' : 's'} notified.`,
+      )
+      setSelectedIds(new Set())
+      refresh()
+    } catch (err) {
+      console.error('Bulk approval failed', err)
+      setBulkMessage('Unable to approve the selected activities. Please try again.')
+    } finally {
+      setBulkBusy(false)
+    }
   }
 
   const applyQuickFilter = (filter: QuickFilter) => {
@@ -296,7 +358,8 @@ export default function DailyActivityApprovalsPage() {
       'Enter remarks for the teacher so they can fix the activity (required).',
     )
 
-    if (!remark || !remark.trim()) {
+    if (remark === null) return // cancelled
+    if (!remark.trim()) {
       alert('Remarks are required to reject an activity.')
       return
     }
@@ -385,20 +448,19 @@ export default function DailyActivityApprovalsPage() {
         </div>
 
         <div className="d-flex align-items-end gap-2">
-          {isAdmin && (
-            <div>
-              <div className="text-xs text-secondary-light mb-1">Status</div>
-              <select
-                className="form-select form-select-sm"
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as ApprovalFilter)}
-                style={{ minWidth: '150px' }}
-              >
-                <option value="pending">Pending Approval</option>
-                <option value="approved">Recently Approved</option>
-              </select>
-            </div>
-          )}
+          <div>
+            <div className="text-xs text-secondary-light mb-1">Status</div>
+            <select
+              className="form-select form-select-sm"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value as ApprovalFilter)}
+              style={{ minWidth: '150px' }}
+            >
+              <option value="pending">Pending Approval</option>
+              <option value="approved">Recently Approved</option>
+              <option value="all">All</option>
+            </select>
+          </div>
           <div>
             <div className="text-xs text-secondary-light mb-1">Student</div>
             <select
@@ -464,10 +526,63 @@ export default function DailyActivityApprovalsPage() {
       ) : activities.length === 0 ? (
         <p className="text-secondary-light">No activities found for the selected filters.</p>
       ) : (
+        <>
+        {isAdmin && pendingIds.length > 0 && (
+          <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2 p-12 radius-8 bg-primary-50">
+            <div className="d-flex flex-wrap align-items-center gap-3">
+              <span className="text-sm fw-semibold">
+                {selectedIds.size > 0 ? `${selectedIds.size} selected` : `${pendingIds.length} pending shown`}
+              </span>
+              <div className="form-check mb-0">
+                <input
+                  id="bulk-include-attachments"
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={includeAttachments}
+                  onChange={e => setIncludeAttachments(e.target.checked)}
+                />
+                <label htmlFor="bulk-include-attachments" className="form-check-label text-sm">
+                  Also approve their attachments
+                </label>
+              </div>
+            </div>
+            <div className="d-flex gap-2">
+              <button
+                type="button"
+                className="btn btn-success btn-sm"
+                disabled={bulkBusy || selectedIds.size === 0}
+                onClick={() => bulkApprove([...selectedIds])}
+              >
+                {bulkBusy ? 'Approving…' : `Approve selected (${selectedIds.size})`}
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-success btn-sm"
+                disabled={bulkBusy}
+                onClick={() => bulkApprove(pendingIds)}
+              >
+                Approve all shown ({pendingIds.length})
+              </button>
+            </div>
+          </div>
+        )}
+        {bulkMessage && <p className="text-sm text-success-600 mb-2">{bulkMessage}</p>}
         <div className="table-responsive">
           <table className="table bordered-table">
             <thead>
               <tr>
+                {isAdmin && (
+                  <th style={{ width: 36 }}>
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      aria-label="Select all pending activities"
+                      checked={allPendingSelected}
+                      disabled={pendingIds.length === 0}
+                      onChange={toggleAllPending}
+                    />
+                  </th>
+                )}
                 <th>Date</th>
                 <th>Teacher</th>
                 <th>Student</th>
@@ -482,6 +597,19 @@ export default function DailyActivityApprovalsPage() {
             <tbody>
               {activities.map(activity => (
                 <tr key={activity.id}>
+                  {isAdmin && (
+                    <td>
+                      {!activity.is_admin_approved && !activity.admin_feedback && (
+                        <input
+                          type="checkbox"
+                          className="form-check-input"
+                          aria-label={`Select activity for ${activity.student?.name ?? 'student'}`}
+                          checked={selectedIds.has(activity.id)}
+                          onChange={() => toggleSelected(activity.id)}
+                        />
+                      )}
+                    </td>
+                  )}
                   <td>
                     {activity?.activity_date
                       ? formatAddedOn(activity.activity_date)
@@ -566,16 +694,31 @@ export default function DailyActivityApprovalsPage() {
                               : 'Mark Pending'}
                           </button>
                         ) : (
-                          <button
-                            type="button"
-                            className="btn btn-success btn-sm"
-                            disabled={processingActivityId === activity.id}
-                            onClick={() => handleApprovalToggle(activity.id, true)}
-                          >
-                            {processingActivityId === activity.id
-                              ? 'Updating...'
-                              : 'Approve Activity'}
-                          </button>
+                          <>
+                            <button
+                              type="button"
+                              className="btn btn-success btn-sm"
+                              disabled={processingActivityId === activity.id}
+                              onClick={() => handleApprovalToggle(activity.id, true)}
+                            >
+                              {processingActivityId === activity.id
+                                ? 'Updating...'
+                                : 'Approve Activity'}
+                            </button>
+                            {/* Send back BEFORE the student ever sees it */}
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm"
+                              disabled={processingActivityId === activity.id}
+                              onClick={() => handleApprovalToggle(activity.id, false)}
+                              title="Send back to the teacher with remarks — the student is not notified"
+                            >
+                              {activity.admin_feedback ? 'Reject again' : 'Reject'}
+                            </button>
+                            {activity.admin_feedback && (
+                              <span className="badge bg-danger-100 text-danger-600 text-xs">Sent back to teacher</span>
+                            )}
+                          </>
                         )
                       )}
                       {renderNotificationMeta(
@@ -593,6 +736,7 @@ export default function DailyActivityApprovalsPage() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       <AttachmentPreviewModal

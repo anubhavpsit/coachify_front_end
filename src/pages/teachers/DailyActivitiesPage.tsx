@@ -49,7 +49,33 @@ type HistoryActivityRow = {
   student?: { id: number; name: string } | null;
   subject?: { id: number; subject: string } | null;
   attachments?: ActivityAttachment[];
+  // Admin review
+  is_admin_approved?: boolean;
+  admin_feedback?: string | null;
 };
+
+/** Sent back = still pending AND the admin left a remark (cleared when you edit it). */
+const isSentBack = (a: HistoryActivityRow) => !a.is_admin_approved && !!a.admin_feedback;
+
+function ReviewStatus({ act }: { act: HistoryActivityRow }) {
+  if (act.is_admin_approved) {
+    return <span className="badge bg-success-100 text-success-600 text-xs">Approved</span>;
+  }
+  if (isSentBack(act)) {
+    return (
+      <div>
+        <span className="badge bg-danger-100 text-danger-600 text-xs">Sent back</span>
+        <div className="text-xs text-danger-600 mt-1" style={{ whiteSpace: "pre-wrap" }}>
+          <strong>Admin:</strong> {act.admin_feedback}
+        </div>
+        <div className="text-xs text-secondary-light mt-1">
+          Fix it in the "Per Student" tab (same student, subject &amp; date) and submit again.
+        </div>
+      </div>
+    );
+  }
+  return <span className="badge bg-warning-100 text-warning-600 text-xs">Awaiting review</span>;
+}
 
 type ActivityFormRow = {
   id: number | null;
@@ -147,6 +173,10 @@ export default function DailyActivitiesPage() {
     HistoryActivityRow[]
   >([]);
   const [historyRemarks, setHistoryRemarks] = useState<Record<number, string>>({});
+  // "Needs changes only": activities the admin sent back with a remark
+  const [needsChangesOnly, setNeedsChangesOnly] = useState(false);
+  const sentBackCount = historyActivities.filter(isSentBack).length;
+  const shownHistory = needsChangesOnly ? historyActivities.filter(isSentBack) : historyActivities;
   const [savingRemarkId, setSavingRemarkId] = useState<number | null>(null);
   const [historyDate, setHistoryDate] = useState<string>(() => {
     const fromQuery = searchParams.get("date");
@@ -840,6 +870,21 @@ const handleSelectStudent = async (
                 </button>
               )}
               <span className="text-xs text-secondary-light">Leave empty to show all records.</span>
+              <div className="form-check ms-auto mb-0">
+                <input
+                  id="needs-changes-only"
+                  type="checkbox"
+                  className="form-check-input"
+                  checked={needsChangesOnly}
+                  onChange={(e) => setNeedsChangesOnly(e.target.checked)}
+                />
+                <label htmlFor="needs-changes-only" className="form-check-label text-sm text-nowrap">
+                  Needs changes only
+                  {sentBackCount > 0 && (
+                    <span className="badge bg-danger-600 text-white rounded-pill ms-1">{sentBackCount}</span>
+                  )}
+                </label>
+              </div>
             </div>
           </div>
 
@@ -848,6 +893,7 @@ const handleSelectStudent = async (
               <thead className="table-light">
                 <tr>
                   <th>Date</th>
+                  <th style={{ minWidth: 170 }}>Review</th>
                   <th>Student</th>
                   <th>Subject</th>
                   <th>Chapter</th>
@@ -856,20 +902,21 @@ const handleSelectStudent = async (
                   <th>Homework</th>
                   <th>Attachments</th>
                   <th>HW Status</th>
-                  <th style={{ minWidth: 220 }}>Remarks</th>
+                  <th style={{ minWidth: 220 }}>Your remarks (to student)</th>
                 </tr>
               </thead>
               <tbody>
-                {historyActivities.length === 0 ? (
+                {shownHistory.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="text-center text-secondary-light py-4">
-                      No activities found.
+                    <td colSpan={11} className="text-center text-secondary-light py-4">
+                      {needsChangesOnly ? "Nothing sent back — all good." : "No activities found."}
                     </td>
                   </tr>
                 ) : (
-                  historyActivities.map((act) => (
-                    <tr key={act.id}>
+                  shownHistory.map((act) => (
+                    <tr key={act.id} className={isSentBack(act) ? "table-danger" : undefined}>
                       <td className="text-nowrap">{formatDate(act.activity_date)}</td>
+                      <td><ReviewStatus act={act} /></td>
                       <td>{act.student?.name ?? "-"}</td>
                       <td>{act.subject?.subject ?? "-"}</td>
                       <td>{act.chapter_model?.name ?? act.chapter_number ?? act.chapter ?? "-"}</td>
