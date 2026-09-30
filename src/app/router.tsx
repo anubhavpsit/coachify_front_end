@@ -13,7 +13,7 @@ import PageFallback from './layout/PageFallback'
 const SignInPage = lazy(() => import('@/features/auth/pages/SignInPage'))
 const SignUpPage = lazy(() => import('@/pages/auth/SignUpPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
-const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'))
+const DashboardPage = lazy(() => import('@/features/dashboard/pages/DashboardPage'))
 const DailyAttendance = lazy(() => import('@/pages/dashboard/DailyAttendance'))
 const CompanyPage = lazy(() => import('@/pages/settings/CompanyPage'))
 const NotificationPage = lazy(() => import('@/pages/settings/NotificationPage'))

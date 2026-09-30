@@ -43,7 +43,7 @@
 | `/` | SignInPage | none (redirects to `/dashboard` if a token exists) | — | — | ☐ |
 | `/auth/sign-up` | SignUpPage (static) | none | — | — | ☐ |
 | all below | — | `ProtectedRoute` | `authToken` present; `/auth/me` not 401 | `Navigate('/')` | ☐ |
-| `/dashboard` | DashboardPage | auth only | — | — | ☐ |
+| `/dashboard` | DashboardPage | auth only | — | — | ☑ |
 | `/dashboard/attendance` | DailyAttendance | RequirePermission | `attendance.mark` | → `/dashboard` | ☐ |
 | `/dashboard/settings/company` / `notification` / `notification-alert` / `theme` | static settings pages | auth only | — | — | ☐ |
 | `/subjects` | SubjectsPage | RequirePermission | `subjects.manage` | → `/dashboard` | ☐ |
@@ -119,17 +119,19 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 
 ## 4. In-page / component-level enforcement
 
+> DashboardPage rows are verified by `src/features/dashboard/pages/DashboardPage.test.tsx`, which renders the page with each widget mocked and asserts exactly which widgets appear for admin, super_admin, staff (none / each key individually), teacher, and student. Deliberate change: widgets no longer vanish while the stats request is loading or has failed. Each widget still has its own gate.
+
 | Page / Component | Element | Requirement | How enforced | Verified |
 |---|---|---|---|---|
-| **DashboardPage** | Fetch `/dashboard` stats | `canAny(['dashboard.view', 'dashboard.stats.*'])` | skips the API call | ☐ |
-| DashboardPage | Admin/staff stat block | role `coaching_admin` \| `staff` | conditional render | ☐ |
-| DashboardPage | Students stat card | `dashboard.stats.students` | conditional render | ☐ |
-| DashboardPage | Teachers stat card | `dashboard.stats.teachers` | conditional render | ☐ |
-| DashboardPage | Activities stat card | `dashboard.stats.activities` | conditional render | ☐ |
-| DashboardPage | Earnings stat card | `dashboard.stats.earnings` | conditional render | ☐ |
-| DashboardPage | Expenses stat card | `dashboard.stats.expenses` | conditional render | ☐ |
-| DashboardPage | PendingActionsCard | `dashboard.pending_actions` | conditional render | ☐ |
-| DashboardPage | PendingFeesCard | `fees.view` | conditional render | ☐ |
+| **DashboardPage** | Fetch `/dashboard` stats | `canAny(['dashboard.view', 'dashboard.stats.*'])` | skips the API call | ☑ (test) |
+| DashboardPage | Admin/staff stat block | role `coaching_admin` \| `staff` | conditional render | ☑ (test) |
+| DashboardPage | Students stat card | `dashboard.stats.students` | conditional render | ☑ (test) |
+| DashboardPage | Teachers stat card | `dashboard.stats.teachers` | conditional render | ☑ (test) |
+| DashboardPage | Activities stat card | `dashboard.stats.activities` | conditional render | ☑ (test) |
+| DashboardPage | Earnings stat card | `dashboard.stats.earnings` | conditional render | ☑ (test) |
+| DashboardPage | Expenses stat card | `dashboard.stats.expenses` | conditional render | ☑ (test) |
+| DashboardPage | PendingActionsCard | `dashboard.pending_actions` | conditional render | ☑ (test) |
+| DashboardPage | PendingFeesCard | `fees.view` | conditional render | ☑ (test) |
 | DashboardPage | TeacherActivityGapsCard | `dashboard.activity_gaps` | conditional render | ☐ |
 | DashboardPage | TodayBirthdayCard, BirthdayCard | `dashboard.birthdays` | conditional render | ☐ |
 | DashboardPage | LowAttendanceCard | `attendance.view` | conditional render | ☐ |
