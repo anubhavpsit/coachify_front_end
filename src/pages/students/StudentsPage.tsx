@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useState } from 'react';
 import axios from 'axios';
 import { formatDate } from '../../utils/date';
 import { Modal, Button, Dropdown } from 'react-bootstrap';
-import AssignTeachersModal from '../../components/AssignTeachersModal';
+import AssignTeachersModal from '@/features/students/components/AssignTeachersModal';
 import Avatar from '../../components/common/Avatar.tsx';
 import Icon from '../../components/common/Icon.tsx';
 import { ROLES } from '../../constants/roles'

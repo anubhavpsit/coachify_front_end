@@ -51,3 +51,37 @@ export async function fetchFollowUpEnquiries() {
   if (!response.data.success) throw new Error('Unable to load enquiries.')
   return { enquiries: response.data.data || [], frequencyDays: response.data.meta?.follow_up_frequency_days ?? null }
 }
+
+export type CoachingClass = { id: number; name: string }
+export type StudentSummary = { id: number; name: string; email: string; class: string | null; status?: string; created_at?: string | null }
+
+/** Ghost/Unassigned cards: GET /classes/{tenant_id} (to show class names) */
+export async function fetchClasses(): Promise<CoachingClass[]> {
+  const res = await axios.get<{ data: CoachingClass[] }>(`${API_BASE_URL}/classes/${localStorage.getItem('tenant_id')}`, {
+    headers: { Authorization: `Bearer ${token()}` },
+  })
+  return res.data.data || []
+}
+
+/** GhostStudentsCard: GET /dashboard/ghost-students?days=N */
+export async function fetchGhostStudents(days: number): Promise<StudentSummary[] | undefined> {
+  const res = await axios.get<{ success: boolean; data: StudentSummary[] }>(`${API_BASE_URL}/dashboard/ghost-students?days=${days}`, {
+    headers: { Authorization: `Bearer ${token()}` },
+  })
+  return res.data.success ? res.data.data : undefined
+}
+
+/** UnassignedStudentsCard: GET /dashboard/unassigned-students */
+export async function fetchUnassignedStudents(): Promise<StudentSummary[] | undefined> {
+  const res = await axios.get<{ success: boolean; data: StudentSummary[] }>(`${API_BASE_URL}/dashboard/unassigned-students`, {
+    headers: { Authorization: `Bearer ${token()}` },
+  })
+  return res.data.success ? res.data.data : undefined
+}
+
+/** Class id → name, falling back to the raw value (legacy getClassName). */
+export function classLabel(classes: CoachingClass[], classIdOrName: string | null): string {
+  if (!classIdOrName) return '—'
+  const found = classes.find((c) => String(c.id) === String(classIdOrName))
+  return found ? found.name : classIdOrName
+}
