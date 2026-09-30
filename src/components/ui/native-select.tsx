@@ -11,7 +11,9 @@ function NativeSelect({ className, size = 'default', ...props }: Omit<React.Comp
         className={cn(
           'tw:m-0 tw:w-full tw:min-w-0 tw:cursor-pointer tw:appearance-none tw:rounded-md tw:border tw:border-solid tw:border-input tw:bg-card tw:pr-9 tw:pl-3 tw:text-sm tw:text-foreground tw:shadow-xs tw:outline-none tw:transition-[border-color,box-shadow]',
           'tw:focus-visible:border-primary tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/40 tw:aria-invalid:border-destructive tw:disabled:cursor-not-allowed tw:disabled:opacity-50',
-          size === 'sm' ? 'tw:h-8' : 'tw:h-10',
+          // Template CSS resets select padding/font; a line-height equal to the inner
+          // height (minus the 2px border) keeps the text vertically centred.
+          size === 'sm' ? 'tw:h-8 tw:py-0 tw:leading-[30px]' : 'tw:h-10 tw:py-0 tw:leading-[38px]',
         )}
         {...props}
       />
