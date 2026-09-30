@@ -16,3 +16,35 @@ export const email = (label = 'Email') =>
 
 export const password = (label = 'Password') =>
   z.string().min(1, `${label} is required.`).min(PASSWORD_MIN, `${label} must be at least ${PASSWORD_MIN} characters.`)
+
+/** Edit forms: blank keeps the current password; otherwise the same policy. */
+export const optionalPassword = (label = 'Password') =>
+  z.string().refine((v) => v === '' || v.length >= PASSWORD_MIN, `${label} must be at least ${PASSWORD_MIN} characters.`)
+
+/** Backend: gender required|in:male,female,other */
+export const GENDERS = ['male', 'female', 'other'] as const
+export const gender = () => z.enum(GENDERS, { error: 'Please select a gender.' })
+
+/** Backend: dob nullable|date. Empty allowed; a date can't be in the future. */
+export const optionalPastDate = (label = 'Date of birth') =>
+  z.string().refine((v) => {
+    if (!v) return true
+    const today = new Date()
+    const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    return v <= iso
+  }, `${label} can't be in the future.`)
+
+/**
+ * Advisory strength score 0–4 for the meter (never blocks saving — D4).
+ * Length ≥ 8, ≥ 12, mixed case, digits, symbols.
+ */
+export function passwordStrength(pw: string): 0 | 1 | 2 | 3 | 4 {
+  if (!pw) return 0
+  let score = 0
+  if (pw.length >= PASSWORD_MIN) score++
+  if (pw.length >= 12) score++
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++
+  if (/\d/.test(pw)) score++
+  if (/[^A-Za-z0-9]/.test(pw)) score++
+  return Math.min(4, pw.length < PASSWORD_MIN ? Math.min(score, 1) : score) as 0 | 1 | 2 | 3 | 4
+}

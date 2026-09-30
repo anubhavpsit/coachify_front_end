@@ -157,8 +157,8 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | **TeachersPage** | Data source | student → own teachers endpoint | endpoint choice | ☐ |
 | TeachersPage | Edit / Delete row buttons | role `coaching_admin` | conditional render | ☐ |
 | TeachersPage | UserProfileModal `canEditImage` | role `coaching_admin` | prop | ☐ |
-| **StaffPage** | Edit / Delete row buttons | `staff.manage` | conditional render | ☐ |
-| StaffPage | UserProfileModal `canEditImage` | `staff.manage` | prop | ☐ |
+| **StaffPage** (features/staff) | Edit / Delete row buttons | `staff.manage` | conditional render | ☑ (test) |
+| StaffPage | UserProfileModal `canEditImage` | `staff.manage` | prop | ☑ (test) |
 | **FeeComponent** | "Edit" column (2 tables) + FeeEditModal | role `coaching_admin` (Q3) | conditional render | ☐ |
 | **EnquiriesPage** | Whole page + list fetch | role `coaching_admin` (Q1) | page returns "not authorized"; fetch skipped | ☐ |
 | **AssessmentsPage** | Data source for students | teacher → `/teachers/students` | endpoint choice | ☐ |

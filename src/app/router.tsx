@@ -26,7 +26,7 @@ const ExpensesComponent = lazy(() => import('@/pages/expenses/ExpensesComponent'
 const EnquiriesPage = lazy(() => import('@/pages/enquiries/EnquiriesPage'))
 const TeachersPage = lazy(() => import('@/pages/teachers/TeachersPage'))
 const DailyActivitiesPage = lazy(() => import('@/pages/teachers/DailyActivitiesPage'))
-const StaffPage = lazy(() => import('@/pages/staff/StaffPage'))
+const StaffPage = lazy(() => import('@/features/staff/pages/StaffPage'))
 const StudentsPage = lazy(() => import('@/pages/students/StudentsPage'))
 const StudentActivitiesPage = lazy(() => import('@/pages/students/StudentActivitiesPage'))
 const StudentTopicContentPage = lazy(() => import('@/pages/students/StudentTopicContentPage'))
