@@ -70,18 +70,18 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Overview',
     items: [
       { to: ROUTES.DASHBOARD, label: 'Dashboard', icon: House, end: true, visible: always },
+      {
+        to: ROUTES.INSIGHTS,
+        label: 'Insights',
+        icon: ChartSpline,
+        visible: (p) => p.hasRole(ROLES.TEACHER) || p.can(P.INSIGHTS_VIEW) || p.hasRole(ROLES.STUDENT),
+      },
       { to: ROUTES.FACTS, label: 'Facts', icon: Lightbulb, visible: always },
       {
         to: ROUTES.MY_ATTENDANCE,
         label: 'My Attendance',
         icon: CalendarCheck,
         visible: (p) => p.hasRole(ROLES.STUDENT, ROLES.TEACHER),
-      },
-      {
-        to: ROUTES.INSIGHTS,
-        label: 'Insights',
-        icon: ChartSpline,
-        visible: (p) => p.hasRole(ROLES.TEACHER) || p.can(P.INSIGHTS_VIEW) || p.hasRole(ROLES.STUDENT),
       },
     ],
   },
