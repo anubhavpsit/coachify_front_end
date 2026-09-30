@@ -1,4 +1,4 @@
-import ActivityLogCard from '@/components/ActivityLogCard'
+import ActivityLogCard from '../widgets/activity-log/ActivityLogCard'
 import BirthdayCard from '../widgets/BirthdayCard'
 import EnquiriesFollowUpCard from '../widgets/EnquiriesFollowUpCard'
 import GhostStudentsCard from '../widgets/GhostStudentsCard'

@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import DashboardPage from './DashboardPage'
 
 // Every legacy widget becomes a marker so we can assert exactly which render.
-vi.mock('@/components/ActivityLogCard', () => ({ default: () => <i data-widget="ActivityLogCard" /> }))
+vi.mock('../widgets/activity-log/ActivityLogCard', () => ({ default: () => <i data-widget="ActivityLogCard" /> }))
 vi.mock('../widgets/BirthdayCard', () => ({ default: () => <i data-widget="BirthdayCard" /> }))
 vi.mock('../widgets/EnquiriesFollowUpCard', () => ({ default: () => <i data-widget="EnquiriesFollowUpCard" /> }))
 vi.mock('../widgets/GhostStudentsCard', () => ({ default: () => <i data-widget="GhostStudentsCard" /> }))
