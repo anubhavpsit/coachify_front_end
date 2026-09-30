@@ -1,0 +1,1 @@
+import{g as e,b as t,p as s,c as r,e as o,r as n}from"./validation-DtvqXBX3.js";const p=a=>({name:n("Name",255),email:o(),password:a==="create"?s():r(),dob:t(),gender:e()}),i=["name","email","password","dob","gender"],g=()=>{const a=new Date;return`${a.getFullYear()}-${String(a.getMonth()+1).padStart(2,"0")}-${String(a.getDate()).padStart(2,"0")}`};export{i as P,p,g as t};
