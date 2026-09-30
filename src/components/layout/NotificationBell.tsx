@@ -1,6 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Icon from '../common/Icon.tsx'
+import { AnimatePresence, m } from 'motion/react'
+import { Bell, BellOff, LoaderCircle } from 'lucide-react'
+import { pop, wiggle } from '@/animations'
+import { Button } from '@/components/ui/button'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 import {
   INBOX_CHANGED_EVENT,
   fetchInbox,
@@ -27,7 +32,13 @@ export default function NotificationBell({ role }: { role?: string }) {
   const [items, setItems] = useState<InboxNotification[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  // Wiggle the bell once each time the unread count goes up (never on mount).
+  const [previousUnread, setPreviousUnread] = useState(unread)
+  const [bumps, setBumps] = useState(0)
+  if (unread !== previousUnread) {
+    if (unread > previousUnread) setBumps((n) => n + 1)
+    setPreviousUnread(unread)
+  }
 
   const refreshCount = useCallback(async () => {
     if (!localStorage.getItem('authToken')) return
@@ -76,21 +87,6 @@ export default function NotificationBell({ role }: { role?: string }) {
     if (open) loadPreview()
   }, [open, loadPreview])
 
-  // Close on outside click / Escape
-  useEffect(() => {
-    if (!open) return
-    const onClick = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
-    document.addEventListener('mousedown', onClick)
-    document.addEventListener('keydown', onKey)
-    return () => {
-      document.removeEventListener('mousedown', onClick)
-      document.removeEventListener('keydown', onKey)
-    }
-  }, [open])
-
   const handleOpenItem = async (n: InboxNotification) => {
     if (!n.is_read) {
       setItems(prev => prev.map(x => (x.id === n.id ? { ...x, is_read: true } : x)))
@@ -113,49 +109,55 @@ export default function NotificationBell({ role }: { role?: string }) {
     }
   }
 
-  return (
-    <div className={`dropdown${open ? ' show' : ''}`} ref={wrapperRef}>
-      <button
-        type="button"
-        className="w-40-px h-40-px bg-neutral-200 rounded-circle d-flex justify-content-center align-items-center position-relative border-0"
-        onClick={() => setOpen(o => !o)}
-        aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
-        aria-expanded={open}
-      >
-        <Icon icon="iconoir:bell" className="text-primary-light text-xl" />
-        {unread > 0 && (
-          <span
-            className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger-600 text-white text-xxs"
-            style={{ fontSize: 10, minWidth: 18 }}
-          >
-            {unread > 99 ? '99+' : unread}
-          </span>
-        )}
-      </button>
+  const label = unread > 99 ? '99+' : String(unread)
 
-      <div
-        className={`dropdown-menu to-top dropdown-menu-lg p-0${open ? ' show' : ''}`}
-        style={{ width: 360, maxWidth: 'calc(100vw - 32px)', right: 0, left: 'auto' }}
-      >
-        <div className="d-flex align-items-center justify-content-between px-16 py-12 border-bottom">
-          <span className="fw-semibold text-primary-light">Notifications</span>
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="tw:relative tw:rounded-full"
+          aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
+        >
+          <m.span key={bumps} variants={wiggle} initial="idle" animate={bumps > 0 ? 'wiggle' : 'idle'} className="tw:inline-flex">
+            <Bell className="tw:size-5" aria-hidden="true" />
+          </m.span>
+          <AnimatePresence>
+            {unread > 0 && (
+              <m.span
+                key={label}
+                variants={pop}
+                initial={bumps > 0 ? 'hidden' : false}
+                animate="visible"
+                exit="exit"
+                className="tw:absolute tw:-top-1 tw:-right-1 tw:min-w-[1.125rem] tw:rounded-full tw:bg-destructive tw:px-1 tw:text-[10px] tw:font-bold tw:leading-[1.125rem] tw:text-destructive-foreground"
+              >
+                {label}
+              </m.span>
+            )}
+          </AnimatePresence>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="tw:w-[22.5rem] tw:max-w-[calc(100vw-2rem)] tw:overflow-hidden tw:p-0">
+        <div className="tw:flex tw:items-center tw:justify-between tw:border-b tw:border-solid tw:border-border tw:px-4 tw:py-3">
+          <span className="tw:font-semibold tw:text-foreground">Notifications</span>
           {unread > 0 && (
-            <button type="button" className="border-0 bg-transparent text-primary-600 text-sm p-0" onClick={handleMarkAll}>
+            <Button variant="link" size="sm" className="tw:h-auto tw:px-0" onClick={handleMarkAll}>
               Mark all as read
-            </button>
+            </Button>
           )}
         </div>
-
-        <div style={{ maxHeight: 400, overflowY: 'auto' }}>
+        <div className="tw:max-h-[400px] tw:overflow-y-auto">
           {loading && items.length === 0 && (
-            <div className="text-center py-24">
-              <span className="spinner-border spinner-border-sm" />
+            <div className="tw:flex tw:justify-center tw:py-6 tw:text-muted-foreground" role="status" aria-label="Loading notifications">
+              <LoaderCircle className="tw:size-5 tw:animate-spin" aria-hidden="true" />
             </div>
           )}
-          {error && <div className="px-16 py-12 text-sm text-danger-600">{error}</div>}
+          {error && <div className="tw:px-4 tw:py-3 tw:text-sm tw:text-destructive">{error}</div>}
           {!loading && !error && items.length === 0 && (
-            <div className="text-center py-24 text-secondary-light text-sm">
-              <Icon icon="iconoir:bell-off" className="text-2xl d-block mx-auto mb-8" />
+            <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:py-6 tw:text-sm tw:text-muted-foreground">
+              <BellOff className="tw:size-6" aria-hidden="true" />
               No notifications yet
             </div>
           )}
@@ -164,23 +166,17 @@ export default function NotificationBell({ role }: { role?: string }) {
               key={n.id}
               type="button"
               onClick={() => handleOpenItem(n)}
-              className={`w-100 text-start border-0 border-bottom px-16 py-12 d-block ${n.is_read ? 'bg-base' : 'bg-primary-50'}`}
+              className={cn(
+                'tw:m-0 tw:block tw:w-full tw:cursor-pointer tw:border-0 tw:border-b tw:border-solid tw:border-border tw:px-4 tw:py-3 tw:text-left tw:transition-colors tw:hover:bg-accent',
+                n.is_read ? 'tw:bg-transparent' : 'tw:bg-primary-soft/60',
+              )}
             >
-              <div className="d-flex align-items-start gap-2">
-                {!n.is_read && (
-                  <span className="rounded-circle bg-primary-600 flex-shrink-0 mt-6" style={{ width: 8, height: 8 }} />
-                )}
-                <div className="flex-grow-1 min-w-0">
-                  <div className={`text-sm text-primary-light ${n.is_read ? 'fw-medium' : 'fw-semibold'}`}>{n.title}</div>
-                  {n.body && (
-                    <div
-                      className="text-xs text-secondary-light mt-2"
-                      style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
-                    >
-                      {n.body}
-                    </div>
-                  )}
-                  <div className="text-xs text-secondary-light mt-4" title={fullDate(n.created_at)}>
+              <div className="tw:flex tw:items-start tw:gap-2">
+                {!n.is_read && <span className="tw:mt-1.5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-primary" aria-label="Unread" />}
+                <div className="tw:min-w-0 tw:flex-1">
+                  <div className={cn('tw:text-sm tw:text-foreground', n.is_read ? 'tw:font-medium' : 'tw:font-semibold')}>{n.title}</div>
+                  {n.body && <div className="tw:mt-0.5 tw:line-clamp-2 tw:text-xs tw:text-muted-foreground">{n.body}</div>}
+                  <div className="tw:mt-1 tw:text-xs tw:text-muted-foreground" title={fullDate(n.created_at)}>
                     {timeAgo(n.created_at)}
                   </div>
                 </div>
@@ -188,18 +184,17 @@ export default function NotificationBell({ role }: { role?: string }) {
             </button>
           ))}
         </div>
-
-        <button
-          type="button"
-          className="w-100 border-0 bg-transparent text-primary-600 text-sm fw-medium py-12"
+        <Button
+          variant="ghost"
+          className="tw:w-full tw:rounded-none tw:text-primary"
           onClick={() => {
             setOpen(false)
             navigate('/my-notifications')
           }}
         >
           View all notifications
-        </button>
-      </div>
-    </div>
+        </Button>
+      </PopoverContent>
+    </Popover>
   )
 }

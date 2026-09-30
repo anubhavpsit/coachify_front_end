@@ -77,40 +77,43 @@
 | `/library/chapters[/:id]`, `/library/topics[/:id]` | Library* pages | auth only | — | — | ☐ |
 | `*` | NotFoundPage | none | — | — | ☐ |
 
-## 3. Sidebar menu filtering (`src/components/layout/Sidebar.tsx`)
+## 3. Sidebar menu filtering (legacy `src/components/layout/Sidebar.tsx` → now `src/permissions/menu.ts`)
 
 The same rules must apply to any new menu, command palette, quick action, or breadcrumb.
 
+> **Phase 4 status:** The sidebar is now driven by `NAV_GROUPS` in `src/permissions/menu.ts`, where each `visible()` is a literal port of the JSX condition below. Before the old Sidebar was deleted, its output was captured for 84 role/permission combinations into `src/permissions/__fixtures__/legacy-sidebar.json`. `menu.test.ts` asserts that the new menu shows **exactly** the same set of routes for every one of them.
+> The one deliberate difference: legacy rendered **Insights** twice (student with `insights.view`) and **Approvals** twice (teacher with `daily_activities.approve`). The new menu merges each pair into one link with the OR of both conditions, so the visible set is unchanged. Items are now grouped (Overview / Learning / Library / Content / People / Administration), so the order differs from legacy.
+
 | Menu item → route | Visible when | Verified |
 |---|---|---|
-| Dashboard → `/dashboard` | always | ☐ |
-| Notice Board → `/notices` (+ unread badge) | always | ☐ |
-| My Notifications → `/my-notifications` (+ unread badge) | always | ☐ |
-| Facts → `/facts` | always | ☐ |
-| My Attendance → `/my-attendance` | role `student` \| `teacher` | ☐ |
-| Manage Facts → `/admin/facts` | `can('facts.manage')` | ☐ |
-| Chapters → `/chapters` | `can('content_library.manage')` | ☐ |
-| Topics → `/topics` | `can('content_library.manage')` | ☐ |
-| Library: Chapters → `/library/chapters`, Topics → `/library/topics` | role `teacher` | ☐ |
-| Insights → `/insights` | role `teacher` \| `can('insights.view')` | ☐ |
-| Students → `/students` | role `teacher` \| `students.view` \| `students.manage` | ☐ |
-| Assessments → `/assessments` | role `teacher` \| `assessments.view` \| `.manage` \| `.grade` | ☐ |
-| Teachers → `/teachers` | role `student` \| `teachers.view` \| `teachers.manage` | ☐ |
-| Staff → `/staff` | `can('staff.manage')` | ☐ |
-| Expenses → `/expenses` | `expenses.view` \| `expenses.manage` | ☐ |
-| Daily Attendance → `/dashboard/attendance` | `can('attendance.mark')` | ☐ |
-| (student block) Insights, My Activities → `/students/activities`, My Assessments → `/students/assessments` | role `student` | ☐ |
-| (teacher block) Daily Activities → `/teachers/daily-activities`, Approvals → `/approvals` | role `teacher` | ☐ |
-| Approvals → `/approvals` | `can('daily_activities.approve')` | ☐ |
-| AI Content → `/approvals/generated-content` | `can('generated_content.approve')` | ☐ |
-| Subjects → `/subjects` | `can('subjects.manage')` | ☐ |
-| Classes → `/classes` | `can('classes.manage')` | ☐ |
-| Academic Years → `/academic-years` | `can('academic_years.manage')` | ☐ |
-| Fees → `/fees` | `fees.view` \| `fees.manage` | ☐ |
-| Enquiries → `/enquiries` | `enquiries.view` \| `enquiries.manage` | ☐ |
-| Attendance Corrections → `/admin/attendance-corrections` | `can('attendance.corrections')` | ☐ |
-| Notifications → `/notifications` | `can('notifications.manage')` | ☐ |
-| Settings (Company / Notification / Notification Alert / Theme), Sign Up | **commented out**, never shown | ☐ |
+| Dashboard → `/dashboard` | always | ☑ (fixture) |
+| Notice Board → `/notices` (+ unread badge) | always | ☑ (fixture) |
+| My Notifications → `/my-notifications` (+ unread badge) | always | ☑ (fixture) |
+| Facts → `/facts` | always | ☑ (fixture) |
+| My Attendance → `/my-attendance` | role `student` \| `teacher` | ☑ (fixture) |
+| Manage Facts → `/admin/facts` | `can('facts.manage')` | ☑ (fixture) |
+| Chapters → `/chapters` | `can('content_library.manage')` | ☑ (fixture) |
+| Topics → `/topics` | `can('content_library.manage')` | ☑ (fixture) |
+| Library: Chapters → `/library/chapters`, Topics → `/library/topics` | role `teacher` | ☑ (fixture) |
+| Insights → `/insights` | role `teacher` \| `can('insights.view')` | ☑ (fixture) |
+| Students → `/students` | role `teacher` \| `students.view` \| `students.manage` | ☑ (fixture) |
+| Assessments → `/assessments` | role `teacher` \| `assessments.view` \| `.manage` \| `.grade` | ☑ (fixture) |
+| Teachers → `/teachers` | role `student` \| `teachers.view` \| `teachers.manage` | ☑ (fixture) |
+| Staff → `/staff` | `can('staff.manage')` | ☑ (fixture) |
+| Expenses → `/expenses` | `expenses.view` \| `expenses.manage` | ☑ (fixture) |
+| Daily Attendance → `/dashboard/attendance` | `can('attendance.mark')` | ☑ (fixture) |
+| (student block) Insights, My Activities → `/students/activities`, My Assessments → `/students/assessments` | role `student` | ☑ (fixture) |
+| (teacher block) Daily Activities → `/teachers/daily-activities`, Approvals → `/approvals` | role `teacher` | ☑ (fixture) |
+| Approvals → `/approvals` | `can('daily_activities.approve')` | ☑ (fixture) |
+| AI Content → `/approvals/generated-content` | `can('generated_content.approve')` | ☑ (fixture) |
+| Subjects → `/subjects` | `can('subjects.manage')` | ☑ (fixture) |
+| Classes → `/classes` | `can('classes.manage')` | ☑ (fixture) |
+| Academic Years → `/academic-years` | `can('academic_years.manage')` | ☑ (fixture) |
+| Fees → `/fees` | `fees.view` \| `fees.manage` | ☑ (fixture) |
+| Enquiries → `/enquiries` | `enquiries.view` \| `enquiries.manage` | ☑ (fixture) |
+| Attendance Corrections → `/admin/attendance-corrections` | `can('attendance.corrections')` | ☑ (fixture) |
+| Notifications → `/notifications` | `can('notifications.manage')` | ☑ (fixture) |
+| Settings (Company / Notification / Notification Alert / Theme), Sign Up | **commented out**, never shown | ☑ (fixture) |
 
 Note: admins pass every `can()` check, so the admin sidebar is a superset. A teacher who is also granted `insights.view` does **not** get duplicate Insights links, because the teacher block has no Insights. A student sees "Insights" from the student block, and could see it twice if also granted `insights.view`. That is existing behaviour.
 
