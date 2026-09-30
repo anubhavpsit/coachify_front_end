@@ -36,9 +36,12 @@ const PAGE_SIZE = 15
 export default function NoticeBoardCard({
   fullPage = false,
   compact = false,
+  bare = false,
 }: {
   fullPage?: boolean
   compact?: boolean
+  /** Compact without the Bootstrap col wrapper (for CSS-grid parents). */
+  bare?: boolean
 }) {
   // "Active" = live notices (the normal Notice Board); "Expired" = past expiry
   const [tab, setTab] = useState<'active' | 'expired'>('active')
@@ -354,5 +357,5 @@ export default function NoticeBoardCard({
     </div>
   )
 
-  return compact ? <div className="col-xxl-4 col-md-6">{content}</div> : content
+  return compact && !bare ? <div className="col-xxl-4 col-md-6">{content}</div> : content
 }
