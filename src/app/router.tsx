@@ -21,7 +21,7 @@ const NotificationAlertPage = lazy(() => import('@/pages/settings/NotificationAl
 const ThemePage = lazy(() => import('@/pages/settings/ThemePage'))
 const SubjectsPage = lazy(() => import('@/features/academics/pages/SubjectsPage'))
 const ClassesPage = lazy(() => import('@/features/academics/pages/ClassesPage'))
-const FeeComponent = lazy(() => import('@/pages/fees/FeeComponent'))
+const FeeComponent = lazy(() => import('@/features/finance/pages/FeesPage'))
 const ExpensesComponent = lazy(() => import('@/features/finance/pages/ExpensesPage'))
 const EnquiriesPage = lazy(() => import('@/pages/enquiries/EnquiriesPage'))
 const TeachersPage = lazy(() => import('@/features/teachers/pages/TeachersPage'))

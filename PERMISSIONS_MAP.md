@@ -35,6 +35,7 @@
 | Q11 | `/dashboard/settings/*` and `/auth/sign-up` are static template pages with no API calls. Their sidebar links are commented out. | `pages/settings/*`, `SignUpPage` | Dead UI. **Decision needed:** keep them as they are, or hide them. |
 | Q12 | "Add New Teacher" button has no in-page gate. | `TeachersPage` | Students (who reach /teachers via orRoles) and staff with only `teachers.view` see the button; the backend rejects their create. Preserved as-is; recommend hiding it unless role `coaching_admin` or `teachers.manage`. |
 | Q13 | Expenses "Add" form has no in-page gate. | `ExpensesPage` | Staff with only `expenses.view` see the add form; the backend rejects the save. Preserved as-is; recommend showing the form only with `expenses.manage`. |
+| Q14 | Fees "Add" form has no in-page gate. | `FeesPage` | Staff with only `fees.view` see the add form; the backend rejects the save. Preserved as-is; recommend showing it only with `fees.manage`. |
 
 > Q1–Q7 and Q10 are **inconsistencies between the route/menu layer and the in-page layer**. Phase 4 must keep them as they are. I recommend we fix them deliberately in a separate, reviewed change once the backend policy is confirmed. For each one, tell me: preserve, or align to permissions.
 
@@ -50,7 +51,7 @@
 | `/dashboard/settings/company` / `notification` / `notification-alert` / `theme` | static settings pages | auth only | — | — | ☐ |
 | `/subjects` | SubjectsPage | RequirePermission | `subjects.manage` | → `/dashboard` | ☐ |
 | `/classes` | ClassesPage | RequirePermission | `classes.manage` | → `/dashboard` | ☐ |
-| `/fees` | FeeComponent | RequirePermission | `fees.view` \| `fees.manage` | → `/dashboard` | ☐ |
+| `/fees` | FeesPage (features/finance) | RequirePermission | `fees.view` \| `fees.manage` | → `/dashboard` | ☑ |
 | `/expenses` | ExpensesPage (features/finance) | RequirePermission | `expenses.view` \| `expenses.manage` | → `/dashboard` | ☑ |
 | `/enquiries` | EnquiriesPage | RequirePermission | `enquiries.view` \| `enquiries.manage` (+Q1) | → `/dashboard` | ☐ |
 | `/teachers` | TeachersPage | RequirePermission | `teachers.view` \| `teachers.manage` \| role `student` | → `/dashboard` | ☐ |
@@ -161,7 +162,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | TeachersPage | UserProfileModal `canEditImage` | role `coaching_admin` | prop | ☑ (test) |
 | **StaffPage** (features/staff) | Edit / Delete row buttons | `staff.manage` | conditional render | ☑ (test) |
 | StaffPage | UserProfileModal `canEditImage` | `staff.manage` | prop | ☑ (test) |
-| **FeeComponent** | "Edit" column (2 tables) + FeeEditModal | role `coaching_admin` (Q3) | conditional render | ☐ |
+| **FeesPage** (features/finance) | "Edit" column (2 tables) + FeeEditDialog | role `coaching_admin` (Q3) | conditional render | ☑ (test) |
 | **EnquiriesPage** | Whole page + list fetch | role `coaching_admin` (Q1) | page returns "not authorized"; fetch skipped | ☐ |
 | **AssessmentsPage** | Data source for students | teacher → `/teachers/students` | endpoint choice | ☐ |
 | AssessmentsPage | Auto-generate assessments toggle card | role `coaching_admin` | conditional render | ☐ |
