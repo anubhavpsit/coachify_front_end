@@ -148,13 +148,13 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | PendingActionsCard | "Notify" action | `dashboard.notify_pending_actions` | conditional render | ☑ (test) |
 | ActivityLogCard | Self entry in user filter | role `coaching_admin` | list building | ☐ |
 | **DailyAttendance** | Mark / Unmark Holiday button | role `coaching_admin` | conditional render | ☐ |
-| **StudentsPage** | Data source | teacher → `/teachers/students`; admin → `/students` (+ status param) | endpoint choice | ☐ |
-| StudentsPage | "Add New Student" button | role `coaching_admin` | conditional render | ☐ |
-| StudentsPage | "Bulk Promote" button | role `coaching_admin` | conditional render | ☐ |
-| StudentsPage | Status filter | role `coaching_admin` | conditional render | ☐ |
-| StudentsPage | Phone column, Status column | role `coaching_admin` | conditional render (th + td) | ☐ |
-| StudentsPage | Row actions dropdown (View, Edit, Assign Teachers, Promote, Reactivate if inactive, Delete) | role `coaching_admin` **and** `student.tenant_id !== 0` | conditional render; others get a "View" link | ☐ |
-| StudentsPage | UserProfileModal `canEditImage` | role `coaching_admin` | prop | ☐ |
+| **StudentsPage** (features/students) | Data source | teacher → `/teachers/students`; admin → `/students` (+ status param) | endpoint choice | ☑ (test) |
+| StudentsPage | "Add New Student" button | role `coaching_admin` | conditional render | ☑ (test) |
+| StudentsPage | "Bulk Promote" button | role `coaching_admin` | conditional render | ☑ (test) |
+| StudentsPage | Status filter | role `coaching_admin` | conditional render | ☑ (test) |
+| StudentsPage | Phone column, Status column | role `coaching_admin` | conditional render (th + td) | ☑ (test) |
+| StudentsPage | Row actions dropdown (View, Edit, Assign Teachers, Promote, Reactivate if inactive, Delete) | role `coaching_admin` **and** `student.tenant_id !== 0` | conditional render; others get a "View" link | ☑ (test) |
+| StudentsPage | UserProfileModal `canEditImage` | role `coaching_admin` | prop | ☑ (test) |
 | **TeachersPage** (features/teachers) | Data source | student → own teachers endpoint | endpoint choice | ☑ (test) |
 | TeachersPage | Edit / Delete row buttons (and View; all hidden for tenant_id 0 rows) | role `coaching_admin` | conditional render | ☑ (test) |
 | TeachersPage | UserProfileModal `canEditImage` | role `coaching_admin` | prop | ☑ (test) |
