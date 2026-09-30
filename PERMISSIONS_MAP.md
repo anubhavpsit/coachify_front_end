@@ -47,7 +47,7 @@
 | `/auth/sign-up` | SignUpPage (static) | none | — | — | ☐ |
 | all below | — | `ProtectedRoute` | `authToken` present; `/auth/me` not 401 | `Navigate('/')` | ☐ |
 | `/dashboard` | DashboardPage | auth only | — | — | ☑ |
-| `/dashboard/attendance` | DailyAttendance | RequirePermission | `attendance.mark` | → `/dashboard` | ☐ |
+| `/dashboard/attendance` | DailyAttendancePage (features/attendance) | RequirePermission | `attendance.mark` | → `/dashboard` | ☑ |
 | `/dashboard/settings/company` / `notification` / `notification-alert` / `theme` | static settings pages | auth only | — | — | ☐ |
 | `/subjects` | SubjectsPage | RequirePermission | `subjects.manage` | → `/dashboard` | ☐ |
 | `/classes` | ClassesPage | RequirePermission | `classes.manage` | → `/dashboard` | ☐ |
@@ -149,7 +149,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | TeacherActivityGapsCard | "Notify" action | `dashboard.notify_activity_gaps` | conditional render | ☑ (test) |
 | PendingActionsCard | "Notify" action | `dashboard.notify_pending_actions` | conditional render | ☑ (test) |
 | ActivityLogCard | Self entry in user filter | role `coaching_admin` | list building | ☐ |
-| **DailyAttendance** | Mark / Unmark Holiday button | role `coaching_admin` | conditional render | ☐ |
+| **DailyAttendancePage** (features/attendance) | Mark / Unmark Holiday button | role `coaching_admin` | conditional render | ☑ (test) |
 | **StudentsPage** (features/students) | Data source | teacher → `/teachers/students`; admin → `/students` (+ status param) | endpoint choice | ☑ (test) |
 | StudentsPage | "Add New Student" button | role `coaching_admin` | conditional render | ☑ (test) |
 | StudentsPage | "Bulk Promote" button | role `coaching_admin` | conditional render | ☑ (test) |
