@@ -10,7 +10,7 @@ import PageFallback from './layout/PageFallback'
 // Route-level code splitting. Paths and guards are identical to the pre-refactor App.tsx
 // (see PERMISSIONS_MAP.md §2); only the per-group <DashboardLayout> copies were merged
 // into one shell so the sidebar no longer remounts on every section change.
-const SignInPage = lazy(() => import('@/pages/auth/SignInPage'))
+const SignInPage = lazy(() => import('@/features/auth/pages/SignInPage'))
 const SignUpPage = lazy(() => import('@/pages/auth/SignUpPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 const DashboardPage = lazy(() => import('@/pages/dashboard/DashboardPage'))
