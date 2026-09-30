@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import ProtectedRoute from './components/ProtectedRoute.tsx'
-import RequirePermission from './components/RequirePermission.tsx'
+import ProtectedRoute from './permissions/ProtectedRoute.tsx'
+import RequirePermission from './permissions/RequirePermission.tsx'
 import DashboardLayout from './layouts/DashboardLayout.tsx'
 import DashboardPage from './pages/dashboard/DashboardPage.tsx'
 import DailyAttendance from './pages/dashboard/DailyAttendance.tsx'

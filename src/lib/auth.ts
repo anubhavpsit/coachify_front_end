@@ -16,6 +16,13 @@ export interface AuthUser {
 
 export const ADMIN_ROLES = ['coaching_admin', 'super_admin']
 
+/** Fired on this window when refreshAuthUser() rewrites/clears localStorage.authUser. */
+export const AUTH_CHANGED_EVENT = 'coachify:auth-changed'
+
+function notifyAuthChanged() {
+  window.dispatchEvent(new Event(AUTH_CHANGED_EVENT))
+}
+
 export function getAuthUser(): AuthUser | null {
   if (typeof window === 'undefined') return null
   try {
@@ -60,6 +67,7 @@ export async function refreshAuthUser(apiBaseUrl: string): Promise<AuthUser | nu
     if (res.status === 401) {
       window.localStorage.removeItem('authUser')
       window.localStorage.removeItem('authToken')
+      notifyAuthChanged()
       return null
     }
     if (!res.ok) return getAuthUser()
@@ -67,6 +75,7 @@ export async function refreshAuthUser(apiBaseUrl: string): Promise<AuthUser | nu
     const user = body?.user as AuthUser | undefined
     if (user) {
       window.localStorage.setItem('authUser', JSON.stringify(user))
+      notifyAuthChanged()
       return user
     }
   } catch {

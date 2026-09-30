@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import { refreshAuthUser } from '../lib/auth'
+import { refreshAuthUser } from '@/lib/auth'
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'

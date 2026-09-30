@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
-import { canAny, getAuthUser } from '../lib/auth'
+import { ROUTES } from '@/constants/routes'
+import { isAllowed, usePermission } from './usePermission'
 
 interface Props {
   /** User needs at least one of these permission keys. */
@@ -18,18 +19,18 @@ interface Props {
  *
  *   <Route element={<RequirePermission anyOf={['fees.view']} />}> ... </Route>
  *   <Route index element={<RequirePermission anyOf={['fees.view']}><FeesPage/></RequirePermission>} />
+ *
+ * Rule (unchanged): allowed = orRoles.includes(user.role) || canAny(anyOf, user).
  */
 export default function RequirePermission({
   anyOf,
   orRoles = [],
-  redirectTo = '/dashboard',
+  redirectTo = ROUTES.DASHBOARD,
   children,
 }: Props) {
-  const user = getAuthUser()
-  const allowed =
-    (!!user && orRoles.includes(user.role)) || canAny(anyOf, user)
+  const api = usePermission()
 
-  if (!allowed) {
+  if (!isAllowed(api, anyOf, orRoles)) {
     return <Navigate to={redirectTo} replace />
   }
 
