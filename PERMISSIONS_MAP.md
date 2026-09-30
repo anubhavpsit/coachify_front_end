@@ -173,7 +173,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | DailyActivityApprovalsPage | Students endpoint | admin → `/students`, teacher → `/teachers/students` | endpoint choice | ☐ |
 | DailyActivityApprovalsPage | Bulk-approve bar, select-all checkbox, per-row checkbox, Approve/Unapprove buttons | `isAdmin` | conditional render | ☐ |
 | **GeneratedContentApprovalsPage** | Whole page + fetches | role `coaching_admin` (Q2) | "not authorized" message; fetch skipped | ☐ |
-| **NotificationsPage** | Whole page fetch | role `coaching_admin` \| `super_admin` (Q10) | error message; fetch skipped | ☐ |
+| **NotificationsPage** (features/notifications) | Whole page fetch | role `coaching_admin` \| `super_admin` (Q10) | error message; fetch skipped (stats/filters now also hidden for non-admins) | ☑ (test) |
 | **SearchResultsPage** | Subjects, Classes, Enquiries result sections | role `coaching_admin` | conditional render | ☐ |
 | **FactsPage** | "Featured" tab | role `coaching_admin` | `show` flag on tab | ☐ |
 | FactsPage | "Manage" link → `/admin/facts` | role `coaching_admin` | conditional render | ☐ |
@@ -186,7 +186,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | UserProfileModal | Change profile image | `canEditImage` prop | render | ☐ |
 | **NoticeBoardCard / NoticeDetailDialog** (features/notices) | Create / Edit / Delete notice, admin details (audience, expiry, push) | server flag `meta.can_manage` | conditional render; form only mounted when true | ☑ (test) |
 | **ChaptersManager / TopicsManager / QuestionsManager / ChapterDetailManager** | Edit / Delete (otherwise a "global/read-only" marker) | ownership: `item.tenant_id === ownTenantId` | conditional render | ☐ |
-| **NotificationBell / MyNotificationsPage** | Deep-link target | role `student` → `/students/assessments`, else `/assessments` | link builder `notificationLink()` | ☐ |
+| **NotificationBell / MyNotificationsPage** | Deep-link target | role `student` → `/students/assessments`, else `/assessments` | link builder `notificationLink()` (unchanged) | ☑ (test) |
 | **Topbar** | Search, profile menu, logout | auth only | — | ☐ |
 
 ## 5. Role test plan (fill in credentials locally; they are not stored here)
