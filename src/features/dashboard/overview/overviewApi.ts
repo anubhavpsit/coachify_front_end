@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
+import { API_BASE_URL } from '@/lib/apiClient'
 
 export type Severity = 'high' | 'medium' | 'info'
 export type OverviewTarget =

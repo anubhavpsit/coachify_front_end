@@ -1,48 +1,30 @@
-import { useEffect, useState } from 'react'
-import NoticeBoardCard from '../notices/NoticeBoardCard'
+import NoticeBoardCard from '@/components/notices/NoticeBoardCard'
+import WidgetCard from '@/components/common/WidgetCard'
+import { useAsync } from '@/hooks/useAsync'
 import DashboardAlerts from './DashboardAlerts'
-import { fetchOverview, type Overview } from './overviewApi'
-import {
-  StudentAttendanceCard,
-  StudentHomeworkCard,
-  StudentNewContentCard,
-  StudentResultsCard,
-  StudentUpcomingCard,
-} from './StudentWidgets'
-import {
-  TeacherAttentionCard,
-  TeacherGradingCard,
-  TeacherPapersCard,
-  TeacherTodayCard,
-  TeacherUpcomingCard,
-} from './TeacherWidgets'
+import { fetchOverview } from './overviewApi'
+import { StudentAttendanceCard, StudentHomeworkCard, StudentNewContentCard, StudentResultsCard, StudentUpcomingCard } from './StudentWidgets'
+import { TeacherAttentionCard, TeacherGradingCard, TeacherPapersCard, TeacherTodayCard, TeacherUpcomingCard } from './TeacherWidgets'
+
+const GRID = 'tw:grid tw:items-start tw:gap-4 tw:md:grid-cols-2 tw:2xl:grid-cols-3'
 
 /**
  * Teacher / student "smart" dashboard below the stats cards: prioritised
  * alerts + role widgets, all from ONE request (GET /dashboard/overview).
  */
 export default function SmartDashboard({ role }: { role: 'student' | 'teacher' }) {
-  const [data, setData] = useState<Overview | null>(null)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    fetchOverview()
-      .then(d => !cancelled && setData(d))
-      .catch(() => !cancelled && setError('Unable to load your dashboard insights.'))
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const { data, loading, error, reload } = useAsync(fetchOverview, [])
 
   return (
-    <>
-      {error && <p className="text-danger-600 text-sm mb-16">{error}</p>}
-      {!data && !error && <p className="text-sm text-secondary-light mb-16">Loading your insights…</p>}
+    <div className="tw:flex tw:flex-col tw:gap-4">
+      {error ? (
+        <WidgetCard title="Your insights" error="Unable to load your dashboard insights." onRetry={reload} maxBodyHeight={false} />
+      ) : null}
 
-      {data && <DashboardAlerts alerts={data.alerts} role={role} />}
+      {data && <DashboardAlerts alerts={data.alerts ?? []} role={role} />}
 
-      <div className="row g-3 mb-24">
+      <div className={GRID}>
+        {loading && !data && Array.from({ length: 3 }, (_, i) => <WidgetCard key={i} title=" " loading />)}
         {data?.student && (
           <>
             <StudentUpcomingCard items={data.student.upcoming_assessments} />
@@ -62,8 +44,8 @@ export default function SmartDashboard({ role }: { role: 'student' | 'teacher' }
           </>
         )}
         {/* Notice Board sits with the widgets (independent of the overview request) */}
-        <NoticeBoardCard compact />
+        <NoticeBoardCard compact bare />
       </div>
-    </>
+    </div>
   )
 }

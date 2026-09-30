@@ -14,7 +14,7 @@ vi.mock('../widgets/TeacherActivityGapsCard', () => ({ default: () => <i data-wi
 vi.mock('../widgets/TodayBirthdayCard', () => ({ default: () => <i data-widget="TodayBirthdayCard" /> }))
 vi.mock('../widgets/UnassignedStudentsCard', () => ({ default: () => <i data-widget="UnassignedStudentsCard" /> }))
 vi.mock('@/components/notices/NoticeBoardCard', () => ({ default: () => <i data-widget="NoticeBoardCard" /> }))
-vi.mock('@/components/overview/SmartDashboard', () => ({ default: ({ role }: { role: string }) => <i data-widget={`SmartDashboard:${role}`} /> }))
+vi.mock('../overview/SmartDashboard', () => ({ default: ({ role }: { role: string }) => <i data-widget={`SmartDashboard:${role}`} /> }))
 
 const statsSpy = vi.fn()
 const topSpy = vi.fn()

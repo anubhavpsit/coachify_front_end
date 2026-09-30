@@ -143,8 +143,8 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | DashboardPage | Student stats block | role `student` | conditional render | ☐ |
 | DashboardPage | SmartDashboard (teacher/student widgets) | role `teacher` \| `student` | conditional render; role passed as prop | ☐ |
 | DashboardPage | ActivityLogCard | role `coaching_admin` \| `activity_logs.view` | conditional render | ☐ |
-| TeacherActivityGapsCard | "Notify" action | `dashboard.notify_activity_gaps` | conditional render | ☐ |
-| PendingActionsCard | "Notify" action | `dashboard.notify_pending_actions` | conditional render | ☐ |
+| TeacherActivityGapsCard | "Notify" action | `dashboard.notify_activity_gaps` | conditional render | ☑ (test) |
+| PendingActionsCard | "Notify" action | `dashboard.notify_pending_actions` | conditional render | ☑ (test) |
 | ActivityLogCard | Self entry in user filter | role `coaching_admin` | list building | ☐ |
 | **DailyAttendance** | Mark / Unmark Holiday button | role `coaching_admin` | conditional render | ☐ |
 | **StudentsPage** | Data source | teacher → `/teachers/students`; admin → `/students` (+ status param) | endpoint choice | ☐ |

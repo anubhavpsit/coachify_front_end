@@ -17,7 +17,7 @@ import { formatCurrency } from '@/lib/formatters'
 import { PERMISSIONS as P, usePermission } from '@/permissions'
 import type { DashboardStats } from '../types'
 
-const GRID = 'tw:grid tw:gap-4 tw:grid-cols-1 tw:sm:grid-cols-2 tw:xl:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]'
+const GRID = 'tw:grid tw:gap-3 tw:grid-cols-2 tw:sm:gap-4 tw:xl:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]'
 
 function Grid({ children }: { children: React.ReactNode }) {
   return (

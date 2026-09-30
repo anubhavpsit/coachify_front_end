@@ -33,17 +33,17 @@ export default function StatCard({ label, value, icon: Icon, tone = 'primary', f
     <m.div
       variants={slideUp}
       className={cn(
-        'tw:flex tw:flex-col tw:gap-4 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-5 tw:shadow-xs tw:transition-[transform,box-shadow] tw:duration-200 tw:hover:-translate-y-0.5 tw:hover:shadow-md',
+        'tw:flex tw:min-w-0 tw:flex-col tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4 tw:shadow-xs tw:sm:gap-4 tw:sm:p-5 tw:transition-[transform,box-shadow] tw:duration-200 tw:hover:-translate-y-0.5 tw:hover:shadow-md',
         className,
       )}
     >
       <div className="tw:flex tw:items-center tw:gap-3">
-        <span className={cn('tw:flex tw:size-11 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full', TONES[tone])}>
-          <Icon className="tw:size-5" aria-hidden="true" />
+        <span className={cn('tw:flex tw:size-9 tw:shrink-0 tw:sm:size-11 tw:items-center tw:justify-center tw:rounded-full', TONES[tone])}>
+          <Icon className="tw:size-4 tw:sm:size-5" aria-hidden="true" />
         </span>
-        <span className="tw:text-sm tw:font-medium tw:text-muted-foreground">{label}</span>
+        <span className="tw:text-xs tw:font-medium tw:text-muted-foreground tw:sm:text-sm">{label}</span>
       </div>
-      <div className="tw:text-3xl tw:font-bold tw:tabular-nums tw:tracking-tight tw:text-foreground" aria-label={`${label}: ${format(value ?? 0)}`}>
+      <div className="tw:truncate tw:text-xl tw:font-bold tw:tabular-nums tw:tracking-tight tw:text-foreground tw:sm:text-3xl" aria-label={`${label}: ${format(value ?? 0)}`}>
         <span aria-hidden="true">{format(shown)}</span>
       </div>
     </m.div>
