@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { personFields } from '@/features/people/schemas/person'
 import type { Student, StudentPayload } from '../services/studentsService'
+import { normalizeSubjectIds } from '../lib/studentRows'
 
 /**
  * StudentController: name/email/password(create min, D4 → 8)/dob/gender as
@@ -28,7 +29,8 @@ export function studentDefaults(s: Student | null): StudentValues {
     password: '',
     class: cls || '',
     grade: typeof s.student_profile?.grade === 'number' ? s.student_profile.grade : '',
-    subjects: s.student_profile?.subjects || [],
+    // Normalised so saved subjects show as ticked and re-ticking can't add a duplicate.
+    subjects: normalizeSubjectIds(s.student_profile?.subjects),
     phone: s.student_profile?.phone || '',
     dob: (s.dob || '').slice(0, 10),
     gender: (s.gender || '') as StudentValues['gender'],

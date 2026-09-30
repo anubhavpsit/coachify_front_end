@@ -37,8 +37,25 @@ export function classLabelFor(s: Student, classes: ClassOption[]): string {
   return typeof s.current_class_name === 'string' && s.current_class_name.trim() !== '' ? s.current_class_name : '-'
 }
 
+/**
+ * Stored subject ids are not clean: older records hold strings ("5") and
+ * some hold repeats ([5, 3, 5]). Coerce to positive integers, keep first-seen
+ * order, drop duplicates.
+ */
+export function normalizeSubjectIds(raw: unknown): number[] {
+  if (!Array.isArray(raw)) return []
+  const out: number[] = []
+  for (const v of raw) {
+    const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN
+    if (Number.isInteger(n) && n > 0 && !out.includes(n)) out.push(n)
+  }
+  return out
+}
+
 export function subjectNamesFor(s: Student, subjects: SubjectOption[]): string[] {
-  return (s.student_profile?.subjects ?? []).map((id) => subjects.find((x) => x.id === id)?.subject).filter((n): n is string => !!n)
+  return normalizeSubjectIds(s.student_profile?.subjects)
+    .map((id) => subjects.find((x) => x.id === id)?.subject)
+    .filter((n): n is string => !!n)
 }
 
 export function filterStudents(list: Student[], search: string, classId: number | ''): Student[] {
