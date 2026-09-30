@@ -9,6 +9,7 @@ import {
   setTenantBranding,
   getTenantPrimaryLogoUrl,
 } from '../../utils/branding'
+import { applyThemeColor } from '@/theme'
 
 type LoginUser = {
   id: number
@@ -68,7 +69,7 @@ export default function SignInPage() {
     }
     const savedColor = window.localStorage.getItem('templateColor')
     if (savedColor) {
-      document.documentElement.style.setProperty('--primary-600', savedColor)
+      applyThemeColor(savedColor)
     }
 
     const storedTenantId = window.localStorage.getItem('tenant_id')
@@ -105,10 +106,7 @@ export default function SignInPage() {
           setBrandName(getTenantBrandName())
           // ✅ APPLY THEME COLOR
           if (tenant.theme_color) {
-            document.documentElement.style.setProperty(
-              '--primary-600',
-              tenant.theme_color
-            )
+            applyThemeColor(tenant.theme_color)
             window.localStorage.setItem(
               'templateColor',
               tenant.theme_color

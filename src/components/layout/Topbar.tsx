@@ -5,6 +5,7 @@ import axios from 'axios'
 import Icon from '../common/Icon.tsx'
 import Avatar from '../common/Avatar.tsx';
 import NotificationBell from './NotificationBell.tsx';
+import { applyThemeColor } from '@/theme';
 
 type TopbarUser = {
   name: string;
@@ -76,7 +77,7 @@ export default function Topbar({
   useEffect(() => {
     const savedColor = window.localStorage.getItem('templateColor')
     if (savedColor) {
-      document.documentElement.style.setProperty('--primary-600', savedColor)
+      applyThemeColor(savedColor)
     }
 
     const stored = window.localStorage.getItem('authUser')

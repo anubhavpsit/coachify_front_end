@@ -1,0 +1,148 @@
+/*
+ * Design system entry.
+ *
+ * Coexistence mode (UI migration):
+ *  - The legacy WowDash + Bootstrap CSS is still loaded from index.html.
+ *  - Tailwind runs with the `tw:` prefix (Bootstrap's `.p-4`, `.border`, … are
+ *    !important and would clash). Write classes as `tw:flex tw:p-4`.
+ *  - Preflight is NOT loaded; Bootstrap's reboot is the base layer.
+ *  - Utilities are left unlayered on purpose: unlayered template CSS would
+ *    otherwise beat every layered Tailwind utility.
+ * Once the template CSS is gone: add preflight and drop the prefix.
+ *
+ * Tenant-driven tokens (--primary, --primary-foreground, --primary-hover,
+ * --primary-soft, --ring, --primary-50..900) are written at runtime by
+ * src/theme/engine.ts. Never declare them on :root here — only use them with
+ * fallbacks.
+ */
+@import 'tailwindcss/theme.css' prefix(tw);
+@import 'tailwindcss/utilities.css' prefix(tw);
+@import 'tw-animate-css';
+
+@import '@fontsource-variable/inter';
+@import '@fontsource/noto-sans-devanagari/400.css';
+@import '@fontsource/noto-sans-devanagari/500.css';
+@import '@fontsource/noto-sans-devanagari/600.css';
+@import '@fontsource/noto-sans-devanagari/700.css';
+
+:root {
+  /* Surfaces & text (mirrors the template's light palette) */
+  --background: #f5f6fa;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --muted: #f3f4f6;
+  --muted-foreground: #4b5563;
+  --secondary: #f3f4f6;
+  --secondary-foreground: #1f2937;
+  --border: #e5e7eb;
+  --input: #d1d5db;
+
+  /* Status colours (AA against white for text use) */
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --success-soft: #dcfce7;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --warning-soft: #fef3c7;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --destructive-soft: #fee2e2;
+  --info: #2563eb;
+  --info-soft: #dbeafe;
+
+  --radius: 0.625rem;
+
+  /* Typography — Inter for Latin, Noto Sans Devanagari picks up Hindi glyphs */
+  --font-family-base: 'Inter Variable', Inter, 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-base: 1rem;
+}
+
+[data-theme='dark'] {
+  --background: #1b2431;
+  --foreground: #f5f6fa;
+  --card: #273142;
+  --card-foreground: #f5f6fa;
+  --popover: #273142;
+  --popover-foreground: #f5f6fa;
+  --muted: #323d4e;
+  --muted-foreground: #d1d5db;
+  --secondary: #323d4e;
+  --secondary-foreground: #f3f4f6;
+  --border: #d1d5db33;
+  --input: #4b5563;
+
+  --success: #22c55e;
+  --success-soft: #22c55e1f;
+  --warning: #f59e0b;
+  --warning-foreground: #1b2431;
+  --warning-soft: #f59e0b1f;
+  --destructive: #f87171;
+  --destructive-foreground: #1b2431;
+  --destructive-soft: #f871711f;
+  --info: #60a5fa;
+  --info-soft: #60a5fa1f;
+}
+
+/* Map tokens to Tailwind utilities: tw:bg-primary, tw:text-muted-foreground, … */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+
+  --color-primary: var(--primary, #487fff);
+  --color-primary-foreground: var(--primary-foreground, #ffffff);
+  --color-primary-hover: var(--primary-hover, #486cea);
+  --color-primary-active: var(--primary-active, #4759d6);
+  --color-primary-soft: var(--primary-soft, #e4f1ff);
+  --color-primary-soft-foreground: var(--primary-soft-foreground, #486cea);
+  --color-ring: var(--ring, #519fff);
+  --color-accent: var(--primary-soft, #e4f1ff);
+  --color-accent-foreground: var(--primary-soft-foreground, #486cea);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --font-sans: var(--font-family-base);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-xs: 0 1px 2px 0 rgb(16 24 40 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(16 24 40 / 0.08), 0 1px 2px -1px rgb(16 24 40 / 0.06);
+  --shadow-md: 0 4px 8px -2px rgb(16 24 40 / 0.08), 0 2px 4px -2px rgb(16 24 40 / 0.05);
+  --shadow-lg: 0 12px 16px -4px rgb(16 24 40 / 0.08), 0 4px 6px -2px rgb(16 24 40 / 0.03);
+
+  /* Motion tokens (mirror src/theme/tokens.ts) */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+}
+
+/* Legacy pages inherit the shared font stack (template used Google-hosted Inter). */
+html body {
+  font-family: var(--font-family-base);
+}
