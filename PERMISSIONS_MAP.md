@@ -34,6 +34,7 @@
 | Q10 | `/notifications` has no route guard. The page itself blocks non-admins with an error string. The sidebar link needs `notifications.manage`. | `NotificationsPage.tsx:126` | Staff with `notifications.manage` see the link, then "Only coaching admins can view notifications." |
 | Q11 | `/dashboard/settings/*` and `/auth/sign-up` are static template pages with no API calls. Their sidebar links are commented out. | `pages/settings/*`, `SignUpPage` | Dead UI. **Decision needed:** keep them as they are, or hide them. |
 | Q12 | "Add New Teacher" button has no in-page gate. | `TeachersPage` | Students (who reach /teachers via orRoles) and staff with only `teachers.view` see the button; the backend rejects their create. Preserved as-is; recommend hiding it unless role `coaching_admin` or `teachers.manage`. |
+| Q13 | Expenses "Add" form has no in-page gate. | `ExpensesPage` | Staff with only `expenses.view` see the add form; the backend rejects the save. Preserved as-is; recommend showing the form only with `expenses.manage`. |
 
 > Q1–Q7 and Q10 are **inconsistencies between the route/menu layer and the in-page layer**. Phase 4 must keep them as they are. I recommend we fix them deliberately in a separate, reviewed change once the backend policy is confirmed. For each one, tell me: preserve, or align to permissions.
 
@@ -50,7 +51,7 @@
 | `/subjects` | SubjectsPage | RequirePermission | `subjects.manage` | → `/dashboard` | ☐ |
 | `/classes` | ClassesPage | RequirePermission | `classes.manage` | → `/dashboard` | ☐ |
 | `/fees` | FeeComponent | RequirePermission | `fees.view` \| `fees.manage` | → `/dashboard` | ☐ |
-| `/expenses` | ExpensesComponent | RequirePermission | `expenses.view` \| `expenses.manage` | → `/dashboard` | ☐ |
+| `/expenses` | ExpensesPage (features/finance) | RequirePermission | `expenses.view` \| `expenses.manage` | → `/dashboard` | ☑ |
 | `/enquiries` | EnquiriesPage | RequirePermission | `enquiries.view` \| `enquiries.manage` (+Q1) | → `/dashboard` | ☐ |
 | `/teachers` | TeachersPage | RequirePermission | `teachers.view` \| `teachers.manage` \| role `student` | → `/dashboard` | ☐ |
 | `/teachers/daily-activities` | DailyActivitiesPage | auth only | — | — | ☐ |

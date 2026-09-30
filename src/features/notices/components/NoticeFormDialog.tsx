@@ -187,7 +187,7 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
                     <FormItem>
                       <FormLabel required>Target audience</FormLabel>
                       <FormControl>
-                        <div role="group" className="tw:flex tw:flex-wrap tw:gap-2">
+                        <div role="group" aria-label="Target audience" className="tw:flex tw:flex-wrap tw:gap-2">
                           {AUDIENCE_OPTIONS.map((t) => {
                             const id = `notice-target-${t}`
                             const disabled = t !== 'all' && allSelected
