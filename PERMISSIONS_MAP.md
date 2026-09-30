@@ -85,6 +85,8 @@
 The same rules must apply to any new menu, command palette, quick action, or breadcrumb.
 
 > **Phase 4 status:** The sidebar is now driven by `NAV_GROUPS` in `src/permissions/menu.ts`, where each `visible()` is a literal port of the JSX condition below. Before the old Sidebar was deleted, its output was captured for 84 role/permission combinations into `src/permissions/__fixtures__/legacy-sidebar.json`. `menu.test.ts` asserts that the new menu shows **exactly** the same set of routes for every one of them.
+> **Moved to the top bar (user request, 2026-09-30):** "Notice Board" and "My Notifications" were always-visible sidebar items (no gate). Notice Board is now the megaphone button in the top bar (every signed-in user, with the unread badge). My Notifications is reached from the bell's "View all notifications". Routes are unchanged, and menu.test.ts excludes the two links from the legacy fixture comparison.
+
 > The one deliberate difference: legacy rendered **Insights** twice (student with `insights.view`) and **Approvals** twice (teacher with `daily_activities.approve`). The new menu merges each pair into one link with the OR of both conditions, so the visible set is unchanged. Items are now grouped (Overview / Learning / Library / Content / People / Administration), so the order differs from legacy.
 
 | Menu item → route | Visible when | Verified |

@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { ROUTES } from '@/constants/routes'
 import { cn } from '@/lib/utils'
 import { useAuthUser } from '@/permissions'
+import NoticeBoardButton from './NoticeBoardButton'
 import UserMenu from './UserMenu'
 
 interface Props {
@@ -100,6 +101,7 @@ export default function Topbar({ isDesktop, sidebarCollapsed, onToggleSidebar, t
             </TooltipTrigger>
             <TooltipContent>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</TooltipContent>
           </Tooltip>
+          <NoticeBoardButton />
           <NotificationBell role={user?.role} />
           <UserMenu user={user} />
         </div>

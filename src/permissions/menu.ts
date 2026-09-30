@@ -1,7 +1,6 @@
 import type { LucideIcon } from 'lucide-react'
 import {
   BadgeCheck,
-  Bell,
   BellRing,
   BookMarked,
   BookOpen,
@@ -18,7 +17,6 @@ import {
   IndianRupee,
   Layers,
   Lightbulb,
-  Megaphone,
   MessageCircleQuestion,
   NotebookText,
   Presentation,
@@ -59,6 +57,9 @@ const always = () => true
  * breadcrumbs, command palette). Visibility is checked against
  * src/permissions/__fixtures__/legacy-sidebar.json by menu.test.tsx.
  *
+ * Notice Board and My Notifications (both always visible) moved to the top
+ * bar: the megaphone button and the bell's "View all notifications".
+ *
  * Legacy duplicates are merged into one item with OR-ed conditions:
  *  - Insights: (teacher || insights.view) OR student
  *  - Approvals: teacher OR daily_activities.approve
@@ -69,8 +70,6 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Overview',
     items: [
       { to: ROUTES.DASHBOARD, label: 'Dashboard', icon: House, end: true, visible: always },
-      { to: ROUTES.NOTICES, label: 'Notice Board', icon: Megaphone, badge: 'notices', visible: always },
-      { to: ROUTES.MY_NOTIFICATIONS, label: 'My Notifications', icon: Bell, badge: 'inbox', visible: always },
       { to: ROUTES.FACTS, label: 'Facts', icon: Lightbulb, visible: always },
       {
         to: ROUTES.MY_ATTENDANCE,
