@@ -11,13 +11,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ROUTES } from '@/constants/routes'
 import { useLogout } from '@/features/auth'
+import { initials } from '@/lib/formatters'
 import type { AuthUser } from '@/lib/auth'
-
-function initials(name?: string) {
-  return (
-    name?.trim().split(/\s+/).map((w) => w.charAt(0)).join('').slice(0, 2).toUpperCase() || '?'
-  )
-}
 
 function formatRole(role?: string) {
   return role ? role.replace(/_/g, ' ') : ''

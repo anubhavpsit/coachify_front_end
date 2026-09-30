@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { initials } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 
 const TONES = [
@@ -16,10 +17,6 @@ function toneFor(name: string) {
   let hash = 0
   for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
   return TONES[Math.abs(hash) % TONES.length]
-}
-
-export function initials(name?: string | null) {
-  return name?.trim().split(/\s+/).map((w) => w.charAt(0)).join('').slice(0, 2).toUpperCase() || '?'
 }
 
 interface Props {

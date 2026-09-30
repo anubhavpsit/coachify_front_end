@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "lint": "eslint .",
+    "lint:migrated": "eslint --max-warnings=0 src/app src/features src/permissions src/lib src/animations src/theme src/hooks src/test src/components/ui src/components/common src/components/layout --ignore-pattern src/components/common/Avatar.tsx --ignore-pattern src/components/common/Icon.tsx --ignore-pattern src/components/common/AttachmentPreviewModal.tsx",
     "test": "vitest run",
     "preview": "vite preview"
   },
