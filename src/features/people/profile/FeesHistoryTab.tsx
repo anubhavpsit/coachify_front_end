@@ -3,6 +3,7 @@ import EmptyState from '@/components/common/EmptyState'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useAsync } from '@/hooks/useAsync'
+import { paymentModeLabel } from '@/lib/formatters'
 import { formatDate } from '@/utils/date'
 import { fetchFeeHistory } from './profileService'
 
@@ -41,7 +42,7 @@ export default function FeesHistoryTab({ studentId }: { studentId: number }) {
                   </TableCell>
                   <TableCell>{formatDate(item.paid_at)}</TableCell>
                   <TableCell className="tw:text-right tw:tabular-nums">₹{Number(item.amount).toFixed(2)}</TableCell>
-                  <TableCell className="tw:capitalize">{item.payment_mode || '-'}</TableCell>
+                  <TableCell>{paymentModeLabel(item.payment_mode)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

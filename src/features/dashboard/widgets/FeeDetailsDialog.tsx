@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useAsync } from '@/hooks/useAsync'
+import { paymentModeLabel } from '@/lib/formatters'
 import { formatDate } from '@/utils/date'
 import { fetchFeeSummary } from '../services/widgetsService'
 
@@ -79,7 +80,7 @@ export default function FeeDetailsDialog({ studentId, onClose }: { studentId: nu
                         <TableCell>{formatDate(fee.from_date)}</TableCell>
                         <TableCell>{formatDate(fee.to_date)}</TableCell>
                         <TableCell className="tw:text-right tw:tabular-nums">{rupees(fee.amount)}</TableCell>
-                        <TableCell className="tw:capitalize">{fee.payment_mode}</TableCell>
+                        <TableCell>{paymentModeLabel(fee.payment_mode)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

@@ -20,7 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ROLES } from '@/constants/roles'
 import { useAsync } from '@/hooks/useAsync'
 import { applyServerErrors } from '@/lib/forms'
-import { formatCurrency } from '@/lib/formatters'
+import { formatCurrency, paymentModeLabel } from '@/lib/formatters'
 import { usePermission } from '@/permissions'
 import { formatDate } from '@/utils/date'
 import FeeEditDialog, { type EditableFee } from '../components/FeeEditDialog'
@@ -101,7 +101,7 @@ export default function FeesPage() {
     { id: 'from', header: 'From Date', accessorFn: (f) => f.from_date, cell: ({ row }) => formatDate(row.original.from_date) },
     { id: 'to', header: 'To Date', accessorFn: (f) => f.to_date, cell: ({ row }) => formatDate(row.original.to_date) },
     { id: 'amount', header: 'Amount', meta: { align: 'right' }, accessorFn: (f) => Number(f.amount) || 0, cell: ({ row }) => <span className="tw:font-semibold tw:tabular-nums">{row.original.amount}</span> },
-    { id: 'mode', header: 'Mode', accessorFn: (f) => f.payment_mode, cell: ({ row }) => <span className="tw:capitalize">{row.original.payment_mode}</span> },
+    { id: 'mode', header: 'Mode', accessorFn: (f) => f.payment_mode, cell: ({ row }) => paymentModeLabel(row.original.payment_mode) },
     { id: 'submitted', header: 'Submitted On', accessorFn: (f) => f.submitted_on || f.created_at, cell: ({ row }) => formatDate(row.original.submitted_on || row.original.created_at) },
     {
       id: 'notes',
@@ -209,7 +209,7 @@ export default function FeesPage() {
                           </TableCell>
                           <TableCell>{item.paid_at ? formatDate(item.paid_at) : '-'}</TableCell>
                           <TableCell className="tw:text-right tw:tabular-nums">₹{Number(item.amount).toFixed(2)}</TableCell>
-                          <TableCell className="tw:capitalize">{item.payment_mode || '-'}</TableCell>
+                          <TableCell>{paymentModeLabel(item.payment_mode)}</TableCell>
                           <TableCell className="tw:whitespace-pre-wrap">{item.notes || '-'}</TableCell>
                           {canEditFees && (
                             <TableCell className="tw:text-right">

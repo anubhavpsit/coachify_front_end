@@ -23,7 +23,7 @@ const SubjectsPage = lazy(() => import('@/features/academics/pages/SubjectsPage'
 const ClassesPage = lazy(() => import('@/features/academics/pages/ClassesPage'))
 const FeeComponent = lazy(() => import('@/features/finance/pages/FeesPage'))
 const ExpensesComponent = lazy(() => import('@/features/finance/pages/ExpensesPage'))
-const EnquiriesPage = lazy(() => import('@/pages/enquiries/EnquiriesPage'))
+const EnquiriesPage = lazy(() => import('@/features/enquiries/pages/EnquiriesPage'))
 const TeachersPage = lazy(() => import('@/features/teachers/pages/TeachersPage'))
 const DailyActivitiesPage = lazy(() => import('@/pages/teachers/DailyActivitiesPage'))
 const StaffPage = lazy(() => import('@/features/staff/pages/StaffPage'))

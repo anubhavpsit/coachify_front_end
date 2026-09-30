@@ -53,7 +53,7 @@
 | `/classes` | ClassesPage | RequirePermission | `classes.manage` | → `/dashboard` | ☐ |
 | `/fees` | FeesPage (features/finance) | RequirePermission | `fees.view` \| `fees.manage` | → `/dashboard` | ☑ |
 | `/expenses` | ExpensesPage (features/finance) | RequirePermission | `expenses.view` \| `expenses.manage` | → `/dashboard` | ☑ |
-| `/enquiries` | EnquiriesPage | RequirePermission | `enquiries.view` \| `enquiries.manage` (+Q1) | → `/dashboard` | ☐ |
+| `/enquiries` | EnquiriesPage (features/enquiries) | RequirePermission | `enquiries.view` \| `enquiries.manage` (+Q1) | → `/dashboard` | ☑ |
 | `/teachers` | TeachersPage | RequirePermission | `teachers.view` \| `teachers.manage` \| role `student` | → `/dashboard` | ☐ |
 | `/teachers/daily-activities` | DailyActivitiesPage | auth only | — | — | ☐ |
 | `/staff` | StaffPage | RequirePermission | `staff.manage` | → `/dashboard` | ☐ |
@@ -163,7 +163,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | **StaffPage** (features/staff) | Edit / Delete row buttons | `staff.manage` | conditional render | ☑ (test) |
 | StaffPage | UserProfileModal `canEditImage` | `staff.manage` | prop | ☑ (test) |
 | **FeesPage** (features/finance) | "Edit" column (2 tables) + FeeEditDialog | role `coaching_admin` (Q3) | conditional render | ☑ (test) |
-| **EnquiriesPage** | Whole page + list fetch | role `coaching_admin` (Q1) | page returns "not authorized"; fetch skipped | ☐ |
+| **EnquiriesPage** (features/enquiries) | Whole page + list fetch | role `coaching_admin` (Q1) | page returns "not authorized"; fetch skipped | ☑ (test) |
 | **AssessmentsPage** | Data source for students | teacher → `/teachers/students` | endpoint choice | ☐ |
 | AssessmentsPage | Auto-generate assessments toggle card | role `coaching_admin` | conditional render | ☐ |
 | AssessmentsPage | Approve / Mark pending (assessment) | role `coaching_admin` | conditional render | ☐ |
