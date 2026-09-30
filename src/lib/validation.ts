@@ -48,3 +48,18 @@ export function passwordStrength(pw: string): 0 | 1 | 2 | 3 | 4 {
   if (/[^A-Za-z0-9]/.test(pw)) score++
   return Math.min(4, pw.length < PASSWORD_MIN ? Math.min(score, 1) : score) as 0 | 1 | 2 | 3 | 4
 }
+
+/** Backend teacher/student phone rule: nullable|max:20|regex:/^\+?[0-9\s\-]{7,20}$/ */
+export const PHONE_PATTERN = /^\+?[0-9\s-]{7,20}$/
+export const optionalPhone = (label = 'Phone') =>
+  z
+    .string()
+    .trim()
+    .max(20, `${label} must be at most 20 characters.`)
+    .refine((v) => v === '' || PHONE_PATTERN.test(v), 'Enter a valid phone number (digits, spaces, dashes, optional +).')
+
+/** Advisory only (D4): 10-digit Indian mobile, optional +91 / 0 prefix. */
+export function looksLikeIndianMobile(v: string): boolean {
+  const digits = v.replace(/[\s-]/g, '')
+  return /^(?:\+91|0)?[6-9]\d{9}$/.test(digits)
+}

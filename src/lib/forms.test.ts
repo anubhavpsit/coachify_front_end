@@ -32,3 +32,18 @@ describe('validation rules', () => {
     expect(password().parse(' pass word ')).toBe(' pass word ')
   })
 })
+
+import { looksLikeIndianMobile, optionalPhone } from './validation'
+describe('phone rules', () => {
+  it('matches the backend regex', () => {
+    expect(optionalPhone().safeParse('').success).toBe(true)
+    expect(optionalPhone().safeParse('+91 98765-43210').success).toBe(true)
+    expect(optionalPhone().safeParse('12ab').success).toBe(false)
+    expect(optionalPhone().safeParse('123').success).toBe(false)
+  })
+  it('Indian mobile hint', () => {
+    expect(looksLikeIndianMobile('9876543210')).toBe(true)
+    expect(looksLikeIndianMobile('+91 98765 43210')).toBe(true)
+    expect(looksLikeIndianMobile('011 2345 6789')).toBe(false)
+  })
+})

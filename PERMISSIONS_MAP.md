@@ -33,6 +33,7 @@
 | Q9 | Some routes have **no permission guard** and rely on the backend: `/teachers/daily-activities`, `/students/activities`, `/students/activities/:id/topic`, `/students/assessments`, `/library/*`, `/search`, `/facts`, `/notices`, `/my-notifications`, `/notifications`, `/my-attendance`, `/profile`, `/dashboard/settings/*`, `/auth/sign-up`. | `App.tsx` | Reachable by URL for any signed-in user (or anyone, for sign-up). The page, the API, or both decide what shows. |
 | Q10 | `/notifications` has no route guard. The page itself blocks non-admins with an error string. The sidebar link needs `notifications.manage`. | `NotificationsPage.tsx:126` | Staff with `notifications.manage` see the link, then "Only coaching admins can view notifications." |
 | Q11 | `/dashboard/settings/*` and `/auth/sign-up` are static template pages with no API calls. Their sidebar links are commented out. | `pages/settings/*`, `SignUpPage` | Dead UI. **Decision needed:** keep them as they are, or hide them. |
+| Q12 | "Add New Teacher" button has no in-page gate. | `TeachersPage` | Students (who reach /teachers via orRoles) and staff with only `teachers.view` see the button; the backend rejects their create. Preserved as-is; recommend hiding it unless role `coaching_admin` or `teachers.manage`. |
 
 > Q1–Q7 and Q10 are **inconsistencies between the route/menu layer and the in-page layer**. Phase 4 must keep them as they are. I recommend we fix them deliberately in a separate, reviewed change once the backend policy is confirmed. For each one, tell me: preserve, or align to permissions.
 
@@ -154,9 +155,9 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | StudentsPage | Phone column, Status column | role `coaching_admin` | conditional render (th + td) | ☐ |
 | StudentsPage | Row actions dropdown (View, Edit, Assign Teachers, Promote, Reactivate if inactive, Delete) | role `coaching_admin` **and** `student.tenant_id !== 0` | conditional render; others get a "View" link | ☐ |
 | StudentsPage | UserProfileModal `canEditImage` | role `coaching_admin` | prop | ☐ |
-| **TeachersPage** | Data source | student → own teachers endpoint | endpoint choice | ☐ |
-| TeachersPage | Edit / Delete row buttons | role `coaching_admin` | conditional render | ☐ |
-| TeachersPage | UserProfileModal `canEditImage` | role `coaching_admin` | prop | ☐ |
+| **TeachersPage** (features/teachers) | Data source | student → own teachers endpoint | endpoint choice | ☑ (test) |
+| TeachersPage | Edit / Delete row buttons (and View; all hidden for tenant_id 0 rows) | role `coaching_admin` | conditional render | ☑ (test) |
+| TeachersPage | UserProfileModal `canEditImage` | role `coaching_admin` | prop | ☑ (test) |
 | **StaffPage** (features/staff) | Edit / Delete row buttons | `staff.manage` | conditional render | ☑ (test) |
 | StaffPage | UserProfileModal `canEditImage` | `staff.manage` | prop | ☑ (test) |
 | **FeeComponent** | "Edit" column (2 tables) + FeeEditModal | role `coaching_admin` (Q3) | conditional render | ☐ |
