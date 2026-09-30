@@ -185,6 +185,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | UserProfileModal | Insights section | viewed `student` && auth `coaching_admin` \| `teacher` | render | ☐ |
 | UserProfileModal | Change profile image | `canEditImage` prop | render | ☐ |
 | **NoticeBoardCard / NoticeDetailDialog** (features/notices) | Create / Edit / Delete notice, admin details (audience, expiry, push) | server flag `meta.can_manage` | conditional render; form only mounted when true | ☑ (test) |
+| **SubjectsPage / ClassesPage** (features/academics) | Edit / Delete row actions (otherwise read-only "Default" badge) | ownership: `item.tenant_id !== 0` (global defaults are read-only) | conditional render | ☑ (test) |
 | **ChaptersManager / TopicsManager / QuestionsManager / ChapterDetailManager** | Edit / Delete (otherwise a "global/read-only" marker) | ownership: `item.tenant_id === ownTenantId` | conditional render | ☐ |
 | **NotificationBell / MyNotificationsPage** | Deep-link target | role `student` → `/students/assessments`, else `/assessments` | link builder `notificationLink()` (unchanged) | ☑ (test) |
 | **Topbar** | Search, profile menu, logout | auth only | — | ☐ |
