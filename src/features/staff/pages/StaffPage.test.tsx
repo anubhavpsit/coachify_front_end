@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import StaffPage from './StaffPage'
 
-vi.mock('@/components/UserProfileModal', () => ({ default: ({ show, canEditImage }: { show: boolean; canEditImage: boolean }) => (show ? <div data-testid="profile" data-can-edit={String(canEditImage)} /> : null) }))
+vi.mock('@/features/people/profile/UserProfileDialog', () => ({ default: ({ show, canEditImage }: { show: boolean; canEditImage: boolean }) => (show ? <div data-testid="profile" data-can-edit={String(canEditImage)} /> : null) }))
 
 const member = { id: 5, name: 'Priya Nair', email: 'priya@x.in', tenant_id: 4, dob: '1990-05-01', gender: 'female', permissions: ['fees.view'] }
 const catalog = [{ group: 'Finance', permissions: [{ key: 'fees.view', label: 'View fees' }, { key: 'fees.manage', label: 'Manage fees' }] }]

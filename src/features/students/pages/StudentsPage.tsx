@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ArrowUpCircle, Eye, GraduationCap, MoreVertical, Pencil, Plus, RotateCcw, Search, Trash2, UserPlus, X } from 'lucide-react'
 import { toast } from 'sonner'
-import UserProfileModal from '@/components/UserProfileModal'
+import UserProfileModal from '@/features/people/profile/UserProfileDialog'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
 import DataTable, { type ColumnDef } from '@/components/common/DataTable'
 import PageHeader from '@/components/common/PageHeader'

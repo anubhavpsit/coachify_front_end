@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import StudentsPage from './StudentsPage'
 
-vi.mock('@/components/UserProfileModal', () => ({ default: ({ show, canEditImage }: { show: boolean; canEditImage: boolean }) => (show ? <div data-testid="profile" data-can-edit={String(canEditImage)} /> : null) }))
+vi.mock('@/features/people/profile/UserProfileDialog', () => ({ default: ({ show, canEditImage }: { show: boolean; canEditImage: boolean }) => (show ? <div data-testid="profile" data-can-edit={String(canEditImage)} /> : null) }))
 
 const opts = { headers: { Authorization: 'Bearer tok', Accept: 'application/json' } }
 const students = [

@@ -30,8 +30,9 @@ interface Props {
 export default function UserAvatar({ name, image, className, toneClassName }: Props) {
   const src = typeof image === 'string' && image.trim() ? image : undefined
   return (
-    <Avatar className={cn('tw:size-9', className)}>
-      {src && <AvatarImage src={src} alt={name} />}
+    // Decorative: the name is always rendered next to it, so screen readers skip the initials.
+    <Avatar className={cn('tw:size-9', className)} aria-hidden="true">
+      {src && <AvatarImage src={src} alt="" />}
       <AvatarFallback className={cn('tw:text-xs', toneClassName ?? toneFor(name))}>{initials(name)}</AvatarFallback>
     </Avatar>
   )

@@ -179,12 +179,12 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | **FactsPage** | "Featured" tab | role `coaching_admin` | `show` flag on tab | ☐ |
 | FactsPage | "Manage" link → `/admin/facts` | role `coaching_admin` | conditional render | ☐ |
 | **ProfilePage** | Student-only sections (fees, etc.) + student data fetch | profile role `student` | conditional render / fetch | ☐ |
-| **UserProfileModal** | Subjects & assessments fetch + section | viewed user `student` && auth role `coaching_admin` \| `teacher` | fetch + render | ☐ |
-| UserProfileModal | Fees summary card | viewed `student` && auth `coaching_admin` && not 403 (`feesForbidden`) | render | ☐ |
-| UserProfileModal | Fees history | viewed `student` && auth `coaching_admin` | fetch + render | ☐ |
-| UserProfileModal | Student-profile admin fields | viewed `student` && auth `coaching_admin` | render | ☐ |
-| UserProfileModal | Insights section | viewed `student` && auth `coaching_admin` \| `teacher` | render | ☐ |
-| UserProfileModal | Change profile image | `canEditImage` prop | render | ☐ |
+| **UserProfileModal → UserProfileDialog** (features/people/profile) | Subjects & assessments fetch + section | viewed user `student` && auth role `coaching_admin` \| `teacher` | fetch + render | ☑ (test) |
+| UserProfileModal | Fees summary card | viewed `student` && auth `coaching_admin` && not 403 (`feesForbidden`) | render | ☑ (test) |
+| UserProfileModal | Fees history | viewed `student` && auth `coaching_admin` | fetch + render | ☑ (test) |
+| UserProfileModal | Student-profile admin fields | viewed `student` && auth `coaching_admin` | render | ☑ (test) |
+| UserProfileModal | Insights section | viewed `student` && auth `coaching_admin` \| `teacher` | render | ☑ (test) |
+| UserProfileModal | Change profile image (now also checks image type / 2 MB, as the backend does) | `canEditImage` prop | render | ☑ (test) |
 | **NoticeBoardCard / NoticeDetailDialog** (features/notices) | Create / Edit / Delete notice, admin details (audience, expiry, push) | server flag `meta.can_manage` | conditional render; form only mounted when true | ☑ (test) |
 | **SubjectsPage / ClassesPage** (features/academics) | Edit / Delete row actions (otherwise read-only "Default" badge) | ownership: `item.tenant_id !== 0` (global defaults are read-only) | conditional render | ☑ (test) |
 | **ChaptersManager / TopicsManager / QuestionsManager / ChapterDetailManager** | Edit / Delete (otherwise a "global/read-only" marker) | ownership: `item.tenant_id === ownTenantId` | conditional render | ☐ |

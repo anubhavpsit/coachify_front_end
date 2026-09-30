@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import axios from 'axios'
 import TeachersPage from './TeachersPage'
 
-vi.mock('@/components/UserProfileModal', () => ({ default: ({ show, canEditImage }: { show: boolean; canEditImage: boolean }) => (show ? <div data-testid="profile" data-can-edit={String(canEditImage)} /> : null) }))
+vi.mock('@/features/people/profile/UserProfileDialog', () => ({ default: ({ show, canEditImage }: { show: boolean; canEditImage: boolean }) => (show ? <div data-testid="profile" data-can-edit={String(canEditImage)} /> : null) }))
 
 const teachers = [
   { id: 1, name: 'Meera Iyer', email: 'm@x.in', phone: '9876543210', tenant_id: 4, dob: '1988-01-01', gender: 'female' },
