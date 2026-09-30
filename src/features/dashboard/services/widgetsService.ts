@@ -85,3 +85,69 @@ export function classLabel(classes: CoachingClass[], classIdOrName: string | nul
   const found = classes.find((c) => String(c.id) === String(classIdOrName))
   return found ? found.name : classIdOrName
 }
+
+// ---- Teacher activity gaps -------------------------------------------------
+export type TeacherGap = { teacher_id: number; teacher_name: string; teacher_email?: string; missing_dates: string[]; missing_days_count: number }
+export type GapsData = { from: string; to: string; teachers: TeacherGap[] }
+
+/** TeacherActivityGapsCard: GET /dashboard/teacher-activity-gaps (null = no token, card hidden) */
+export async function fetchTeacherActivityGaps(): Promise<GapsData | null> {
+  const t = token()
+  if (!t) return null
+  const response = await axios.get<{ success: boolean; data: GapsData }>(`${API_BASE_URL}/dashboard/teacher-activity-gaps`, {
+    headers: { Authorization: `Bearer ${t}` },
+  })
+  if (!response.data.success) throw new Error('Unable to load teacher activity gaps.')
+  return response.data.data
+}
+
+/** POST /dashboard/teacher-activity-gaps/{id}/notify */
+export async function notifyTeacherActivityGap(teacherId: number) {
+  const response = await axios.post<{ success: boolean; message: string }>(
+    `${API_BASE_URL}/dashboard/teacher-activity-gaps/${teacherId}/notify`,
+    {},
+    { headers: { Authorization: `Bearer ${token()}`, Accept: 'application/json' } },
+  )
+  return response.data
+}
+
+// ---- Pending actions -------------------------------------------------------
+export type PendingAction = {
+  type: string
+  date?: string
+  title: string
+  description: string
+  action_route?: string
+  severity?: 'low' | 'medium' | 'high'
+  for_teacher_id?: number
+  for_teacher_name?: string
+  student_id?: number
+  student_name?: string
+  subject_name?: string
+}
+
+/** PendingActionsCard: GET /dashboard/pending-actions (null = no token → empty list) */
+export async function fetchPendingActions(): Promise<PendingAction[]> {
+  const t = token()
+  if (!t) return []
+  const response = await axios.get<{ success: boolean; data: PendingAction[] }>(`${API_BASE_URL}/dashboard/pending-actions`, {
+    headers: { Authorization: `Bearer ${t}` },
+  })
+  if (!response.data.success) throw new Error('Unable to load pending actions.')
+  return response.data.data || []
+}
+
+/** POST /dashboard/pending-actions/notify */
+export async function notifyPendingAction(action: PendingAction) {
+  const response = await axios.post<{ success: boolean; message: string }>(
+    `${API_BASE_URL}/dashboard/pending-actions/notify`,
+    {
+      teacher_id: action.for_teacher_id,
+      reason: action.type,
+      student_name: action.student_name,
+      subject_name: action.subject_name,
+    },
+    { headers: { Authorization: `Bearer ${token()}`, Accept: 'application/json' } },
+  )
+  return response.data
+}
