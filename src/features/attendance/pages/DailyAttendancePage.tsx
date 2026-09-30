@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { CalendarOff, ClipboardCheck, PartyPopper, Search, Users } from 'lucide-react'
 import { AnimatePresence, m } from 'motion/react'
@@ -20,7 +20,8 @@ import { useBeforeUnload } from '@/hooks/useBeforeUnload'
 import { cn } from '@/lib/utils'
 import { usePermission } from '@/permissions'
 import { formatDate, toDateInputValue } from '@/utils/date'
-import StatusPills, { STATUSES, STATUS_META } from '../components/StatusPills'
+import StatusPills from '../components/StatusPills'
+import { STATUSES, STATUS_META } from '../components/statusMeta'
 import { loadDay, markHoliday, saveDay, unmarkHoliday, type AttendanceRecord, type AttendanceStatus } from '../services/dailyAttendanceService'
 
 const SUMMARY_TONE: Record<AttendanceStatus, 'success' | 'destructive' | 'warning' | 'secondary'> = {
@@ -67,11 +68,8 @@ export default function DailyAttendancePage() {
       return { date, map: next }
     })
 
-  const counts = useMemo(() => {
-    const c: Record<AttendanceStatus, number> = { present: 0, absent: 0, leave: 0, not_marked: 0 }
-    users.forEach((u) => c[attendance[u.id]?.status ?? 'not_marked']++)
-    return c
-  }, [users, attendance])
+  const counts: Record<AttendanceStatus, number> = { present: 0, absent: 0, leave: 0, not_marked: 0 }
+  users.forEach((u) => counts[attendance[u.id]?.status ?? 'not_marked']++)
   const q = search.trim().toLowerCase()
   const visible = q ? users.filter((u) => u.name.toLowerCase().includes(q)) : users
   const allHave = (s: AttendanceStatus) => users.length > 0 && users.every((u) => attendance[u.id]?.status === s)
