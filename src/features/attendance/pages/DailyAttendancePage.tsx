@@ -213,10 +213,10 @@ export default function DailyAttendancePage() {
                         className={cn('tw:border-0 tw:border-b tw:border-solid tw:border-border tw:transition-colors', unmarked && 'tw:bg-warning-soft/50')}
                         title={unmarked ? 'Attendance not yet marked for this person' : undefined}
                       >
-                        <td className="tw:px-4 tw:py-2 tw:text-muted-foreground tw:tabular-nums">{users.indexOf(u) + 1}</td>
-                        <td className="tw:px-4 tw:py-2 tw:font-medium tw:text-foreground">{u.name}</td>
-                        <td className="tw:px-4 tw:py-2 tw:capitalize tw:text-muted-foreground">{u.role}</td>
-                        <td className="tw:px-4 tw:py-2 tw:text-right">
+                        <td className="tw:px-4 tw:py-2 tw:align-middle tw:text-muted-foreground tw:tabular-nums">{users.indexOf(u) + 1}</td>
+                        <td className="tw:px-4 tw:py-2 tw:align-middle tw:font-medium tw:text-foreground">{u.name}</td>
+                        <td className="tw:px-4 tw:py-2 tw:align-middle tw:capitalize tw:text-muted-foreground">{u.role}</td>
+                        <td className="tw:px-4 tw:py-2 tw:align-middle tw:text-right">
                           <StatusPills name={`status_${u.id}`} label={`Attendance for ${u.name}`} value={status} disabled={isHoliday} onChange={(s) => setStatus([u.id], s)} />
                         </td>
                       </tr>

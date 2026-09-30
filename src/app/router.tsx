@@ -40,7 +40,7 @@ const MyAttendance = lazy(() => import('@/features/attendance/pages/MyAttendance
 const NoticesPage = lazy(() => import('@/features/notices/pages/NoticesPage'))
 const MyNotificationsPage = lazy(() => import('@/features/notifications/pages/MyNotificationsPage'))
 const NotificationsPage = lazy(() => import('@/features/notifications/pages/NotificationsPage'))
-const CorrectionsAdminPage = lazy(() => import('@/pages/attendance/CorrectionsAdminPage'))
+const CorrectionsAdminPage = lazy(() => import('@/features/attendance/pages/CorrectionsAdminPage'))
 const FactsPage = lazy(() => import('@/pages/facts/FactsPage'))
 const AdminFactsPage = lazy(() => import('@/pages/facts/AdminFactsPage'))
 const InsightsPage = lazy(() => import('@/pages/insights/InsightsPage'))

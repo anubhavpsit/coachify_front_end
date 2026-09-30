@@ -66,11 +66,11 @@
 | `/approvals` | DailyActivityApprovalsPage | RequirePermission | `daily_activities.approve` \| role `teacher` | → `/dashboard` | ☐ |
 | `/approvals/generated-content` | GeneratedContentApprovalsPage | RequirePermission | `generated_content.approve` (+Q2) | → `/dashboard` | ☐ |
 | `/profile` | ProfilePage | auth only | — | — | ☐ |
-| `/my-attendance` | MyAttendance | auth only | — | — | ☐ |
+| `/my-attendance` | MyAttendancePage (features/attendance) | auth only | — | — | ☑ |
 | `/notices` | NoticesPage | auth only | — | — | ☐ |
 | `/my-notifications` | MyNotificationsPage | auth only | — | — | ☐ |
 | `/notifications` | NotificationsPage | auth only (+Q10, in-page) | — | — | ☐ |
-| `/admin/attendance-corrections` | CorrectionsAdminPage | RequirePermission | `attendance.corrections` | → `/dashboard` | ☐ |
+| `/admin/attendance-corrections` | CorrectionsAdminPage (features/attendance) | RequirePermission | `attendance.corrections` | → `/dashboard` | ☑ |
 | `/facts` | FactsPage | auth only | — | — | ☐ |
 | `/insights` | InsightsPage | RequirePermission | `insights.view` \| role `teacher` \| `student` | → `/dashboard` | ☐ |
 | `/academic-years` | AcademicYearsPage | RequirePermission | `academic_years.manage` | → `/dashboard` | ☐ |
