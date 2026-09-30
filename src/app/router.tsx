@@ -43,7 +43,7 @@ const NotificationsPage = lazy(() => import('@/features/notifications/pages/Noti
 const CorrectionsAdminPage = lazy(() => import('@/features/attendance/pages/CorrectionsAdminPage'))
 const FactsPage = lazy(() => import('@/pages/facts/FactsPage'))
 const AdminFactsPage = lazy(() => import('@/pages/facts/AdminFactsPage'))
-const InsightsPage = lazy(() => import('@/pages/insights/InsightsPage'))
+const InsightsPage = lazy(() => import('@/features/insights/pages/InsightsPage'))
 const AcademicYearsPage = lazy(() => import('@/features/academics/pages/AcademicYearsPage'))
 const TopicsPage = lazy(() => import('@/pages/topics/TopicsPage'))
 const TopicQuestionsPage = lazy(() => import('@/pages/topics/TopicQuestionsPage'))

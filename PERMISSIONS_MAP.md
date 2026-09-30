@@ -72,7 +72,7 @@
 | `/notifications` | NotificationsPage | auth only (+Q10, in-page) | — | — | ☐ |
 | `/admin/attendance-corrections` | CorrectionsAdminPage (features/attendance) | RequirePermission | `attendance.corrections` | → `/dashboard` | ☑ |
 | `/facts` | FactsPage | auth only | — | — | ☐ |
-| `/insights` | InsightsPage | RequirePermission | `insights.view` \| role `teacher` \| `student` | → `/dashboard` | ☐ |
+| `/insights` | InsightsPage (features/insights) | RequirePermission | `insights.view` \| role `teacher` \| `student` | → `/dashboard` | ☑ |
 | `/academic-years` | AcademicYearsPage | RequirePermission | `academic_years.manage` | → `/dashboard` | ☐ |
 | `/admin/facts` | AdminFactsPage | RequirePermission | `facts.manage` | → `/dashboard` | ☐ |
 | `/topics`, `/topics/:topicId/questions` | TopicsPage, TopicQuestionsPage | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☐ |
