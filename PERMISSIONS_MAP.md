@@ -62,7 +62,7 @@
 | `/students/activities/:activityId/topic` | StudentTopicContentPage | auth only | — | — | ☐ |
 | `/students/assessments` | StudentAssessmentsPage | auth only | — | — | ☐ |
 | `/assessments` | AssessmentsPage | RequirePermission | `assessments.view` \| `.manage` \| `.grade` \| role `teacher` | → `/dashboard` | ☐ |
-| `/search` | SearchResultsPage | auth only | — | — | ☐ |
+| `/search` | SearchResultsPage (features/search) | auth only | — | — | ☑ |
 | `/approvals` | DailyActivityApprovalsPage | RequirePermission | `daily_activities.approve` \| role `teacher` | → `/dashboard` | ☐ |
 | `/approvals/generated-content` | GeneratedContentApprovalsPage | RequirePermission | `generated_content.approve` (+Q2) | → `/dashboard` | ☐ |
 | `/profile` | ProfilePage (features/profile) | auth only | — | — | ☑ |
@@ -177,7 +177,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | DailyActivityApprovalsPage | Bulk-approve bar, select-all checkbox, per-row checkbox, Approve/Unapprove buttons | `isAdmin` | conditional render | ☐ |
 | **GeneratedContentApprovalsPage** | Whole page + fetches | role `coaching_admin` (Q2) | "not authorized" message; fetch skipped | ☐ |
 | **NotificationsPage** (features/notifications) | Whole page fetch | role `coaching_admin` \| `super_admin` (Q10) | error message; fetch skipped (stats/filters now also hidden for non-admins) | ☑ (test) |
-| **SearchResultsPage** | Subjects, Classes, Enquiries result sections | role `coaching_admin` | conditional render | ☐ |
+| **SearchResultsPage** (features/search) | Subjects, Classes, Enquiries result sections | role `coaching_admin` | conditional render | ☑ (test) |
 | **FactsPage** | "Featured" tab | role `coaching_admin` | `show` flag on tab | ☐ |
 | FactsPage | "Manage" link → `/admin/facts` | role `coaching_admin` | conditional render | ☐ |
 | **ProfilePage** (features/profile) | Student-only sections (fees, etc.) + student data fetch | fetch: auth or profile role `student`; render: profile role `student` | conditional render / fetch | ☑ (test) |
