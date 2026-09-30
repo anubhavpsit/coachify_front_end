@@ -65,7 +65,7 @@
 | `/search` | SearchResultsPage | auth only | — | — | ☐ |
 | `/approvals` | DailyActivityApprovalsPage | RequirePermission | `daily_activities.approve` \| role `teacher` | → `/dashboard` | ☐ |
 | `/approvals/generated-content` | GeneratedContentApprovalsPage | RequirePermission | `generated_content.approve` (+Q2) | → `/dashboard` | ☐ |
-| `/profile` | ProfilePage | auth only | — | — | ☐ |
+| `/profile` | ProfilePage (features/profile) | auth only | — | — | ☑ |
 | `/my-attendance` | MyAttendancePage (features/attendance) | auth only | — | — | ☑ |
 | `/notices` | NoticesPage | auth only | — | — | ☐ |
 | `/my-notifications` | MyNotificationsPage | auth only | — | — | ☐ |
@@ -180,7 +180,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | **SearchResultsPage** | Subjects, Classes, Enquiries result sections | role `coaching_admin` | conditional render | ☐ |
 | **FactsPage** | "Featured" tab | role `coaching_admin` | `show` flag on tab | ☐ |
 | FactsPage | "Manage" link → `/admin/facts` | role `coaching_admin` | conditional render | ☐ |
-| **ProfilePage** | Student-only sections (fees, etc.) + student data fetch | profile role `student` | conditional render / fetch | ☐ |
+| **ProfilePage** (features/profile) | Student-only sections (fees, etc.) + student data fetch | fetch: auth or profile role `student`; render: profile role `student` | conditional render / fetch | ☑ (test) |
 | **UserProfileModal → UserProfileDialog** (features/people/profile) | Subjects & assessments fetch + section | viewed user `student` && auth role `coaching_admin` \| `teacher` | fetch + render | ☑ (test) |
 | UserProfileModal | Fees summary card | viewed `student` && auth `coaching_admin` && not 403 (`feesForbidden`) | render | ☑ (test) |
 | UserProfileModal | Fees history | viewed `student` && auth `coaching_admin` | fetch + render | ☑ (test) |
