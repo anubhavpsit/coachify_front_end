@@ -76,7 +76,7 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: ChartSpline,
         visible: (p) => p.hasRole(ROLES.TEACHER) || p.can(P.INSIGHTS_VIEW) || p.hasRole(ROLES.STUDENT),
       },
-      { to: ROUTES.FACTS, label: 'Facts', icon: Lightbulb, visible: always },
+      { to: ROUTES.DAILY_ATTENDANCE, label: 'Daily Attendance', icon: ClipboardCheck, visible: (p) => p.can(P.ATTENDANCE_MARK) },
       {
         to: ROUTES.MY_ATTENDANCE,
         label: 'My Attendance',
@@ -117,6 +117,7 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: Bot,
         visible: (p) => p.can(P.GENERATED_CONTENT_APPROVE),
       },
+      { to: ROUTES.FACTS, label: 'Facts', icon: Lightbulb, visible: always },
     ],
   },
   {
@@ -155,13 +156,6 @@ export const NAV_GROUPS: NavGroup[] = [
         visible: (p) => p.hasRole(ROLES.STUDENT) || p.can(P.TEACHERS_VIEW) || p.can(P.TEACHERS_MANAGE),
       },
       { to: ROUTES.STAFF, label: 'Staff', icon: UserCog, visible: (p) => p.can(P.STAFF_MANAGE) },
-      { to: ROUTES.DAILY_ATTENDANCE, label: 'Daily Attendance', icon: ClipboardCheck, visible: (p) => p.can(P.ATTENDANCE_MARK) },
-      {
-        to: ROUTES.ATTENDANCE_CORRECTIONS,
-        label: 'Attendance Corrections',
-        icon: ClipboardPen,
-        visible: (p) => p.can(P.ATTENDANCE_CORRECTIONS),
-      },
     ],
   },
   {
@@ -185,6 +179,12 @@ export const NAV_GROUPS: NavGroup[] = [
         visible: (p) => p.can(P.ENQUIRIES_VIEW) || p.can(P.ENQUIRIES_MANAGE),
       },
       { to: ROUTES.NOTIFICATIONS, label: 'Notifications', icon: BellRing, visible: (p) => p.can(P.NOTIFICATIONS_MANAGE) },
+      {
+        to: ROUTES.ATTENDANCE_CORRECTIONS,
+        label: 'Attendance Corrections',
+        icon: ClipboardPen,
+        visible: (p) => p.can(P.ATTENDANCE_CORRECTIONS),
+      },
     ],
   },
 ]
