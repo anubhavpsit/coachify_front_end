@@ -9,7 +9,7 @@ vi.mock('../widgets/EnquiriesFollowUpCard', () => ({ default: () => <i data-widg
 vi.mock('../widgets/GhostStudentsCard', () => ({ default: () => <i data-widget="GhostStudentsCard" /> }))
 vi.mock('../widgets/LowAttendanceCard', () => ({ default: () => <i data-widget="LowAttendanceCard" /> }))
 vi.mock('../widgets/PendingActionsCard', () => ({ default: () => <i data-widget="PendingActionsCard" /> }))
-vi.mock('@/components/PendingFeesCard', () => ({ default: () => <i data-widget="PendingFeesCard" /> }))
+vi.mock('../widgets/PendingFeesCard', () => ({ default: () => <i data-widget="PendingFeesCard" /> }))
 vi.mock('../widgets/TeacherActivityGapsCard', () => ({ default: () => <i data-widget="TeacherActivityGapsCard" /> }))
 vi.mock('../widgets/TodayBirthdayCard', () => ({ default: () => <i data-widget="TodayBirthdayCard" /> }))
 vi.mock('../widgets/UnassignedStudentsCard', () => ({ default: () => <i data-widget="UnassignedStudentsCard" /> }))

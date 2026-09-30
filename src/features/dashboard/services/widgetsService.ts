@@ -80,8 +80,8 @@ export async function fetchUnassignedStudents(): Promise<StudentSummary[] | unde
 }
 
 /** Class id → name, falling back to the raw value (legacy getClassName). */
-export function classLabel(classes: CoachingClass[], classIdOrName: string | null): string {
-  if (!classIdOrName) return '—'
+export function classLabel(classes: CoachingClass[], classIdOrName: string | null, fallback = '—'): string {
+  if (!classIdOrName) return fallback
   const found = classes.find((c) => String(c.id) === String(classIdOrName))
   return found ? found.name : classIdOrName
 }
@@ -150,4 +150,53 @@ export async function notifyPendingAction(action: PendingAction) {
     { headers: { Authorization: `Bearer ${token()}`, Accept: 'application/json' } },
   )
   return response.data
+}
+
+// ---- Pending fees ----------------------------------------------------------
+export type PendingFee = {
+  student_id: number
+  student_name: string
+  student_email?: string
+  student_status?: string
+  class?: string | null
+  phone?: string | null
+  last_paid_to_date?: string | null
+  due_date: string
+  days_overdue: number
+}
+
+export type FeeSummary = {
+  student?: { name?: string; email?: string; class?: string | null; phone?: string | null }
+  summary?: {
+    total_paid?: number | string
+    last_paid_to_date?: string | null
+    next_due_date?: string | null
+    days_overdue?: number
+    unpaid_periods?: number
+  }
+  fees?: Array<{ id: number; from_date: string; to_date: string; amount: number | string; payment_mode: string }>
+}
+
+/** PendingFeesCard: GET /dashboard/pending-fees + GET /classes/{tenant} together (as before). */
+export async function fetchPendingFees() {
+  const t = token()
+  if (!t) throw new Error('You are not authenticated.')
+  const [feesResponse, classes] = await Promise.all([
+    axios.get<{ success: boolean; data: PendingFee[]; meta?: { today?: string; total_pending_students?: number } }>(
+      `${API_BASE_URL}/dashboard/pending-fees`,
+      { headers: { Authorization: `Bearer ${t}`, Accept: 'application/json' } },
+    ),
+    fetchClasses(),
+  ])
+  if (!feesResponse.data.success) throw new Error('Unable to load pending fees.')
+  return { items: feesResponse.data.data || [], asOf: feesResponse.data.meta?.today ?? null, classes }
+}
+
+/** Fee details modal: GET /student-fees/{id}/summary */
+export async function fetchFeeSummary(studentId: number): Promise<FeeSummary> {
+  const res = await axios.get(`${API_BASE_URL}/student-fees/${studentId}/summary`, {
+    headers: { Authorization: `Bearer ${token()}` },
+  })
+  if (!res.data?.success) throw new Error('Unable to load fee details.')
+  return res.data.data
 }
