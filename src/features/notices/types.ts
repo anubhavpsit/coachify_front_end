@@ -1,7 +1,4 @@
-import { formatDateTime } from '../../utils/date'
-
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
+import { formatDateTime } from '@/utils/date'
 
 export type NoticeAudience = 'all' | 'admin' | 'teacher' | 'student'
 
@@ -53,11 +50,6 @@ export const ROLE_LABELS: Record<string, string> = {
   staff: 'Staff',
   teacher: 'Teacher',
   student: 'Student',
-}
-
-export function authHeaders() {
-  const token = localStorage.getItem('authToken')
-  return { Authorization: `Bearer ${token}`, Accept: 'application/json' }
 }
 
 /** DD/MM/YYYY HH:mm:ss (shared app-wide format). */

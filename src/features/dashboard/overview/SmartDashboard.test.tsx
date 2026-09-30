@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import axios from 'axios'
 import SmartDashboard from './SmartDashboard'
 
-vi.mock('@/components/notices/NoticeBoardCard', () => ({ default: () => <i data-testid="notices" /> }))
+vi.mock('@/features/notices/components/NoticeBoardCard', () => ({ default: () => <i data-testid="notices" /> }))
 
 const student = {
   role: 'student',

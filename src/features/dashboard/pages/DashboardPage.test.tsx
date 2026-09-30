@@ -13,7 +13,7 @@ vi.mock('../widgets/PendingFeesCard', () => ({ default: () => <i data-widget="Pe
 vi.mock('../widgets/TeacherActivityGapsCard', () => ({ default: () => <i data-widget="TeacherActivityGapsCard" /> }))
 vi.mock('../widgets/TodayBirthdayCard', () => ({ default: () => <i data-widget="TodayBirthdayCard" /> }))
 vi.mock('../widgets/UnassignedStudentsCard', () => ({ default: () => <i data-widget="UnassignedStudentsCard" /> }))
-vi.mock('@/components/notices/NoticeBoardCard', () => ({ default: () => <i data-widget="NoticeBoardCard" /> }))
+vi.mock('@/features/notices/components/NoticeBoardCard', () => ({ default: () => <i data-widget="NoticeBoardCard" /> }))
 vi.mock('../overview/SmartDashboard', () => ({ default: ({ role }: { role: string }) => <i data-widget={`SmartDashboard:${role}`} /> }))
 
 const statsSpy = vi.fn()

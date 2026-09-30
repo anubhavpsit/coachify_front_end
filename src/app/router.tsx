@@ -37,7 +37,7 @@ const DailyActivityApprovalsPage = lazy(() => import('@/pages/approvals/DailyAct
 const GeneratedContentApprovalsPage = lazy(() => import('@/pages/approvals/GeneratedContentApprovalsPage'))
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'))
 const MyAttendance = lazy(() => import('@/pages/attendance/MyAttendance'))
-const NoticesPage = lazy(() => import('@/pages/notices/NoticesPage'))
+const NoticesPage = lazy(() => import('@/features/notices/pages/NoticesPage'))
 const MyNotificationsPage = lazy(() => import('@/pages/notifications/MyNotificationsPage'))
 const NotificationsPage = lazy(() => import('@/pages/notifications/NotificationsPage'))
 const CorrectionsAdminPage = lazy(() => import('@/pages/attendance/CorrectionsAdminPage'))

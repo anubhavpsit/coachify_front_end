@@ -59,7 +59,7 @@ function FormItem({ className, children, ...props }: React.ComponentProps<'div'>
   const id = React.useId()
   return (
     <FormItemContext.Provider value={{ id }}>
-      <ShakeOnInvalidSubmit className={cn('tw:grid tw:gap-2', className)} {...props}>
+      <ShakeOnInvalidSubmit className={cn('tw:grid tw:content-start tw:gap-2', className)} {...props}>
         {children}
       </ShakeOnInvalidSubmit>
     </FormItemContext.Provider>

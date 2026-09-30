@@ -1,4 +1,4 @@
-import NoticeBoardCard from '@/components/notices/NoticeBoardCard'
+import NoticeBoardCard from '@/features/notices/components/NoticeBoardCard'
 import WidgetCard from '@/components/common/WidgetCard'
 import { useAsync } from '@/hooks/useAsync'
 import DashboardAlerts from './DashboardAlerts'
