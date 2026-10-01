@@ -63,7 +63,7 @@
 | `/students/assessments` | StudentAssessmentsPage | auth only | — | — | ☐ |
 | `/assessments` | AssessmentsPage | RequirePermission | `assessments.view` \| `.manage` \| `.grade` \| role `teacher` | → `/dashboard` | ☐ |
 | `/search` | SearchResultsPage (features/search) | auth only | — | — | ☑ |
-| `/approvals` | DailyActivityApprovalsPage | RequirePermission | `daily_activities.approve` \| role `teacher` | → `/dashboard` | ☐ |
+| `/approvals` | DailyActivityApprovalsPage (features/approvals) | RequirePermission | `daily_activities.approve` \| role `teacher` | → `/dashboard` | ☑ |
 | `/approvals/generated-content` | GeneratedContentApprovalsPage | RequirePermission | `generated_content.approve` (+Q2) | → `/dashboard` | ☐ |
 | `/profile` | ProfilePage (features/profile) | auth only | — | — | ☑ |
 | `/my-attendance` | MyAttendancePage (features/attendance) | auth only | — | — | ☑ |
@@ -173,10 +173,12 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | AssessmentsPage | Approve / Mark pending (file), Remove file | role `coaching_admin` | conditional render (otherwise a status label) | ☐ |
 | QuestionPaperModal | Editing controls | `paper.status !== 'released'` (read-only mode) | disabled / hidden | ☐ |
 | **DailyActivitiesPage** (features/daily-activities) | Delete attachment (×) | role `coaching_admin` | conditional render | ☑ (test) |
-| **DailyActivityApprovalsPage** | `isAdmin` view | role `coaching_admin` \| (role `staff` && `daily_activities.approve`) | derived flag | ☐ |
-| DailyActivityApprovalsPage | Page access | `isAdmin` \| role `teacher` | fetch gated on `canAccess` | ☐ |
-| DailyActivityApprovalsPage | Students endpoint | admin → `/students`, teacher → `/teachers/students` | endpoint choice | ☐ |
-| DailyActivityApprovalsPage | Bulk-approve bar, select-all checkbox, per-row checkbox, Approve/Unapprove buttons | `isAdmin` | conditional render | ☐ |
+| **DailyActivityApprovalsPage** (features/approvals) | approver view (`isApprover`) | role `coaching_admin` \| (role `staff` && `daily_activities.approve`) | derived flag | ☑ (test) |
+| DailyActivityApprovalsPage | Page access | approver \| role `teacher` | fetch gated on `canAccess` | ☑ (test) |
+| DailyActivityApprovalsPage | Students endpoint | admin → `/students`, teacher → `/teachers/students` | endpoint choice | ☑ (test) |
+| DailyActivityApprovalsPage | Bulk-approve bar, select-all, per-card checkbox, Approve / Send back / Mark pending | approver | conditional render | ☑ (test) |
+| DailyActivityApprovalsPage | Attachment Approve / Revoke | approver (was ungated in legacy; backend `updateApproval` requires `canApprove`, so teachers only got 403s) | conditional render | ☑ (test) |
+| DailyActivityApprovalsPage | "Send now" on queued notifications | `notifications.manage` (was ungated; backend route requires it) | conditional render | ☑ (test) |
 | **GeneratedContentApprovalsPage** | Whole page + fetches | role `coaching_admin` (Q2) | "not authorized" message; fetch skipped | ☐ |
 | **NotificationsPage** (features/notifications) | Whole page fetch | role `coaching_admin` \| `super_admin` (Q10) | error message; fetch skipped (stats/filters now also hidden for non-admins) | ☑ (test) |
 | **SearchResultsPage** (features/search) | Subjects, Classes, Enquiries result sections | role `coaching_admin` | conditional render | ☑ (test) |

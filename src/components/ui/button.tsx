@@ -12,6 +12,7 @@ const buttonVariants = cva(
       variant: {
         default: 'tw:bg-primary tw:text-primary-foreground tw:shadow-xs tw:hover:bg-primary-hover tw:active:bg-primary-active',
         destructive: 'tw:bg-destructive tw:text-destructive-foreground tw:shadow-xs tw:hover:bg-destructive/90',
+        success: 'tw:bg-success tw:text-success-foreground tw:shadow-xs tw:hover:bg-success/90',
         outline: 'tw:border-border tw:bg-card tw:text-foreground tw:shadow-xs tw:hover:bg-accent tw:hover:text-accent-foreground',
         secondary: 'tw:bg-secondary tw:text-secondary-foreground tw:hover:bg-secondary/80',
         soft: 'tw:bg-primary-soft tw:text-primary-soft-foreground tw:hover:bg-primary-soft/70',
@@ -21,6 +22,7 @@ const buttonVariants = cva(
       size: {
         default: 'tw:h-10 tw:px-4',
         sm: 'tw:h-8 tw:px-3 tw:text-xs',
+        xs: 'tw:h-7 tw:gap-1 tw:rounded-sm tw:px-2 tw:text-xs tw:[&_svg:not([class*=size-])]:size-3.5',
         lg: 'tw:h-11 tw:px-6 tw:text-base',
         icon: 'tw:size-10 tw:p-0',
         'icon-sm': 'tw:size-8 tw:p-0',
