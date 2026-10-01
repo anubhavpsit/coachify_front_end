@@ -93,7 +93,7 @@ export default function LessonFields<T extends FieldValues>({ control, setValue,
           )}
         />
       </div>
-      <div className="tw:grid tw:gap-4 tw:lg:grid-cols-2">
+      <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
         <FormField
           control={control}
           name={names.notes}
