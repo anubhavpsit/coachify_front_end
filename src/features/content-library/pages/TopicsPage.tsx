@@ -1,29 +1,30 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { ListChecks, MessageCircleQuestion, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
 import DataTable, { type ColumnDef } from '@/components/common/DataTable'
-import FormDialog from '@/components/common/FormDialog'
 import PageHeader from '@/components/common/PageHeader'
-import RichTextEditor from '@/components/common/RichTextEditor'
 import RowActions from '@/components/common/RowActions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import { useAsync } from '@/hooks/useAsync'
-import { applyServerErrors } from '@/lib/forms'
 import { ReadOnlyMark, ScopeBadge } from '../components/ScopeBadge'
-import { friendlyDuplicate, GRADES, toTopicPayload, topicDefaults, topicSchema, type TopicValues } from '../schemas/contentForms'
-import { createTopic, deleteTopic, fetchChapters, fetchSubjects, fetchTopics, ownTenantId, updateTopic, type Topic } from '../services/contentLibraryService'
+import TopicFormDialog from '../components/TopicFormDialog'
+import { GRADES } from '../schemas/contentForms'
+import { deleteTopic, fetchChapters, fetchSubjects, fetchTopics, ownTenantId, type Topic } from '../services/contentLibraryService'
 
 const questionsRoute = (id: number) => `/topics/${id}/questions`
-const plainText = (html: string | null) => (html ? html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim() : '')
+const plainText = (html: string | null) =>
+  html
+    ? html
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    : ''
 
 /** Route gate: content_library.manage | role teacher (unchanged). Only this coaching's own topics are editable (unchanged). */
 export default function TopicsPage() {
@@ -42,44 +43,19 @@ export default function TopicsPage() {
   const subjectName = (t: Topic) => t.subject?.subject ?? subjects.data?.find((s) => s.id === t.subject_id)?.subject ?? '-'
   const canManage = (t: Topic) => t.tenant_id === tenantId
 
-  const form = useForm<TopicValues>({ resolver: zodResolver(topicSchema), defaultValues: topicDefaults(), mode: 'onTouched' })
-  const formSubject = useWatch({ control: form.control, name: 'subject_id' })
-  const formChapters = useAsync(() => fetchChapters(formSubject).catch((e) => (console.error('Error fetching chapters:', e), [])), [formSubject], { enabled: !!formSubject })
   const [editing, setEditing] = useState<Topic | null>(null)
   const [formOpen, setFormOpen] = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<Topic | null>(null)
 
   const openForm = (t: Topic | null) => {
     setEditing(t)
-    setFormError(null)
-    // A new topic starts from the current filters, so adding several to one chapter is quick.
-    form.reset(
-      topicDefaults(t, {
-        subject_id: subjectFilter,
-        chapter_id: chapterFilter && chapterFilter !== 'none' ? chapterFilter : '',
-        grade: gradeFilter && gradeFilter !== 'none' ? gradeFilter : '',
-      }),
-    )
     setFormOpen(true)
   }
-
-  const submit = async (v: TopicValues) => {
-    setFormError(null)
-    try {
-      if (editing) await updateTopic(editing.id, toTopicPayload(v))
-      else await createTopic(toTopicPayload(v))
-      toast.success(editing ? 'Topic updated.' : `Topic “${v.name.trim()}” added.`)
-      setFormOpen(false)
-      list.reload()
-    } catch (err) {
-      console.error(editing ? 'Error updating topic:' : 'Error creating topic:', err)
-      setFormError(
-        applyServerErrors(err, form.setError, ['subject_id', 'chapter_id', 'grade', 'name', 'explanation_html'], { fallback: editing ? 'Failed to update topic.' : 'Failed to create topic.' }),
-      )
-      const nameErr = form.getFieldState('name').error?.message
-      if (nameErr) form.setError('name', { type: 'server', message: friendlyDuplicate(nameErr, 'topic') })
-    }
+  // A new topic starts from the current filters, so adding several to one chapter is quick.
+  const preset = {
+    subject_id: subjectFilter,
+    chapter_id: chapterFilter && chapterFilter !== 'none' ? chapterFilter : '',
+    grade: gradeFilter && gradeFilter !== 'none' ? gradeFilter : '',
   }
 
   const remove = async () => {
@@ -230,117 +206,18 @@ export default function TopicsPage() {
         />
       </Card>
 
-      <FormDialog
+      <TopicFormDialog
         open={formOpen}
         onClose={() => setFormOpen(false)}
-        title={editing ? 'Edit Topic' : 'Add Topic'}
-        description={editing ? undefined : 'Teachers will be able to pick this topic when they log a lesson.'}
-        form={form}
-        onSubmit={submit}
-        submitLabel={editing ? 'Update' : 'Save'}
-        submittingLabel={editing ? 'Updating...' : 'Saving...'}
-        error={formError}
-        className="tw:sm:max-w-2xl"
-      >
-        <FormField
-          control={form.control}
-          name="subject_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel required>Subject</FormLabel>
-              <FormControl>
-                <NativeSelect
-                  {...field}
-                  disabled={subjects.loading}
-                  onChange={(e) => {
-                    field.onChange(e.target.value)
-                    form.setValue('chapter_id', '') // chapters belong to a subject (legacy reset)
-                  }}
-                >
-                  <option value="">{subjects.loading ? 'Loading…' : 'Select subject'}</option>
-                  {(subjects.data ?? []).map((s) => (
-                    <option key={s.id} value={String(s.id)}>
-                      {s.subject}
-                    </option>
-                  ))}
-                </NativeSelect>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="chapter_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Chapter</FormLabel>
-                <FormControl>
-                  <NativeSelect {...field} disabled={!formSubject || formChapters.loading}>
-                    <option value="">{!formSubject ? 'Select a subject first' : formChapters.loading ? 'Loading…' : 'No chapter'}</option>
-                    {formSubject &&
-                      (formChapters.data ?? []).map((c) => (
-                        <option key={c.id} value={String(c.id)}>
-                          {c.name}
-                        </option>
-                      ))}
-                  </NativeSelect>
-                </FormControl>
-                <FormDescription>Optional.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="grade"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Grade</FormLabel>
-                <FormControl>
-                  <NativeSelect {...field}>
-                    <option value="">All grades (shared)</option>
-                    {GRADES.map((g) => (
-                      <option key={g} value={String(g)}>
-                        Grade {g}
-                      </option>
-                    ))}
-                  </NativeSelect>
-                </FormControl>
-                <FormDescription>Leave as “All grades” unless it is grade-specific.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel required>Topic name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g. Profit and Loss" autoComplete="off" maxLength={255} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="explanation_html"
-          render={({ field, fieldState }) => (
-            <FormItem>
-              <FormLabel>Explanation</FormLabel>
-              <FormControl>
-                <RichTextEditor value={field.value} onChange={field.onChange} aria-invalid={!!fieldState.error} placeholder="Explain the topic for students (optional)." />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </FormDialog>
+        topic={editing}
+        subjects={subjects.data ?? []}
+        subjectsLoading={subjects.loading}
+        preset={preset}
+        onSaved={(v) => {
+          toast.success(editing ? 'Topic updated.' : `Topic “${v.name.trim()}” added.`)
+          list.reload()
+        }}
+      />
 
       <ConfirmDialog
         open={!!deleting}

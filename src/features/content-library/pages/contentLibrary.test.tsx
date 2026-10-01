@@ -61,7 +61,10 @@ describe('ChaptersPage', () => {
 
   it('validates, posts the legacy body, and explains a duplicate name', async () => {
     mockGets()
-    const post = vi.spyOn(axios, 'post').mockRejectedValueOnce(taken()).mockResolvedValueOnce({ data: { success: true, data: { id: 9 } } })
+    const post = vi
+      .spyOn(axios, 'post')
+      .mockRejectedValueOnce(taken())
+      .mockResolvedValueOnce({ data: { success: true, data: { id: 9 } } })
     renderIt(<ChaptersPage />)
     await userEvent.click(await screen.findByRole('button', { name: 'Add Chapter' }))
     const dialog = await screen.findByRole('dialog')

@@ -47,7 +47,5 @@ export const toTopicPayload = (v: TopicValues): TopicPayload => ({
 /** Laravel's unique-rule text, rewritten so it says what to do. */
 export function friendlyDuplicate(message: string, what: 'chapter' | 'topic'): string {
   if (!/already been taken/i.test(message)) return message
-  return what === 'chapter'
-    ? 'Your coaching already has a chapter with this name in this subject.'
-    : 'Your coaching already has a topic with this name for this subject and grade.'
+  return what === 'chapter' ? 'Your coaching already has a chapter with this name in this subject.' : 'Your coaching already has a topic with this name for this subject and grade.'
 }

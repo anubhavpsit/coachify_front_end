@@ -48,7 +48,7 @@ const AcademicYearsPage = lazy(() => import('@/features/academics/pages/Academic
 const TopicsPage = lazy(() => import('@/features/content-library/pages/TopicsPage'))
 const TopicQuestionsPage = lazy(() => import('@/pages/topics/TopicQuestionsPage'))
 const ChaptersPage = lazy(() => import('@/features/content-library/pages/ChaptersPage'))
-const ChapterDetailPage = lazy(() => import('@/pages/topics/ChapterDetailPage'))
+const ChapterDetailPage = lazy(() => import('@/features/content-library/pages/ChapterDetailPage'))
 const LibraryChaptersPage = lazy(() => import('@/pages/library/LibraryChaptersPage'))
 const LibraryChapterDetailPage = lazy(() => import('@/pages/library/LibraryChapterDetailPage'))
 const LibraryTopicsPage = lazy(() => import('@/pages/library/LibraryTopicsPage'))

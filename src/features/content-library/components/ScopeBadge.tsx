@@ -19,7 +19,11 @@ export function ReadOnlyMark({ what }: { what: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span tabIndex={0} className="tw:inline-flex tw:size-8 tw:items-center tw:justify-center tw:rounded-md tw:text-muted-foreground tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50" aria-label={`Base ${what} — read-only`}>
+        <span
+          tabIndex={0}
+          className="tw:inline-flex tw:size-8 tw:items-center tw:justify-center tw:rounded-md tw:text-muted-foreground tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50"
+          aria-label={`Base ${what} — read-only`}
+        >
           <Lock className="tw:size-4" aria-hidden="true" />
         </span>
       </TooltipTrigger>

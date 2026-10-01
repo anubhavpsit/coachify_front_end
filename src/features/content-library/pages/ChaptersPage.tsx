@@ -1,25 +1,20 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { BookMarked, ChevronRight, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
 import DataTable, { type ColumnDef } from '@/components/common/DataTable'
-import FormDialog from '@/components/common/FormDialog'
 import PageHeader from '@/components/common/PageHeader'
 import RowActions from '@/components/common/RowActions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import { useAsync } from '@/hooks/useAsync'
-import { applyServerErrors } from '@/lib/forms'
+import ChapterFormDialog from '../components/ChapterFormDialog'
 import { ReadOnlyMark, ScopeBadge } from '../components/ScopeBadge'
-import { chapterDefaults, chapterSchema, friendlyDuplicate, toChapterPayload, type ChapterValues } from '../schemas/contentForms'
-import { createChapter, deleteChapter, fetchChapters, fetchSubjects, ownTenantId, updateChapter, type Chapter } from '../services/contentLibraryService'
+import type { ChapterValues } from '../schemas/contentForms'
+import { deleteChapter, fetchChapters, fetchSubjects, ownTenantId, type Chapter } from '../services/contentLibraryService'
 
 const chapterRoute = (id: number) => `/chapters/${id}`
 
@@ -34,38 +29,19 @@ export default function ChaptersPage() {
   const subjectName = (c: Chapter) => c.subject?.subject ?? subjects.data?.find((s) => s.id === c.subject_id)?.subject ?? '-'
   const canManage = (c: Chapter) => c.tenant_id === tenantId
 
-  const form = useForm<ChapterValues>({ resolver: zodResolver(chapterSchema), defaultValues: chapterDefaults(), mode: 'onTouched' })
   const [editing, setEditing] = useState<Chapter | null>(null)
   const [formOpen, setFormOpen] = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<Chapter | null>(null)
 
   const openForm = (c: Chapter | null) => {
     setEditing(c)
-    setFormError(null)
-    form.reset(chapterDefaults(c, subjectFilter))
     setFormOpen(true)
   }
 
-  const submit = async (v: ChapterValues) => {
-    setFormError(null)
-    try {
-      if (editing) {
-        await updateChapter(editing.id, toChapterPayload(v))
-        toast.success('Chapter updated.')
-      } else {
-        const res = await createChapter(toChapterPayload(v))
-        const id: number | undefined = res.data?.data?.id
-        toast.success(`Chapter “${v.name.trim()}” added.`, id ? { action: { label: 'Add topics', onClick: () => navigate(chapterRoute(id)) } } : undefined)
-      }
-      setFormOpen(false)
-      list.reload()
-    } catch (err) {
-      console.error(editing ? 'Error updating chapter:' : 'Error creating chapter:', err)
-      setFormError(applyServerErrors(err, form.setError, ['subject_id', 'name'], { fallback: editing ? 'Failed to update chapter.' : 'Failed to create chapter.' }))
-      const nameErr = form.getFieldState('name').error?.message
-      if (nameErr) form.setError('name', { type: 'server', message: friendlyDuplicate(nameErr, 'chapter') })
-    }
+  const onSaved = ({ id, values }: { id?: number; values: ChapterValues }) => {
+    if (editing) toast.success('Chapter updated.')
+    else toast.success(`Chapter “${values.name.trim()}” added.`, id ? { action: { label: 'Add topics', onClick: () => navigate(chapterRoute(id)) } } : undefined)
+    list.reload()
   }
 
   const remove = async () => {
@@ -174,52 +150,15 @@ export default function ChaptersPage() {
         />
       </Card>
 
-      <FormDialog
+      <ChapterFormDialog
         open={formOpen}
         onClose={() => setFormOpen(false)}
-        title={editing ? 'Edit Chapter' : 'Add Chapter'}
-        description={editing ? undefined : 'Chapters belong to one subject. Add topics to it afterwards.'}
-        form={form}
-        onSubmit={submit}
-        submitLabel={editing ? 'Update' : 'Save'}
-        submittingLabel={editing ? 'Updating...' : 'Saving...'}
-        error={formError}
-      >
-        <FormField
-          control={form.control}
-          name="subject_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel required>Subject</FormLabel>
-              <FormControl>
-                <NativeSelect {...field} disabled={subjects.loading}>
-                  <option value="">{subjects.loading ? 'Loading…' : 'Select subject'}</option>
-                  {(subjects.data ?? []).map((s) => (
-                    <option key={s.id} value={String(s.id)}>
-                      {s.subject}
-                    </option>
-                  ))}
-                </NativeSelect>
-              </FormControl>
-              {editing && <FormDescription>Changing the subject only affects the chapter itself — topics already added stay assigned.</FormDescription>}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel required>Chapter name</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g. Rational And Irrational Numbers" autoComplete="off" maxLength={255} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </FormDialog>
+        chapter={editing}
+        subjects={subjects.data ?? []}
+        subjectsLoading={subjects.loading}
+        presetSubjectId={subjectFilter}
+        onSaved={onSaved}
+      />
 
       <ConfirmDialog
         open={!!deleting}

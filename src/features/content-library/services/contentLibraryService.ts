@@ -56,3 +56,13 @@ export async function fetchTopics(f: TopicFilters): Promise<Topic[]> {
 export const createTopic = (p: TopicPayload) => axios.post(`${API_BASE_URL}${TOPICS}`, p, { headers: headers() })
 export const updateTopic = (id: number, p: TopicPayload) => axios.put(`${API_BASE_URL}${TOPICS}/${id}`, p, { headers: headers() })
 export const deleteTopic = (id: number) => axios.delete(`${API_BASE_URL}${TOPICS}/${id}`, { headers: headers() })
+
+export type ChapterDetail = Chapter & { is_base?: boolean; topics: Topic[] }
+
+export async function fetchChapter(id: string | number): Promise<ChapterDetail> {
+  const res = await axios.get(`${API_BASE_URL}${CHAPTERS}/${id}`, { headers: headers() })
+  return res.data?.data
+}
+
+export const attachTopics = (chapterId: number, topicIds: number[]) => axios.post(`${API_BASE_URL}${CHAPTERS}/${chapterId}/topics`, { topic_ids: topicIds }, { headers: headers() })
+export const detachTopic = (chapterId: number, topicId: number) => axios.delete(`${API_BASE_URL}${CHAPTERS}/${chapterId}/topics/${topicId}`, { headers: headers() })
