@@ -55,7 +55,7 @@
 | `/expenses` | ExpensesPage (features/finance) | RequirePermission | `expenses.view` \| `expenses.manage` | → `/dashboard` | ☑ |
 | `/enquiries` | EnquiriesPage (features/enquiries) | RequirePermission | `enquiries.view` \| `enquiries.manage` (+Q1) | → `/dashboard` | ☑ |
 | `/teachers` | TeachersPage | RequirePermission | `teachers.view` \| `teachers.manage` \| role `student` | → `/dashboard` | ☐ |
-| `/teachers/daily-activities` | DailyActivitiesPage | auth only | — | — | ☐ |
+| `/teachers/daily-activities` | DailyActivitiesPage (features/daily-activities) | auth only | — | — | ☑ |
 | `/staff` | StaffPage | RequirePermission | `staff.manage` | → `/dashboard` | ☐ |
 | `/students` | StudentsPage | RequirePermission | `students.view` \| `students.manage` \| role `teacher` | → `/dashboard` | ☐ |
 | `/students/activities` | StudentActivitiesPage | auth only | — | — | ☐ |
@@ -172,7 +172,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | AssessmentsPage | Question Paper button | role `coaching_admin` \| `teacher` | conditional render | ☐ |
 | AssessmentsPage | Approve / Mark pending (file), Remove file | role `coaching_admin` | conditional render (otherwise a status label) | ☐ |
 | QuestionPaperModal | Editing controls | `paper.status !== 'released'` (read-only mode) | disabled / hidden | ☐ |
-| **DailyActivitiesPage** | Delete attachment (×) | role `coaching_admin` | conditional render | ☐ |
+| **DailyActivitiesPage** (features/daily-activities) | Delete attachment (×) | role `coaching_admin` | conditional render | ☑ (test) |
 | **DailyActivityApprovalsPage** | `isAdmin` view | role `coaching_admin` \| (role `staff` && `daily_activities.approve`) | derived flag | ☐ |
 | DailyActivityApprovalsPage | Page access | `isAdmin` \| role `teacher` | fetch gated on `canAccess` | ☐ |
 | DailyActivityApprovalsPage | Students endpoint | admin → `/students`, teacher → `/teachers/students` | endpoint choice | ☐ |
