@@ -10,6 +10,8 @@ interface Props {
   disabled?: boolean
   id?: string
   placeholder?: string
+  /** Accessible name (a <label> can't name a contenteditable). */
+  label?: string
   'aria-describedby'?: string
   'aria-invalid'?: boolean
 }
@@ -35,7 +37,7 @@ function Tool({ label, active, onClick, disabled, children }: { label: string; a
 }
 
 /** Tiptap editor (same StarterKit + toolbar as the legacy one) in the app's form style. */
-export default function RichTextEditor({ value, onChange, disabled, id, placeholder, ...aria }: Props) {
+export default function RichTextEditor({ value, onChange, disabled, id, placeholder, label, ...aria }: Props) {
   const editor = useEditor({
     extensions: [StarterKit],
     content: value || '',
@@ -44,6 +46,7 @@ export default function RichTextEditor({ value, onChange, disabled, id, placehol
       attributes: {
         ...(id ? { id } : {}),
         role: 'textbox',
+        ...(label ? { 'aria-label': label } : {}),
         'aria-multiline': 'true',
         ...(aria['aria-describedby'] ? { 'aria-describedby': aria['aria-describedby'] } : {}),
         ...(aria['aria-invalid'] ? { 'aria-invalid': 'true' } : {}),

@@ -161,7 +161,7 @@ export default function TopicFormDialog({ open, onClose, topic, subjects, subjec
           <FormItem>
             <FormLabel>Explanation</FormLabel>
             <FormControl>
-              <RichTextEditor value={field.value} onChange={field.onChange} aria-invalid={!!fieldState.error} placeholder="Explain the topic for students (optional)." />
+              <RichTextEditor value={field.value} onChange={field.onChange} aria-invalid={!!fieldState.error} label="Explanation" placeholder="Explain the topic for students (optional)." />
             </FormControl>
             <FormMessage />
           </FormItem>

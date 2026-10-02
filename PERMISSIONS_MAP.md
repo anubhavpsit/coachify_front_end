@@ -75,8 +75,8 @@
 | `/insights` | InsightsPage (features/insights) | RequirePermission | `insights.view` \| role `teacher` \| `student` | → `/dashboard` | ☑ |
 | `/academic-years` | AcademicYearsPage | RequirePermission | `academic_years.manage` | → `/dashboard` | ☐ |
 | `/admin/facts` | AdminFactsPage | RequirePermission | `facts.manage` | → `/dashboard` | ☐ |
-| `/topics`, `/topics/:topicId/questions` | TopicsPage, TopicQuestionsPage | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☐ |
-| `/chapters`, `/chapters/:chapterId` | ChaptersPage, ChapterDetailPage | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☐ |
+| `/topics`, `/topics/:topicId/questions` | TopicsPage, TopicQuestionsPage (features/content-library) | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☑ |
+| `/chapters`, `/chapters/:chapterId` | ChaptersPage, ChapterDetailPage (features/content-library) | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☑ |
 | `/library/chapters[/:id]`, `/library/topics[/:id]` | Library* pages | auth only | — | — | ☐ |
 | `*` | NotFoundPage | none | — | — | ☐ |
 
@@ -194,7 +194,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | **NoticeBoardCard / NoticeDetailDialog** (features/notices) | Create / Edit / Delete notice, admin details (audience, expiry, push) | server flag `meta.can_manage` | conditional render; form only mounted when true | ☑ (test) |
 | **SubjectsPage / ClassesPage** (features/academics) | Edit / Delete row actions (otherwise read-only "Default" badge) | ownership: `item.tenant_id !== 0` (global defaults are read-only) | conditional render | ☑ (test) |
 | **ChaptersPage / TopicsPage / ChapterDetailPage** (features/content-library) | Edit / Delete (otherwise a lock "Base … read-only" marker) | ownership: `item.tenant_id === ownTenantId` | conditional render | ☑ (test) |
-| **QuestionsManager** | Edit / Delete (otherwise a "global/read-only" marker) | ownership: `item.tenant_id === ownTenantId` | conditional render | ☐ |
+| **TopicQuestionsPage** (features/content-library) | Edit / Delete (otherwise a lock "Base … read-only" marker) | ownership: `item.tenant_id === ownTenantId` | conditional render | ☑ (test) |
 | **NotificationBell / MyNotificationsPage** | Deep-link target | role `student` → `/students/assessments`, else `/assessments` | link builder `notificationLink()` (unchanged) | ☑ (test) |
 | **Topbar** | Search, profile menu, logout | auth only | — | ☐ |
 

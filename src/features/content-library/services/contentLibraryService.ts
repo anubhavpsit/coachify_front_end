@@ -66,3 +66,61 @@ export async function fetchChapter(id: string | number): Promise<ChapterDetail> 
 
 export const attachTopics = (chapterId: number, topicIds: number[]) => axios.post(`${API_BASE_URL}${CHAPTERS}/${chapterId}/topics`, { topic_ids: topicIds }, { headers: headers() })
 export const detachTopic = (chapterId: number, topicId: number) => axios.delete(`${API_BASE_URL}${CHAPTERS}/${chapterId}/topics/${topicId}`, { headers: headers() })
+
+// ---- Question bank (per topic) ----
+export type QuestionType = '' | 'mcq' | 'true_false' | 'short_answer' | 'long_answer' | 'fill_in_the_blank' | 'match_the_following'
+export type Question = {
+  id: number
+  tenant_id: number
+  grade: number
+  difficulty: string | null
+  question_type: string | null
+  question_html: string
+  solution_html: string | null
+  option_a: string | null
+  option_b: string | null
+  option_c: string | null
+  option_d: string | null
+  correct_answer: string | null
+  answer_key: string | null
+  needs_image: boolean
+  image_note: string | null
+}
+/** Same body as the legacy buildPayload() (grade as a string). */
+export type QuestionPayload = {
+  grade: string
+  difficulty: string | null
+  question_type: string | null
+  question_html: string
+  solution_html: string | null
+  option_a: string | null
+  option_b: string | null
+  option_c: string | null
+  option_d: string | null
+  correct_answer: string | null
+  answer_key: string | null
+  needs_image: boolean
+  image_note: string | null
+}
+
+const questionsUrl = (topicId: string | number) => `${API_BASE_URL}${TOPICS}/${topicId}/questions`
+
+export async function fetchTopic(id: string | number): Promise<Topic | null> {
+  const res = await axios.get(`${API_BASE_URL}${TOPICS}/${id}`, { headers: headers() })
+  return res.data?.data ?? null
+}
+
+export async function fetchQuestions(topicId: string | number, grade?: string): Promise<Question[]> {
+  const res = await axios.get(questionsUrl(topicId), { params: grade ? { grade } : undefined, headers: headers() })
+  return res.data?.data ?? []
+}
+export const createQuestion = (topicId: string | number, p: QuestionPayload) => axios.post(questionsUrl(topicId), p, { headers: headers() })
+export const updateQuestion = (topicId: string | number, id: number, p: QuestionPayload) => axios.put(`${questionsUrl(topicId)}/${id}`, p, { headers: headers() })
+export const deleteQuestion = (topicId: string | number, id: number) => axios.delete(`${questionsUrl(topicId)}/${id}`, { headers: headers() })
+
+export async function uploadQuestionImage(topicId: string | number, id: number, file: File): Promise<string> {
+  const fd = new FormData()
+  fd.append('image', file)
+  const res = await axios.post(`${questionsUrl(topicId)}/${id}/image`, fd, { headers: { ...headers(), 'Content-Type': 'multipart/form-data' } })
+  return res.data?.url ?? ''
+}
