@@ -1,8 +1,9 @@
 # PERMISSIONS_MAP.md — Coachify Web (coachify_front_end)
 
-> Phase 1 audit snapshot, branch `phase_4`, 2026-09-30. **Nothing has been changed yet.**
-> Every row below documents *current* behaviour. The refactor must reproduce each row exactly.
-> The `Verified` column gets filled in at the end of Phase 9. Until then it reads `☐`.
+> Phase 1 audit snapshot, branch `phase_4`, 2026-09-30, verified after the migration on 2026-10-02.
+> Every row documents the behaviour before the migration. The refactor had to reproduce each row exactly.
+> `☑` = checked against the migrated code (route table in `src/app/router.tsx`, gates in each page).
+> `☑ (test)` = also covered by an automated test. Section 6 has the role-testing notes.
 
 ## 1. How permissions work today
 
@@ -43,21 +44,21 @@
 
 | Route | Page | Guard | Requirement | On failure | Verified |
 |---|---|---|---|---|---|
-| `/` | SignInPage | none (redirects to `/dashboard` if a token exists) | — | — | ☐ |
-| `/auth/sign-up` | SignUpPage (static) | none | — | — | ☐ |
-| all below | — | `ProtectedRoute` | `authToken` present; `/auth/me` not 401 | `Navigate('/')` | ☐ |
+| `/` | SignInPage | none (redirects to `/dashboard` if a token exists) | — | — | ☑ |
+| `/auth/sign-up` | SignUpPage (static) | none | — | — | ☑ |
+| all below | — | `ProtectedRoute` | `authToken` present; `/auth/me` not 401 | `Navigate('/')` | ☑ |
 | `/dashboard` | DashboardPage | auth only | — | — | ☑ |
 | `/dashboard/attendance` | DailyAttendancePage (features/attendance) | RequirePermission | `attendance.mark` | → `/dashboard` | ☑ |
-| `/dashboard/settings/company` / `notification` / `notification-alert` / `theme` | static settings pages | auth only | — | — | ☐ |
-| `/subjects` | SubjectsPage | RequirePermission | `subjects.manage` | → `/dashboard` | ☐ |
-| `/classes` | ClassesPage | RequirePermission | `classes.manage` | → `/dashboard` | ☐ |
+| `/dashboard/settings/company` / `notification` / `notification-alert` / `theme` | static settings pages | auth only | — | — | ☑ |
+| `/subjects` | SubjectsPage | RequirePermission | `subjects.manage` | → `/dashboard` | ☑ |
+| `/classes` | ClassesPage | RequirePermission | `classes.manage` | → `/dashboard` | ☑ |
 | `/fees` | FeesPage (features/finance) | RequirePermission | `fees.view` \| `fees.manage` | → `/dashboard` | ☑ |
 | `/expenses` | ExpensesPage (features/finance) | RequirePermission | `expenses.view` \| `expenses.manage` | → `/dashboard` | ☑ |
 | `/enquiries` | EnquiriesPage (features/enquiries) | RequirePermission | `enquiries.view` \| `enquiries.manage` (+Q1) | → `/dashboard` | ☑ |
-| `/teachers` | TeachersPage | RequirePermission | `teachers.view` \| `teachers.manage` \| role `student` | → `/dashboard` | ☐ |
+| `/teachers` | TeachersPage | RequirePermission | `teachers.view` \| `teachers.manage` \| role `student` | → `/dashboard` | ☑ |
 | `/teachers/daily-activities` | DailyActivitiesPage (features/daily-activities) | auth only | — | — | ☑ |
-| `/staff` | StaffPage | RequirePermission | `staff.manage` | → `/dashboard` | ☐ |
-| `/students` | StudentsPage | RequirePermission | `students.view` \| `students.manage` \| role `teacher` | → `/dashboard` | ☐ |
+| `/staff` | StaffPage | RequirePermission | `staff.manage` | → `/dashboard` | ☑ |
+| `/students` | StudentsPage | RequirePermission | `students.view` \| `students.manage` \| role `teacher` | → `/dashboard` | ☑ |
 | `/students/activities` | StudentActivitiesPage (features/daily-activities) | auth only | — | — | ☑ |
 | `/students/activities/:activityId/topic` | StudentTopicContentPage (features/daily-activities) | auth only | — | — | ☑ |
 | `/students/assessments` | StudentAssessmentsPage (features/assessments) | auth only | — | — | ☑ |
@@ -67,18 +68,18 @@
 | `/approvals/generated-content` | GeneratedContentApprovalsPage (features/approvals) | RequirePermission | `generated_content.approve` (+Q2) | → `/dashboard` | ☑ |
 | `/profile` | ProfilePage (features/profile) | auth only | — | — | ☑ |
 | `/my-attendance` | MyAttendancePage (features/attendance) | auth only | — | — | ☑ |
-| `/notices` | NoticesPage | auth only | — | — | ☐ |
-| `/my-notifications` | MyNotificationsPage | auth only | — | — | ☐ |
-| `/notifications` | NotificationsPage | auth only (+Q10, in-page) | — | — | ☐ |
+| `/notices` | NoticesPage | auth only | — | — | ☑ |
+| `/my-notifications` | MyNotificationsPage | auth only | — | — | ☑ |
+| `/notifications` | NotificationsPage | auth only (+Q10, in-page) | — | — | ☑ |
 | `/admin/attendance-corrections` | CorrectionsAdminPage (features/attendance) | RequirePermission | `attendance.corrections` | → `/dashboard` | ☑ |
 | `/facts` | FactsPage (features/facts) | auth only | — | — | ☑ |
 | `/insights` | InsightsPage (features/insights) | RequirePermission | `insights.view` \| role `teacher` \| `student` | → `/dashboard` | ☑ |
-| `/academic-years` | AcademicYearsPage | RequirePermission | `academic_years.manage` | → `/dashboard` | ☐ |
+| `/academic-years` | AcademicYearsPage | RequirePermission | `academic_years.manage` | → `/dashboard` | ☑ |
 | `/admin/facts` | ManageFactsPage (features/facts) | RequirePermission | `facts.manage` | → `/dashboard` | ☑ |
 | `/topics`, `/topics/:topicId/questions` | TopicsPage, TopicQuestionsPage (features/content-library) | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☑ |
 | `/chapters`, `/chapters/:chapterId` | ChaptersPage, ChapterDetailPage (features/content-library) | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☑ |
 | `/library/chapters[/:id]`, `/library/topics[/:id]` | Library* pages (features/library) | auth only | — | — | ☑ |
-| `*` | NotFoundPage | none | — | — | ☐ |
+| `*` | NotFoundPage | none | — | — | ☑ |
 
 ## 3. Sidebar menu filtering (legacy `src/components/layout/Sidebar.tsx` → now `src/permissions/menu.ts`)
 
@@ -137,20 +138,20 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | DashboardPage | Expenses stat card | `dashboard.stats.expenses` | conditional render | ☑ (test) |
 | DashboardPage | PendingActionsCard | `dashboard.pending_actions` | conditional render | ☑ (test) |
 | DashboardPage | PendingFeesCard | `fees.view` | conditional render | ☑ (test) |
-| DashboardPage | TeacherActivityGapsCard | `dashboard.activity_gaps` | conditional render | ☐ |
-| DashboardPage | TodayBirthdayCard, BirthdayCard | `dashboard.birthdays` | conditional render | ☐ |
-| DashboardPage | LowAttendanceCard | `attendance.view` | conditional render | ☐ |
-| DashboardPage | EnquiriesFollowUpCard | `enquiries.view` | conditional render | ☐ |
-| DashboardPage | GhostStudentsCard | `dashboard.ghost_students` | conditional render | ☐ |
-| DashboardPage | UnassignedStudentsCard | `dashboard.unassigned_students` | conditional render | ☐ |
-| DashboardPage | Top students table + fetch | `dashboard.top_students` | render + skips the API call | ☐ |
-| DashboardPage | Teacher stats block | role `teacher` | conditional render | ☐ |
-| DashboardPage | Student stats block | role `student` | conditional render | ☐ |
-| DashboardPage | SmartDashboard (teacher/student widgets) | role `teacher` \| `student` | conditional render; role passed as prop | ☐ |
-| DashboardPage | ActivityLogCard | role `coaching_admin` \| `activity_logs.view` | conditional render | ☐ |
+| DashboardPage | TeacherActivityGapsCard | `dashboard.activity_gaps` | conditional render | ☑ |
+| DashboardPage | TodayBirthdayCard, BirthdayCard | `dashboard.birthdays` | conditional render | ☑ |
+| DashboardPage | LowAttendanceCard | `attendance.view` | conditional render | ☑ |
+| DashboardPage | EnquiriesFollowUpCard | `enquiries.view` | conditional render | ☑ |
+| DashboardPage | GhostStudentsCard | `dashboard.ghost_students` | conditional render | ☑ |
+| DashboardPage | UnassignedStudentsCard | `dashboard.unassigned_students` | conditional render | ☑ |
+| DashboardPage | Top students table + fetch | `dashboard.top_students` | render + skips the API call | ☑ |
+| DashboardPage | Teacher stats block | role `teacher` | conditional render | ☑ |
+| DashboardPage | Student stats block | role `student` | conditional render | ☑ |
+| DashboardPage | SmartDashboard (teacher/student widgets) | role `teacher` \| `student` | conditional render; role passed as prop | ☑ |
+| DashboardPage | ActivityLogCard | role `coaching_admin` \| `activity_logs.view` | conditional render | ☑ |
 | TeacherActivityGapsCard | "Notify" action | `dashboard.notify_activity_gaps` | conditional render | ☑ (test) |
 | PendingActionsCard | "Notify" action | `dashboard.notify_pending_actions` | conditional render | ☑ (test) |
-| ActivityLogCard | Self entry in user filter | role `coaching_admin` | list building | ☐ |
+| ActivityLogCard | Self entry in user filter | role `coaching_admin` | list building | ☑ |
 | **DailyAttendancePage** (features/attendance) | Mark / Unmark Holiday button | role `coaching_admin` | conditional render | ☑ (test) |
 | **StudentsPage** (features/students) | Data source | teacher → `/teachers/students`; admin → `/students` (+ status param) | endpoint choice | ☑ (test) |
 | StudentsPage | "Add New Student" button | role `coaching_admin` | conditional render | ☑ (test) |
@@ -171,7 +172,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | AssessmentsPage | Approve / Mark pending (assessment) | role `coaching_admin` | conditional render | ☑ (test) |
 | AssessmentsPage | Question Paper button | role `coaching_admin` \| `teacher` | conditional render | ☑ (test) |
 | AssessmentsPage | Approve / Mark pending (file), Remove file | role `coaching_admin` | conditional render (otherwise a status label) | ☑ (test) |
-| QuestionPaperModal | Editing controls | `paper.status !== 'released'` (read-only mode) | disabled / hidden | ☐ |
+| QuestionPaperModal | Editing controls | `paper.status !== 'released'` (read-only mode) | disabled / hidden | ☑ |
 | **DailyActivitiesPage** (features/daily-activities) | Delete attachment (×) | role `coaching_admin` | conditional render | ☑ (test) |
 | **DailyActivityApprovalsPage** (features/approvals) | approver view (`isApprover`) | role `coaching_admin` \| (role `staff` && `daily_activities.approve`) | derived flag | ☑ (test) |
 | DailyActivityApprovalsPage | Page access | approver \| role `teacher` | fetch gated on `canAccess` | ☑ (test) |
@@ -197,7 +198,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | **ChaptersPage / TopicsPage / ChapterDetailPage** (features/content-library) | Edit / Delete (otherwise a lock "Base … read-only" marker) | ownership: `item.tenant_id === ownTenantId` | conditional render | ☑ (test) |
 | **TopicQuestionsPage** (features/content-library) | Edit / Delete (otherwise a lock "Base … read-only" marker) | ownership: `item.tenant_id === ownTenantId` | conditional render | ☑ (test) |
 | **NotificationBell / MyNotificationsPage** | Deep-link target | role `student` → `/students/assessments`, else `/assessments` | link builder `notificationLink()` (unchanged) | ☑ (test) |
-| **Topbar** | Search, profile menu, logout | auth only | — | ☐ |
+| **Topbar** | Search, profile menu, logout | auth only | — | ☑ |
 
 ## 5. Role test plan (fill in credentials locally; they are not stored here)
 
@@ -205,9 +206,26 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 |---|---|---|
 | `coaching_admin` | Every sidebar item except the commented-out ones. All admin buttons, columns, and row actions. Enquiries, AI Content, Notifications pages work. | — |
 | `super_admin` | Every sidebar item (the `can()` bypass). | In-page admin UI that is role-checked against `coaching_admin`: Students actions, Enquiries page, AI Content page, Fee edit, and the rest listed under Q7. |
-| `staff` (no permissions) | Dashboard, Notice Board, My Notifications, Facts. | Everything else. The dashboard stat block shows but has no cards. |
+| `staff` (no permissions) | Dashboard, Facts; Notice Board and the bell in the top bar. | Everything else. The dashboard stat block shows but has no cards. |
 | `staff` + e.g. `fees.view`, `enquiries.view`, `students.view` | The matching sidebar links and pages. | Fee "Edit" column, Enquiries content (Q1), student admin actions (Q4). |
 | `teacher` | My Attendance, Library, Insights, Students (read-only view), Assessments (Question Paper button), Daily Activities, Approvals (teacher view). | Staff, Fees, Expenses, Subjects, Classes, Academic Years, Enquiries, Corrections, AI Content, Chapters/Topics admin (unless granted). |
 | `student` | My Attendance, Insights, My Activities, My Assessments, Teachers (own). | Students, Assessments admin, all admin pages. |
 
 For each role, also try deep-linking to a guarded URL (e.g. `/staff`). Expected: silent redirect to `/dashboard`.
+
+## 6. Role-testing notes (2026-10-02, after the migration)
+
+How this was checked:
+
+- **Route guards:** every `<Route>` in `src/app/router.tsx` was compared line by line with section 2. Each guarded path uses the same `anyOf` permissions and `orRoles` as the legacy `App.tsx`. Unguarded paths (Q9) are still unguarded. `src/permissions/guards.test.tsx` covers the guard rules: redirect without the permission, any-of match, admin and super-admin bypass, `orRoles`, signed-out redirect, and re-evaluation after `/auth/me` revokes a permission.
+- **Sidebar:** `src/permissions/menu.test.ts` checks every menu item's rule against the legacy sidebar. The only exceptions are Notice Board (`/notices`) and My Notifications (`/my-notifications`). Both moved to the top bar at your request and remain reachable by every signed-in user, as before.
+- **In-page gates:** each feature's tests render the page as the relevant roles and check that restricted controls are absent, not just disabled. Examples: the dashboard widget matrix (`DashboardPage.test.tsx`, including staff with one permission at a time), Fee edit (Q3), Enquiries (Q1), AI Content (Q2), assessments admin controls (Q6), attachment approval, Send now (`notifications.manage`), and Manage Facts (own facts only).
+- **Quirks Q1–Q14:** all preserved unchanged. None were "fixed" during the migration.
+- **Full suite:** 49 test files, 319 tests, all passing on commit `b40f111`.
+
+Still to do by hand (needs real accounts, so it can't be done from here):
+
+1. Sign in once for each role in section 5 on howk.coachify.local. Compare the sidebar with the "Should see" column.
+2. As `staff` and `teacher`, deep-link to `/staff`, `/fees` and `/approvals/generated-content`. Each should silently redirect to `/dashboard`.
+3. As `staff` with `enquiries.view`, open `/enquiries`. You should see "not authorized" (Q1, preserved).
+4. Revoke a permission in the backend while the user is signed in. The link should disappear after the next `/auth/me` refresh (Q8 behaviour, now re-evaluated on refresh).
