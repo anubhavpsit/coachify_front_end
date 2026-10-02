@@ -1,0 +1,1 @@
+import{a_ as i,a9 as p}from"./index-BJm6cHw4.js";function d(s,a,c,{fieldMap:f={},fallback:u}={}){const r=i(s),e=[];let t=!1;for(const[o,l]of Object.entries(r)){const n=f[o]??o;c.includes(n)?(a(n,{type:"server",message:l},{shouldFocus:!t}),t=!0):e.push(l)}return Object.keys(r).length===0?p(s,u):e.length?e[0]:null}export{d as a};

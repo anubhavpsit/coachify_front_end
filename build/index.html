@@ -7,48 +7,13 @@
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/assets/images/favicon.png" sizes="16x16" />
-
-    <!-- Remix icon font css  -->
-    <link rel="stylesheet" href="/assets/css/remixicon.css" />
-    <!-- BootStrap css -->
-    <link rel="stylesheet" href="/assets/css/lib/bootstrap.min.css" />
-    <!-- Apex Chart css -->
-    <link rel="stylesheet" href="/assets/css/lib/apexcharts.css" />
-    <!-- Data Table css -->
-    <link rel="stylesheet" href="/assets/css/lib/dataTables.min.css" />
-    <!-- Text Editor css -->
-    <link rel="stylesheet" href="/assets/css/lib/editor-katex.min.css" />
-    <link rel="stylesheet" href="/assets/css/lib/editor.atom-one-dark.min.css" />
-    <link rel="stylesheet" href="/assets/css/lib/editor.quill.snow.css" />
-    <!-- Date picker css -->
-    <link rel="stylesheet" href="/assets/css/lib/flatpickr.min.css" />
-    <!-- Calendar css -->
-    <link rel="stylesheet" href="/assets/css/lib/full-calendar.css" />
-    <!-- Vector Map css -->
-    <link rel="stylesheet" href="/assets/css/lib/jquery-jvectormap-2.0.5.css" />
-    <!-- Popup css -->
-    <link rel="stylesheet" href="/assets/css/lib/magnific-popup.css" />
-    <!-- Slick Slider css -->
-    <link rel="stylesheet" href="/assets/css/lib/slick.css" />
-    <!-- prism css -->
-    <link rel="stylesheet" href="/assets/css/lib/prism.css" />
-    <!-- file upload css -->
-    <link rel="stylesheet" href="/assets/css/lib/file-upload.css" />
-    <!-- Audio player css -->
-    <link rel="stylesheet" href="/assets/css/lib/audioplayer.css" />
-
-    <!-- Main template css -->
-    <link rel="stylesheet" href="/assets/css/style.css" />
-    <script type="module" crossorigin src="/assets/index-DOyl-EDq.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-B0VVnTHt.css">
+    <script type="module" crossorigin src="/assets/index-BJm6cHw4.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-B2t4f3ie.css">
     <script>var __coachifyTheme=(()=>{var m=Object.defineProperty;var _=Object.getOwnPropertyDescriptor;var k=Object.getOwnPropertyNames;var I=Object.prototype.hasOwnProperty;var G=(n,t)=>{for(var r in t)m(n,r,{get:t[r],enumerable:!0})},v=(n,t,r,e)=>{if(t&&typeof t=="object"||typeof t=="function")for(let o of k(t))!I.call(n,o)&&o!==r&&m(n,o,{get:()=>t[o],enumerable:!(e=_(t,o))||e.enumerable});return n};var L=n=>v(m({},"__esModule",{value:!0}),n);var Y={};G(Y,{DEFAULT_PRIMARY:()=>d,TENANT_KEY:()=>x,THEME_COLOR_KEY:()=>y,THEME_MODE_KEY:()=>w,applyThemeColor:()=>C,bootTheme:()=>H,buildDarkThemeVars:()=>T,buildPrimaryScale:()=>g,buildThemeCss:()=>M,buildThemeVars:()=>R,contrastRatio:()=>c,luminance:()=>l,normalizeHex:()=>a,readStoredThemeColor:()=>S,readableForeground:()=>E});const d="#487FFF",y="templateColor",x="tenant",w="coachify-theme",F="#FFFFFF",f="#0F172A";function a(n){if(typeof n!="string")return null;const t=n.trim().replace(/^#/,"");return/^[0-9a-fA-F]{3}$/.test(t)?("#"+t.split("").map(r=>r+r).join("")).toUpperCase():/^[0-9a-fA-F]{6}$/.test(t)?("#"+t).toUpperCase():null}function p(n){const t=parseInt(n.slice(1),16);return[t>>16&255,t>>8&255,t&255]}function O([n,t,r]){const e=o=>Math.round(Math.min(255,Math.max(0,o))).toString(16).padStart(2,"0");return("#"+e(n)+e(t)+e(r)).toUpperCase()}function B(n,t,r){const e=i=>{const u=i/255;return u<=.04045?u/12.92:Math.pow((u+.055)/1.055,2.4)},o=i=>255*(i<=.0031308?i*12.92:1.055*Math.pow(i,.4166666666666667)-.055),s=p(n).map(e),A=p(t).map(e);return O([0,1,2].map(i=>o(s[i]+(A[i]-s[i])*r)))}function l(n){const[t,r,e]=p(n).map(o=>{const s=o/255;return s<=.03928?s/12.92:Math.pow((s+.055)/1.055,2.4)});return .2126*t+.7152*r+.0722*e}function c(n,t){const r=l(n),e=l(t);return(Math.max(r,e)+.05)/(Math.min(r,e)+.05)}function E(n){const t=c(n,F);return t>=4.5?F:c(n,f)>t?f:F}const D=[[50,"#FFFFFF",.92],[100,"#FFFFFF",.8],[200,"#FFFFFF",.62],[300,"#FFFFFF",.44],[400,"#FFFFFF",.26],[500,"#FFFFFF",.1],[600,"#FFFFFF",0],[700,"#000000",.14],[800,"#000000",.28],[900,"#000000",.42]];function g(n){const t={};for(const[r,e,o]of D)t[r]=o?B(n,e,o):n;return t}function R(n){var o;const t=(o=a(n))!=null?o:d,r=g(t),e={};for(const s of Object.keys(r))e["--primary-"+s]=r[Number(s)];return e["--primary"]=t,e["--primary-foreground"]=E(t),e["--primary-hover"]=r[700],e["--primary-active"]=r[800],e["--primary-soft"]=r[50],e["--primary-soft-foreground"]=c(r[50],r[700])>=4.5?r[700]:r[900],e["--ring"]=r[400],e}function T(n){var e;const t=(e=a(n))!=null?e:d,r=g(t);return{"--primary-50":t+"0F","--primary-soft":t+"1F","--primary-soft-foreground":r[300]}}const h="cf-tenant-theme";function b(n){return Object.keys(n).map(t=>t+":"+n[t]).join(";")}function M(n){return":root{"+b(R(n))+"}[data-theme=dark]{"+b(T(n))+"}"}function C(n){if(typeof document=="undefined")return;let t=document.getElementById(h);t||(t=document.createElement("style"),t.id=h),t.textContent=M(n),document.head.appendChild(t),document.documentElement.style.removeProperty("--primary-600")}function S(){try{const n=a(window.localStorage.getItem(y));if(n)return n;const t=JSON.parse(window.localStorage.getItem(x)||"null");return a(t&&t.theme_color)}catch(n){return null}}function H(){try{C(S());const n=window.localStorage.getItem(w);(n==="light"||n==="dark")&&document.documentElement.setAttribute("data-theme",n)}catch(n){}}return L(Y);})();
 ;__coachifyTheme.bootTheme();</script>
   </head>
   <body>
     <div id="root"></div>
-
-    <!-- Iconify runtime for <iconify-icon> elements -->
-    <script src="/assets/js/lib/iconify-icon.min.js"></script>
 
     <!-- React entry -->
   </body>
