@@ -43,7 +43,9 @@ export default function StatCard({ label, value, icon: Icon, tone = 'primary', f
         </span>
         <span className="text-xs font-medium text-muted-foreground sm:text-sm">{label}</span>
       </div>
-      <div className="truncate text-xl font-bold tabular-nums tracking-tight text-foreground sm:text-3xl" aria-label={`${label}: ${format(value ?? 0)}`}>
+      <div className="truncate text-xl font-bold tabular-nums tracking-tight text-foreground sm:text-3xl">
+        {/* Screen readers get the final value, not the count-up frames. */}
+        <span className="sr-only">{format(value ?? 0)}</span>
         <span aria-hidden="true">{format(shown)}</span>
       </div>
     </m.div>

@@ -10,25 +10,34 @@
 
 ## 1. Performance: before / after
 
-### How it was measured
+### Official Lighthouse scores (Lighthouse 12.8.2, mobile, default throttling)
 
-The Lighthouse CLI is **not installed** on this machine. Per the working rule (no installs without approval), these numbers come from a Lighthouse-equivalent run instead:
+Median of 3 runs per page. Both builds point at the same local mock API (empty data), so only the frontend is measured. Signed-in pages use a seeded `coaching_admin` session with a cold cache on every run.
 
-- Headless Chrome via Playwright, mobile viewport 412×823.
-- **Lighthouse's mobile throttling:** 150 ms RTT, 1.6 Mbps down, 4× CPU slowdown.
-- `vite preview` of each production build.
-- API mocked with empty responses, so only the frontend is measured.
-- Each value is the median of 3 runs.
+| Page | Build | Performance | Accessibility | Best practices | SEO | FCP | LCP | TBT | CLS | Weight |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `/` (sign-in) | before | 67 | 94 | 100 | 82 | 5.1 s | 5.1 s | 96 ms | 0.018 | 736 KB |
+| | **after** | **86** | **100** | 100 | 82 | 2.8 s | 3.3 s | 132 ms | 0 | 378 KB |
+| `/dashboard` | before | 44 | 84 | 100 | 82 | 6.0 s | 7.6 s | 682 ms | 0 | 762 KB |
+| | **after** | **59** | **100** | 100 | 82 | 3.4 s | 5.8 s | 454 ms | 0.070 | 459 KB |
+| `/students` | before | 60 | 84 | 100 | 82 | 5.2 s | 6.6 s | 236 ms | 0 | 674 KB |
+| | **after** | **75** | **100** | 100 | 82 | 3.3 s | 4.7 s | 156 ms | 0.003 | 373 KB |
 
-Metrics come from the browser's own `PerformanceObserver`:
+Notes:
 
-| Metric | Source |
-|---|---|
-| FCP, LCP | paint entries |
-| CLS | `layout-shift` |
-| TBT | `longtask` time beyond 50 ms |
+- **Dashboard runs varied:** performance before was 44 / 55 / 35, after 59 / 52 / 62.
+- **Accessibility fixes found by this run:**
+  - stat-card values used `aria-label` on a plain `div`;
+  - card titles skipped from `h1` to `h3` (`CardTitle` is now `h2`).
+- **SEO stays at 82 in both builds:** there's no meta description, and `/robots.txt` falls through to the SPA. Both were left alone because the brief says SEO tags must not change. Adding them is a quick follow-up if you want it.
+- **Dashboard is still the slowest page:**
+  - its main script costs about 1.2 s on a throttled phone;
+  - its widgets fire about 40 API calls;
+  - it loads the assign-teachers form code at first paint.
+  
+  Lazy-loading that dialog and splitting the main chunk are the next steps.
 
-To get official Lighthouse scores, approve `npx lighthouse` (see §4) and run against both builds.
+### Earlier Lighthouse-equivalent measurement (Playwright, same throttling)
 
 ### Results (median of 3)
 
@@ -87,7 +96,8 @@ TBT on the sign-in page rose slightly. That page now loads the shared UI primiti
 | Insights charts (D6) | Web | The page was migrated in its existing card layout, but no charts were added. `recharts` has been uninstalled; adding charts later means installing a chart library again (lazy-loaded). |
 | Unused dependencies `recharts`, `cmdk`, `canvas-confetti` (+ `@types/canvas-confetti`) | Web | **Removed** 2026-10-02. |
 | Main chunk 579 KB (Vite warning) | Web | Add `manualChunks` (radix / motion / tiptap / tanstack). |
-| Official Lighthouse scores | Web | Needs the `lighthouse` CLI; see §1. |
+| Dashboard performance (59) | Web | Lazy-load AssignTeachersModal, split the main chunk, and consider one batched dashboard endpoint (Backend) instead of ~40 calls. |
+| SEO 82 | Web | No meta description or robots.txt. Left as-is per the brief. |
 | `build/` folder committed and not git-ignored | Repo | UI_AUDIT §9. Not touched. |
 | Backend password rule (D4) | Backend | **Done** in coachify_back_end: `min:8` on every create/update rule. Sign-in has no length rule, so existing 6–7 character passwords still work until they are changed. |
 | Min-8 password check | Mobile | No client-side check exists in coachify_react_native. |
@@ -129,12 +139,3 @@ Not yet done:
 - Profile, Notifications, Students and Dashboard were re-checked with realistic data in light mode, dark mode, and at 390px mobile:
   - no error boundaries;
   - no horizontal overflow.
-
-## 4. To finish the Lighthouse deliverable (needs approval)
-
-```bash
-# one-off, not added to package.json
-npx -y lighthouse@12 http://localhost:5302/dashboard --form-factor=mobile --only-categories=performance,accessibility,best-practices --chrome-flags="--headless" --output=json
-```
-
-Authenticated pages need the `authToken`/`authUser` localStorage values injected. The Playwright harness in this report already does that, and Lighthouse can be driven the same way through its Puppeteer API.
