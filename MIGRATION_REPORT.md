@@ -89,7 +89,7 @@ TBT on the sign-in page rose slightly. That page now loads the shared UI primiti
 | Main chunk 579 KB (Vite warning) | Web | Add `manualChunks` (radix / motion / tiptap / tanstack). |
 | Official Lighthouse scores | Web | Needs the `lighthouse` CLI; see §1. |
 | `build/` folder committed and not git-ignored | Repo | UI_AUDIT §9. Not touched. |
-| Backend password rule still `min:6` (D4 follow-up) | Backend | Web enforces 8. Change it in `API/AuthController.php:44`, `API/Admin/StaffController.php:86,152`, `API/Admin/TeacherController`, `API/Admin/StudentController` and `SuperAdmin/UserController.php:68,125`. |
+| Backend password rule (D4) | Backend | **Done** in coachify_back_end: `min:8` on every create/update rule. Sign-in has no length rule, so existing 6–7 character passwords still work until they are changed. |
 | Min-8 password check | Mobile | No client-side check exists in coachify_react_native. |
 | Tenant settings only refresh on re-login | Web | UI_AUDIT §2. Pre-existing; unchanged. |
 
@@ -99,7 +99,7 @@ Fixed in coachify_back_end `ec0c53a` (branch `phase_3`):
 
 | Sev | Issue | Fix | Still to do |
 |---|---|---|---|
-| **High** | D7: `GET /tenants/{subdomain}` (public) returned `fcm_server_key` and `firebase_admin_sdk_json` | `$hidden` on `Tenant`. The `sleep(1)` was removed. Verified live: no secrets, 32 ms | **Rotate both Firebase keys**: they were public. Browsers that signed in before the fix still hold them in `localStorage.tenant` until their next sign-in |
+| **High** | D7: `GET /tenants/{subdomain}` (public) returned `fcm_server_key` and `firebase_admin_sdk_json` | `$hidden` on `Tenant`. The `sleep(1)` was removed. Verified live: no secrets, 32 ms | **Rotate both Firebase keys** (deferred by you on 2026-10-02): they were public. Browsers that signed in before the fix still hold them in `localStorage.tenant` until their next sign-in |
 | **High** | `ChapterController@show` (teacher and admin) returned other tenants' topics | Topics filtered to `tenant_id IN (0, own)` | — |
 | Medium | Student activities had no topic or chapter names | `topicModel` and `chapterModel` are now eager-loaded | — |
 | Medium | Student topic content had no MCQ choices | `question_type` and `option_a`–`option_d` are added. `correct_answer` is sent only once solutions unlock. The web page shows the choices and reveals the answer on "Show answer" | Mobile can use the same fields |
