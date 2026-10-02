@@ -71,10 +71,10 @@
 | `/my-notifications` | MyNotificationsPage | auth only | — | — | ☐ |
 | `/notifications` | NotificationsPage | auth only (+Q10, in-page) | — | — | ☐ |
 | `/admin/attendance-corrections` | CorrectionsAdminPage (features/attendance) | RequirePermission | `attendance.corrections` | → `/dashboard` | ☑ |
-| `/facts` | FactsPage | auth only | — | — | ☐ |
+| `/facts` | FactsPage (features/facts) | auth only | — | — | ☑ |
 | `/insights` | InsightsPage (features/insights) | RequirePermission | `insights.view` \| role `teacher` \| `student` | → `/dashboard` | ☑ |
 | `/academic-years` | AcademicYearsPage | RequirePermission | `academic_years.manage` | → `/dashboard` | ☐ |
-| `/admin/facts` | AdminFactsPage | RequirePermission | `facts.manage` | → `/dashboard` | ☐ |
+| `/admin/facts` | ManageFactsPage (features/facts) | RequirePermission | `facts.manage` | → `/dashboard` | ☑ |
 | `/topics`, `/topics/:topicId/questions` | TopicsPage, TopicQuestionsPage (features/content-library) | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☑ |
 | `/chapters`, `/chapters/:chapterId` | ChaptersPage, ChapterDetailPage (features/content-library) | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☑ |
 | `/library/chapters[/:id]`, `/library/topics[/:id]` | Library* pages (features/library) | auth only | — | — | ☑ |
@@ -182,8 +182,9 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | **GeneratedContentApprovalsPage** | Whole page + fetches | role `coaching_admin` (Q2) | "not authorized" message; fetch skipped | ☐ |
 | **NotificationsPage** (features/notifications) | Whole page fetch | role `coaching_admin` \| `super_admin` (Q10) | error message; fetch skipped (stats/filters now also hidden for non-admins) | ☑ (test) |
 | **SearchResultsPage** (features/search) | Subjects, Classes, Enquiries result sections | role `coaching_admin` | conditional render | ☑ (test) |
-| **FactsPage** | "Featured" tab | role `coaching_admin` | `show` flag on tab | ☐ |
-| FactsPage | "Manage" link → `/admin/facts` | role `coaching_admin` | conditional render | ☐ |
+| **FactsPage** (features/facts) | "Featured" tab | role `coaching_admin` | `show` flag on tab | ☑ (test) |
+| FactsPage | "Manage" link → `/admin/facts` | role `coaching_admin` | conditional render | ☑ (test) |
+| ManageFactsPage (features/facts) | Edit / Delete / (De)activate | own facts only (`tenant_id` = mine); shared facts show a "Featured" label — the API 404s on them | conditional render | ☑ (test) |
 | **ProfilePage** (features/profile) | Student-only sections (fees, etc.) + student data fetch | fetch: auth or profile role `student`; render: profile role `student` | conditional render / fetch | ☑ (test) |
 | **UserProfileModal → UserProfileDialog** (features/people/profile) | Subjects & assessments fetch + section | viewed user `student` && auth role `coaching_admin` \| `teacher` | fetch + render | ☑ (test) |
 | UserProfileModal | Fees summary card | viewed `student` && auth `coaching_admin` && not 403 (`feesForbidden`) | render | ☑ (test) |
