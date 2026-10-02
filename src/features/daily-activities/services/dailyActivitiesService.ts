@@ -177,3 +177,30 @@ export async function searchTopics(subjectId: number, chapterId: number | null, 
   })
   return res.data?.data ?? []
 }
+
+// ---- Student (self) ----
+export type StudentActivity = {
+  id: number
+  activity_date: string
+  chapter: string | null
+  topic: string | null
+  topic_id: number | null
+  /** Present once the API loads these relations (preferred over the legacy text columns). */
+  chapter_model?: { id: number; name: string } | null
+  topic_model?: { id: number; name: string } | null
+  notes: string | null
+  homework: string | null
+  remarks: string | null
+  homework_status?: HomeworkStatus | null
+  teacher?: { id: number; name: string } | null
+  subject?: { id: number; subject: string } | null
+  attachments?: ActivityAttachment[]
+}
+
+/** Same request as the legacy StudentActivitiesPage (approved activities only, server-side). */
+export async function fetchMyActivities(date?: string): Promise<StudentActivity[]> {
+  const params: Record<string, string> = {}
+  if (date) params.date = date
+  const res = await axios.get(`${API_BASE_URL}/student/daily-activities`, { headers: auth(), params })
+  return res.data.success ? res.data.data || [] : []
+}
