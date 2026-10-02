@@ -38,6 +38,8 @@ interface Props<T> {
   /** Extra controls rendered next to the search box (filters). */
   toolbar?: ReactNode
   className?: string
+  /** Per-row DOM id / extra classes (e.g. a deep-linked row to scroll to and highlight). */
+  rowProps?: (row: T) => { id?: string; className?: string }
 }
 
 /**
@@ -57,6 +59,7 @@ export default function DataTable<T>({
   emptyIcon,
   emptyAction,
   pageSize,
+  rowProps,
   toolbar,
   className,
 }: Props<T>) {
@@ -160,7 +163,8 @@ export default function DataTable<T>({
                   animate={{ opacity: 1, y: 0, transition: { ...transitions.base, delay: Math.min(i, 10) * 0.025 } }}
                   exit={{ opacity: 0, transition: transitions.fast }}
                   data-slot="table-row"
-                  className="tw:border-0 tw:border-b tw:border-solid tw:border-border tw:transition-colors tw:hover:bg-muted/50"
+                  id={rowProps?.(row.original).id}
+                  className={cn('tw:border-0 tw:border-b tw:border-solid tw:border-border tw:transition-colors tw:hover:bg-muted/50', rowProps?.(row.original).className)}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const align = (cell.column.columnDef.meta as { align?: 'right' | 'center' } | undefined)?.align

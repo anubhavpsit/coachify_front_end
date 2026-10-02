@@ -61,7 +61,7 @@
 | `/students/activities` | StudentActivitiesPage | auth only | — | — | ☐ |
 | `/students/activities/:activityId/topic` | StudentTopicContentPage | auth only | — | — | ☐ |
 | `/students/assessments` | StudentAssessmentsPage | auth only | — | — | ☐ |
-| `/assessments` | AssessmentsPage | RequirePermission | `assessments.view` \| `.manage` \| `.grade` \| role `teacher` | → `/dashboard` | ☐ |
+| `/assessments` | AssessmentsPage (features/assessments) | RequirePermission | `assessments.view` \| `.manage` \| `.grade` \| role `teacher` | → `/dashboard` | ☑ |
 | `/search` | SearchResultsPage (features/search) | auth only | — | — | ☑ |
 | `/approvals` | DailyActivityApprovalsPage (features/approvals) | RequirePermission | `daily_activities.approve` \| role `teacher` | → `/dashboard` | ☑ |
 | `/approvals/generated-content` | GeneratedContentApprovalsPage | RequirePermission | `generated_content.approve` (+Q2) | → `/dashboard` | ☐ |
@@ -166,11 +166,11 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | StaffPage | UserProfileModal `canEditImage` | `staff.manage` | prop | ☑ (test) |
 | **FeesPage** (features/finance) | "Edit" column (2 tables) + FeeEditDialog | role `coaching_admin` (Q3) | conditional render | ☑ (test) |
 | **EnquiriesPage** (features/enquiries) | Whole page + list fetch | role `coaching_admin` (Q1) | page returns "not authorized"; fetch skipped | ☑ (test) |
-| **AssessmentsPage** | Data source for students | teacher → `/teachers/students` | endpoint choice | ☐ |
-| AssessmentsPage | Auto-generate assessments toggle card | role `coaching_admin` | conditional render | ☐ |
-| AssessmentsPage | Approve / Mark pending (assessment) | role `coaching_admin` | conditional render | ☐ |
-| AssessmentsPage | Question Paper button | role `coaching_admin` \| `teacher` | conditional render | ☐ |
-| AssessmentsPage | Approve / Mark pending (file), Remove file | role `coaching_admin` | conditional render (otherwise a status label) | ☐ |
+| **AssessmentsPage** (features/assessments) | Data source for students | teacher → `/teachers/students` | endpoint choice | ☑ (test) |
+| AssessmentsPage | Auto-generate assessments toggle card | role `coaching_admin` | conditional render | ☑ (test) |
+| AssessmentsPage | Approve / Mark pending (assessment) | role `coaching_admin` | conditional render | ☑ (test) |
+| AssessmentsPage | Question Paper button | role `coaching_admin` \| `teacher` | conditional render | ☑ (test) |
+| AssessmentsPage | Approve / Mark pending (file), Remove file | role `coaching_admin` | conditional render (otherwise a status label) | ☑ (test) |
 | QuestionPaperModal | Editing controls | `paper.status !== 'released'` (read-only mode) | disabled / hidden | ☐ |
 | **DailyActivitiesPage** (features/daily-activities) | Delete attachment (×) | role `coaching_admin` | conditional render | ☑ (test) |
 | **DailyActivityApprovalsPage** (features/approvals) | approver view (`isApprover`) | role `coaching_admin` \| (role `staff` && `daily_activities.approve`) | derived flag | ☑ (test) |
