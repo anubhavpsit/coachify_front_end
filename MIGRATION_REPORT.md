@@ -20,6 +20,7 @@ Median of 3 runs per page. Both builds point at the same local mock API (empty d
 | | **after** | **86** | **100** | 100 | 82 | 2.8 s | 3.3 s | 132 ms | 0 | 378 KB |
 | `/dashboard` | before | 44 | 84 | 100 | 82 | 6.0 s | 7.6 s | 682 ms | 0 | 762 KB |
 | | **after** | **59** | **100** | 100 | 82 | 3.4 s | 5.8 s | 454 ms | 0.070 | 459 KB |
+| | **after perf pass** (`75d5faf`) | **65** | 100 | 100 | 82 | 2.9 s | 5.3 s | 386 ms | 0.040 | 407 KB |
 | `/students` | before | 60 | 84 | 100 | 82 | 5.2 s | 6.6 s | 236 ms | 0 | 674 KB |
 | | **after** | **75** | **100** | 100 | 82 | 3.3 s | 4.7 s | 156 ms | 0.003 | 373 KB |
 
@@ -30,12 +31,15 @@ Notes:
   - stat-card values used `aria-label` on a plain `div`;
   - card titles skipped from `h1` to `h3` (`CardTitle` is now `h2`).
 - **SEO stays at 82 in both builds:** there's no meta description, and `/robots.txt` falls through to the SPA. Both were left alone because the brief says SEO tags must not change. Adding them is a quick follow-up if you want it.
-- **Dashboard is still the slowest page:**
-  - its main script costs about 1.2 s on a throttled phone;
-  - its widgets fire about 40 API calls;
-  - it loads the assign-teachers form code at first paint.
-  
-  Lazy-loading that dialog and splitting the main chunk are the next steps.
+- **Dashboard perf pass (`75d5faf`, no API changes):**
+  - the notice form (react-hook-form + zod) and the assign-teachers dialog load only when first opened;
+  - the animation engine loads in its own chunk;
+  - the stats skeleton now matches the real cards (on phones the grid used to jump 72 px);
+  - a metric-matched fallback font stops the web-font swap from reflowing text;
+  - below-the-fold sections use `content-visibility: auto`.
+
+  Scores went from 52–59 (noisy) to 64–67. Sign-in (86–87) and Students (74–75) are unchanged within noise.
+- **Dashboard is still the slowest page.** About 1.3 s of script time is React rendering the whole page on a throttled phone, and the remaining 0.04 CLS comes from widgets that hide themselves when empty (existing behaviour, kept). The next big step needs the backend: one combined dashboard endpoint instead of about 40 calls.
 
 ### Earlier Lighthouse-equivalent measurement (Playwright, same throttling)
 
@@ -96,7 +100,7 @@ TBT on the sign-in page rose slightly. That page now loads the shared UI primiti
 | Insights charts (D6) | Web | The page was migrated in its existing card layout, but no charts were added. `recharts` has been uninstalled; adding charts later means installing a chart library again (lazy-loaded). |
 | Unused dependencies `recharts`, `cmdk`, `canvas-confetti` (+ `@types/canvas-confetti`) | Web | **Removed** 2026-10-02. |
 | Main chunk 579 KB (Vite warning) | Web | Add `manualChunks` (radix / motion / tiptap / tanstack). |
-| Dashboard performance (59) | Web | Lazy-load AssignTeachersModal, split the main chunk, and consider one batched dashboard endpoint (Backend) instead of ~40 calls. |
+| Dashboard performance (65) | Backend + Web | Frontend pass done (`75d5faf`). Next: one batched dashboard endpoint instead of ~40 calls. This changes the API, so it needs a decision. |
 | SEO 82 | Web | No meta description or robots.txt. Left as-is per the brief. |
 | `build/` folder committed and not git-ignored | Repo | UI_AUDIT §9. Not touched. |
 | Backend password rule (D4) | Backend | **Done** in coachify_back_end: `min:8` on every create/update rule. Sign-in has no length rule, so existing 6–7 character passwords still work until they are changed. |
