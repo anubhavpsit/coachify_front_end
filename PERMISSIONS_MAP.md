@@ -59,7 +59,7 @@
 | `/staff` | StaffPage | RequirePermission | `staff.manage` | → `/dashboard` | ☐ |
 | `/students` | StudentsPage | RequirePermission | `students.view` \| `students.manage` \| role `teacher` | → `/dashboard` | ☐ |
 | `/students/activities` | StudentActivitiesPage (features/daily-activities) | auth only | — | — | ☑ |
-| `/students/activities/:activityId/topic` | StudentTopicContentPage | auth only | — | — | ☐ |
+| `/students/activities/:activityId/topic` | StudentTopicContentPage (features/daily-activities) | auth only | — | — | ☑ |
 | `/students/assessments` | StudentAssessmentsPage (features/assessments) | auth only | — | — | ☑ |
 | `/assessments` | AssessmentsPage (features/assessments) | RequirePermission | `assessments.view` \| `.manage` \| `.grade` \| role `teacher` | → `/dashboard` | ☑ |
 | `/search` | SearchResultsPage (features/search) | auth only | — | — | ☑ |

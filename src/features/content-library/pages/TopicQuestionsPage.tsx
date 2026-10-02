@@ -25,7 +25,7 @@ const DIFF_VARIANT: Record<string, 'success' | 'warning' | 'destructive'> = { ea
 
 /** Rich question / solution HTML — always sanitised (the legacy table rendered it raw). */
 function Html({ html, className }: { html: string; className?: string }) {
-  return <div className={cn('tw:text-sm tw:text-foreground tw:[&_img]:max-h-48 tw:[&_img]:rounded-md tw:[&_ol]:pl-5 tw:[&_p]:my-1 tw:[&_ul]:pl-5', className)} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html || '') }} />
+  return <div className={cn('tw:text-sm tw:text-foreground tw:[&_img]:max-h-48 tw:[&_img]:rounded-md tw:[&_ol]:list-decimal tw:[&_ol]:pl-5 tw:[&_ul]:list-disc tw:[&_p]:my-1 tw:[&_ul]:pl-5', className)} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html || '') }} />
 }
 
 function QuestionCard({ q, n, canManage, onEdit, onDelete }: { q: Question; n: number; canManage: boolean; onEdit: () => void; onDelete: () => void }) {

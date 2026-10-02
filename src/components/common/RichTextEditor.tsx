@@ -50,7 +50,7 @@ export default function RichTextEditor({ value, onChange, disabled, id, placehol
         'aria-multiline': 'true',
         ...(aria['aria-describedby'] ? { 'aria-describedby': aria['aria-describedby'] } : {}),
         ...(aria['aria-invalid'] ? { 'aria-invalid': 'true' } : {}),
-        class: 'tw:min-h-36 tw:px-3 tw:py-2 tw:text-sm tw:outline-none tw:[&_ol]:pl-5 tw:[&_ul]:pl-5 tw:[&_p]:my-1 tw:[&_h3]:mt-2 tw:[&_h3]:mb-1 tw:[&_h3]:text-base!',
+        class: 'tw:min-h-36 tw:px-3 tw:py-2 tw:text-sm tw:outline-none tw:[&_ol]:list-decimal tw:[&_ol]:pl-5 tw:[&_ul]:list-disc tw:[&_ul]:pl-5 tw:[&_p]:my-1 tw:[&_h3]:mt-2 tw:[&_h3]:mb-1 tw:[&_h3]:text-base!',
       },
     },
     // An empty document is "" rather than "<p></p>" so blank stays blank.

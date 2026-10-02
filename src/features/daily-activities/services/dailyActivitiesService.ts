@@ -204,3 +204,20 @@ export async function fetchMyActivities(date?: string): Promise<StudentActivity[
   const res = await axios.get(`${API_BASE_URL}/student/daily-activities`, { headers: auth(), params })
   return res.data.success ? res.data.data || [] : []
 }
+
+export type TopicContent = {
+  topic: { id: number; name: string; explanation_html: string | null }
+  chapter_number: number | null
+  chapter: { id: number; name: string } | null
+  grade_unknown: boolean
+  questions: { id: number; grade: number; difficulty: string | null; question_html: string; solution_html: string | null }[]
+  solutions_visible: boolean
+  solution_unlock_at: string | null
+}
+
+/** Same request as the legacy StudentTopicContentView. `success: false` carries the API message. */
+export async function fetchTopicContent(activityId: string): Promise<TopicContent> {
+  const res = await axios.get(`${API_BASE_URL}/student/daily-activities/${activityId}/topic-content`, { headers: { ...auth(), Accept: 'application/json' } })
+  if (!res.data?.success) throw new Error(res.data?.message ?? 'This activity has no linked topic.')
+  return res.data.data
+}
