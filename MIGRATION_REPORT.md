@@ -84,8 +84,8 @@ TBT on the sign-in page rose slightly. That page now loads the shared UI primiti
 
 | Item | Layer | Notes |
 |---|---|---|
-| Insights charts (D6) | Web | The page was migrated in its existing card layout, but no charts were added. `recharts` is installed and **unused**. Either build lazy-loaded charts or uninstall it. |
-| Unused dependencies: `recharts`, `cmdk`, `canvas-confetti` (+ `@types/canvas-confetti`) | Web | Nothing imports them. Uninstalling needs your OK. |
+| Insights charts (D6) | Web | The page was migrated in its existing card layout, but no charts were added. `recharts` has been uninstalled; adding charts later means installing a chart library again (lazy-loaded). |
+| Unused dependencies `recharts`, `cmdk`, `canvas-confetti` (+ `@types/canvas-confetti`) | Web | **Removed** 2026-10-02. |
 | Main chunk 579 KB (Vite warning) | Web | Add `manualChunks` (radix / motion / tiptap / tanstack). |
 | Official Lighthouse scores | Web | Needs the `lighthouse` CLI; see §1. |
 | `build/` folder committed and not git-ignored | Repo | UI_AUDIT §9. Not touched. |
