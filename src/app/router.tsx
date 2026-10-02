@@ -49,10 +49,10 @@ const TopicsPage = lazy(() => import('@/features/content-library/pages/TopicsPag
 const TopicQuestionsPage = lazy(() => import('@/features/content-library/pages/TopicQuestionsPage'))
 const ChaptersPage = lazy(() => import('@/features/content-library/pages/ChaptersPage'))
 const ChapterDetailPage = lazy(() => import('@/features/content-library/pages/ChapterDetailPage'))
-const LibraryChaptersPage = lazy(() => import('@/pages/library/LibraryChaptersPage'))
-const LibraryChapterDetailPage = lazy(() => import('@/pages/library/LibraryChapterDetailPage'))
-const LibraryTopicsPage = lazy(() => import('@/pages/library/LibraryTopicsPage'))
-const LibraryTopicDetailPage = lazy(() => import('@/pages/library/LibraryTopicDetailPage'))
+const LibraryChaptersPage = lazy(() => import('@/features/library/pages/LibraryChaptersPage'))
+const LibraryChapterDetailPage = lazy(() => import('@/features/library/pages/LibraryChapterDetailPage'))
+const LibraryTopicsPage = lazy(() => import('@/features/library/pages/LibraryTopicsPage'))
+const LibraryTopicDetailPage = lazy(() => import('@/features/library/pages/LibraryTopicDetailPage'))
 
 function Guard({ anyOf, orRoles, children }: { anyOf: string[]; orRoles?: string[]; children: ReactNode }) {
   return (

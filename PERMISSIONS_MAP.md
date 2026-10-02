@@ -77,7 +77,7 @@
 | `/admin/facts` | AdminFactsPage | RequirePermission | `facts.manage` | → `/dashboard` | ☐ |
 | `/topics`, `/topics/:topicId/questions` | TopicsPage, TopicQuestionsPage (features/content-library) | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☑ |
 | `/chapters`, `/chapters/:chapterId` | ChaptersPage, ChapterDetailPage (features/content-library) | RequirePermission | `content_library.manage` \| role `teacher` | → `/dashboard` | ☑ |
-| `/library/chapters[/:id]`, `/library/topics[/:id]` | Library* pages | auth only | — | — | ☐ |
+| `/library/chapters[/:id]`, `/library/topics[/:id]` | Library* pages (features/library) | auth only | — | — | ☑ |
 | `*` | NotFoundPage | none | — | — | ☐ |
 
 ## 3. Sidebar menu filtering (legacy `src/components/layout/Sidebar.tsx` → now `src/permissions/menu.ts`)
