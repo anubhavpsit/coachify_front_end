@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { UserPlus, UserRoundX } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAsync } from '@/hooks/useAsync'
-import AssignTeachersModal from '@/features/students/components/AssignTeachersModal'
 import { classLabel, fetchClasses, fetchUnassignedStudents } from '../services/widgetsService'
 import StudentListCard from './StudentListCard'
+
+// Only fetched when an admin clicks "Assign Teacher".
+const AssignTeachersModal = lazy(() => import('@/features/students/components/AssignTeachersModal'))
 
 /** Gate: `dashboard.unassigned_students` (in DashboardPage). Hidden entirely when there are none, as before. */
 export default function UnassignedStudentsCard() {
@@ -44,13 +46,15 @@ export default function UnassignedStudentsCard() {
         )}
       />
       {assignStudentId && (
-        <AssignTeachersModal
-          show={showAssignModal}
-          onHide={() => setShowAssignModal(false)}
-          studentId={assignStudentId}
-          // The assigned student now has a teacher, so drop them from this list.
-          onAssigned={() => setAssigned((prev) => [...prev, assignStudentId])}
-        />
+        <Suspense fallback={null}>
+          <AssignTeachersModal
+            show={showAssignModal}
+            onHide={() => setShowAssignModal(false)}
+            studentId={assignStudentId}
+            // The assigned student now has a teacher, so drop them from this list.
+            onAssigned={() => setAssigned((prev) => [...prev, assignStudentId])}
+          />
+        </Suspense>
       )}
     </>
   )

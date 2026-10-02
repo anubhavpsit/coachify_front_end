@@ -17,6 +17,18 @@
 @import '@fontsource/noto-sans-devanagari/600.css';
 @import '@fontsource/noto-sans-devanagari/700.css';
 
+/* Arial resized to Inter's metrics, shown until Inter loads: the swap no
+   longer reflows text (it was the dashboard's main layout shift). Liberation
+   Sans is Arial-metric-compatible (Linux). */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Helvetica');
+  size-adjust: 107.06%;
+  ascent-override: 90.49%;
+  descent-override: 22.56%;
+  line-gap-override: 0%;
+}
+
 :root {
   /* Surfaces & text (mirrors the template's light palette) */
   --background: #f5f6fa;
@@ -48,7 +60,7 @@
   --radius: 0.625rem;
 
   /* Typography — Inter for Latin, Noto Sans Devanagari picks up Hindi glyphs */
-  --font-family-base: 'Inter Variable', Inter, 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI',
+  --font-family-base: 'Inter Variable', Inter, 'Inter Fallback', 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-size-base: 1rem;
 }
@@ -133,6 +145,14 @@
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-decelerate: cubic-bezier(0, 0, 0, 1);
   --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+}
+
+/* Below-the-fold sections: the browser skips their layout/paint until they
+   scroll near the viewport. Only for sections that always render (an empty
+   wrapper would hold the placeholder height). */
+@utility defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
 }
 
 @layer base {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { BellOff, Megaphone, Plus } from 'lucide-react'
 import { AnimatePresence, m } from 'motion/react'
 import { pop, slideUp, stagger } from '@/animations'
@@ -11,8 +11,11 @@ import { cn } from '@/lib/utils'
 import { useNoticeFeed, type NoticeTab } from '../hooks/useNoticeFeed'
 import type { Notice } from '../types'
 import NoticeDetailDialog from './NoticeDetailDialog'
-import NoticeFormDialog from './NoticeFormDialog'
 import NoticeListItem from './NoticeListItem'
+
+// The form (react-hook-form + zod) is only fetched the first time it's opened,
+// so it stays off the dashboard's first load.
+const NoticeFormDialog = lazy(() => import('./NoticeFormDialog'))
 
 function noticeIdFromUrl() {
   const id = Number(new URLSearchParams(window.location.search).get('notice'))
@@ -40,6 +43,9 @@ export default function NoticeBoardCard({
   const [openId, setOpenId] = useState<number | null>(noticeIdFromUrl)
   const [formNotice, setFormNotice] = useState<Notice | null>(null)
   const [showForm, setShowForm] = useState(false)
+  // Stays mounted after the first open so its close animation still runs.
+  const [formLoaded, setFormLoaded] = useState(false)
+  if (showForm && !formLoaded) setFormLoaded(true)
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
   const { hasMore, loadMore } = feed
@@ -186,16 +192,18 @@ export default function NoticeBoardCard({
         }}
       />
 
-      {feed.canManage && (
-        <NoticeFormDialog
-          show={showForm}
-          notice={formNotice}
-          onHide={() => setShowForm(false)}
-          onSaved={() => {
-            setShowForm(false)
-            void feed.loadFirstPage()
-          }}
-        />
+      {feed.canManage && formLoaded && (
+        <Suspense fallback={null}>
+          <NoticeFormDialog
+            show={showForm}
+            notice={formNotice}
+            onHide={() => setShowForm(false)}
+            onSaved={() => {
+              setShowForm(false)
+              void feed.loadFirstPage()
+            }}
+          />
+        </Suspense>
       )}
     </Card>
   )

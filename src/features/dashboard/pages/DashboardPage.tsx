@@ -29,6 +29,8 @@ const DASHBOARD_STAT_KEYS = [
 ]
 
 const WIDGET_GRID = 'grid items-start gap-4 md:grid-cols-2 2xl:grid-cols-3'
+// The admin widget grid always holds the Notice Board, so it can defer safely.
+const ADMIN_WIDGET_GRID = `${WIDGET_GRID} defer-render`
 
 /**
  * Every gate below is carried over from the legacy page (PERMISSIONS_MAP.md §4).
@@ -73,7 +75,7 @@ export default function DashboardPage() {
           {can(P.FEES_VIEW) && <PendingFeesCard />}
           {can(P.DASHBOARD_ACTIVITY_GAPS) && <TeacherActivityGapsCard />}
 
-          <div className={WIDGET_GRID}>
+          <div className={ADMIN_WIDGET_GRID}>
             {can(P.DASHBOARD_BIRTHDAYS) && <TodayBirthdayCard />}
             <NoticeBoardCard compact bare />
             {can(P.DASHBOARD_BIRTHDAYS) && <BirthdayCard />}
@@ -84,7 +86,11 @@ export default function DashboardPage() {
           {can(P.DASHBOARD_GHOST_STUDENTS) && <GhostStudentsCard />}
           {can(P.DASHBOARD_UNASSIGNED_STUDENTS) && <UnassignedStudentsCard />}
 
-          {can(P.DASHBOARD_TOP_STUDENTS) && <TopStudentsCard students={topStudents.students} loading={topStudents.loading} />}
+          {can(P.DASHBOARD_TOP_STUDENTS) && (
+            <div className="defer-render">
+              <TopStudentsCard students={topStudents.students} loading={topStudents.loading} />
+            </div>
+          )}
         </>
       )}
 
@@ -101,7 +107,11 @@ export default function DashboardPage() {
       {/* Teachers/students: smart alerts + widgets (+ Notice Board) below their stats cards. */}
       {(isTeacher || isStudent) && <SmartDashboard role={isTeacher ? 'teacher' : 'student'} />}
 
-      {(role === ROLES.COACHING_ADMIN || can(P.ACTIVITY_LOGS_VIEW)) && <ActivityLogCard />}
+      {(role === ROLES.COACHING_ADMIN || can(P.ACTIVITY_LOGS_VIEW)) && (
+        <div className="defer-render">
+          <ActivityLogCard />
+        </div>
+      )}
     </div>
   )
 }

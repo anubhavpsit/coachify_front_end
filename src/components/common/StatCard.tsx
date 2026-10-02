@@ -52,14 +52,15 @@ export default function StatCard({ label, value, icon: Icon, tone = 'primary', f
   )
 }
 
+/** Same box as StatCard at every breakpoint, so the grid doesn't jump when the numbers arrive. */
 export function StatCardSkeleton() {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-solid border-border bg-card p-5">
+    <div className="flex flex-col gap-3 rounded-xl border border-solid border-border bg-card p-4 sm:gap-4 sm:p-5">
       <div className="flex items-center gap-3">
-        <Skeleton className="size-11 rounded-full" />
+        <Skeleton className="size-9 shrink-0 rounded-full sm:size-11" />
         <Skeleton className="h-4 w-28" />
       </div>
-      <Skeleton className="h-8 w-20" />
+      <Skeleton className="h-7 w-20 sm:h-9" />
     </div>
   )
 }
