@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import axios from 'axios'
 import DOMPurify from 'dompurify'
-import { ArrowLeft, BookOpen, ChevronDown, Info, Lightbulb, LockKeyhole, MessageCircleQuestion } from 'lucide-react'
+import { ArrowLeft, BookOpen, Check, ChevronDown, Info, Lightbulb, LockKeyhole, MessageCircleQuestion } from 'lucide-react'
 import EmptyState from '@/components/common/EmptyState'
 import ErrorState from '@/components/common/ErrorState'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -32,6 +32,7 @@ function Rich({ html, className }: { html: string; className?: string }) {
 
 function QuestionItem({ q, n, solutionsVisible }: { q: TopicContent['questions'][number]; n: number; solutionsVisible: boolean }) {
   const [open, setOpen] = useState(false)
+  const opts = (['a', 'b', 'c', 'd'] as const).map((k) => [k, q[`option_${k}`]] as const).filter((o): o is [typeof o[0], string] => !!o[1])
   return (
     <li className="flex flex-col gap-3 rounded-xl border border-solid border-border p-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -44,13 +45,28 @@ function QuestionItem({ q, n, solutionsVisible }: { q: TopicContent['questions']
         )}
       </div>
       <Rich html={q.question_html} />
-      {solutionsVisible && q.solution_html && (
+      {q.question_type === 'mcq' && opts.length > 0 && (
+        <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
+          {opts.map(([k, v]) => {
+            const right = open && q.correct_answer === k
+            return (
+              <li key={k} className={cn('flex items-center gap-2 rounded-lg border border-solid px-3 py-1.5 text-sm', right ? 'border-success/50 bg-success-soft' : 'border-border')}>
+                <span className={cn('flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold', right ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground')}>
+                  {right ? <Check className="size-3.5" aria-label="Correct" /> : k.toUpperCase()}
+                </span>
+                <span>{v}</span>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+      {solutionsVisible && (q.solution_html || q.correct_answer) && (
         <div>
           <Button type="button" size="sm" variant={open ? 'soft' : 'outline'} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-            <Lightbulb aria-hidden="true" /> {open ? 'Hide solution' : 'Show solution'}
+            <Lightbulb aria-hidden="true" /> {`${open ? 'Hide' : 'Show'} ${q.solution_html ? 'solution' : 'answer'}`}
             <ChevronDown className={cn('transition-transform', open && 'rotate-180')} aria-hidden="true" />
           </Button>
-          {open && (
+          {open && q.solution_html && (
             <div className="mt-2 rounded-lg border-l-4 border-solid border-y-0 border-r-0 border-success bg-success-soft/60 px-3 py-2">
               <span className="text-xs font-semibold text-success">Solution</span>
               <Rich html={q.solution_html} />

@@ -57,6 +57,26 @@ describe('StudentTopicContentPage', () => {
     expect(screen.queryByRole('button', { name: /Show solution/ })).toBeNull()
   })
 
+  it('MCQ: choices always shown; the correct one only after "Show answer"', async () => {
+    const mcq = { id: 2, grade: 7, difficulty: 'easy', question_html: '<p>2 + 2 = ?</p>', question_type: 'mcq', option_a: '3', option_b: '4', option_c: '5', option_d: '6', correct_answer: 'b', solution_html: null }
+    vi.spyOn(axios, 'get').mockResolvedValue({ data: { success: true, data: { ...base, questions: [mcq] } } })
+    renderAt()
+    const q = (await screen.findByText('2 + 2 = ?')).closest('li')!
+    for (const o of ['3', '4', '5', '6']) expect(within(q).getByText(o)).toBeTruthy()
+    expect(within(q).queryByLabelText('Correct')).toBeNull()
+    await userEvent.click(within(q).getByRole('button', { name: /Show answer/ }))
+    expect(within(q).getByLabelText('Correct').closest('li')!.textContent).toBe('4')
+  })
+
+  it('MCQ while locked: choices shown, no answer button', async () => {
+    const mcq = { id: 2, grade: 7, difficulty: 'easy', question_html: '<p>2 + 2 = ?</p>', question_type: 'mcq', option_a: '3', option_b: '4', correct_answer: null, solution_html: null }
+    vi.spyOn(axios, 'get').mockResolvedValue({ data: { success: true, data: { ...base, questions: [mcq], solutions_visible: false, solution_unlock_at: null } } })
+    renderAt()
+    const q = (await screen.findByText('2 + 2 = ?')).closest('li')!
+    expect(within(q).getByText('4')).toBeTruthy()
+    expect(within(q).queryByRole('button')).toBeNull()
+  })
+
   it('shows the API message when the activity has no topic', async () => {
     vi.spyOn(axios, 'get').mockResolvedValue({ data: { success: false, message: 'This activity has no linked topic.' } })
     renderAt()

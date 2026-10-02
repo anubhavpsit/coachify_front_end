@@ -93,10 +93,24 @@ TBT on the sign-in page rose slightly. That page now loads the shared UI primiti
 | Min-8 password check | Mobile | No client-side check exists in coachify_react_native. |
 | Tenant settings only refresh on re-login | Web | UI_AUDIT §2. Pre-existing; unchanged. |
 
-### Backend issues found during the migration (waiting on your decision)
+### Backend issues found during the migration
 
-| Sev | Issue | Proposed fix |
+Fixed in coachify_back_end `ec0c53a` (branch `phase_3`):
+
+| Sev | Issue | Fix | Still to do |
+|---|---|---|---|
+| **High** | D7: `GET /tenants/{subdomain}` (public) returned `fcm_server_key` and `firebase_admin_sdk_json` | `$hidden` on `Tenant`. The `sleep(1)` was removed. Verified live: no secrets, 32 ms | **Rotate both Firebase keys**: they were public. Browsers that signed in before the fix still hold them in `localStorage.tenant` until their next sign-in |
+| **High** | `ChapterController@show` (teacher and admin) returned other tenants' topics | Topics filtered to `tenant_id IN (0, own)` | — |
+| Medium | Student activities had no topic or chapter names | `topicModel` and `chapterModel` are now eager-loaded | — |
+| Medium | Student topic content had no MCQ choices | `question_type` and `option_a`–`option_d` are added. `correct_answer` is sent only once solutions unlock. The web page shows the choices and reveals the answer on "Show answer" | Mobile can use the same fields |
+
+Not yet done:
+
+| Sev | Issue | Next step |
 |---|---|---|
+| Low | Student `subjects` JSON holds duplicate or invalid ids. The fix and the `students:clean-subject-ids` command are written | Run `--dry-run` (25 of 48 profiles would change), then run it for real. This changes data, so it's your call |
+
+---|---|---|
 | **High** | D7: `GET /tenants/{subdomain}` (public) returns `fcm_server_key` and `firebase_admin_sdk_json` | Hide them on `Tenant` (or return a public DTO), **rotate the keys**, and remove the `sleep(1)` |
 | **High** | `ChapterController@show` returns topics from other tenants. The web app now hides them client-side, but the API still sends them | `Topic::where('chapter_id', …)->whereIn('tenant_id', [0, $tenantId])` |
 | Medium | Student activities don't eager-load `topicModel`/`chapterModel`, so topic and chapter names are missing | Add them to `with()` in `studentActivities` |

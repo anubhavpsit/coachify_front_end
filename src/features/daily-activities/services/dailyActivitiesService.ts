@@ -210,7 +210,21 @@ export type TopicContent = {
   chapter_number: number | null
   chapter: { id: number; name: string } | null
   grade_unknown: boolean
-  questions: { id: number; grade: number; difficulty: string | null; question_html: string; solution_html: string | null }[]
+  questions: {
+    id: number
+    grade: number
+    difficulty: string | null
+    question_html: string
+    /** Added by the backend fix; absent on older API builds. */
+    question_type?: string | null
+    option_a?: string | null
+    option_b?: string | null
+    option_c?: string | null
+    option_d?: string | null
+    /** Only sent once solutions unlock. */
+    correct_answer?: string | null
+    solution_html: string | null
+  }[]
   solutions_visible: boolean
   solution_unlock_at: string | null
 }
