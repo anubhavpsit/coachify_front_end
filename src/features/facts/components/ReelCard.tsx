@@ -69,6 +69,8 @@ function ReelCard({ fact: f, index, setSize, featured, author, onLike, onSave, o
   const when = timeAgo(f.publish_at || f.updated_at)
   const tags = (f.tags ?? []).slice(0, 4)
   const host = hostOf(absoluteUrl(f.source_url))
+  // Clamped previews drop blank lines so the "…" never lands on an empty line; the panel shows the full text.
+  const preview = (f.content ?? '').replace(/\n\s*\n+/g, '\n')
 
   useLayoutEffect(() => {
     if (textRef.current) setTruncated(textRef.current.scrollHeight > textRef.current.clientHeight + 1)
@@ -138,11 +140,11 @@ function ReelCard({ fact: f, index, setSize, featured, author, onLike, onSave, o
             </>
           ) : (
             // Text-only fact: big centred text, like a coloured-background post.
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-7 pt-16 pb-44 text-center text-white">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 pt-16 pr-[4.5rem] pb-44 pl-6 text-center text-white md:px-7">
               <h2 className="m-0 text-[clamp(22px,4.5vw,30px)]! leading-tight font-extrabold text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.25)]">{f.title}</h2>
               {f.content && (
                 <p ref={textRef} className="m-0 line-clamp-[7] text-[clamp(15px,2.8vw,18px)] leading-relaxed whitespace-pre-line text-white/90">
-                  {f.content}
+                  {preview}
                 </p>
               )}
             </div>
@@ -159,7 +161,7 @@ function ReelCard({ fact: f, index, setSize, featured, author, onLike, onSave, o
                 <h2 className="m-0 line-clamp-2 text-base! leading-snug font-bold text-white">{f.title}</h2>
                 {f.content && (
                   <p ref={textRef} className="m-0 line-clamp-2 text-sm leading-snug whitespace-pre-line text-white/85">
-                    {f.content}
+                    {preview}
                   </p>
                 )}
               </>
