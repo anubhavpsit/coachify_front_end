@@ -64,7 +64,7 @@
 | `/assessments` | AssessmentsPage (features/assessments) | RequirePermission | `assessments.view` \| `.manage` \| `.grade` \| role `teacher` | → `/dashboard` | ☑ |
 | `/search` | SearchResultsPage (features/search) | auth only | — | — | ☑ |
 | `/approvals` | DailyActivityApprovalsPage (features/approvals) | RequirePermission | `daily_activities.approve` \| role `teacher` | → `/dashboard` | ☑ |
-| `/approvals/generated-content` | GeneratedContentApprovalsPage | RequirePermission | `generated_content.approve` (+Q2) | → `/dashboard` | ☐ |
+| `/approvals/generated-content` | GeneratedContentApprovalsPage (features/approvals) | RequirePermission | `generated_content.approve` (+Q2) | → `/dashboard` | ☑ |
 | `/profile` | ProfilePage (features/profile) | auth only | — | — | ☑ |
 | `/my-attendance` | MyAttendancePage (features/attendance) | auth only | — | — | ☑ |
 | `/notices` | NoticesPage | auth only | — | — | ☐ |
@@ -179,7 +179,7 @@ Note: admins pass every `can()` check, so the admin sidebar is a superset. A tea
 | DailyActivityApprovalsPage | Bulk-approve bar, select-all, per-card checkbox, Approve / Send back / Mark pending | approver | conditional render | ☑ (test) |
 | DailyActivityApprovalsPage | Attachment Approve / Revoke | approver (was ungated in legacy; backend `updateApproval` requires `canApprove`, so teachers only got 403s) | conditional render | ☑ (test) |
 | DailyActivityApprovalsPage | "Send now" on queued notifications | `notifications.manage` (was ungated; backend route requires it) | conditional render | ☑ (test) |
-| **GeneratedContentApprovalsPage** | Whole page + fetches | role `coaching_admin` (Q2) | "not authorized" message; fetch skipped | ☐ |
+| **GeneratedContentApprovalsPage** (features/approvals) | Whole page + fetches | role `coaching_admin` (Q2) | "not authorized" message; fetch skipped | ☑ (test) |
 | **NotificationsPage** (features/notifications) | Whole page fetch | role `coaching_admin` \| `super_admin` (Q10) | error message; fetch skipped (stats/filters now also hidden for non-admins) | ☑ (test) |
 | **SearchResultsPage** (features/search) | Subjects, Classes, Enquiries result sections | role `coaching_admin` | conditional render | ☑ (test) |
 | **FactsPage** (features/facts) | "Featured" tab | role `coaching_admin` | `show` flag on tab | ☑ (test) |

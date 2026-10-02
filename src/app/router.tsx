@@ -34,7 +34,7 @@ const StudentAssessmentsPage = lazy(() => import('@/features/assessments/pages/S
 const AssessmentsPage = lazy(() => import('@/features/assessments/pages/AssessmentsPage'))
 const SearchResultsPage = lazy(() => import('@/features/search/pages/SearchResultsPage'))
 const DailyActivityApprovalsPage = lazy(() => import('@/features/approvals/pages/DailyActivityApprovalsPage'))
-const GeneratedContentApprovalsPage = lazy(() => import('@/pages/approvals/GeneratedContentApprovalsPage'))
+const GeneratedContentApprovalsPage = lazy(() => import('@/features/approvals/pages/GeneratedContentApprovalsPage'))
 const ProfilePage = lazy(() => import('@/features/profile/pages/ProfilePage'))
 const MyAttendance = lazy(() => import('@/features/attendance/pages/MyAttendancePage'))
 const NoticesPage = lazy(() => import('@/features/notices/pages/NoticesPage'))
