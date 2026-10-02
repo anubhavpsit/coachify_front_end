@@ -10,6 +10,7 @@ import { applyThemeColor, readStoredThemeColor } from '@/theme'
 import { duration, easing } from '@/theme/tokens'
 import BrandMark from './BrandMark'
 import Footer from './Footer'
+import { ROUTES } from '@/constants/routes'
 import PageFallback from './PageFallback'
 import SidebarNav from './SidebarNav'
 import Topbar from './Topbar'
@@ -72,6 +73,9 @@ export default function AppShell() {
   }
 
   const railCollapsed = isDesktop && collapsed
+  // Full-screen pages (the Facts reels feed): no padding or footer, and the
+  // page itself doesn't scroll — the feed inside does.
+  const immersive = pathname === ROUTES.FACTS
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,7 +110,8 @@ export default function AppShell() {
 
       <div
         className={cn(
-          'flex min-h-screen min-w-0 flex-col transition-[padding] duration-250 ease-standard',
+          'flex min-w-0 flex-col transition-[padding] duration-250 ease-standard',
+          immersive ? 'h-dvh overflow-hidden' : 'min-h-screen',
           isDesktop && (railCollapsed ? 'pl-[4.75rem]' : 'pl-64'),
         )}
       >
@@ -117,8 +122,8 @@ export default function AppShell() {
           theme={theme}
           onToggleTheme={toggleTheme}
         />
-        <main id="main-content" className="flex-1 p-4 md:p-6">
-          <div ref={contentRef}>
+        <main id="main-content" className={immersive ? 'min-h-0 flex-1' : 'flex-1 p-4 md:p-6'}>
+          <div ref={contentRef} className={immersive ? 'h-full' : undefined}>
             <ErrorBoundary resetKey={pathname}>
               <Suspense fallback={<PageFallback />}>
                 <Outlet />
@@ -126,7 +131,7 @@ export default function AppShell() {
             </ErrorBoundary>
           </div>
         </main>
-        <Footer />
+        {!immersive && <Footer />}
       </div>
     </div>
   )

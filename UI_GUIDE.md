@@ -104,6 +104,7 @@ Every data view handles **four states**: loading (a `Skeleton` shaped like the c
 - **Width:** reading pages (topic detail, profile) use `mx-auto max-w-4xl`. Lists use the full width.
 - **Mobile:** every screen must work at 360px. Filters stack (`w-full sm:w-48`). Tables scroll inside their card, never the page. Long text in flex rows needs `min-w-0` and `truncate`.
 - **Headings:** one `h1` per page (`PageHeader` renders it). Card titles use `CardTitle`.
+- **Full-screen pages:** `/facts` is "immersive": `AppShell` drops the page padding and footer and locks the page height, so only the feed scrolls. Add a route to that check in `AppShell.tsx` only for app-like, full-bleed screens.
 
 ---
 
