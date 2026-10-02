@@ -21,17 +21,17 @@ import { searchAll, type SearchUser } from '../services/searchService'
 function Section({ title, icon: Icon, count, to, children }: { title: string; icon: typeof UserRound; count: number; to: string; children: ReactNode }) {
   return (
     <m.section variants={slideUp} aria-label={title}>
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
-        <CardHeader className="tw:flex tw:flex-row tw:items-center tw:justify-between tw:gap-3 tw:border-b tw:border-solid tw:border-border tw:py-4">
-          <CardTitle className="tw:flex tw:items-center tw:gap-2">
-            <Icon className="tw:size-4 tw:text-primary" aria-hidden="true" />
+      <Card className="gap-0 overflow-hidden py-0">
+        <CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-solid border-border py-4">
+          <CardTitle className="flex items-center gap-2">
+            <Icon className="size-4 text-primary" aria-hidden="true" />
             {title}
-            <Badge variant="secondary" className="tw:tabular-nums">
+            <Badge variant="secondary" className="tabular-nums">
               {count}
             </Badge>
           </CardTitle>
-          <Link to={to} className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:font-medium tw:text-primary tw:no-underline tw:hover:underline">
-            Go to {title} <ArrowRight className="tw:size-3.5" aria-hidden="true" />
+          <Link to={to} className="inline-flex items-center gap-1 text-sm font-medium text-primary no-underline hover:underline">
+            Go to {title} <ArrowRight className="size-3.5" aria-hidden="true" />
           </Link>
         </CardHeader>
         {children}
@@ -42,9 +42,9 @@ function Section({ title, icon: Icon, count, to, children }: { title: string; ic
 
 function PersonCell({ user, q }: { user: SearchUser; q: string }) {
   return (
-    <div className="tw:flex tw:items-center tw:gap-2.5">
-      <UserAvatar name={user.name} image={user.profile_image} className="tw:size-8" />
-      <span className="tw:font-medium">
+    <div className="flex items-center gap-2.5">
+      <UserAvatar name={user.name} image={user.profile_image} className="size-8" />
+      <span className="font-medium">
         <Highlight text={user.name} query={q} />
       </span>
     </div>
@@ -53,9 +53,9 @@ function PersonCell({ user, q }: { user: SearchUser; q: string }) {
 
 function Chips({ items, q }: { items: { id: number; label: string }[]; q: string }) {
   return (
-    <ul className="tw:m-0 tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-5">
+    <ul className="m-0 flex list-none flex-wrap gap-2 p-5">
       {items.map((i) => (
-        <li key={i.id} className="tw:rounded-full tw:border tw:border-solid tw:border-border tw:bg-muted/50 tw:px-3 tw:py-1 tw:text-sm">
+        <li key={i.id} className="rounded-full border border-solid border-border bg-muted/50 px-3 py-1 text-sm">
           <Highlight text={i.label} query={q} />
         </li>
       ))}
@@ -63,7 +63,7 @@ function Chips({ items, q }: { items: { id: number; label: string }[]; q: string
   )
 }
 
-const dash = <span className="tw:text-muted-foreground">-</span>
+const dash = <span className="text-muted-foreground">-</span>
 
 /**
  * Global search results. No route gate (Q9). In-page gate kept exactly: the
@@ -93,17 +93,17 @@ export default function SearchResultsPage() {
   const error = search.error ? (search.error instanceof Error && search.error.message === 'You are not authenticated.' ? search.error.message : 'Unable to load search results.') : null
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Search Results"
         description={
           query ? (
             <>
-              Showing results for <strong className="tw:text-foreground">&ldquo;{query}&rdquo;</strong>
+              Showing results for <strong className="text-foreground">&ldquo;{query}&rdquo;</strong>
             </>
           ) : undefined
         }
-        className="tw:mb-0"
+        className="mb-0"
       />
 
       {!query ? (
@@ -111,9 +111,9 @@ export default function SearchResultsPage() {
           <EmptyState icon={SearchIcon} title="Search your coaching" description="Type a keyword in the search box above to find students, teachers, subjects, classes, or enquiries." />
         </Card>
       ) : search.loading ? (
-        <div className="tw:flex tw:flex-col tw:gap-4" role="status" aria-label="Loading results">
-          <Skeleton className="tw:h-40" />
-          <Skeleton className="tw:h-28" />
+        <div className="flex flex-col gap-4" role="status" aria-label="Loading results">
+          <Skeleton className="h-40" />
+          <Skeleton className="h-28" />
         </div>
       ) : error ? (
         <ErrorState title={error} onRetry={error === 'You are not authenticated.' ? undefined : search.reload} />
@@ -122,7 +122,7 @@ export default function SearchResultsPage() {
           <EmptyState icon={SearchX} title="No results found." description="Try a different spelling, or search by email or phone." />
         </Card>
       ) : (
-        <m.div key={query} className="tw:flex tw:flex-col tw:gap-4" variants={stagger(0.06)} initial="hidden" animate="visible">
+        <m.div key={query} className="flex flex-col gap-4" variants={stagger(0.06)} initial="hidden" animate="visible">
           {students.length > 0 && (
             <Section title="Students" icon={GraduationCap} count={students.length} to={ROUTES.STUDENTS}>
               <Table>
@@ -140,7 +140,7 @@ export default function SearchResultsPage() {
                       <TableCell>
                         <PersonCell user={s} q={query} />
                       </TableCell>
-                      <TableCell className="tw:text-muted-foreground">
+                      <TableCell className="text-muted-foreground">
                         <Highlight text={s.email} query={query} />
                       </TableCell>
                       <TableCell>{s.student_profile?.class ?? dash}</TableCell>
@@ -167,7 +167,7 @@ export default function SearchResultsPage() {
                       <TableCell>
                         <PersonCell user={t} q={query} />
                       </TableCell>
-                      <TableCell className="tw:text-muted-foreground">
+                      <TableCell className="text-muted-foreground">
                         <Highlight text={t.email} query={query} />
                       </TableCell>
                     </TableRow>
@@ -204,18 +204,18 @@ export default function SearchResultsPage() {
                 <TableBody>
                   {enquiries.map((e) => (
                     <TableRow key={e.id}>
-                      <TableCell className="tw:font-medium">
+                      <TableCell className="font-medium">
                         <Highlight text={e.name} query={query} />
                       </TableCell>
                       <TableCell>{e.contact_number || dash}</TableCell>
                       <TableCell>{e.email || dash}</TableCell>
                       <TableCell>
-                        <Badge variant={e.enquiry_type === 'teacher' ? 'info' : 'soft'} className="tw:capitalize">
+                        <Badge variant={e.enquiry_type === 'teacher' ? 'info' : 'soft'} className="capitalize">
                           {e.enquiry_type}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={e.status === 'active' ? 'success' : 'secondary'} className="tw:capitalize">
+                        <Badge variant={e.status === 'active' ? 'success' : 'secondary'} className="capitalize">
                           {e.status}
                         </Badge>
                       </TableCell>

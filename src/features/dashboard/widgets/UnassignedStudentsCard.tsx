@@ -23,7 +23,7 @@ export default function UnassignedStudentsCard() {
       <StudentListCard
         title="Unassigned Students"
         icon={UserRoundX}
-        iconClassName="tw:bg-destructive-soft tw:text-destructive"
+        iconClassName="bg-destructive-soft text-destructive"
         countLabel={`${list.length} with no teacher`}
         badgeVariant="destructive"
         loading={students.loading}

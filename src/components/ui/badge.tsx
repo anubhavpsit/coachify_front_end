@@ -4,18 +4,18 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const badgeVariants = cva(
-  'tw:inline-flex tw:items-center tw:gap-1 tw:w-fit tw:shrink-0 tw:whitespace-nowrap tw:rounded-full tw:border tw:border-solid tw:border-transparent tw:px-2 tw:py-0.5 tw:text-xs tw:font-medium tw:leading-4 tw:[&>svg]:size-3',
+  'inline-flex items-center gap-1 w-fit shrink-0 whitespace-nowrap rounded-full border border-solid border-transparent px-2 py-0.5 text-xs font-medium leading-4 [&>svg]:size-3',
   {
     variants: {
       variant: {
-        default: 'tw:bg-primary tw:text-primary-foreground',
-        soft: 'tw:bg-primary-soft tw:text-primary-soft-foreground',
-        secondary: 'tw:bg-secondary tw:text-secondary-foreground',
-        success: 'tw:bg-success-soft tw:text-success',
-        warning: 'tw:bg-warning-soft tw:text-warning',
-        destructive: 'tw:bg-destructive-soft tw:text-destructive',
-        info: 'tw:bg-info-soft tw:text-info',
-        outline: 'tw:border-border tw:text-foreground',
+        default: 'bg-primary text-primary-foreground',
+        soft: 'bg-primary-soft text-primary-soft-foreground',
+        secondary: 'bg-secondary text-secondary-foreground',
+        success: 'bg-success-soft text-success',
+        warning: 'bg-warning-soft text-warning',
+        destructive: 'bg-destructive-soft text-destructive',
+        info: 'bg-info-soft text-info',
+        outline: 'border-border text-foreground',
       },
     },
     defaultVariants: { variant: 'soft' },

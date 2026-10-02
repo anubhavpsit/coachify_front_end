@@ -15,7 +15,7 @@ interface Props {
 }
 
 /** Circular progress that fills (and counts up) the first time it scrolls into view. */
-export default function ProgressRing({ value, size = 88, stroke = 8, toneClassName = 'tw:text-primary', label, className }: Props) {
+export default function ProgressRing({ value, size = 88, stroke = 8, toneClassName = 'text-primary', label, className }: Props) {
   const ref = useRef<SVGSVGElement>(null)
   const inView = useInView(ref, { once: true, amount: 0.6 })
   const reduce = useReducedMotion()
@@ -25,9 +25,9 @@ export default function ProgressRing({ value, size = 88, stroke = 8, toneClassNa
   const c = 2 * Math.PI * r
 
   return (
-    <div className={cn('tw:relative tw:inline-flex tw:shrink-0', className)} style={{ width: size, height: size }}>
-      <svg ref={ref} width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={label ?? `${pct}%`} className="tw:-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="tw:stroke-muted" />
+    <div className={cn('relative inline-flex shrink-0', className)} style={{ width: size, height: size }}>
+      <svg ref={ref} width={size} height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label={label ?? `${pct}%`} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="stroke-muted" />
         <m.circle
           cx={size / 2}
           cy={size / 2}
@@ -43,7 +43,7 @@ export default function ProgressRing({ value, size = 88, stroke = 8, toneClassNa
           transition={{ duration: 0.9, ease: [0, 0, 0, 1] }}
         />
       </svg>
-      <span className="tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center tw:text-lg tw:font-bold tw:tabular-nums tw:text-foreground" aria-hidden="true">
+      <span className="absolute inset-0 flex items-center justify-center text-lg font-bold tabular-nums text-foreground" aria-hidden="true">
         {Math.round(shown)}%
       </span>
     </div>

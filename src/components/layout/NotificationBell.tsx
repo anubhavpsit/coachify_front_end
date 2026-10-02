@@ -117,11 +117,11 @@ export default function NotificationBell({ role }: { role?: string }) {
         <Button
           variant="secondary"
           size="icon"
-          className="tw:relative tw:rounded-full"
+          className="relative rounded-full"
           aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
         >
-          <m.span key={bumps} variants={wiggle} initial="idle" animate={bumps > 0 ? 'wiggle' : 'idle'} className="tw:inline-flex">
-            <Bell className="tw:size-5" aria-hidden="true" />
+          <m.span key={bumps} variants={wiggle} initial="idle" animate={bumps > 0 ? 'wiggle' : 'idle'} className="inline-flex">
+            <Bell className="size-5" aria-hidden="true" />
           </m.span>
           <AnimatePresence>
             {unread > 0 && (
@@ -131,7 +131,7 @@ export default function NotificationBell({ role }: { role?: string }) {
                 initial={bumps > 0 ? 'hidden' : false}
                 animate="visible"
                 exit="exit"
-                className="tw:absolute tw:-top-1 tw:-right-1 tw:min-w-[1.125rem] tw:rounded-full tw:bg-destructive tw:px-1 tw:text-[10px] tw:font-bold tw:leading-[1.125rem] tw:text-destructive-foreground"
+                className="absolute -top-1 -right-1 min-w-[1.125rem] rounded-full bg-destructive px-1 text-[10px] font-bold leading-[1.125rem] text-destructive-foreground"
               >
                 {label}
               </m.span>
@@ -139,25 +139,25 @@ export default function NotificationBell({ role }: { role?: string }) {
           </AnimatePresence>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="tw:w-[22.5rem] tw:max-w-[calc(100vw-2rem)] tw:overflow-hidden tw:p-0">
-        <div className="tw:flex tw:items-center tw:justify-between tw:border-b tw:border-solid tw:border-border tw:px-4 tw:py-3">
-          <span className="tw:font-semibold tw:text-foreground">Notifications</span>
+      <PopoverContent align="end" className="w-[22.5rem] max-w-[calc(100vw-2rem)] overflow-hidden p-0">
+        <div className="flex items-center justify-between border-b border-solid border-border px-4 py-3">
+          <span className="font-semibold text-foreground">Notifications</span>
           {unread > 0 && (
-            <Button variant="link" size="sm" className="tw:h-auto tw:px-0" onClick={handleMarkAll}>
+            <Button variant="link" size="sm" className="h-auto px-0" onClick={handleMarkAll}>
               Mark all as read
             </Button>
           )}
         </div>
-        <div className="tw:max-h-[400px] tw:overflow-y-auto">
+        <div className="max-h-[400px] overflow-y-auto">
           {loading && items.length === 0 && (
-            <div className="tw:flex tw:justify-center tw:py-6 tw:text-muted-foreground" role="status" aria-label="Loading notifications">
-              <LoaderCircle className="tw:size-5 tw:animate-spin" aria-hidden="true" />
+            <div className="flex justify-center py-6 text-muted-foreground" role="status" aria-label="Loading notifications">
+              <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             </div>
           )}
-          {error && <div className="tw:px-4 tw:py-3 tw:text-sm tw:text-destructive">{error}</div>}
+          {error && <div className="px-4 py-3 text-sm text-destructive">{error}</div>}
           {!loading && !error && items.length === 0 && (
-            <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:py-6 tw:text-sm tw:text-muted-foreground">
-              <BellOff className="tw:size-6" aria-hidden="true" />
+            <div className="flex flex-col items-center gap-2 py-6 text-sm text-muted-foreground">
+              <BellOff className="size-6" aria-hidden="true" />
               No notifications yet
             </div>
           )}
@@ -167,16 +167,16 @@ export default function NotificationBell({ role }: { role?: string }) {
               type="button"
               onClick={() => handleOpenItem(n)}
               className={cn(
-                'tw:m-0 tw:block tw:w-full tw:cursor-pointer tw:border-0 tw:border-b tw:border-solid tw:border-border tw:px-4 tw:py-3 tw:text-left tw:transition-colors tw:hover:bg-accent',
-                n.is_read ? 'tw:bg-transparent' : 'tw:bg-primary-soft/60',
+                'm-0 block w-full cursor-pointer border-0 border-b border-solid border-border px-4 py-3 text-left transition-colors hover:bg-accent',
+                n.is_read ? 'bg-transparent' : 'bg-primary-soft/60',
               )}
             >
-              <div className="tw:flex tw:items-start tw:gap-2">
-                {!n.is_read && <span className="tw:mt-1.5 tw:size-2 tw:shrink-0 tw:rounded-full tw:bg-primary" aria-label="Unread" />}
-                <div className="tw:min-w-0 tw:flex-1">
-                  <div className={cn('tw:text-sm tw:text-foreground', n.is_read ? 'tw:font-medium' : 'tw:font-semibold')}>{n.title}</div>
-                  {n.body && <div className="tw:mt-0.5 tw:line-clamp-2 tw:text-xs tw:text-muted-foreground">{n.body}</div>}
-                  <div className="tw:mt-1 tw:text-xs tw:text-muted-foreground" title={fullDate(n.created_at)}>
+              <div className="flex items-start gap-2">
+                {!n.is_read && <span className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" aria-label="Unread" />}
+                <div className="min-w-0 flex-1">
+                  <div className={cn('text-sm text-foreground', n.is_read ? 'font-medium' : 'font-semibold')}>{n.title}</div>
+                  {n.body && <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{n.body}</div>}
+                  <div className="mt-1 text-xs text-muted-foreground" title={fullDate(n.created_at)}>
                     {timeAgo(n.created_at)}
                   </div>
                 </div>
@@ -186,7 +186,7 @@ export default function NotificationBell({ role }: { role?: string }) {
         </div>
         <Button
           variant="ghost"
-          className="tw:w-full tw:rounded-none tw:text-primary"
+          className="w-full rounded-none text-primary"
           onClick={() => {
             setOpen(false)
             navigate('/my-notifications')

@@ -34,7 +34,6 @@ export function getTenantBranding(): Branding {
       logoIcon: typeof logoIcon === 'string' && logoIcon.length > 0 ? logoIcon : DEFAULT_BRANDING.logoIcon,
     };
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.error('Failed to parse tenant branding from localStorage', error);
     return DEFAULT_BRANDING;
   }

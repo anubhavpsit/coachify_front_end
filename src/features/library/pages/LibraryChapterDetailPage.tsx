@@ -10,8 +10,8 @@ import { fetchLibraryChapter } from '../services/libraryService'
 
 function Back() {
   return (
-    <Link to="/library/chapters" className="tw:inline-flex tw:w-fit tw:items-center tw:gap-1.5 tw:text-sm tw:text-muted-foreground tw:no-underline tw:hover:text-foreground">
-      <ArrowLeft className="tw:size-4" aria-hidden="true" /> Back to Chapters
+    <Link to="/library/chapters" className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground no-underline hover:text-foreground">
+      <ArrowLeft className="size-4" aria-hidden="true" /> Back to Chapters
     </Link>
   )
 }
@@ -31,30 +31,30 @@ export default function LibraryChapterDetailPage() {
 
   if (detail.loading && !c)
     return (
-      <div className="tw:flex tw:flex-col tw:gap-4" role="status" aria-label="Loading chapter">
+      <div className="flex flex-col gap-4" role="status" aria-label="Loading chapter">
         <Back />
-        <Skeleton className="tw:h-16 tw:w-1/2" />
-        <Skeleton className="tw:h-48 tw:rounded-xl" />
+        <Skeleton className="h-16 w-1/2" />
+        <Skeleton className="h-48 rounded-xl" />
       </div>
     )
   if (detail.error || !c)
     return (
-      <div className="tw:flex tw:flex-col tw:gap-4">
+      <div className="flex flex-col gap-4">
         <Back />
         <ErrorState title="You do not have access to this chapter, or it does not exist." />
       </div>
     )
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-5">
+    <div className="flex flex-col gap-5">
       <Back />
-      <div className="tw:flex tw:items-start tw:gap-3">
-        <span className="tw:flex tw:size-12 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-xl tw:bg-primary-soft tw:text-primary">
-          <BookMarked className="tw:size-6" aria-hidden="true" />
+      <div className="flex items-start gap-3">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+          <BookMarked className="size-6" aria-hidden="true" />
         </span>
-        <div className="tw:flex tw:flex-col tw:gap-1">
-          <h1 className="tw:m-0 tw:text-2xl! tw:font-bold tw:text-foreground">{c.name}</h1>
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-sm tw:text-muted-foreground">
+        <div className="flex flex-col gap-1">
+          <h1 className="m-0 text-2xl! font-bold text-foreground">{c.name}</h1>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {c.subject?.subject && <Badge variant="soft">{c.subject.subject}</Badge>}
             {c.topics.length} {c.topics.length === 1 ? 'topic' : 'topics'}
           </div>
@@ -66,17 +66,17 @@ export default function LibraryChapterDetailPage() {
           <EmptyState icon={ListChecks} title="No topics have been added to this chapter yet." />
         </Card>
       ) : (
-        <ol className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:p-0">
+        <ol className="m-0 flex list-none flex-col gap-2 p-0">
           {c.topics.map((t, i) => (
             <li key={t.id}>
               <Link
                 to={`/library/topics/${t.id}`}
-                className="tw:group tw:flex tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:px-4 tw:py-3 tw:text-foreground tw:no-underline tw:transition-colors tw:hover:border-primary/40 tw:hover:bg-primary-soft/30"
+                className="group flex items-center gap-3 rounded-xl border border-solid border-border bg-card px-4 py-3 text-foreground no-underline transition-colors hover:border-primary/40 hover:bg-primary-soft/30"
               >
-                <span className="tw:flex tw:size-7 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-muted tw:text-xs tw:font-semibold tw:text-muted-foreground">{i + 1}</span>
-                <span className="tw:min-w-0 tw:flex-1 tw:font-medium">{t.name}</span>
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">{i + 1}</span>
+                <span className="min-w-0 flex-1 font-medium">{t.name}</span>
                 <Badge variant="secondary">{t.grade ? `Grade ${t.grade}` : 'All grades'}</Badge>
-                <ChevronRight className="tw:size-4 tw:shrink-0 tw:text-muted-foreground tw:transition-transform tw:group-hover:translate-x-0.5" aria-hidden="true" />
+                <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
             </li>
           ))}

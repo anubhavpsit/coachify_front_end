@@ -62,9 +62,9 @@ export default function ChaptersPage() {
       header: 'Chapter',
       accessorFn: (c) => c.name,
       cell: ({ row }) => (
-        <Link to={chapterRoute(row.original.id)} className="tw:group tw:inline-flex tw:items-center tw:gap-1 tw:font-medium tw:text-foreground tw:no-underline tw:hover:text-primary">
+        <Link to={chapterRoute(row.original.id)} className="group inline-flex items-center gap-1 font-medium text-foreground no-underline hover:text-primary">
           {row.original.name}
-          <ChevronRight className="tw:size-3.5 tw:opacity-0 tw:transition-opacity tw:group-hover:opacity-100" aria-hidden="true" />
+          <ChevronRight className="size-3.5 opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
         </Link>
       ),
     },
@@ -77,7 +77,7 @@ export default function ChaptersPage() {
       cell: ({ row }) => {
         const n = row.original.topics_count ?? 0
         return (
-          <Link to={chapterRoute(row.original.id)} className="tw:text-sm tw:font-medium tw:text-primary tw:no-underline tw:hover:underline">
+          <Link to={chapterRoute(row.original.id)} className="text-sm font-medium text-primary no-underline hover:underline">
             {n} topic{n === 1 ? '' : 's'}
           </Link>
         )
@@ -85,14 +85,14 @@ export default function ChaptersPage() {
     },
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">Actions</span>,
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) =>
         canManage(row.original) ? (
           <RowActions name={row.original.name} onEdit={() => openForm(row.original)} onDelete={() => setDeleting(row.original)} />
         ) : (
-          <div className="tw:flex tw:justify-end">
+          <div className="flex justify-end">
             <ReadOnlyMark what="chapter" />
           </div>
         ),
@@ -102,11 +102,11 @@ export default function ChaptersPage() {
   const custom = chapters.filter((c) => c.tenant_id !== 0).length
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Chapters"
         description="Group topics into chapters for each subject. Base chapters are shared; you can add your own."
-        className="tw:mb-0"
+        className="mb-0"
         actions={
           <Button onClick={() => openForm(null)}>
             <Plus aria-hidden="true" /> Add Chapter
@@ -114,7 +114,7 @@ export default function ChaptersPage() {
         }
       />
 
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+      <Card className="gap-0 overflow-hidden py-0">
         <DataTable
           columns={columns}
           data={chapters}
@@ -131,8 +131,8 @@ export default function ChaptersPage() {
           }
           pageSize={25}
           toolbar={
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
-              <NativeSelect aria-label="Subject" className="tw:w-full tw:sm:w-48" value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)}>
+            <div className="flex flex-wrap items-center gap-3">
+              <NativeSelect aria-label="Subject" className="w-full sm:w-48" value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)}>
                 <option value="">All subjects</option>
                 {(subjects.data ?? []).map((s) => (
                   <option key={s.id} value={s.id}>
@@ -141,7 +141,7 @@ export default function ChaptersPage() {
                 ))}
               </NativeSelect>
               {!list.loading && (
-                <span className="tw:text-xs tw:text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {chapters.length} chapters · {custom} custom
                 </span>
               )}

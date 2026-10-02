@@ -7,21 +7,21 @@ import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils/date'
 import { fetchAssessmentSummary } from './profileService'
 
-const tone = (pct: number) => (pct < 40 ? 'tw:text-destructive' : pct >= 80 ? 'tw:text-success' : 'tw:text-foreground')
+const tone = (pct: number) => (pct < 40 ? 'text-destructive' : pct >= 80 ? 'text-success' : 'text-foreground')
 
 /** Viewed user is a student; viewer is coaching_admin or teacher (gate in the dialog). */
 export default function AssessmentsTab({ studentId }: { studentId: number }) {
   const { data, loading, error } = useAsync(() => fetchAssessmentSummary(studentId), [studentId])
   if (loading)
     return (
-      <div className="tw:grid tw:grid-cols-2 tw:gap-2 tw:sm:grid-cols-4" role="status" aria-label="Loading assessments">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="status" aria-label="Loading assessments">
         {Array.from({ length: 4 }, (_, i) => (
-          <Skeleton key={i} className="tw:h-16" />
+          <Skeleton key={i} className="h-16" />
         ))}
       </div>
     )
-  if (error) return <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">Unable to load assessments summary.</p>
-  if (!data) return <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">No data available.</p>
+  if (error) return <p className="m-0 text-sm text-muted-foreground">Unable to load assessments summary.</p>
+  if (!data) return <p className="m-0 text-sm text-muted-foreground">No data available.</p>
 
   const tiles: Array<[string, string]> = [
     ['Completed', String(data.completed_count)],
@@ -32,41 +32,41 @@ export default function AssessmentsTab({ studentId }: { studentId: number }) {
   const last = data.last_result
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
-      <div className="tw:grid tw:grid-cols-2 tw:gap-2 tw:sm:grid-cols-4">
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {tiles.map(([label, value]) => (
-          <div key={label} className="tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-3">
-            <div className="tw:text-xs tw:text-muted-foreground">{label}</div>
-            <div className="tw:text-base tw:font-bold tw:text-foreground">{value}</div>
+          <div key={label} className="rounded-lg border border-solid border-border p-3">
+            <div className="text-xs text-muted-foreground">{label}</div>
+            <div className="text-base font-bold text-foreground">{value}</div>
           </div>
         ))}
       </div>
-      <div className="tw:rounded-lg tw:bg-muted/50 tw:p-3">
-        <div className="tw:mb-1 tw:text-xs tw:text-muted-foreground">Last Result</div>
+      <div className="rounded-lg bg-muted/50 p-3">
+        <div className="mb-1 text-xs text-muted-foreground">Last Result</div>
         {!last ? (
-          <div className="tw:text-sm tw:text-muted-foreground">—</div>
+          <div className="text-sm text-muted-foreground">—</div>
         ) : (
-          <div className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+          <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="tw:font-medium tw:text-foreground">{last.subject || 'Subject'}</div>
-              <div className="tw:text-sm tw:text-muted-foreground">{last.title || '-'}</div>
+              <div className="font-medium text-foreground">{last.subject || 'Subject'}</div>
+              <div className="text-sm text-muted-foreground">{last.title || '-'}</div>
             </div>
-            <div className="tw:text-right">
-              <div className={cn('tw:text-xl tw:font-bold', tone(last.percentage))}>{Math.round(last.percentage)}%</div>
-              <div className="tw:text-xs tw:text-muted-foreground">{formatDate(last.attempted_at || last.graded_at)}</div>
+            <div className="text-right">
+              <div className={cn('text-xl font-bold', tone(last.percentage))}>{Math.round(last.percentage)}%</div>
+              <div className="text-xs text-muted-foreground">{formatDate(last.attempted_at || last.graded_at)}</div>
             </div>
           </div>
         )}
       </div>
       {data.recent_results.length > 0 ? (
-        <div className="tw:overflow-hidden tw:rounded-lg tw:border tw:border-solid tw:border-border">
+        <div className="overflow-hidden rounded-lg border border-solid border-border">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Subject</TableHead>
                 <TableHead>Title</TableHead>
-                <TableHead className="tw:text-right">%</TableHead>
-                <TableHead className="tw:text-right">Date</TableHead>
+                <TableHead className="text-right">%</TableHead>
+                <TableHead className="text-right">Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -74,8 +74,8 @@ export default function AssessmentsTab({ studentId }: { studentId: number }) {
                 <TableRow key={r.assignment_id}>
                   <TableCell>{r.subject}</TableCell>
                   <TableCell>{r.title}</TableCell>
-                  <TableCell className={cn('tw:text-right tw:font-semibold', tone(r.percentage))}>{Math.round(r.percentage)}%</TableCell>
-                  <TableCell className="tw:text-right tw:text-muted-foreground">{formatDate(r.attempted_at || r.graded_at)}</TableCell>
+                  <TableCell className={cn('text-right font-semibold', tone(r.percentage))}>{Math.round(r.percentage)}%</TableCell>
+                  <TableCell className="text-right text-muted-foreground">{formatDate(r.attempted_at || r.graded_at)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

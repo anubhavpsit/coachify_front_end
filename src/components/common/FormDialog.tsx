@@ -55,13 +55,13 @@ export default function FormDialog<T extends FieldValues>({
   return (
     <>
       <Dialog open={open} onOpenChange={(next) => !next && requestClose()}>
-        <DialogContent className={cn('tw:sm:max-w-lg', className)} onInteractOutside={(e) => isDirty && e.preventDefault()}>
+        <DialogContent className={cn('sm:max-w-lg', className)} onInteractOutside={(e) => isDirty && e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             {description && <DialogDescription>{description}</DialogDescription>}
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="tw:flex tw:flex-col tw:gap-5">
+            <form onSubmit={form.handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
               {children}
               <AnimatePresence initial={false}>
                 {error && (

@@ -3,8 +3,8 @@ import { getTenantBrandName } from '@/utils/branding'
 export default function Footer() {
   const brandName = getTenantBrandName()
   return (
-    <footer className="tw:mt-auto tw:border-t tw:border-solid tw:border-border tw:bg-card tw:px-4 tw:py-4 tw:md:px-6">
-      <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">
+    <footer className="mt-auto border-t border-solid border-border bg-card px-4 py-4 md:px-6">
+      <p className="m-0 text-sm text-muted-foreground">
         © {new Date().getFullYear()} {brandName}. All Rights Reserved.
       </p>
     </footer>

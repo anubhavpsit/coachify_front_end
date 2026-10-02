@@ -14,9 +14,9 @@ const rupees = (v: number | string | undefined) => `₹${Number(v || 0).toFixed(
 
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="tw:flex tw:flex-col tw:gap-0.5 tw:rounded-lg tw:bg-muted/60 tw:px-3 tw:py-2.5">
-      <span className="tw:text-xs tw:text-muted-foreground">{label}</span>
-      <span className="tw:text-sm tw:font-semibold tw:text-foreground">{value}</span>
+    <div className="flex flex-col gap-0.5 rounded-lg bg-muted/60 px-3 py-2.5">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      <span className="text-sm font-semibold text-foreground">{value}</span>
     </div>
   )
 }
@@ -28,7 +28,7 @@ export default function FeeDetailsDialog({ studentId, onClose }: { studentId: nu
 
   return (
     <Dialog open={studentId != null} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="tw:sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Fee Details</DialogTitle>
           <DialogDescription>
@@ -39,21 +39,21 @@ export default function FeeDetailsDialog({ studentId, onClose }: { studentId: nu
         </DialogHeader>
 
         {loading ? (
-          <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading fee details">
-            <div className="tw:grid tw:grid-cols-2 tw:gap-2 tw:sm:grid-cols-3">
+          <div className="flex flex-col gap-3" role="status" aria-label="Loading fee details">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {Array.from({ length: 5 }, (_, i) => (
-                <Skeleton key={i} className="tw:h-14" />
+                <Skeleton key={i} className="h-14" />
               ))}
             </div>
-            <Skeleton className="tw:h-32" />
+            <Skeleton className="h-32" />
           </div>
         ) : error ? (
-          <p className="tw:m-0 tw:text-sm tw:text-destructive" role="alert">
+          <p className="m-0 text-sm text-destructive" role="alert">
             Unable to load fee details.
           </p>
         ) : details ? (
-          <div className="tw:flex tw:flex-col tw:gap-4">
-            <div className="tw:grid tw:grid-cols-2 tw:gap-2 tw:sm:grid-cols-3">
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               <Stat label="Total Paid" value={rupees(s?.total_paid)} />
               <Stat label="Last Paid Till" value={formatDate(s?.last_paid_to_date)} />
               <Stat label="Next Due Date" value={formatDate(s?.next_due_date)} />
@@ -63,14 +63,14 @@ export default function FeeDetailsDialog({ studentId, onClose }: { studentId: nu
               />
               <Stat label="Unpaid Periods (approx)" value={s?.unpaid_periods ?? 0} />
             </div>
-            <div className="tw:overflow-hidden tw:rounded-lg tw:border tw:border-solid tw:border-border">
+            <div className="overflow-hidden rounded-lg border border-solid border-border">
               {Array.isArray(details.fees) && details.fees.length > 0 ? (
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>From</TableHead>
                       <TableHead>To</TableHead>
-                      <TableHead className="tw:text-right">Amount</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
                       <TableHead>Mode</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -79,7 +79,7 @@ export default function FeeDetailsDialog({ studentId, onClose }: { studentId: nu
                       <TableRow key={fee.id}>
                         <TableCell>{formatDate(fee.from_date)}</TableCell>
                         <TableCell>{formatDate(fee.to_date)}</TableCell>
-                        <TableCell className="tw:text-right tw:tabular-nums">{rupees(fee.amount)}</TableCell>
+                        <TableCell className="text-right tabular-nums">{rupees(fee.amount)}</TableCell>
                         <TableCell>{paymentModeLabel(fee.payment_mode)}</TableCell>
                       </TableRow>
                     ))}

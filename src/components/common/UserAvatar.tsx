@@ -3,13 +3,13 @@ import { initials } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 
 const TONES = [
-  'tw:bg-primary-soft tw:text-primary-soft-foreground',
-  'tw:bg-success-soft tw:text-success',
-  'tw:bg-destructive-soft tw:text-destructive',
-  'tw:bg-warning-soft tw:text-warning',
-  'tw:bg-info-soft tw:text-info',
-  'tw:bg-violet-500/12 tw:text-violet-600',
-  'tw:bg-pink-500/12 tw:text-pink-600',
+  'bg-primary-soft text-primary-soft-foreground',
+  'bg-success-soft text-success',
+  'bg-destructive-soft text-destructive',
+  'bg-warning-soft text-warning',
+  'bg-info-soft text-info',
+  'bg-violet-500/12 text-violet-600',
+  'bg-pink-500/12 text-pink-600',
 ]
 
 // Same hash as the legacy Avatar so people keep their colour.
@@ -31,9 +31,9 @@ export default function UserAvatar({ name, image, className, toneClassName }: Pr
   const src = typeof image === 'string' && image.trim() ? image : undefined
   return (
     // Decorative: the name is always rendered next to it, so screen readers skip the initials.
-    <Avatar className={cn('tw:size-9', className)} aria-hidden="true">
+    <Avatar className={cn('size-9', className)} aria-hidden="true">
       {src && <AvatarImage src={src} alt="" />}
-      <AvatarFallback className={cn('tw:text-xs', toneClassName ?? toneFor(name))}>{initials(name)}</AvatarFallback>
+      <AvatarFallback className={cn('text-xs', toneClassName ?? toneFor(name))}>{initials(name)}</AvatarFallback>
     </Avatar>
   )
 }

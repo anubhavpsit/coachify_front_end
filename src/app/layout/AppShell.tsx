@@ -74,30 +74,30 @@ export default function AppShell() {
   const railCollapsed = isDesktop && collapsed
 
   return (
-    <div className="tw:min-h-screen tw:bg-background">
+    <div className="min-h-screen bg-background">
       {isDesktop ? (
         <aside
           className={cn(
-            'tw:fixed tw:inset-y-0 tw:left-0 tw:z-40 tw:flex tw:flex-col tw:border-r tw:border-solid tw:border-border tw:bg-card tw:transition-[width] tw:duration-250 tw:ease-standard',
-            railCollapsed ? 'tw:w-[4.75rem]' : 'tw:w-64',
+            'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-solid border-border bg-card transition-[width] duration-250 ease-standard',
+            railCollapsed ? 'w-[4.75rem]' : 'w-64',
           )}
         >
-          <div className={cn('tw:flex tw:h-16 tw:shrink-0 tw:items-center tw:border-b tw:border-solid tw:border-border', railCollapsed ? 'tw:justify-center tw:px-2' : 'tw:px-5')}>
+          <div className={cn('flex h-16 shrink-0 items-center border-b border-solid border-border', railCollapsed ? 'justify-center px-2' : 'px-5')}>
             <BrandMark collapsed={railCollapsed} />
           </div>
-          <div className="tw:flex-1 tw:overflow-y-auto tw:overflow-x-hidden">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden">
             <SidebarNav collapsed={railCollapsed} layoutId="nav-active-desktop" />
           </div>
         </aside>
       ) : (
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetContent side="left" className="tw:w-72 tw:gap-0 tw:p-0">
-            <SheetTitle className="tw:sr-only">Menu</SheetTitle>
-            <SheetDescription className="tw:sr-only">Main navigation</SheetDescription>
-            <div className="tw:flex tw:h-16 tw:shrink-0 tw:items-center tw:border-b tw:border-solid tw:border-border tw:px-5">
+          <SheetContent side="left" className="w-72 gap-0 p-0">
+            <SheetTitle className="sr-only">Menu</SheetTitle>
+            <SheetDescription className="sr-only">Main navigation</SheetDescription>
+            <div className="flex h-16 shrink-0 items-center border-b border-solid border-border px-5">
               <BrandMark />
             </div>
-            <div className="tw:flex-1 tw:overflow-y-auto">
+            <div className="flex-1 overflow-y-auto">
               <SidebarNav layoutId="nav-active-mobile" onNavigate={() => setMobileOpen(false)} />
             </div>
           </SheetContent>
@@ -106,8 +106,8 @@ export default function AppShell() {
 
       <div
         className={cn(
-          'tw:flex tw:min-h-screen tw:min-w-0 tw:flex-col tw:transition-[padding] tw:duration-250 tw:ease-standard',
-          isDesktop && (railCollapsed ? 'tw:pl-[4.75rem]' : 'tw:pl-64'),
+          'flex min-h-screen min-w-0 flex-col transition-[padding] duration-250 ease-standard',
+          isDesktop && (railCollapsed ? 'pl-[4.75rem]' : 'pl-64'),
         )}
       >
         <Topbar
@@ -117,7 +117,7 @@ export default function AppShell() {
           theme={theme}
           onToggleTheme={toggleTheme}
         />
-        <main id="main-content" className="tw:flex-1 tw:p-4 tw:md:p-6">
+        <main id="main-content" className="flex-1 p-4 md:p-6">
           <div ref={contentRef}>
             <ErrorBoundary resetKey={pathname}>
               <Suspense fallback={<PageFallback />}>

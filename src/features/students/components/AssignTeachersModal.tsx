@@ -72,16 +72,16 @@ export default function AssignTeachersModal({ show, onHide, studentId, onAssigne
 
   return (
     <Dialog open={show} onOpenChange={(open) => !open && !saving && onHide()}>
-      <DialogContent className="tw:gap-5">
+      <DialogContent className="gap-5">
         <DialogHeader>
           <DialogTitle>Assign Teachers</DialogTitle>
           <DialogDescription>Choose one or more teachers for this student.</DialogDescription>
         </DialogHeader>
 
         {teachers.length > 6 && (
-          <div className="tw:relative">
-            <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search teachers" aria-label="Search teachers" className="tw:pl-9" />
+          <div className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search teachers" aria-label="Search teachers" className="pl-9" />
           </div>
         )}
 
@@ -90,17 +90,17 @@ export default function AssignTeachersModal({ show, onHide, studentId, onAssigne
           aria-label="Teachers"
           aria-invalid={invalid || undefined}
           aria-describedby={invalid ? errorId : undefined}
-          className="tw:-mx-2 tw:max-h-72 tw:overflow-y-auto tw:px-2"
+          className="-mx-2 max-h-72 overflow-y-auto px-2"
         >
           {loading ? (
-            <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading teachers">
+            <div className="flex flex-col gap-3" role="status" aria-label="Loading teachers">
               {Array.from({ length: 4 }, (_, i) => (
-                <Skeleton key={i} className="tw:h-10" />
+                <Skeleton key={i} className="h-10" />
               ))}
             </div>
           ) : error ? (
-            <div className="tw:flex tw:flex-col tw:items-start tw:gap-2" role="alert">
-              <p className="tw:m-0 tw:text-sm tw:text-destructive">Unable to load teachers.</p>
+            <div className="flex flex-col items-start gap-2" role="alert">
+              <p className="m-0 text-sm text-destructive">Unable to load teachers.</p>
               <Button variant="outline" size="sm" onClick={reload}>
                 Try again
               </Button>
@@ -110,19 +110,19 @@ export default function AssignTeachersModal({ show, onHide, studentId, onAssigne
           ) : visible.length === 0 ? (
             <EmptyState icon={Search} title={`No teachers match “${query}”.`} />
           ) : (
-            <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0">
+            <ul className="m-0 flex list-none flex-col gap-1 p-0">
               {visible.map((teacher) => {
                 const id = `teacher-${teacher.id}`
                 return (
                   <li key={teacher.id}>
                     <label
                       htmlFor={id}
-                      className="tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-lg tw:border tw:border-solid tw:border-transparent tw:px-3 tw:py-2.5 tw:transition-colors tw:hover:bg-accent tw:has-[[data-state=checked]]:border-primary/30 tw:has-[[data-state=checked]]:bg-primary-soft/60"
+                      className="m-0 flex cursor-pointer items-center gap-3 rounded-lg border border-solid border-transparent px-3 py-2.5 transition-colors hover:bg-accent has-[[data-state=checked]]:border-primary/30 has-[[data-state=checked]]:bg-primary-soft/60"
                     >
                       <Checkbox id={id} checked={selected.includes(teacher.id)} onCheckedChange={() => toggle(teacher.id)} disabled={saving} />
-                      <span className="tw:flex tw:min-w-0 tw:flex-col">
-                        <span className="tw:truncate tw:text-sm tw:font-medium tw:text-foreground">{teacher.name}</span>
-                        <span className="tw:truncate tw:text-xs tw:text-muted-foreground">{teacher.email}</span>
+                      <span className="flex min-w-0 flex-col">
+                        <span className="truncate text-sm font-medium text-foreground">{teacher.name}</span>
+                        <span className="truncate text-xs text-muted-foreground">{teacher.email}</span>
                       </span>
                     </label>
                   </li>
@@ -133,7 +133,7 @@ export default function AssignTeachersModal({ show, onHide, studentId, onAssigne
         </div>
 
         {invalid && (
-          <p id={errorId} className="tw:m-0 tw:-mt-2 tw:text-xs tw:font-medium tw:text-destructive">
+          <p id={errorId} className="m-0 -mt-2 text-xs font-medium text-destructive">
             Select at least one teacher.
           </p>
         )}

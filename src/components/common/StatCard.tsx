@@ -7,13 +7,13 @@ import { cn } from '@/lib/utils'
 export type StatTone = 'primary' | 'success' | 'warning' | 'destructive' | 'info' | 'violet' | 'pink'
 
 const TONES: Record<StatTone, string> = {
-  primary: 'tw:bg-primary-soft tw:text-primary-soft-foreground',
-  success: 'tw:bg-success-soft tw:text-success',
-  warning: 'tw:bg-warning-soft tw:text-warning',
-  destructive: 'tw:bg-destructive-soft tw:text-destructive',
-  info: 'tw:bg-info-soft tw:text-info',
-  violet: 'tw:bg-violet-500/12 tw:text-violet-600',
-  pink: 'tw:bg-pink-500/12 tw:text-pink-600',
+  primary: 'bg-primary-soft text-primary-soft-foreground',
+  success: 'bg-success-soft text-success',
+  warning: 'bg-warning-soft text-warning',
+  destructive: 'bg-destructive-soft text-destructive',
+  info: 'bg-info-soft text-info',
+  violet: 'bg-violet-500/12 text-violet-600',
+  pink: 'bg-pink-500/12 text-pink-600',
 }
 
 interface Props {
@@ -33,17 +33,17 @@ export default function StatCard({ label, value, icon: Icon, tone = 'primary', f
     <m.div
       variants={slideUp}
       className={cn(
-        'tw:flex tw:min-w-0 tw:flex-col tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4 tw:shadow-xs tw:sm:gap-4 tw:sm:p-5 tw:transition-[transform,box-shadow] tw:duration-200 tw:hover:-translate-y-0.5 tw:hover:shadow-md',
+        'flex min-w-0 flex-col gap-3 rounded-xl border border-solid border-border bg-card p-4 shadow-xs sm:gap-4 sm:p-5 transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-md',
         className,
       )}
     >
-      <div className="tw:flex tw:items-center tw:gap-3">
-        <span className={cn('tw:flex tw:size-9 tw:shrink-0 tw:sm:size-11 tw:items-center tw:justify-center tw:rounded-full', TONES[tone])}>
-          <Icon className="tw:size-4 tw:sm:size-5" aria-hidden="true" />
+      <div className="flex items-center gap-3">
+        <span className={cn('flex size-9 shrink-0 sm:size-11 items-center justify-center rounded-full', TONES[tone])}>
+          <Icon className="size-4 sm:size-5" aria-hidden="true" />
         </span>
-        <span className="tw:text-xs tw:font-medium tw:text-muted-foreground tw:sm:text-sm">{label}</span>
+        <span className="text-xs font-medium text-muted-foreground sm:text-sm">{label}</span>
       </div>
-      <div className="tw:truncate tw:text-xl tw:font-bold tw:tabular-nums tw:tracking-tight tw:text-foreground tw:sm:text-3xl" aria-label={`${label}: ${format(value ?? 0)}`}>
+      <div className="truncate text-xl font-bold tabular-nums tracking-tight text-foreground sm:text-3xl" aria-label={`${label}: ${format(value ?? 0)}`}>
         <span aria-hidden="true">{format(shown)}</span>
       </div>
     </m.div>
@@ -52,12 +52,12 @@ export default function StatCard({ label, value, icon: Icon, tone = 'primary', f
 
 export function StatCardSkeleton() {
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-5">
-      <div className="tw:flex tw:items-center tw:gap-3">
-        <Skeleton className="tw:size-11 tw:rounded-full" />
-        <Skeleton className="tw:h-4 tw:w-28" />
+    <div className="flex flex-col gap-4 rounded-xl border border-solid border-border bg-card p-5">
+      <div className="flex items-center gap-3">
+        <Skeleton className="size-11 rounded-full" />
+        <Skeleton className="h-4 w-28" />
       </div>
-      <Skeleton className="tw:h-8 tw:w-20" />
+      <Skeleton className="h-8 w-20" />
     </div>
   )
 }

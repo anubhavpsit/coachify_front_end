@@ -48,37 +48,37 @@ export default function WidgetCard({
 }: Props) {
   const state = loading ? 'loading' : error ? 'error' : empty ? 'empty' : 'content'
   return (
-    <Card className={cn('tw:h-full tw:gap-3 tw:pb-3', className)}>
+    <Card className={cn('h-full gap-3 pb-3', className)}>
       <CardHeader>
-        <CardTitle className="tw:flex tw:items-center tw:gap-2">
-          {Icon && <Icon className="tw:size-4 tw:text-muted-foreground" aria-hidden="true" />}
+        <CardTitle className="flex items-center gap-2">
+          {Icon && <Icon className="size-4 text-muted-foreground" aria-hidden="true" />}
           {title}
         </CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
         {action && <CardAction>{action}</CardAction>}
       </CardHeader>
       <CardContent
-        className={cn('tw:min-h-0 tw:overflow-y-auto', bodyClassName)}
+        className={cn('min-h-0 overflow-y-auto', bodyClassName)}
         style={maxBodyHeight ? { maxHeight: maxBodyHeight } : undefined}
       >
         <AnimatePresence mode="wait" initial={false}>
           <m.div key={state} variants={fadeIn} initial="hidden" animate="visible" exit="exit">
             {state === 'loading' && (
-              <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading">
+              <div className="flex flex-col gap-3" role="status" aria-label="Loading">
                 {Array.from({ length: skeletonRows }, (_, i) => (
-                  <div key={i} className="tw:flex tw:items-center tw:gap-3">
-                    <Skeleton className="tw:size-9 tw:rounded-full" />
-                    <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-1.5">
-                      <Skeleton className="tw:h-3.5 tw:w-2/5" />
-                      <Skeleton className="tw:h-3 tw:w-1/4" />
+                  <div key={i} className="flex items-center gap-3">
+                    <Skeleton className="size-9 rounded-full" />
+                    <div className="flex flex-1 flex-col gap-1.5">
+                      <Skeleton className="h-3.5 w-2/5" />
+                      <Skeleton className="h-3 w-1/4" />
                     </div>
                   </div>
                 ))}
               </div>
             )}
             {state === 'error' && (
-              <div className="tw:flex tw:flex-col tw:items-start tw:gap-2 tw:py-2" role="alert">
-                <p className="tw:m-0 tw:text-sm tw:text-destructive">{error}</p>
+              <div className="flex flex-col items-start gap-2 py-2" role="alert">
+                <p className="m-0 text-sm text-destructive">{error}</p>
                 {onRetry && (
                   <Button variant="outline" size="sm" onClick={onRetry}>
                     Try again
@@ -86,7 +86,7 @@ export default function WidgetCard({
                 )}
               </div>
             )}
-            {state === 'empty' && <EmptyState icon={emptyIcon} title={emptyTitle} className="tw:py-4" />}
+            {state === 'empty' && <EmptyState icon={emptyIcon} title={emptyTitle} className="py-4" />}
             {state === 'content' && children}
           </m.div>
         </AnimatePresence>

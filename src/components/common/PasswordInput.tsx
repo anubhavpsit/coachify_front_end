@@ -8,16 +8,16 @@ export default function PasswordInput({ className, ...props }: Omit<ComponentPro
   const [visible, setVisible] = useState(false)
   const Icon = visible ? EyeOff : Eye
   return (
-    <div className="tw:relative">
-      <Input type={visible ? 'text' : 'password'} className={cn('tw:pr-11', className)} {...props} />
+    <div className="relative">
+      <Input type={visible ? 'text' : 'password'} className={cn('pr-11', className)} {...props} />
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? 'Hide password' : 'Show password'}
         aria-pressed={visible}
-        className="tw:absolute tw:top-1/2 tw:right-1.5 tw:m-0 tw:inline-flex tw:size-8 tw:-translate-y-1/2 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-md tw:border-0 tw:bg-transparent tw:text-muted-foreground tw:outline-none tw:transition-colors tw:hover:text-foreground tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50"
+        className="absolute top-1/2 right-1.5 m-0 inline-flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md border-0 bg-transparent text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50"
       >
-        <Icon className="tw:size-4" aria-hidden="true" />
+        <Icon className="size-4" aria-hidden="true" />
       </button>
     </div>
   )

@@ -19,8 +19,8 @@ function DropdownMenuContent({ className, sideOffset = 6, ...props }: React.Comp
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         className={cn(
-          'tw:z-[1100] tw:min-w-[10rem] tw:max-h-(--radix-dropdown-menu-content-available-height) tw:overflow-y-auto tw:overflow-x-hidden tw:rounded-lg tw:border tw:border-solid tw:border-border tw:bg-popover tw:p-1 tw:text-popover-foreground tw:shadow-lg',
-          'tw:origin-(--radix-dropdown-menu-content-transform-origin) tw:data-[state=open]:animate-in tw:data-[state=open]:fade-in-0 tw:data-[state=open]:zoom-in-95 tw:data-[state=closed]:animate-out tw:data-[state=closed]:fade-out-0 tw:data-[state=closed]:zoom-out-95',
+          'z-[1100] min-w-[10rem] max-h-(--radix-dropdown-menu-content-available-height) overflow-y-auto overflow-x-hidden rounded-lg border border-solid border-border bg-popover p-1 text-popover-foreground shadow-lg',
+          'origin-(--radix-dropdown-menu-content-transform-origin) data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           className,
         )}
         {...props}
@@ -40,11 +40,11 @@ function DropdownMenuItem({
       data-slot="dropdown-menu-item"
       data-variant={variant}
       className={cn(
-        'tw:relative tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-md tw:px-2 tw:py-2 tw:text-sm tw:text-foreground tw:outline-none tw:select-none',
-        'tw:focus:bg-accent tw:focus:text-accent-foreground tw:data-disabled:pointer-events-none tw:data-disabled:opacity-50',
-        'tw:data-[variant=destructive]:text-destructive tw:data-[variant=destructive]:focus:bg-destructive-soft tw:data-[variant=destructive]:focus:text-destructive',
-        'tw:[&_svg]:pointer-events-none tw:[&_svg]:shrink-0 tw:[&_svg:not([class*=size-])]:size-4',
-        inset && 'tw:pl-8',
+        'relative flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground outline-none select-none',
+        'focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
+        'data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive-soft data-[variant=destructive]:focus:text-destructive',
+        '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=size-])]:size-4',
+        inset && 'pl-8',
         className,
       )}
       {...props}
@@ -53,11 +53,11 @@ function DropdownMenuItem({
 }
 
 function DropdownMenuLabel({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Label>) {
-  return <DropdownMenuPrimitive.Label data-slot="dropdown-menu-label" className={cn('tw:px-2 tw:py-1.5 tw:text-sm tw:font-medium', className)} {...props} />
+  return <DropdownMenuPrimitive.Label data-slot="dropdown-menu-label" className={cn('px-2 py-1.5 text-sm font-medium', className)} {...props} />
 }
 
 function DropdownMenuSeparator({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
-  return <DropdownMenuPrimitive.Separator data-slot="dropdown-menu-separator" className={cn('tw:-mx-1 tw:my-1 tw:h-px tw:bg-border', className)} {...props} />
+  return <DropdownMenuPrimitive.Separator data-slot="dropdown-menu-separator" className={cn('-mx-1 my-1 h-px bg-border', className)} {...props} />
 }
 
 export {

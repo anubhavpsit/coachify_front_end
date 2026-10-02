@@ -48,7 +48,7 @@ export default function FileDropzone({ value, onChange, accept, hint, invalid, d
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-2">
+    <div className="flex flex-col gap-2">
       <label
         htmlFor={inputId}
         onDragOver={(e) => {
@@ -58,17 +58,17 @@ export default function FileDropzone({ value, onChange, accept, hint, invalid, d
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
         className={cn(
-          'tw:m-0 tw:flex tw:cursor-pointer tw:flex-col tw:items-center tw:gap-1.5 tw:rounded-lg tw:border-2 tw:border-dashed tw:border-input tw:bg-muted/40 tw:px-4 tw:py-5 tw:text-center tw:transition-colors',
-          dragging && 'tw:border-primary tw:bg-primary-soft/60',
-          invalid && 'tw:border-destructive',
-          disabled && 'tw:cursor-not-allowed tw:opacity-50',
+          'm-0 flex cursor-pointer flex-col items-center gap-1.5 rounded-lg border-2 border-dashed border-input bg-muted/40 px-4 py-5 text-center transition-colors',
+          dragging && 'border-primary bg-primary-soft/60',
+          invalid && 'border-destructive',
+          disabled && 'cursor-not-allowed opacity-50',
         )}
       >
-        <Upload className="tw:size-5 tw:text-muted-foreground" aria-hidden="true" />
-        <span className="tw:text-sm tw:font-medium tw:text-foreground">
-          Drop a file here or <span className="tw:text-primary">browse</span>
+        <Upload className="size-5 text-muted-foreground" aria-hidden="true" />
+        <span className="text-sm font-medium text-foreground">
+          Drop a file here or <span className="text-primary">browse</span>
         </span>
-        {hint && <span className="tw:text-xs tw:text-muted-foreground">{hint}</span>}
+        {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
         <input
           ref={inputRef}
           id={inputId}
@@ -77,7 +77,7 @@ export default function FileDropzone({ value, onChange, accept, hint, invalid, d
           disabled={disabled}
           aria-invalid={invalid || undefined}
           aria-describedby={describedBy}
-          className="tw:sr-only"
+          className="sr-only"
           onChange={(e) => {
             onChange(e.target.files?.[0] ?? null)
             e.target.value = '' // allow re-picking the same file
@@ -92,18 +92,18 @@ export default function FileDropzone({ value, onChange, accept, hint, invalid, d
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="tw:flex tw:items-center tw:gap-3 tw:rounded-lg tw:border tw:border-solid tw:border-border tw:bg-card tw:p-2"
+            className="flex items-center gap-3 rounded-lg border border-solid border-border bg-card p-2"
           >
             {preview ? (
-              <img src={preview} alt="" className="tw:size-12 tw:rounded-md tw:object-cover" />
+              <img src={preview} alt="" className="size-12 rounded-md object-cover" />
             ) : (
-              <span className="tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-md tw:bg-muted tw:text-muted-foreground">
-                <FileText className="tw:size-5" aria-hidden="true" />
+              <span className="flex size-12 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                <FileText className="size-5" aria-hidden="true" />
               </span>
             )}
-            <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-              <span className="tw:truncate tw:text-sm tw:font-medium tw:text-foreground">{value.name}</span>
-              <span className="tw:text-xs tw:text-muted-foreground">{formatSize(value.size)}</span>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-sm font-medium text-foreground">{value.name}</span>
+              <span className="text-xs text-muted-foreground">{formatSize(value.size)}</span>
             </div>
             <Button type="button" variant="ghost" size="icon-sm" onClick={() => onChange(null)} aria-label={`Remove ${value.name}`}>
               <X aria-hidden="true" />

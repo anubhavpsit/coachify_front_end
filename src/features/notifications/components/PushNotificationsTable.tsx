@@ -43,10 +43,10 @@ function SortHead({ label, column, props }: { label: string; column: SortBy; pro
       <button
         type="button"
         onClick={() => props.onSort(column, active && props.sortDirection === 'desc' ? 'asc' : 'desc')}
-        className="tw:m-0 tw:inline-flex tw:cursor-pointer tw:items-center tw:gap-1 tw:border-0 tw:bg-transparent tw:p-0 tw:text-inherit tw:uppercase tw:outline-none tw:hover:text-foreground tw:focus-visible:underline"
+        className="m-0 inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-inherit uppercase outline-none hover:text-foreground focus-visible:underline"
       >
         {label}
-        <Icon className={active ? 'tw:size-3.5 tw:text-foreground' : 'tw:size-3.5 tw:opacity-50'} aria-hidden="true" />
+        <Icon className={active ? 'size-3.5 text-foreground' : 'size-3.5 opacity-50'} aria-hidden="true" />
       </button>
     </TableHead>
   )
@@ -129,7 +129,7 @@ export default function PushNotificationsTable(props: Props) {
             Array.from({ length: 5 }, (_, i) => (
               <TableRow key={i}>
                 <TableCell colSpan={10}>
-                  <Skeleton className="tw:h-8" />
+                  <Skeleton className="h-8" />
                 </TableCell>
               </TableRow>
             ))}
@@ -137,7 +137,7 @@ export default function PushNotificationsTable(props: Props) {
             <TableRow>
               <TableCell colSpan={10}>
                 {error ? (
-                  <p className="tw:m-0 tw:py-4 tw:text-center tw:text-sm tw:text-destructive" role="alert">
+                  <p className="m-0 py-4 text-center text-sm text-destructive" role="alert">
                     {error}
                   </p>
                 ) : (
@@ -150,37 +150,37 @@ export default function PushNotificationsTable(props: Props) {
             const status = n.status.toLowerCase()
             return (
               <TableRow key={n.id}>
-                <TableCell className="tw:max-w-72 tw:whitespace-normal">
-                  <div className="tw:truncate tw:font-semibold">{n.title}</div>
-                  <div className="tw:text-xs tw:text-muted-foreground">{truncate(n.body)}</div>
+                <TableCell className="max-w-72 whitespace-normal">
+                  <div className="truncate font-semibold">{n.title}</div>
+                  <div className="text-xs text-muted-foreground">{truncate(n.body)}</div>
                 </TableCell>
                 <TableCell>
-                  <div className="tw:font-medium">{n.recipient?.name ?? `User #${n.sent_to}`}</div>
-                  <div className="tw:text-xs tw:capitalize tw:text-muted-foreground">{n.recipient?.role ?? 'unknown'}</div>
+                  <div className="font-medium">{n.recipient?.name ?? `User #${n.sent_to}`}</div>
+                  <div className="text-xs capitalize text-muted-foreground">{n.recipient?.role ?? 'unknown'}</div>
                 </TableCell>
                 <TableCell>
-                  <div className="tw:font-medium">{n.sender?.name ?? 'System'}</div>
-                  <div className="tw:text-xs tw:capitalize tw:text-muted-foreground">{n.sender?.role ?? 'automated'}</div>
+                  <div className="font-medium">{n.sender?.name ?? 'System'}</div>
+                  <div className="text-xs capitalize text-muted-foreground">{n.sender?.role ?? 'automated'}</div>
                 </TableCell>
-                <TableCell className="tw:capitalize">{n.type.replace(/_/g, ' ')}</TableCell>
+                <TableCell className="capitalize">{n.type.replace(/_/g, ' ')}</TableCell>
                 <TableCell>
-                  <Badge variant={STATUS_VARIANT[status] ?? 'secondary'} className="tw:capitalize">
+                  <Badge variant={STATUS_VARIANT[status] ?? 'secondary'} className="capitalize">
                     {status.replace('_', ' ')}
                   </Badge>
                 </TableCell>
-                <TableCell className="tw:tabular-nums">
+                <TableCell className="tabular-nums">
                   {n.attempts}/{n.max_attempts}
                 </TableCell>
-                <TableCell className="tw:text-muted-foreground">{formatDateTime(n.created_at)}</TableCell>
-                <TableCell className="tw:text-muted-foreground">{formatDateTime(n.sent_at)}</TableCell>
-                <TableCell className="tw:max-w-56 tw:whitespace-normal tw:text-xs tw:text-destructive">{truncate(n.last_error, 80)}</TableCell>
+                <TableCell className="text-muted-foreground">{formatDateTime(n.created_at)}</TableCell>
+                <TableCell className="text-muted-foreground">{formatDateTime(n.sent_at)}</TableCell>
+                <TableCell className="max-w-56 whitespace-normal text-xs text-destructive">{truncate(n.last_error, 80)}</TableCell>
                 <TableCell>
                   {status === 'sent' ? (
-                    <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:text-success" title="Already delivered">
-                      <CheckCircle2 className="tw:size-4" aria-hidden="true" /> Sent
+                    <span className="inline-flex items-center gap-1 text-sm text-success" title="Already delivered">
+                      <CheckCircle2 className="size-4" aria-hidden="true" /> Sent
                     </span>
                   ) : (
-                    <div className="tw:flex tw:gap-2">
+                    <div className="flex gap-2">
                       <Button variant="outline" size="sm" loading={busyId === n.id} disabled={busyId === n.id} onClick={() => void send(n.id)}>
                         {busyId !== n.id && <Send aria-hidden="true" />}
                         {busyId === n.id ? 'Sending...' : 'Send now'}
@@ -188,7 +188,7 @@ export default function PushNotificationsTable(props: Props) {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="tw:border-destructive/40 tw:text-destructive tw:hover:bg-destructive-soft tw:hover:text-destructive"
+                        className="border-destructive/40 text-destructive hover:bg-destructive-soft hover:text-destructive"
                         disabled={busyId === n.id}
                         onClick={() => setCancelling(n)}
                       >
@@ -204,11 +204,11 @@ export default function PushNotificationsTable(props: Props) {
         </TableBody>
       </Table>
       {loading && records.length > 0 && (
-        <div className="tw:p-4" role="status" aria-label="Loading more notifications">
-          <Skeleton className="tw:h-8" />
+        <div className="p-4" role="status" aria-label="Loading more notifications">
+          <Skeleton className="h-8" />
         </div>
       )}
-      <div ref={sentinelRef} className="tw:h-px" />
+      <div ref={sentinelRef} className="h-px" />
       <ConfirmDialog
         open={!!cancelling}
         onOpenChange={(open) => !open && setCancelling(null)}

@@ -12,12 +12,12 @@ interface Props {
 
 export default function Pagination({ page, lastPage, total, itemLabel = 'items', disabled, onPageChange }: Props) {
   return (
-    <nav aria-label="Pagination" className="tw:flex tw:items-center tw:justify-between tw:gap-3">
+    <nav aria-label="Pagination" className="flex items-center justify-between gap-3">
       <Button variant="outline" size="sm" disabled={page <= 1 || disabled} onClick={() => onPageChange(Math.max(1, page - 1))}>
         <ChevronLeft aria-hidden="true" />
         Previous
       </Button>
-      <p className="tw:m-0 tw:text-center tw:text-sm tw:text-muted-foreground" aria-live="polite">
+      <p className="m-0 text-center text-sm text-muted-foreground" aria-live="polite">
         Page {page} of {lastPage}
         {total !== undefined && ` · ${total} ${itemLabel}`}
       </p>

@@ -60,7 +60,7 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
       submitLabel="Create"
       submittingLabel="Saving..."
       error={error}
-      className="tw:sm:max-w-xl"
+      className="sm:max-w-xl"
     >
       <FormField
         control={form.control}
@@ -75,7 +75,7 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
           </FormItem>
         )}
       />
-      <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="subject_id"
@@ -126,7 +126,7 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
               <FormControl>
                 <Input type="number" inputMode="numeric" min={1} max={1000} step={1} placeholder="e.g. 50" {...field} />
               </FormControl>
-              <div className="tw:flex tw:flex-wrap tw:gap-1.5" role="group" aria-label="Common totals">
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Common totals">
                 {QUICK_MARKS.map((m) => (
                   <button
                     key={m}
@@ -135,8 +135,8 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
                     onClick={() => form.setValue('total_marks', String(m), { shouldDirty: true, shouldValidate: true })}
                     className={
                       marks === String(m)
-                        ? 'tw:m-0 tw:cursor-pointer tw:rounded-full tw:border tw:border-solid tw:border-primary tw:bg-primary-soft tw:px-2.5 tw:py-0.5 tw:text-xs tw:font-medium tw:text-primary'
-                        : 'tw:m-0 tw:cursor-pointer tw:rounded-full tw:border tw:border-solid tw:border-border tw:bg-transparent tw:px-2.5 tw:py-0.5 tw:text-xs tw:text-muted-foreground tw:hover:bg-muted'
+                        ? 'm-0 cursor-pointer rounded-full border border-solid border-primary bg-primary-soft px-2.5 py-0.5 text-xs font-medium text-primary'
+                        : 'm-0 cursor-pointer rounded-full border border-solid border-border bg-transparent px-2.5 py-0.5 text-xs text-muted-foreground hover:bg-muted'
                     }
                   >
                     {m}
@@ -167,9 +167,9 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
         name="description"
         render={({ field }) => (
           <FormItem>
-            <div className="tw:flex tw:items-baseline tw:justify-between">
+            <div className="flex items-baseline justify-between">
               <FormLabel>Description</FormLabel>
-              <span className="tw:text-xs tw:text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {description.length}/{DESCRIPTION_MAX}
               </span>
             </div>

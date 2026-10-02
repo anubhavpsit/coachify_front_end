@@ -48,11 +48,11 @@ export default function EntryCard(p: Props) {
   const prefix = `entries.${index}` as const
 
   return (
-    <Card className={cn('tw:gap-4 tw:transition-shadow', hasErrors && 'tw:border-destructive/50 tw:ring-2 tw:ring-destructive/15')}>
-      <CardHeader className="tw:flex tw:flex-row tw:flex-wrap tw:items-center tw:gap-2">
-        <span className="tw:flex tw:size-8 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary-soft tw:text-sm tw:font-bold tw:text-primary">{index + 1}</span>
-        <CardTitle className="tw:min-w-0 tw:flex-1 tw:truncate">{student ? student.name : 'New entry'}</CardTitle>
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
+    <Card className={cn('gap-4 transition-shadow', hasErrors && 'border-destructive/50 ring-2 ring-destructive/15')}>
+      <CardHeader className="flex flex-row flex-wrap items-center gap-2">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-bold text-primary">{index + 1}</span>
+        <CardTitle className="min-w-0 flex-1 truncate">{student ? student.name : 'New entry'}</CardTitle>
+        <div className="flex flex-wrap items-center gap-1.5">
           {id && p.review && <ReviewBadge review={p.review} />}
           {!id ? <Badge variant="secondary">Not saved</Badge> : dirty ? <Badge variant="warning">Unsaved changes</Badge> : null}
           <IconAction label={`Copy entry ${index + 1} for another student`} onClick={p.onDuplicate}>
@@ -63,10 +63,10 @@ export default function EntryCard(p: Props) {
           </IconAction>
         </div>
       </CardHeader>
-      <CardContent className="tw:flex tw:flex-col tw:gap-4">
+      <CardContent className="flex flex-col gap-4">
         {id && p.review && <AdminFeedback review={p.review} />}
 
-        <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <FormField
             control={form.control}
             name={`${prefix}.student_id`}
@@ -100,21 +100,21 @@ export default function EntryCard(p: Props) {
               <FormItem>
                 <FormLabel required>Subject</FormLabel>
                 {studentId === '' ? (
-                  <p className="tw:m-0 tw:flex tw:h-10 tw:items-center tw:gap-2 tw:text-sm tw:text-muted-foreground">
-                    <GraduationCap className="tw:size-4" aria-hidden="true" /> Choose a student to see their subjects.
+                  <p className="m-0 flex h-10 items-center gap-2 text-sm text-muted-foreground">
+                    <GraduationCap className="size-4" aria-hidden="true" /> Choose a student to see their subjects.
                   </p>
                 ) : p.subjects === 'loading' || p.subjects === undefined ? (
-                  <div className="tw:flex tw:h-10 tw:items-center tw:gap-2" role="status" aria-label="Loading subjects">
-                    <Skeleton className="tw:h-8 tw:w-24 tw:rounded-full" />
-                    <Skeleton className="tw:h-8 tw:w-20 tw:rounded-full" />
+                  <div className="flex h-10 items-center gap-2" role="status" aria-label="Loading subjects">
+                    <Skeleton className="h-8 w-24 rounded-full" />
+                    <Skeleton className="h-8 w-20 rounded-full" />
                   </div>
                 ) : p.subjects === 'error' ? (
-                  <p className="tw:m-0 tw:flex tw:h-10 tw:items-center tw:text-sm tw:text-destructive">Couldn&apos;t load this student&apos;s subjects. Pick the student again.</p>
+                  <p className="m-0 flex h-10 items-center text-sm text-destructive">Couldn&apos;t load this student&apos;s subjects. Pick the student again.</p>
                 ) : subjectList.length === 0 ? (
-                  <p className="tw:m-0 tw:flex tw:h-10 tw:items-center tw:text-sm tw:text-muted-foreground">This student has no subjects assigned.</p>
+                  <p className="m-0 flex h-10 items-center text-sm text-muted-foreground">This student has no subjects assigned.</p>
                 ) : (
                   <FormControl>
-                    <div role="radiogroup" aria-label="Subject" className="tw:flex tw:min-h-10 tw:flex-wrap tw:items-center tw:gap-2">
+                    <div role="radiogroup" aria-label="Subject" className="flex min-h-10 flex-wrap items-center gap-2">
                       {subjectList.map((s) => {
                         const on = field.value === s.id
                         return (
@@ -126,8 +126,8 @@ export default function EntryCard(p: Props) {
                             disabled={p.disabled}
                             onClick={() => p.onSubjectChange(on ? '' : s.id)}
                             className={cn(
-                              'tw:m-0 tw:cursor-pointer tw:rounded-full tw:border tw:border-solid tw:px-3 tw:py-1.5 tw:text-sm tw:font-medium tw:transition-colors tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50',
-                              on ? 'tw:border-primary tw:bg-primary tw:text-primary-foreground' : 'tw:border-input tw:bg-transparent tw:text-foreground tw:hover:bg-muted',
+                              'm-0 cursor-pointer rounded-full border border-solid px-3 py-1.5 text-sm font-medium transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                              on ? 'border-primary bg-primary text-primary-foreground' : 'border-input bg-transparent text-foreground hover:bg-muted',
                             )}
                           >
                             {s.subject}
@@ -151,8 +151,8 @@ export default function EntryCard(p: Props) {
           disabled={p.disabled}
         />
 
-        <div className="tw:flex tw:flex-col tw:gap-2">
-          <span className="tw:text-sm tw:font-medium tw:text-foreground">Attachments</span>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-foreground">Attachments</span>
           <AttachmentChips attachments={p.attachments} onPreview={p.onPreview} onDelete={p.onDeleteAttachment} canDelete={p.canDeleteAttachments} deletingId={p.deletingAttachmentId} />
           <FilePicker
             onFiles={p.onUpload}

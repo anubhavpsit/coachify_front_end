@@ -12,7 +12,7 @@ export function IconAction({ label, onClick, children, destructive }: { label: s
           size="icon-sm"
           aria-label={label}
           onClick={onClick}
-          className={destructive ? 'tw:text-destructive tw:hover:bg-destructive-soft tw:hover:text-destructive' : undefined}
+          className={destructive ? 'text-destructive hover:bg-destructive-soft hover:text-destructive' : undefined}
         >
           {children}
         </Button>
@@ -25,7 +25,7 @@ export function IconAction({ label, onClick, children, destructive }: { label: s
 /** Edit / Delete icon buttons with tooltips and accessible names (the legacy ones had none). */
 export default function RowActions({ name, onEdit, onDelete }: { name: string; onEdit?: () => void; onDelete?: () => void }) {
   return (
-    <div className="tw:flex tw:items-center tw:justify-end tw:gap-1">
+    <div className="flex items-center justify-end gap-1">
       {onEdit && (
         <IconAction label={`Edit ${name}`} onClick={onEdit}>
           <Pencil aria-hidden="true" />

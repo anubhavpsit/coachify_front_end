@@ -60,22 +60,22 @@ export default function UserProfileDialog({ userId, show, onHide, canEditImage }
 
   return (
     <Dialog open={show} onOpenChange={(o) => !o && onHide()}>
-      <DialogContent className="tw:gap-5 tw:sm:max-w-4xl">
+      <DialogContent className="gap-5 sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>User Profile</DialogTitle>
-          <DialogDescription className="tw:sr-only">Profile details</DialogDescription>
+          <DialogDescription className="sr-only">Profile details</DialogDescription>
         </DialogHeader>
 
         {profile.loading || !user ? (
-          <div className="tw:flex tw:flex-col tw:gap-4" role="status" aria-label="Loading profile">
-            <div className="tw:flex tw:items-center tw:gap-4">
-              <Skeleton className="tw:size-16 tw:rounded-full" />
-              <div className="tw:flex tw:flex-1 tw:flex-col tw:gap-2">
-                <Skeleton className="tw:h-5 tw:w-40" />
-                <Skeleton className="tw:h-4 tw:w-60" />
+          <div className="flex flex-col gap-4" role="status" aria-label="Loading profile">
+            <div className="flex items-center gap-4">
+              <Skeleton className="size-16 rounded-full" />
+              <div className="flex flex-1 flex-col gap-2">
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-4 w-60" />
               </div>
             </div>
-            <Skeleton className="tw:h-32" />
+            <Skeleton className="h-32" />
           </div>
         ) : (
           <>

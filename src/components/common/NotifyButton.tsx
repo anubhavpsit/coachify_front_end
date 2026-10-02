@@ -19,14 +19,14 @@ export default function NotifyButton({ state, onClick, title }: { state: NotifyS
       onClick={onClick}
       title={title}
       className={cn(
-        'tw:min-w-24',
-        state === 'sent' && 'tw:bg-success-soft tw:text-success tw:disabled:opacity-100',
-        state === 'error' && 'tw:border-destructive/40 tw:text-destructive',
+        'min-w-24',
+        state === 'sent' && 'bg-success-soft text-success disabled:opacity-100',
+        state === 'error' && 'border-destructive/40 text-destructive',
       )}
     >
       <AnimatePresence mode="wait" initial={false}>
         {state === 'sent' ? (
-          <m.span key="sent" variants={pop} initial="hidden" animate="visible" className="tw:inline-flex">
+          <m.span key="sent" variants={pop} initial="hidden" animate="visible" className="inline-flex">
             <Check aria-hidden="true" />
           </m.span>
         ) : state === 'error' ? (

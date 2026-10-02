@@ -36,7 +36,7 @@ interface Props {
 export default function QuestionPaperDialog({ assessmentId, onClose, onChanged }: Props) {
   return (
     <Dialog open={assessmentId !== null} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="tw:sm:max-w-3xl">{assessmentId !== null && <PaperBody key={assessmentId} id={assessmentId} onClose={onClose} onChanged={onChanged} />}</DialogContent>
+      <DialogContent className="sm:max-w-3xl">{assessmentId !== null && <PaperBody key={assessmentId} id={assessmentId} onClose={onClose} onChanged={onChanged} />}</DialogContent>
     </Dialog>
   )
 }
@@ -119,7 +119,7 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <DialogTitle className="flex flex-wrap items-center gap-2">
           Question paper {paper && <Badge variant={STATUS[paper.status].variant}>{STATUS[paper.status].label}</Badge>}
         </DialogTitle>
         <DialogDescription>
@@ -135,9 +135,9 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
       </DialogHeader>
 
       {loading && !paper ? (
-        <div className="tw:flex tw:flex-col tw:gap-2" role="status" aria-label="Loading question paper">
-          <Skeleton className="tw:h-16" />
-          <Skeleton className="tw:h-16" />
+        <div className="flex flex-col gap-2" role="status" aria-label="Loading question paper">
+          <Skeleton className="h-16" />
+          <Skeleton className="h-16" />
         </div>
       ) : error ? (
         <Alert variant="destructive">
@@ -145,7 +145,7 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : paper ? (
-        <div className="tw:flex tw:max-h-[60vh] tw:flex-col tw:gap-3 tw:overflow-y-auto tw:pr-1">
+        <div className="flex max-h-[60vh] flex-col gap-3 overflow-y-auto pr-1">
           {readOnly && (
             <Alert>
               <Info aria-hidden="true" />
@@ -153,12 +153,12 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
             </Alert>
           )}
 
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-            <span className={cn('tw:rounded-full tw:px-2.5 tw:py-1 tw:text-xs tw:font-semibold tw:tabular-nums', sum === paper.total_marks ? 'tw:bg-success-soft tw:text-success' : 'tw:bg-warning-soft tw:text-warning')}>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={cn('rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums', sum === paper.total_marks ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning')}>
               {sum}/{paper.total_marks} marks
             </span>
-            {sum !== paper.total_marks && paper.questions.length > 0 && <span className="tw:text-xs tw:text-muted-foreground">Question marks don&apos;t add up to the total yet.</span>}
-            <div className="tw:ml-auto tw:flex tw:flex-wrap tw:gap-2">
+            {sum !== paper.total_marks && paper.questions.length > 0 && <span className="text-xs text-muted-foreground">Question marks don&apos;t add up to the total yet.</span>}
+            <div className="ml-auto flex flex-wrap gap-2">
               {!readOnly && (
                 <Button size="sm" variant="outline" onClick={() => setAdding((v) => !v)} aria-expanded={adding}>
                   <Plus aria-hidden="true" /> {adding ? 'Close' : 'Add questions'}
@@ -190,40 +190,40 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
           )}
 
           {paper.questions.length === 0 ? (
-            <EmptyState icon={Plus} title="No questions on this paper yet." description="Use “Add questions” to build it." className="tw:py-6" />
+            <EmptyState icon={Plus} title="No questions on this paper yet." description="Use “Add questions” to build it." className="py-6" />
           ) : (
-            <ol className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:divide-y tw:divide-border tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-0">
+            <ol className="m-0 flex list-none flex-col divide-y divide-border rounded-lg border border-solid border-border p-0">
               {paper.questions.map((q, i) => {
                 const problem = marksProblem(marks[q.id] ?? '')
                 return (
-                  <li key={q.id} className="tw:flex tw:gap-3 tw:p-3">
-                    <span className="tw:w-6 tw:shrink-0 tw:pt-0.5 tw:text-right tw:text-sm tw:font-semibold tw:text-muted-foreground">{i + 1}.</span>
-                    <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-2">
+                  <li key={q.id} className="flex gap-3 p-3">
+                    <span className="w-6 shrink-0 pt-0.5 text-right text-sm font-semibold text-muted-foreground">{i + 1}.</span>
+                    <div className="flex min-w-0 flex-1 flex-col gap-2">
                       <QuestionBody q={q} />
-                      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         {q.difficulty && (
-                          <Badge variant="secondary" className="tw:capitalize">
+                          <Badge variant="secondary" className="capitalize">
                             {q.difficulty}
                           </Badge>
                         )}
-                        <label className="tw:m-0 tw:flex tw:items-center tw:gap-1.5 tw:text-xs tw:text-muted-foreground">
+                        <label className="m-0 flex items-center gap-1.5 text-xs text-muted-foreground">
                           Marks
                           <Input
                             type="number"
                             min={1}
                             max={100}
-                            className="tw:h-8 tw:w-20"
+                            className="h-8 w-20"
                             disabled={readOnly}
                             value={marks[q.id] ?? ''}
                             aria-invalid={!!problem || undefined}
                             onChange={(e) => setMarks((m) => ({ ...m, [q.id]: e.target.value }))}
                           />
                         </label>
-                        {problem && <span className="tw:text-xs tw:text-destructive">Marks must be a whole number from 1 to 100.</span>}
+                        {problem && <span className="text-xs text-destructive">Marks must be a whole number from 1 to 100.</span>}
                       </div>
                     </div>
                     {!readOnly && (
-                      <Button size="icon-sm" variant="ghost" className="tw:text-destructive tw:hover:bg-destructive-soft" disabled={busy} aria-label={`Remove question ${i + 1}`} onClick={() => setConfirm({ kind: 'remove', q, n: i + 1 })}>
+                      <Button size="icon-sm" variant="ghost" className="text-destructive hover:bg-destructive-soft" disabled={busy} aria-label={`Remove question ${i + 1}`} onClick={() => setConfirm({ kind: 'remove', q, n: i + 1 })}>
                         <Trash2 aria-hidden="true" />
                       </Button>
                     )}
@@ -235,7 +235,7 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
         </div>
       ) : null}
 
-      <DialogFooter className="tw:flex-wrap">
+      <DialogFooter className="flex-wrap">
         {paper && paper.questions.length > 0 && (
           <Button variant="outline" onClick={print} disabled={busy}>
             <Printer aria-hidden="true" /> Print / Download PDF
@@ -310,13 +310,13 @@ function AddQuestionsPanel({ id, busy, onAdd }: { id: number; busy: boolean; onA
   const chosen = useMemo(() => (items ?? []).filter((x) => selected.has(x.id)).map((x) => x.id), [items, selected])
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-2 tw:rounded-lg tw:border tw:border-solid tw:border-primary/30 tw:bg-primary-soft/30 tw:p-3">
-      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <div className="tw:relative tw:min-w-48 tw:flex-1">
-          <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-          <Input className="tw:h-9 tw:pl-9" placeholder="Search question text…" aria-label="Search questions" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} />
+    <div className="flex flex-col gap-2 rounded-lg border border-solid border-primary/30 bg-primary-soft/30 p-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative min-w-48 flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <Input className="h-9 pl-9" placeholder="Search question text…" aria-label="Search questions" value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} />
         </div>
-        <NativeSelect size="sm" aria-label="Difficulty" className="tw:w-36" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+        <NativeSelect size="sm" aria-label="Difficulty" className="w-36" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
           <option value="">Any difficulty</option>
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
@@ -330,16 +330,16 @@ function AddQuestionsPanel({ id, busy, onAdd }: { id: number; busy: boolean; onA
         </Button>
       </div>
       {items === null ? (
-        <Skeleton className="tw:h-16" />
+        <Skeleton className="h-16" />
       ) : items.length === 0 ? (
-        <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">No more questions available for this topic.</p>
+        <p className="m-0 text-sm text-muted-foreground">No more questions available for this topic.</p>
       ) : (
-        <ul className="tw:m-0 tw:max-h-60 tw:list-none tw:divide-y tw:divide-border tw:overflow-y-auto tw:rounded-md tw:border tw:border-solid tw:border-border tw:bg-card tw:p-0">
+        <ul className="m-0 max-h-60 list-none divide-y divide-border overflow-y-auto rounded-md border border-solid border-border bg-card p-0">
           {items.map((x) => (
             <li key={x.id}>
-              <label className="tw:m-0 tw:flex tw:cursor-pointer tw:items-start tw:gap-3 tw:px-3 tw:py-2 tw:hover:bg-muted/50">
+              <label className="m-0 flex cursor-pointer items-start gap-3 px-3 py-2 hover:bg-muted/50">
                 <Checkbox
-                  className="tw:mt-0.5"
+                  className="mt-0.5"
                   checked={selected.has(x.id)}
                   onCheckedChange={(v) =>
                     setSelected((prev) => {
@@ -351,10 +351,10 @@ function AddQuestionsPanel({ id, busy, onAdd }: { id: number; busy: boolean; onA
                   }
                   aria-label={`Select question: ${stripHtml(x.question_html).slice(0, 60)}`}
                 />
-                <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1">
+                <div className="flex min-w-0 flex-1 flex-col gap-1">
                   <QuestionBody q={x} />
                   {x.difficulty && (
-                    <Badge variant="secondary" className="tw:w-fit tw:capitalize">
+                    <Badge variant="secondary" className="w-fit capitalize">
                       {x.difficulty}
                     </Badge>
                   )}

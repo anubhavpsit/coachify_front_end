@@ -15,17 +15,17 @@ const REEL_H = 'calc(100dvh - 116px)'
 
 function Skeleton() {
   return (
-    <div className="tw:flex tw:h-full tw:flex-none tw:items-center tw:justify-center tw:bg-neutral-950 tw:px-4 tw:py-3" aria-hidden="true">
-      <div className="tw:relative tw:h-full tw:w-full tw:max-w-[400px] tw:animate-pulse tw:overflow-hidden tw:rounded-[20px] tw:bg-[#1a1a2e] tw:motion-reduce:animate-none">
-        <div className="tw:absolute tw:right-4 tw:bottom-28 tw:flex tw:flex-col tw:gap-4">
+    <div className="flex h-full flex-none items-center justify-center bg-neutral-950 px-4 py-3" aria-hidden="true">
+      <div className="relative h-full w-full max-w-[400px] animate-pulse overflow-hidden rounded-[20px] bg-[#1a1a2e] motion-reduce:animate-none">
+        <div className="absolute right-4 bottom-28 flex flex-col gap-4">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="tw:size-11 tw:rounded-full tw:bg-white/10" />
+            <div key={i} className="size-11 rounded-full bg-white/10" />
           ))}
         </div>
-        <div className="tw:absolute tw:bottom-0 tw:left-0 tw:right-20 tw:flex tw:flex-col tw:gap-3 tw:p-6">
-          <div className="tw:h-3 tw:w-2/5 tw:rounded-full tw:bg-white/10" />
-          <div className="tw:h-5 tw:w-4/5 tw:rounded-md tw:bg-white/10" />
-          <div className="tw:h-3.5 tw:w-full tw:rounded-md tw:bg-white/10" />
+        <div className="absolute bottom-0 left-0 right-20 flex flex-col gap-3 p-6">
+          <div className="h-3 w-2/5 rounded-full bg-white/10" />
+          <div className="h-5 w-4/5 rounded-md bg-white/10" />
+          <div className="h-3.5 w-full rounded-md bg-white/10" />
         </div>
       </div>
     </div>
@@ -156,10 +156,10 @@ export default function FactsPage() {
   ]
 
   return (
-    <div className="tw:-m-4 tw:overflow-hidden tw:md:-m-6">
-      <div className="tw:flex tw:h-[52px] tw:items-center tw:gap-1.5 tw:overflow-x-auto tw:border-b tw:border-solid tw:border-border tw:bg-card tw:px-4">
-        <h1 className="tw:sr-only">Facts</h1>
-        <div role="tablist" aria-label="Facts feed" className="tw:flex tw:gap-1.5">
+    <div className="-m-4 overflow-hidden md:-m-6">
+      <div className="flex h-[52px] items-center gap-1.5 overflow-x-auto border-b border-solid border-border bg-card px-4">
+        <h1 className="sr-only">Facts</h1>
+        <div role="tablist" aria-label="Facts feed" className="flex gap-1.5">
           {tabs
             .filter((t) => t.show)
             .map((t) => (
@@ -170,45 +170,45 @@ export default function FactsPage() {
                 aria-selected={tab === t.key}
                 onClick={() => setTab(t.key)}
                 className={cn(
-                  'tw:m-0 tw:inline-flex tw:cursor-pointer tw:items-center tw:gap-1.5 tw:rounded-full tw:border-0 tw:px-4 tw:py-1.5 tw:text-[13px] tw:whitespace-nowrap tw:transition-colors tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50',
-                  tab === t.key ? 'tw:bg-primary tw:font-bold tw:text-primary-foreground' : 'tw:bg-muted tw:font-medium tw:text-foreground tw:hover:bg-muted/70',
+                  'm-0 inline-flex cursor-pointer items-center gap-1.5 rounded-full border-0 px-4 py-1.5 text-[13px] whitespace-nowrap transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                  tab === t.key ? 'bg-primary font-bold text-primary-foreground' : 'bg-muted font-medium text-foreground hover:bg-muted/70',
                 )}
               >
-                <t.icon className="tw:size-3.5" aria-hidden="true" /> {t.label}
+                <t.icon className="size-3.5" aria-hidden="true" /> {t.label}
               </button>
             ))}
         </div>
         {isCoachingAdmin && (
           <Link
             to="/admin/facts"
-            className="tw:ml-auto tw:inline-flex tw:items-center tw:gap-1.5 tw:rounded-full tw:bg-muted tw:px-3.5 tw:py-1.5 tw:text-[13px] tw:font-medium tw:whitespace-nowrap tw:text-foreground tw:no-underline tw:hover:bg-muted/70"
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-muted px-3.5 py-1.5 text-[13px] font-medium whitespace-nowrap text-foreground no-underline hover:bg-muted/70"
           >
-            <Settings className="tw:size-3.5" aria-hidden="true" /> Manage
+            <Settings className="size-3.5" aria-hidden="true" /> Manage
           </Link>
         )}
       </div>
 
       {error && (
-        <p role="alert" className="tw:m-0 tw:bg-destructive-soft tw:px-4 tw:py-2.5 tw:text-sm tw:text-destructive">
+        <p role="alert" className="m-0 bg-destructive-soft px-4 py-2.5 text-sm text-destructive">
           {error}
         </p>
       )}
 
-      <div className="tw:flex tw:snap-y tw:snap-mandatory tw:flex-col tw:overflow-y-scroll tw:[scrollbar-width:none]" style={{ height: REEL_H }}>
+      <div className="flex snap-y snap-mandatory flex-col overflow-y-scroll [scrollbar-width:none]" style={{ height: REEL_H }}>
         {loading ? (
           [0, 1].map((i) => (
-            <div key={i} className="tw:flex-none" style={{ height: REEL_H }}>
+            <div key={i} className="flex-none" style={{ height: REEL_H }}>
               <Skeleton />
             </div>
           ))
         ) : facts.length === 0 && !error ? (
-          <div className="tw:flex tw:flex-col tw:items-center tw:justify-center tw:gap-3 tw:text-muted-foreground" style={{ height: REEL_H }}>
-            <FileText className="tw:size-8" aria-hidden="true" />
-            <span className="tw:text-[15px]">{tab === 'saved' ? 'No saved facts yet — tap the bookmark on any fact.' : 'No facts found.'}</span>
+          <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground" style={{ height: REEL_H }}>
+            <FileText className="size-8" aria-hidden="true" />
+            <span className="text-[15px]">{tab === 'saved' ? 'No saved facts yet — tap the bookmark on any fact.' : 'No facts found.'}</span>
           </div>
         ) : (
           facts.map((f, i) => (
-            <div key={f.id} className="tw:flex-none" style={{ height: REEL_H }}>
+            <div key={f.id} className="flex-none" style={{ height: REEL_H }}>
               <ReelCard
                 fact={f}
                 index={i}
@@ -227,8 +227,8 @@ export default function FactsPage() {
       </div>
 
       {loadingMore && (
-        <div role="status" className="tw:fixed tw:bottom-5 tw:left-1/2 tw:z-50 tw:flex tw:-translate-x-1/2 tw:items-center tw:gap-2 tw:rounded-full tw:bg-black/65 tw:px-4 tw:py-1.5 tw:text-[13px] tw:text-white tw:backdrop-blur">
-          <LoaderCircle className="tw:size-3.5 tw:animate-spin tw:motion-reduce:animate-none" aria-hidden="true" /> Loading more…
+        <div role="status" className="fixed bottom-5 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/65 px-4 py-1.5 text-[13px] text-white backdrop-blur">
+          <LoaderCircle className="size-3.5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> Loading more…
         </div>
       )}
 

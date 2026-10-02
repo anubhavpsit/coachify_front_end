@@ -122,14 +122,14 @@ export default function StaffPage() {
           type="button"
           onClick={() => setViewUserId(row.original.id)}
           title="View profile"
-          className="tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:border-0 tw:bg-transparent tw:p-0 tw:text-left tw:outline-none tw:hover:underline tw:focus-visible:underline"
+          className="m-0 flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left outline-none hover:underline focus-visible:underline"
         >
-          <UserAvatar name={row.original.name} className="tw:size-8" toneClassName="tw:bg-success-soft tw:text-success" />
-          <span className="tw:font-medium tw:text-foreground">{row.original.name}</span>
+          <UserAvatar name={row.original.name} className="size-8" toneClassName="bg-success-soft text-success" />
+          <span className="font-medium text-foreground">{row.original.name}</span>
         </button>
       ),
     },
-    { accessorKey: 'email', header: 'Email', cell: ({ row }) => <span className="tw:text-muted-foreground">{row.original.email}</span> },
+    { accessorKey: 'email', header: 'Email', cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span> },
     {
       id: 'permissions',
       header: 'Permissions',
@@ -137,9 +137,9 @@ export default function StaffPage() {
       accessorFn: (s) => (s.permissions ?? []).map((k) => permissionLabels[k] ?? k).join(' '),
       cell: ({ row }) => {
         const keys = row.original.permissions ?? []
-        if (keys.length === 0) return <span className="tw:text-sm tw:text-muted-foreground">No permissions</span>
+        if (keys.length === 0) return <span className="text-sm text-muted-foreground">No permissions</span>
         return (
-          <div className="tw:flex tw:max-w-md tw:flex-wrap tw:gap-1 tw:whitespace-normal">
+          <div className="flex max-w-md flex-wrap gap-1 whitespace-normal">
             {keys.slice(0, MAX_BADGES).map((key) => (
               <Badge key={key} variant="soft" title={key}>
                 {permissionLabels[key] ?? key}
@@ -156,11 +156,11 @@ export default function StaffPage() {
     },
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">Actions</span>,
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) => (
-        <div className="tw:flex tw:items-center tw:justify-end tw:gap-1">
+        <div className="flex items-center justify-end gap-1">
           <IconAction label={`View ${row.original.name}`} onClick={() => setViewUserId(row.original.id)}>
             <Eye aria-hidden="true" />
           </IconAction>
@@ -182,7 +182,7 @@ export default function StaffPage() {
           </Button>
         }
       />
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+      <Card className="gap-0 overflow-hidden py-0">
         <DataTable
           columns={columns}
           data={staff}
@@ -204,7 +204,7 @@ export default function StaffPage() {
         submitLabel={mode === 'edit' ? 'Update' : 'Save'}
         submittingLabel={mode === 'edit' ? 'Updating...' : 'Saving...'}
         error={formError}
-        className="tw:sm:max-w-2xl"
+        className="sm:max-w-2xl"
       >
         <PersonFields control={form.control as unknown as Control<PersonBase>} mode={mode} />
         <FormField

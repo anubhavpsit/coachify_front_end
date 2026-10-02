@@ -32,14 +32,14 @@ const ICONS: Record<string, LucideIcon> = {
 }
 
 const TONE: Record<OverviewAlert['severity'], string> = {
-  high: 'tw:border-l-destructive tw:bg-destructive-soft',
-  medium: 'tw:border-l-warning tw:bg-warning-soft',
-  info: 'tw:border-l-info tw:bg-info-soft',
+  high: 'border-l-destructive bg-destructive-soft',
+  medium: 'border-l-warning bg-warning-soft',
+  info: 'border-l-info bg-info-soft',
 }
 const ICON_TONE: Record<OverviewAlert['severity'], string> = {
-  high: 'tw:text-destructive',
-  medium: 'tw:text-warning',
-  info: 'tw:text-info',
+  high: 'text-destructive',
+  medium: 'text-warning',
+  info: 'text-info',
 }
 
 /** "What needs attention today" — prioritised by the API (high → info). Same targets as before. */
@@ -50,13 +50,13 @@ export default function DashboardAlerts({ alerts, role }: { alerts: OverviewAler
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="tw:flex tw:items-center tw:gap-2">
-          <Zap className="tw:size-4 tw:text-primary" aria-hidden="true" />
+        <CardTitle className="flex items-center gap-2">
+          <Zap className="size-4 text-primary" aria-hidden="true" />
           Needs your attention
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <m.div className="tw:grid tw:gap-2 tw:md:grid-cols-2 tw:xl:grid-cols-3" variants={stagger(0.05)} initial="hidden" animate="visible">
+        <m.div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3" variants={stagger(0.05)} initial="hidden" animate="visible">
           {alerts.map((a) => {
             const Icon = ICONS[a.icon] ?? Info
             return (
@@ -66,14 +66,14 @@ export default function DashboardAlerts({ alerts, role }: { alerts: OverviewAler
                 type="button"
                 onClick={() => navigate(targetRoute(a.target, role))}
                 className={cn(
-                  'tw:m-0 tw:flex tw:h-full tw:w-full tw:cursor-pointer tw:gap-3 tw:rounded-lg tw:border-0 tw:border-l-4 tw:border-solid tw:p-3 tw:text-left tw:outline-none tw:transition-transform tw:duration-150 tw:hover:-translate-y-0.5 tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50',
+                  'm-0 flex h-full w-full cursor-pointer gap-3 rounded-lg border-0 border-l-4 border-solid p-3 text-left outline-none transition-transform duration-150 hover:-translate-y-0.5 focus-visible:ring-[3px] focus-visible:ring-ring/50',
                   TONE[a.severity],
                 )}
               >
-                <Icon className={cn('tw:mt-0.5 tw:size-5 tw:shrink-0', ICON_TONE[a.severity])} aria-hidden="true" />
-                <span className="tw:flex tw:flex-col tw:gap-0.5">
-                  <span className="tw:text-sm tw:font-semibold tw:text-foreground">{a.title}</span>
-                  <span className="tw:text-xs tw:text-muted-foreground">{a.message}</span>
+                <Icon className={cn('mt-0.5 size-5 shrink-0', ICON_TONE[a.severity])} aria-hidden="true" />
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-sm font-semibold text-foreground">{a.title}</span>
+                  <span className="text-xs text-muted-foreground">{a.message}</span>
                 </span>
               </m.button>
             )

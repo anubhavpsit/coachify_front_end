@@ -24,10 +24,10 @@ function Badge({ count, label, compact }: { count: number; label: string; compac
       animate="visible"
       aria-label={`${count} unread ${label}`}
       className={cn(
-        'tw:rounded-full tw:bg-destructive tw:font-bold tw:text-destructive-foreground',
+        'rounded-full bg-destructive font-bold text-destructive-foreground',
         compact
-          ? 'tw:absolute tw:top-1.5 tw:right-1.5 tw:size-2.5 tw:ring-2 tw:ring-card tw:text-[0px]'
-          : 'tw:relative tw:ml-auto tw:min-w-[1.375rem] tw:h-[1.375rem] tw:px-1.5 tw:text-[11px] tw:leading-[1.375rem] tw:text-center',
+          ? 'absolute top-1.5 right-1.5 size-2.5 ring-2 ring-card text-[0px]'
+          : 'relative ml-auto min-w-[1.375rem] h-[1.375rem] px-1.5 text-[11px] leading-[1.375rem] text-center',
       )}
     >
       {compact ? null : text}

@@ -81,7 +81,7 @@ export default function CatalogCombobox({ value, onChange, search, deps, placeho
   }
 
   return (
-    <div className="tw:relative">
+    <div className="relative">
       <Popover open={open} onOpenChange={(o) => !disabled && setOpen(o)}>
         <PopoverTrigger asChild>
           <button
@@ -94,18 +94,18 @@ export default function CatalogCombobox({ value, onChange, search, deps, placeho
             aria-describedby={aria['aria-describedby']}
             disabled={disabled}
             className={cn(
-              'tw:m-0 tw:flex tw:h-10 tw:w-full tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-md tw:border tw:border-solid tw:border-input tw:bg-transparent tw:pr-9 tw:pl-3 tw:text-left tw:text-sm tw:shadow-xs tw:outline-none tw:transition-[color,box-shadow]',
-              'tw:focus-visible:border-ring tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50 tw:disabled:cursor-not-allowed tw:disabled:opacity-50',
-              'tw:aria-invalid:border-destructive tw:aria-invalid:ring-destructive/20',
+              'm-0 flex h-10 w-full cursor-pointer items-center gap-2 rounded-md border border-solid border-input bg-transparent pr-9 pl-3 text-left text-sm shadow-xs outline-none transition-[color,box-shadow]',
+              'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50',
+              'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
             )}
           >
-            <span className={cn('tw:min-w-0 tw:flex-1 tw:truncate', !value && 'tw:text-muted-foreground')}>{disabled ? disabledHint : value ? value.name : placeholder}</span>
-            {!value && <ChevronsUpDown className="tw:size-4 tw:shrink-0 tw:text-muted-foreground" aria-hidden="true" />}
+            <span className={cn('min-w-0 flex-1 truncate', !value && 'text-muted-foreground')}>{disabled ? disabledHint : value ? value.name : placeholder}</span>
+            {!value && <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />}
           </button>
         </PopoverTrigger>
-        <PopoverContent align="start" className="tw:w-(--radix-popover-trigger-width) tw:min-w-64 tw:p-0">
-          <div className="tw:flex tw:items-center tw:gap-2 tw:border-b tw:border-solid tw:border-border tw:px-3">
-            <Search className="tw:size-4 tw:shrink-0 tw:text-muted-foreground" aria-hidden="true" />
+        <PopoverContent align="start" className="w-(--radix-popover-trigger-width) min-w-64 p-0">
+          <div className="flex items-center gap-2 border-b border-solid border-border px-3">
+            <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <input
               autoFocus
               value={q}
@@ -115,15 +115,15 @@ export default function CatalogCombobox({ value, onChange, search, deps, placeho
               aria-label="Search"
               aria-controls={listId}
               aria-activedescendant={items[active] ? `${listId}-${items[active].id}` : undefined}
-              className="tw:m-0 tw:h-10 tw:w-full tw:border-0 tw:bg-transparent tw:p-0 tw:text-sm tw:outline-none"
+              className="m-0 h-10 w-full border-0 bg-transparent p-0 text-sm outline-none"
             />
-            {loading && <LoaderCircle className="tw:size-4 tw:shrink-0 tw:animate-spin tw:text-muted-foreground tw:motion-reduce:animate-none" aria-hidden="true" />}
+            {loading && <LoaderCircle className="size-4 shrink-0 animate-spin text-muted-foreground motion-reduce:animate-none" aria-hidden="true" />}
           </div>
-          <ul id={listId} role="listbox" className="tw:m-0 tw:max-h-60 tw:list-none tw:overflow-y-auto tw:p-1">
+          <ul id={listId} role="listbox" className="m-0 max-h-60 list-none overflow-y-auto p-1">
             {failed ? (
-              <li className="tw:px-3 tw:py-2 tw:text-sm tw:text-destructive">Couldn&apos;t load the list. Try again.</li>
+              <li className="px-3 py-2 text-sm text-destructive">Couldn&apos;t load the list. Try again.</li>
             ) : !loading && items.length === 0 ? (
-              <li className="tw:px-3 tw:py-2 tw:text-sm tw:text-muted-foreground">{emptyText}</li>
+              <li className="px-3 py-2 text-sm text-muted-foreground">{emptyText}</li>
             ) : (
               items.map((it, i) => (
                 <li
@@ -134,14 +134,14 @@ export default function CatalogCombobox({ value, onChange, search, deps, placeho
                   onMouseEnter={() => setActive(i)}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => choose(it)}
-                  className={cn('tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-sm tw:px-2 tw:py-1.5 tw:text-sm', i === active && 'tw:bg-accent')}
+                  className={cn('flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm', i === active && 'bg-accent')}
                 >
-                  <Check className={cn('tw:size-4 tw:shrink-0', value?.id === it.id ? 'tw:text-primary' : 'tw:invisible')} aria-hidden="true" />
-                  <span className="tw:min-w-0 tw:flex-1 tw:truncate">{it.name}</span>
+                  <Check className={cn('size-4 shrink-0', value?.id === it.id ? 'text-primary' : 'invisible')} aria-hidden="true" />
+                  <span className="min-w-0 flex-1 truncate">{it.name}</span>
                   <span
                     className={cn(
-                      'tw:shrink-0 tw:rounded-full tw:px-1.5 tw:text-[10px] tw:font-semibold',
-                      it.tenant_id === 0 ? 'tw:bg-success-soft tw:text-success' : 'tw:bg-warning-soft tw:text-warning',
+                      'shrink-0 rounded-full px-1.5 text-[10px] font-semibold',
+                      it.tenant_id === 0 ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning',
                     )}
                   >
                     {it.tenant_id === 0 ? 'Base' : 'Custom'}
@@ -157,9 +157,9 @@ export default function CatalogCombobox({ value, onChange, search, deps, placeho
           type="button"
           onClick={() => onChange(null)}
           aria-label={`Clear ${value.name}`}
-          className="tw:absolute tw:top-1/2 tw:right-2 tw:m-0 tw:flex tw:size-6 tw:-translate-y-1/2 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-sm tw:border-0 tw:bg-transparent tw:p-0 tw:text-muted-foreground tw:hover:bg-muted tw:hover:text-foreground"
+          className="absolute top-1/2 right-2 m-0 flex size-6 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent p-0 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
-          <X className="tw:size-3.5" aria-hidden="true" />
+          <X className="size-3.5" aria-hidden="true" />
         </button>
       )}
     </div>

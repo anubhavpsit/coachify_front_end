@@ -70,26 +70,26 @@ export default function EnquiryDetailDialog({ enquiry, onClose, onUpdated }: Pro
 
   return (
     <Dialog open={!!enquiry} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="tw:sm:max-w-3xl">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="tw:flex tw:items-center tw:gap-2">
+          <DialogTitle className="flex items-center gap-2">
             Enquiry Details
-            {enquiry && <Badge variant={enquiry.status === 'active' ? 'success' : 'secondary'} className="tw:capitalize">{enquiry.status}</Badge>}
+            {enquiry && <Badge variant={enquiry.status === 'active' ? 'success' : 'secondary'} className="capitalize">{enquiry.status}</Badge>}
           </DialogTitle>
           <DialogDescription>Contact history and follow-ups for this enquiry.</DialogDescription>
         </DialogHeader>
         {enquiry && (
-          <div className="tw:grid tw:gap-6 tw:md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-            <section className="tw:flex tw:flex-col tw:gap-4">
-              <dl className="tw:m-0 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-2 tw:text-sm">
+          <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+            <section className="flex flex-col gap-4">
+              <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
                 {info
                   .filter(([, v]) => !!v)
                   .map(([k, v]) => (
-                    <div key={k} className="tw:contents">
-                      <dt className="tw:text-muted-foreground">{k}</dt>
-                      <dd className="tw:m-0 tw:break-words tw:text-foreground">
+                    <div key={k} className="contents">
+                      <dt className="text-muted-foreground">{k}</dt>
+                      <dd className="m-0 break-words text-foreground">
                         {k === 'Contact' ? (
-                          <a href={`tel:${v}`} className="tw:text-primary">
+                          <a href={`tel:${v}`} className="text-primary">
                             {v}
                           </a>
                         ) : (
@@ -100,14 +100,14 @@ export default function EnquiryDetailDialog({ enquiry, onClose, onUpdated }: Pro
                   ))}
               </dl>
               {enquiry.description && (
-                <div className="tw:rounded-lg tw:bg-muted/60 tw:p-3 tw:text-sm tw:whitespace-pre-wrap">{enquiry.description}</div>
+                <div className="rounded-lg bg-muted/60 p-3 text-sm whitespace-pre-wrap">{enquiry.description}</div>
               )}
             </section>
 
-            <section className="tw:flex tw:flex-col tw:gap-4">
+            <section className="flex flex-col gap-4">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(submit)} noValidate className="tw:grid tw:gap-3 tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-3 tw:sm:grid-cols-2">
-                  <div className="tw:text-sm tw:font-semibold tw:sm:col-span-2">Log a communication</div>
+                <form onSubmit={form.handleSubmit(submit)} noValidate className="grid gap-3 rounded-lg border border-solid border-border p-3 sm:grid-cols-2">
+                  <div className="text-sm font-semibold sm:col-span-2">Log a communication</div>
                   <FormField
                     control={form.control}
                     name="channel"
@@ -144,7 +144,7 @@ export default function EnquiryDetailDialog({ enquiry, onClose, onUpdated }: Pro
                     control={form.control}
                     name="notes"
                     render={({ field }) => (
-                      <FormItem className="tw:sm:col-span-2">
+                      <FormItem className="sm:col-span-2">
                         <FormLabel>Notes</FormLabel>
                         <FormControl>
                           <Input placeholder="What was discussed?" disabled={submitting} {...field} />
@@ -153,7 +153,7 @@ export default function EnquiryDetailDialog({ enquiry, onClose, onUpdated }: Pro
                       </FormItem>
                     )}
                   />
-                  <div className="tw:sm:col-span-2">
+                  <div className="sm:col-span-2">
                     <Button type="submit" size="sm" loading={submitting}>
                       {submitting ? 'Saving...' : 'Save Communication'}
                     </Button>
@@ -161,25 +161,25 @@ export default function EnquiryDetailDialog({ enquiry, onClose, onUpdated }: Pro
                 </form>
               </Form>
 
-              <div className="tw:flex tw:flex-col tw:gap-2">
-                <div className="tw:text-sm tw:font-semibold">History</div>
+              <div className="flex flex-col gap-2">
+                <div className="text-sm font-semibold">History</div>
                 {logs.length === 0 ? (
-                  <EmptyState icon={MessageSquareText} title="No communications logged yet." className="tw:py-4" />
+                  <EmptyState icon={MessageSquareText} title="No communications logged yet." className="py-4" />
                 ) : (
-                  <ol className="tw:m-0 tw:max-h-64 tw:list-none tw:overflow-y-auto tw:border-0 tw:border-l tw:border-solid tw:border-border tw:p-0 tw:pl-5">
+                  <ol className="m-0 max-h-64 list-none overflow-y-auto border-0 border-l border-solid border-border p-0 pl-5">
                     <AnimatePresence initial={false}>
                       {logs.map((log) => {
                         const ch = CHANNEL[log.channel] ?? CHANNEL.other
                         return (
-                          <m.li key={log.id} variants={slideUp} initial="hidden" animate="visible" className="tw:relative tw:pb-3 tw:last:pb-0">
-                            <span className="tw:absolute tw:top-0.5 tw:-left-[1.95rem] tw:flex tw:size-6 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary-soft tw:text-primary-soft-foreground tw:ring-4 tw:ring-card">
-                              <ch.icon className="tw:size-3" aria-hidden="true" />
+                          <m.li key={log.id} variants={slideUp} initial="hidden" animate="visible" className="relative pb-3 last:pb-0">
+                            <span className="absolute top-0.5 -left-[1.95rem] flex size-6 items-center justify-center rounded-full bg-primary-soft text-primary-soft-foreground ring-4 ring-card">
+                              <ch.icon className="size-3" aria-hidden="true" />
                             </span>
-                            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-sm">
-                              <span className="tw:font-medium">{ch.label}</span>
-                              <span className="tw:text-xs tw:text-muted-foreground">{formatDateTime(log.communicated_at || log.created_at)}</span>
+                            <div className="flex flex-wrap items-center gap-2 text-sm">
+                              <span className="font-medium">{ch.label}</span>
+                              <span className="text-xs text-muted-foreground">{formatDateTime(log.communicated_at || log.created_at)}</span>
                             </div>
-                            {log.notes && <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">{log.notes}</p>}
+                            {log.notes && <p className="m-0 text-sm text-muted-foreground">{log.notes}</p>}
                           </m.li>
                         )
                       })}

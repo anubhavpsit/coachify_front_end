@@ -24,7 +24,7 @@ interface Props {
 /** Student / period / amount / mode / submitted-on / notes — shared by Add and Edit. */
 export default function FeeFields({ control, students, disabled, studentHint, fromHint, onStudentChange, className }: Props) {
   return (
-    <div className={cn('tw:grid tw:gap-5 tw:sm:grid-cols-2 tw:lg:grid-cols-3', className)}>
+    <div className={cn('grid gap-5 sm:grid-cols-2 lg:grid-cols-3', className)}>
       <FormField
         control={control}
         name="student_id"
@@ -89,12 +89,12 @@ export default function FeeFields({ control, students, disabled, studentHint, fr
         render={({ field }) => (
           <FormItem>
             <FormLabel required>Amount Submitted</FormLabel>
-            <div className="tw:relative">
-              <span className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:-translate-y-1/2 tw:text-sm tw:text-muted-foreground" aria-hidden="true">
+            <div className="relative">
+              <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground" aria-hidden="true">
                 ₹
               </span>
               <FormControl>
-                <Input type="number" inputMode="decimal" min="0" step="0.01" placeholder="0.00" className="tw:pl-7" disabled={disabled} {...field} />
+                <Input type="number" inputMode="decimal" min="0" step="0.01" placeholder="0.00" className="pl-7" disabled={disabled} {...field} />
               </FormControl>
             </div>
             <FormMessage />
@@ -137,14 +137,14 @@ export default function FeeFields({ control, students, disabled, studentHint, fr
         control={control}
         name="notes"
         render={({ field }) => (
-          <FormItem className="tw:sm:col-span-2 tw:lg:col-span-3">
+          <FormItem className="sm:col-span-2 lg:col-span-3">
             <FormLabel>Notes</FormLabel>
             <FormControl>
               <Textarea rows={2} maxLength={NOTES_MAX} placeholder="Optional (receipt no., remarks…)" disabled={disabled} {...field} />
             </FormControl>
-            <div className="tw:flex tw:justify-between">
+            <div className="flex justify-between">
               <FormMessage />
-              <span className="tw:ml-auto tw:text-xs tw:tabular-nums tw:text-muted-foreground">
+              <span className="ml-auto text-xs tabular-nums text-muted-foreground">
                 {field.value.length}/{NOTES_MAX}
               </span>
             </div>

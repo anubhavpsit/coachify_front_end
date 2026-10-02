@@ -49,9 +49,9 @@ function SwitchField({
       control={control}
       name={name}
       render={({ field }) => (
-        <div className="tw:flex tw:items-center tw:gap-2">
+        <div className="flex items-center gap-2">
           <Switch id={id} checked={field.value} onCheckedChange={field.onChange} />
-          <Label htmlFor={id} className="tw:font-normal">
+          <Label htmlFor={id} className="font-normal">
             {label}
           </Label>
         </div>
@@ -125,14 +125,14 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
   return (
     <>
       <Dialog open={show} onOpenChange={(open) => !open && requestClose()}>
-        <DialogContent className="tw:sm:max-w-2xl" onInteractOutside={(e) => isDirty && e.preventDefault()}>
+        <DialogContent className="sm:max-w-2xl" onInteractOutside={(e) => isDirty && e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>{ctx.isEdit ? 'Edit Notice' : 'Add Notice'}</DialogTitle>
             <DialogDescription>Notices appear on the Notice Board for the audience you choose.</DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(submit)} noValidate className="tw:flex tw:flex-col tw:gap-5">
+            <form onSubmit={form.handleSubmit(submit)} noValidate className="flex flex-col gap-5">
               <FormField
                 control={form.control}
                 name="title"
@@ -142,9 +142,9 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
                     <FormControl>
                       <Input placeholder="e.g. Holiday on Monday" maxLength={TITLE_MAX} autoComplete="off" {...field} />
                     </FormControl>
-                    <div className="tw:flex tw:justify-between tw:gap-2">
+                    <div className="flex justify-between gap-2">
                       <FormMessage />
-                      <span className="tw:ml-auto tw:text-xs tw:tabular-nums tw:text-muted-foreground">
+                      <span className="ml-auto text-xs tabular-nums text-muted-foreground">
                         {title.length}/{TITLE_MAX}
                       </span>
                     </div>
@@ -159,12 +159,12 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
                   <FormItem>
                     <FormLabel required>Description</FormLabel>
                     <FormControl>
-                      <Textarea rows={6} placeholder="Write the full notice. Line breaks are kept." className="tw:max-h-72" {...field} />
+                      <Textarea rows={6} placeholder="Write the full notice. Line breaks are kept." className="max-h-72" {...field} />
                     </FormControl>
-                    <div className="tw:flex tw:justify-between tw:gap-2">
+                    <div className="flex justify-between gap-2">
                       <FormMessage />
                       {body.length > BODY_MAX * 0.8 && (
-                        <span className="tw:ml-auto tw:text-xs tw:tabular-nums tw:text-muted-foreground">
+                        <span className="ml-auto text-xs tabular-nums text-muted-foreground">
                           {body.length.toLocaleString()}/{BODY_MAX.toLocaleString()}
                         </span>
                       )}
@@ -187,7 +187,7 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
                     <FormItem>
                       <FormLabel required>Target audience</FormLabel>
                       <FormControl>
-                        <div role="group" aria-label="Target audience" className="tw:flex tw:flex-wrap tw:gap-2">
+                        <div role="group" aria-label="Target audience" className="flex flex-wrap gap-2">
                           {AUDIENCE_OPTIONS.map((t) => {
                             const id = `notice-target-${t}`
                             const disabled = t !== 'all' && allSelected
@@ -195,7 +195,7 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
                               <label
                                 key={t}
                                 htmlFor={id}
-                                className="tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-solid tw:border-input tw:px-3 tw:py-1.5 tw:text-sm tw:transition-colors tw:has-[[data-state=checked]]:border-primary tw:has-[[data-state=checked]]:bg-primary-soft tw:has-[:disabled]:cursor-not-allowed tw:has-[:disabled]:opacity-50"
+                                className="m-0 flex cursor-pointer items-center gap-2 rounded-full border border-solid border-input px-3 py-1.5 text-sm transition-colors has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary-soft has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50"
                               >
                                 <Checkbox id={id} checked={field.value.includes(t)} disabled={disabled} onCheckedChange={() => toggle(t)} />
                                 {AUDIENCE_LABELS[t]}
@@ -211,7 +211,7 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
                 }}
               />
 
-              <div className="tw:grid tw:gap-5 tw:md:grid-cols-2">
+              <div className="grid gap-5 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="publishAt"
@@ -249,16 +249,16 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
                   <FormItem>
                     <FormLabel>Attachment</FormLabel>
                     {ctx.isEdit && notice?.attachment && !removeAttachment && !file && (
-                      <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm">
-                        <a href={notice.attachment.url} target="_blank" rel="noreferrer" className="tw:inline-flex tw:items-center tw:gap-1 tw:text-primary">
+                      <div className="flex items-center gap-2 text-sm">
+                        <a href={notice.attachment.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary">
                           {notice.attachment.name}
-                          <ExternalLink className="tw:size-3.5" aria-hidden="true" />
+                          <ExternalLink className="size-3.5" aria-hidden="true" />
                         </a>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="tw:text-destructive"
+                          className="text-destructive"
                           onClick={() => form.setValue('removeAttachment', true, { shouldDirty: true })}
                         >
                           <X aria-hidden="true" />
@@ -281,7 +281,7 @@ export default function NoticeFormDialog({ show, notice, onHide, onSaved }: Prop
                 )}
               />
 
-              <div className="tw:flex tw:flex-wrap tw:gap-x-6 tw:gap-y-3">
+              <div className="flex flex-wrap gap-x-6 gap-y-3">
                 <SwitchField control={form.control} name="isPinned" id="notice-pin" label="Pin to top" />
                 <SwitchField control={form.control} name="isImportant" id="notice-important" label="Mark as important" />
                 {ctx.pushAlreadySent ? (

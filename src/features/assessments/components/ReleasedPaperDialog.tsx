@@ -12,7 +12,7 @@ import QuestionBody from './QuestionBody'
 export default function ReleasedPaperDialog({ paper, onClose }: { paper: { id: number; title: string } | null; onClose: () => void }) {
   return (
     <Dialog open={!!paper} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="tw:sm:max-w-2xl">{paper && <Body key={paper.id} {...paper} onClose={onClose} />}</DialogContent>
+      <DialogContent className="sm:max-w-2xl">{paper && <Body key={paper.id} {...paper} onClose={onClose} />}</DialogContent>
     </Dialog>
   )
 }
@@ -32,9 +32,9 @@ function Body({ id, title, onClose }: { id: number; title: string; onClose: () =
         </DialogDescription>
       </DialogHeader>
       {p.loading ? (
-        <div className="tw:flex tw:flex-col tw:gap-2" role="status" aria-label="Loading question paper">
-          <Skeleton className="tw:h-14" />
-          <Skeleton className="tw:h-14" />
+        <div className="flex flex-col gap-2" role="status" aria-label="Loading question paper">
+          <Skeleton className="h-14" />
+          <Skeleton className="h-14" />
         </div>
       ) : error ? (
         <Alert variant="destructive">
@@ -42,14 +42,14 @@ function Body({ id, title, onClose }: { id: number; title: string; onClose: () =
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : (
-        <ol className="tw:m-0 tw:flex tw:max-h-[60vh] tw:list-none tw:flex-col tw:divide-y tw:divide-border tw:overflow-y-auto tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-0">
+        <ol className="m-0 flex max-h-[60vh] list-none flex-col divide-y divide-border overflow-y-auto rounded-lg border border-solid border-border p-0">
           {qs.map((q, i) => (
-            <li key={q.id} className="tw:flex tw:gap-3 tw:p-3">
-              <span className="tw:w-6 tw:shrink-0 tw:text-right tw:text-sm tw:font-semibold tw:text-muted-foreground">{i + 1}.</span>
-              <div className="tw:min-w-0 tw:flex-1">
+            <li key={q.id} className="flex gap-3 p-3">
+              <span className="w-6 shrink-0 text-right text-sm font-semibold text-muted-foreground">{i + 1}.</span>
+              <div className="min-w-0 flex-1">
                 <QuestionBody q={q} />
               </div>
-              <span className="tw:shrink-0 tw:self-start tw:rounded-full tw:bg-muted tw:px-2 tw:py-0.5 tw:text-xs tw:font-semibold tw:tabular-nums tw:text-muted-foreground">{q.marks ?? '—'} m</span>
+              <span className="shrink-0 self-start rounded-full bg-muted px-2 py-0.5 text-xs font-semibold tabular-nums text-muted-foreground">{q.marks ?? '—'} m</span>
             </li>
           ))}
         </ol>

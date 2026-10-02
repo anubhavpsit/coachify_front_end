@@ -59,7 +59,7 @@ function FormItem({ className, children, ...props }: React.ComponentProps<'div'>
   const id = React.useId()
   return (
     <FormItemContext.Provider value={{ id }}>
-      <ShakeOnInvalidSubmit className={cn('tw:grid tw:content-start tw:gap-2', className)} {...props}>
+      <ShakeOnInvalidSubmit className={cn('grid content-start gap-2', className)} {...props}>
         {children}
       </ShakeOnInvalidSubmit>
     </FormItemContext.Provider>
@@ -96,13 +96,13 @@ function FormLabel({ className, required, children, ...props }: React.ComponentP
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn('tw:data-[error=true]:text-destructive', className)}
+      className={cn('data-[error=true]:text-destructive', className)}
       htmlFor={formItemId}
       {...props}
     >
       {children}
       {required && (
-        <span className="tw:text-destructive" aria-hidden="true">
+        <span className="text-destructive" aria-hidden="true">
           *
         </span>
       )}
@@ -125,7 +125,7 @@ function FormControl(props: React.ComponentProps<typeof SlotPrimitive.Slot>) {
 
 function FormDescription({ className, ...props }: React.ComponentProps<'p'>) {
   const { formDescriptionId } = useFormField()
-  return <p data-slot="form-description" id={formDescriptionId} className={cn('tw:m-0 tw:text-xs tw:text-muted-foreground', className)} {...props} />
+  return <p data-slot="form-description" id={formDescriptionId} className={cn('m-0 text-xs text-muted-foreground', className)} {...props} />
 }
 
 /** Inline field error. Always in the DOM target for aria-describedby; content animates in. */
@@ -137,12 +137,12 @@ function FormMessage({ className, children, ...props }: React.ComponentProps<'p'
       data-slot="form-message"
       id={formMessageId}
       aria-live="polite"
-      className={cn('tw:m-0 tw:text-xs tw:font-medium tw:text-destructive tw:empty:hidden', className)}
+      className={cn('m-0 text-xs font-medium text-destructive empty:hidden', className)}
       {...props}
     >
       <AnimatePresence initial={false} mode="wait">
         {body ? (
-          <m.span key={String(body)} className="tw:block" variants={slideUp} initial="hidden" animate="visible" exit="exit">
+          <m.span key={String(body)} className="block" variants={slideUp} initial="hidden" animate="visible" exit="exit">
             {body}
           </m.span>
         ) : null}

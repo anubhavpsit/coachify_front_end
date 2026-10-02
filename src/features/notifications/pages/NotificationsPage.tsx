@@ -10,7 +10,7 @@ import { NativeSelect } from '@/components/ui/native-select'
 import PushNotificationsTable from '../components/PushNotificationsTable'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 
-const FIELD = 'tw:m-0 tw:flex tw:flex-col tw:gap-1.5 tw:text-sm tw:font-medium tw:text-foreground'
+const FIELD = 'm-0 flex flex-col gap-1.5 text-sm font-medium text-foreground'
 
 /** Admin push-notification queue. Page-level role gate lives in usePushNotifications (Q10). */
 export default function NotificationsPage() {
@@ -19,11 +19,11 @@ export default function NotificationsPage() {
   const shown = q.records.length
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
-      <PageHeader title="Push Notifications" description="Delivery queue for app and push notifications" className="tw:mb-0" />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Push Notifications" description="Delivery queue for app and push notifications" className="mb-0" />
 
       {q.allowed && (
-        <m.div className="tw:grid tw:grid-cols-1 tw:gap-4 tw:sm:grid-cols-3" variants={stagger(0.05)} initial="hidden" animate="visible">
+        <m.div className="grid grid-cols-1 gap-4 sm:grid-cols-3" variants={stagger(0.05)} initial="hidden" animate="visible">
           <StatCard label="Pending queue" value={q.stats.pending} icon={Clock} tone="warning" />
           <StatCard label="Failed deliveries" value={q.stats.failed} icon={CircleX} tone="destructive" />
           <StatCard label="Sent today" value={q.stats.sent_today} icon={Send} tone="success" />
@@ -31,18 +31,18 @@ export default function NotificationsPage() {
       )}
 
       {q.allowed && (
-        <Card className="tw:py-5">
+        <Card className="py-5">
           <CardContent>
             <form
-              className="tw:grid tw:grid-cols-1 tw:items-end tw:gap-4 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:2xl:grid-cols-6"
+              className="grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6"
               onSubmit={(e) => e.preventDefault()}
               role="search"
             >
-              <label className={`${FIELD} tw:lg:col-span-1 tw:2xl:col-span-2`}>
+              <label className={`${FIELD} lg:col-span-1 2xl:col-span-2`}>
                 Search
-                <span className="tw:relative">
-                  <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-                  <Input value={filters.search} onChange={(e) => update({ search: e.target.value })} placeholder="Search title or body" className="tw:pl-9" />
+                <span className="relative">
+                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                  <Input value={filters.search} onChange={(e) => update({ search: e.target.value })} placeholder="Search title or body" className="pl-9" />
                 </span>
               </label>
               <label className={FIELD}>
@@ -75,7 +75,7 @@ export default function NotificationsPage() {
                 End date
                 <Input type="date" value={filters.endDate} min={filters.startDate || undefined} onChange={(e) => update({ endDate: e.target.value })} />
               </label>
-              <Button type="button" variant="secondary" onClick={q.reset} className="tw:2xl:col-start-6">
+              <Button type="button" variant="secondary" onClick={q.reset} className="2xl:col-start-6">
                 <RotateCcw aria-hidden="true" />
                 Reset filters
               </Button>
@@ -84,7 +84,7 @@ export default function NotificationsPage() {
         </Card>
       )}
 
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+      <Card className="gap-0 overflow-hidden py-0">
         <PushNotificationsTable
           records={q.records}
           loading={q.loading}
@@ -99,11 +99,11 @@ export default function NotificationsPage() {
       </Card>
 
       {q.allowed && (
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
-          <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="m-0 text-sm text-muted-foreground">
             Showing {shown} of {q.pagination.total} entries
           </p>
-          <NativeSelect className="tw:w-36" aria-label="Rows per page" value={filters.perPage} onChange={(e) => update({ perPage: Number(e.target.value) })}>
+          <NativeSelect className="w-36" aria-label="Rows per page" value={filters.perPage} onChange={(e) => update({ perPage: Number(e.target.value) })}>
             {[10, 25, 50, 100].map((size) => (
               <option key={size} value={size}>
                 {size} / page

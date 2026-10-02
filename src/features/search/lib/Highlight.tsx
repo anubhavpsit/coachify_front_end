@@ -10,7 +10,7 @@ export default function Highlight({ text, query }: { text: string; query: string
   for (let at = lower.indexOf(q); at !== -1; at = lower.indexOf(q, from)) {
     if (at > from) parts.push(text.slice(from, at))
     parts.push(
-      <mark key={at} className="tw:rounded-[3px] tw:bg-primary-soft tw:p-0! tw:text-primary-soft-foreground">
+      <mark key={at} className="rounded-[3px] bg-primary-soft p-0! text-primary-soft-foreground">
         {text.slice(at, at + q.length)}
       </mark>,
     )

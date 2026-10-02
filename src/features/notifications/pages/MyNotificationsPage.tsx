@@ -61,8 +61,8 @@ export default function MyNotificationsPage() {
         }
       />
 
-      <Card className="tw:gap-0 tw:py-0">
-        <div className="tw:border-b tw:border-solid tw:border-border tw:px-4 tw:py-3 tw:sm:px-6">
+      <Card className="gap-0 py-0">
+        <div className="border-b border-solid border-border px-4 py-3 sm:px-6">
           <SegmentedControl<InboxFilter>
             size="sm"
             label="Notification filter"
@@ -76,28 +76,28 @@ export default function MyNotificationsPage() {
         </div>
 
         {feed.loading && (
-          <div className="tw:flex tw:flex-col tw:gap-4 tw:p-6" role="status" aria-label="Loading notifications">
+          <div className="flex flex-col gap-4 p-6" role="status" aria-label="Loading notifications">
             {Array.from({ length: 5 }, (_, i) => (
-              <div key={i} className="tw:flex tw:flex-col tw:gap-2">
-                <Skeleton className="tw:h-4 tw:w-1/2" />
-                <Skeleton className="tw:h-3 tw:w-4/5" />
+              <div key={i} className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-4/5" />
               </div>
             ))}
           </div>
         )}
 
         {feed.error && !feed.loading && (
-          <div className="tw:flex tw:items-center tw:gap-2 tw:px-6 tw:py-4 tw:text-sm" role="alert">
-            <span className="tw:text-destructive">{feed.error}</span>
-            <Button variant="link" size="sm" className="tw:h-auto tw:p-0" onClick={() => void feed.loadFirstPage()}>
+          <div className="flex items-center gap-2 px-6 py-4 text-sm" role="alert">
+            <span className="text-destructive">{feed.error}</span>
+            <Button variant="link" size="sm" className="h-auto p-0" onClick={() => void feed.loadFirstPage()}>
               Retry
             </Button>
           </div>
         )}
 
         {!feed.loading && !feed.error && feed.items.length === 0 && (
-          <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:py-10 tw:text-sm tw:text-muted-foreground">
-            <BellOff className="tw:size-7" aria-hidden="true" />
+          <div className="flex flex-col items-center gap-2 py-10 text-sm text-muted-foreground">
+            <BellOff className="size-7" aria-hidden="true" />
             {feed.filter === 'unread' ? "You're all caught up." : 'No notifications yet'}
           </div>
         )}
@@ -112,14 +112,14 @@ export default function MyNotificationsPage() {
           </m.div>
         )}
 
-        {!feed.loading && feed.hasMore && <div ref={sentinelRef} className="tw:h-px" />}
+        {!feed.loading && feed.hasMore && <div ref={sentinelRef} className="h-px" />}
         {feed.loadingMore && (
-          <div className="tw:flex tw:flex-col tw:gap-2 tw:p-4" role="status" aria-label="Loading more notifications">
-            <Skeleton className="tw:h-4 tw:w-1/2" />
+          <div className="flex flex-col gap-2 p-4" role="status" aria-label="Loading more notifications">
+            <Skeleton className="h-4 w-1/2" />
           </div>
         )}
         {!feed.loading && !feed.error && feed.items.length > 0 && !feed.hasMore && (
-          <div className="tw:py-3 tw:text-center tw:text-xs tw:text-muted-foreground">No older notifications.</div>
+          <div className="py-3 text-center text-xs text-muted-foreground">No older notifications.</div>
         )}
       </Card>
     </div>

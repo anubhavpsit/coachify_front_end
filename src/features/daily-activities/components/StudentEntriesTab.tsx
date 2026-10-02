@@ -216,8 +216,8 @@ export default function StudentEntriesTab({ date, refreshKey, students, students
   if (saved.error) return <ErrorState title="Couldn't load this day's activities." onRetry={saved.reload} />
   if (saved.loading && !saved.data)
     return (
-      <div className="tw:flex tw:flex-col tw:gap-4" role="status" aria-label="Loading activities">
-        <Skeleton className="tw:h-72 tw:rounded-xl" />
+      <div className="flex flex-col gap-4" role="status" aria-label="Loading activities">
+        <Skeleton className="h-72 rounded-xl" />
       </div>
     )
 
@@ -226,7 +226,7 @@ export default function StudentEntriesTab({ date, refreshKey, students, students
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(submit, onInvalid)} noValidate className="tw:flex tw:flex-col tw:gap-4">
+      <form onSubmit={form.handleSubmit(submit, onInvalid)} noValidate className="flex flex-col gap-4">
         {fields.map((f, i) => {
           const id = form.getValues(`${entryPath(i)}.id`)
           const studentId = form.getValues(`${entryPath(i)}.student_id`)
@@ -264,15 +264,15 @@ export default function StudentEntriesTab({ date, refreshKey, students, students
           </Alert>
         )}
 
-        <div className="tw:sticky tw:bottom-0 tw:z-10 tw:-mx-1 tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card/95 tw:px-4 tw:py-3 tw:shadow-lg tw:backdrop-blur">
+        <div className="sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center gap-3 rounded-xl border border-solid border-border bg-card/95 px-4 py-3 shadow-lg backdrop-blur">
           <Button type="button" variant="outline" onClick={() => append(blankEntry())} disabled={busy}>
             <Plus aria-hidden="true" /> Add student
           </Button>
-          <span className="tw:hidden tw:text-sm tw:text-muted-foreground tw:sm:inline">
+          <span className="hidden text-sm text-muted-foreground sm:inline">
             {count} {count === 1 ? 'entry' : 'entries'}
             {isDirty ? ' · unsaved changes' : ''}
           </span>
-          <Button type="submit" className="tw:ml-auto" loading={isSubmitting} disabled={busy}>
+          <Button type="submit" className="ml-auto" loading={isSubmitting} disabled={busy}>
             <Save aria-hidden="true" /> {isSubmitting ? 'Saving…' : count === 1 ? 'Save activity' : `Save ${count} activities`}
           </Button>
         </div>

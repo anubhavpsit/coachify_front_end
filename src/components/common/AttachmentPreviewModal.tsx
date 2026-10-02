@@ -1,218 +1,131 @@
-import { useState, useEffect, useRef } from 'react';
-import { Modal, Spinner } from 'react-bootstrap';
+import { useRef, useState, type PointerEvent } from 'react'
+import { LoaderCircle, RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
 
 export type PreviewableAttachment = {
-  id?: number;
-  original_name: string;
-  file_type?: 'image' | 'pdf' | 'other';
-};
+  id?: number
+  original_name: string
+  file_type?: 'image' | 'pdf' | 'other'
+}
 
 type Props = {
-  attachment: PreviewableAttachment | null;
-  url: string | null;
-  onHide: () => void;
-  subtitle?: string;
-};
+  attachment: PreviewableAttachment | null
+  url: string | null
+  onHide: () => void
+  subtitle?: string
+}
 
+/** Image / PDF preview (same props as the react-bootstrap version): rotate, zoom 25–500%, drag to pan when zoomed. */
 export default function AttachmentPreviewModal({ attachment, url, onHide, subtitle }: Props) {
-  const [loaded, setLoaded] = useState(false);
-  const [scale, setScale] = useState(1);
-  const [rotation, setRotation] = useState(0);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef<{ mx: number; my: number; ox: number; oy: number } | null>(null);
+  return (
+    <Dialog open={!!attachment} onOpenChange={(o) => !o && onHide()}>
+      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-4xl">
+        <DialogHeader className="px-5 py-3">
+          <DialogTitle className="truncate pr-8 text-sm">{attachment?.original_name ?? 'Attachment Preview'}</DialogTitle>
+          <DialogDescription className={subtitle ? undefined : 'sr-only'}>{subtitle ?? 'Attachment preview'}</DialogDescription>
+        </DialogHeader>
+        {/* Keyed so zoom / rotation / position reset for each file (legacy reset on url change). */}
+        {attachment && url && <Viewer key={url} attachment={attachment} url={url} />}
+      </DialogContent>
+    </Dialog>
+  )
+}
 
-  useEffect(() => {
-    setLoaded(false);
-    setScale(1);
-    setRotation(0);
-    setPos({ x: 0, y: 0 });
-    setIsDragging(false);
-    dragStart.current = null;
-  }, [url]);
+function Viewer({ attachment, url }: { attachment: PreviewableAttachment; url: string }) {
+  const isPdf = attachment.file_type === 'pdf'
+  const [loaded, setLoaded] = useState(false)
+  const [scale, setScale] = useState(1)
+  const [rotation, setRotation] = useState(0)
+  const [pos, setPos] = useState({ x: 0, y: 0 })
+  const [dragging, setDragging] = useState(false)
+  const start = useRef<{ mx: number; my: number; ox: number; oy: number } | null>(null)
 
-  const isPdf = attachment?.file_type === 'pdf';
+  const zoomIn = () => setScale((s) => Math.min(+(s + 0.25).toFixed(2), 5))
+  const zoomOut = () => setScale((s) => Math.max(+(s - 0.25).toFixed(2), 0.25))
+  const reset = () => {
+    setScale(1)
+    setRotation(0)
+    setPos({ x: 0, y: 0 })
+  }
 
-  const zoomIn = () => setScale((s) => Math.min(+(s + 0.25).toFixed(2), 5));
-  const zoomOut = () => setScale((s) => Math.max(+(s - 0.25).toFixed(2), 0.25));
-  const rotateLeft = () => setRotation((r) => r - 90);
-  const rotateRight = () => setRotation((r) => r + 90);
-  const reset = () => { setScale(1); setRotation(0); setPos({ x: 0, y: 0 }); };
-
-  const onContainerMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (scale <= 1 || isPdf) return;
-    e.preventDefault();
-    dragStart.current = { mx: e.clientX, my: e.clientY, ox: pos.x, oy: pos.y };
-    setIsDragging(true);
-  };
-
-  const onContainerMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!dragStart.current) return;
-    setPos({
-      x: dragStart.current.ox + (e.clientX - dragStart.current.mx),
-      y: dragStart.current.oy + (e.clientY - dragStart.current.my),
-    });
-  };
-
-  const onContainerMouseUp = () => {
-    dragStart.current = null;
-    setIsDragging(false);
-  };
+  const down = (e: PointerEvent<HTMLDivElement>) => {
+    if (scale <= 1 || isPdf) return
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    start.current = { mx: e.clientX, my: e.clientY, ox: pos.x, oy: pos.y }
+    setDragging(true)
+  }
+  const move = (e: PointerEvent<HTMLDivElement>) => {
+    if (!start.current) return
+    setPos({ x: start.current.ox + (e.clientX - start.current.mx), y: start.current.oy + (e.clientY - start.current.my) })
+  }
+  const up = () => {
+    start.current = null
+    setDragging(false)
+  }
 
   return (
-    <Modal show={!!attachment} onHide={onHide} centered size="lg">
-      <Modal.Header closeButton className="py-2">
-        <div>
-          <div className="fw-semibold" style={{ fontSize: '14px' }}>
-            {attachment?.original_name ?? 'Attachment Preview'}
-          </div>
-          {subtitle && <div className="text-secondary small">{subtitle}</div>}
+    <>
+      {!isPdf && (
+        <div role="toolbar" aria-label="Image controls" className="flex flex-wrap items-center gap-1.5 border-y border-solid border-border bg-muted/40 px-4 py-2">
+          <Button size="icon-sm" variant="outline" onClick={() => setRotation((r) => r - 90)} aria-label="Rotate 90° left" title="Rotate 90° left">
+            <RotateCcw aria-hidden="true" />
+          </Button>
+          <Button size="icon-sm" variant="outline" onClick={() => setRotation((r) => r + 90)} aria-label="Rotate 90° right" title="Rotate 90° right">
+            <RotateCw aria-hidden="true" />
+          </Button>
+          <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+          <Button size="icon-sm" variant="outline" onClick={zoomOut} disabled={scale <= 0.25} aria-label="Zoom out" title="Zoom out">
+            <ZoomOut aria-hidden="true" />
+          </Button>
+          <span className="min-w-12 text-center text-xs font-semibold tabular-nums text-muted-foreground" aria-live="polite">
+            {Math.round(scale * 100)}%
+          </span>
+          <Button size="icon-sm" variant="outline" onClick={zoomIn} disabled={scale >= 5} aria-label="Zoom in" title="Zoom in">
+            <ZoomIn aria-hidden="true" />
+          </Button>
+          <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+          <Button size="sm" variant="outline" onClick={reset} title="Reset zoom, rotation and position">
+            Reset
+          </Button>
+          {scale > 1 && <span className="ml-auto text-xs text-muted-foreground">Drag image to pan</span>}
         </div>
-      </Modal.Header>
-
-      <Modal.Body className="p-0">
-        {/* Toolbar — images only */}
-        {!isPdf && (
-          <div
-            className="d-flex align-items-center gap-2 px-3 py-2 border-bottom"
-            style={{ backgroundColor: '#f8f9fa', flexWrap: 'wrap' }}
-          >
-            <button
-              className="btn btn-sm btn-outline-secondary"
-              onClick={rotateLeft}
-              title="Rotate 90° left"
-            >
-              ↺
-            </button>
-            <button
-              className="btn btn-sm btn-outline-secondary"
-              onClick={rotateRight}
-              title="Rotate 90° right"
-            >
-              ↻
-            </button>
-            <div className="vr" />
-            <button
-              className="btn btn-sm btn-outline-secondary"
-              onClick={zoomOut}
-              disabled={scale <= 0.25}
-              title="Zoom out"
-            >
-              −
-            </button>
-            <span
-              className="text-secondary small fw-semibold"
-              style={{ minWidth: 40, textAlign: 'center' }}
-            >
-              {Math.round(scale * 100)}%
-            </span>
-            <button
-              className="btn btn-sm btn-outline-secondary"
-              onClick={zoomIn}
-              disabled={scale >= 5}
-              title="Zoom in"
-            >
-              +
-            </button>
-            <div className="vr" />
-            <button
-              className="btn btn-sm btn-outline-secondary"
-              onClick={reset}
-              title="Reset zoom, rotation and position"
-            >
-              Reset
-            </button>
-            {scale > 1 && (
-              <span className="text-secondary small ms-auto" style={{ fontSize: '0.75rem' }}>
-                Drag image to pan
-              </span>
-            )}
+      )}
+      <div
+        className={cn(
+          'relative flex h-[68vh] touch-none items-center justify-center overflow-hidden bg-neutral-950',
+          isPdf ? 'cursor-default' : scale > 1 ? (dragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in',
+        )}
+        onPointerDown={down}
+        onPointerMove={move}
+        onPointerUp={up}
+        onPointerCancel={up}
+      >
+        {!loaded && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2.5 text-sm text-neutral-400" role="status">
+            <LoaderCircle className="size-7 animate-spin text-white motion-reduce:animate-none" aria-hidden="true" />
+            Loading…
           </div>
         )}
-
-        {/* Content area */}
-        <div
-          style={{
-            height: '68vh',
-            overflow: 'hidden',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#111',
-            position: 'relative',
-            cursor: isPdf
-              ? 'default'
-              : scale > 1
-              ? isDragging
-                ? 'grabbing'
-                : 'grab'
-              : 'zoom-in',
-          }}
-          onMouseDown={onContainerMouseDown}
-          onMouseMove={onContainerMouseMove}
-          onMouseUp={onContainerMouseUp}
-          onMouseLeave={onContainerMouseUp}
-        >
-          {/* Loading spinner */}
-          {!loaded && (
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 10,
-                zIndex: 10,
-              }}
-            >
-              <Spinner animation="border" variant="light" />
-              <span style={{ color: '#aaa', fontSize: 13 }}>Loading…</span>
-            </div>
-          )}
-
-          {/* PDF */}
-          {attachment && url && isPdf && (
-            <iframe
-              key={url}
-              title={attachment.original_name}
-              src={`${url}#toolbar=1`}
-              style={{
-                width: '100%',
-                height: '68vh',
-                border: 'none',
-                opacity: loaded ? 1 : 0,
-                transition: 'opacity 0.2s',
-              }}
-              onLoad={() => setLoaded(true)}
-            />
-          )}
-
-          {/* Image */}
-          {attachment && url && !isPdf && (
-            <img
-              key={url}
-              src={url}
-              alt={attachment.original_name}
-              draggable={false}
-              style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                display: 'block',
-                opacity: loaded ? 1 : 0,
-                transform: `translate(${pos.x}px, ${pos.y}px) rotate(${rotation}deg) scale(${scale})`,
-                transformOrigin: 'center center',
-                transition: isDragging ? 'opacity 0.2s' : 'transform 0.2s ease, opacity 0.2s',
-                userSelect: 'none',
-                WebkitUserSelect: 'none',
-                pointerEvents: 'none',
-              }}
-              onLoad={() => setLoaded(true)}
-            />
-          )}
-        </div>
-      </Modal.Body>
-    </Modal>
-  );
+        {isPdf ? (
+          <iframe title={attachment.original_name} src={`${url}#toolbar=1`} className={cn('h-[68vh] w-full border-0 transition-opacity', loaded ? 'opacity-100' : 'opacity-0')} onLoad={() => setLoaded(true)} />
+        ) : (
+          <img
+            src={url}
+            alt={attachment.original_name}
+            draggable={false}
+            onLoad={() => setLoaded(true)}
+            className={cn('pointer-events-none block max-h-full max-w-full select-none', loaded ? 'opacity-100' : 'opacity-0')}
+            style={{
+              transform: `translate(${pos.x}px, ${pos.y}px) rotate(${rotation}deg) scale(${scale})`,
+              transformOrigin: 'center center',
+              transition: dragging ? 'opacity 0.2s' : 'transform 0.2s ease, opacity 0.2s',
+            }}
+          />
+        )}
+      </div>
+    </>
+  )
 }

@@ -20,9 +20,9 @@ import { decideCorrection, fetchCorrections, type CorrectionFilter, type Correct
 const STATUS_TONE = { present: 'success', absent: 'destructive', leave: 'warning', not_marked: 'secondary' } as const
 
 function StatusChip({ s }: { s?: CorrectionItem['current_status'] }) {
-  if (!s) return <span className="tw:text-muted-foreground">—</span>
+  if (!s) return <span className="text-muted-foreground">—</span>
   return (
-    <Badge variant={STATUS_TONE[s]} className="tw:capitalize">
+    <Badge variant={STATUS_TONE[s]} className="capitalize">
       {s.replace('_', ' ')}
     </Badge>
   )
@@ -51,11 +51,11 @@ export default function CorrectionsAdminPage() {
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Attendance Correction Requests"
         description="Review requests from students and teachers to fix their attendance."
-        className="tw:mb-0"
+        className="mb-0"
         actions={
           <SegmentedControl<CorrectionFilter>
             label="Request status"
@@ -74,9 +74,9 @@ export default function CorrectionsAdminPage() {
       {list.error ? (
         <ErrorState title="Failed to load requests" onRetry={list.reload} />
       ) : list.loading && items.length === 0 ? (
-        <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading requests">
+        <div className="flex flex-col gap-3" role="status" aria-label="Loading requests">
           {Array.from({ length: 3 }, (_, i) => (
-            <Skeleton key={i} className="tw:h-28 tw:rounded-xl" />
+            <Skeleton key={i} className="h-28 rounded-xl" />
           ))}
         </div>
       ) : items.length === 0 ? (
@@ -84,47 +84,47 @@ export default function CorrectionsAdminPage() {
           <EmptyState icon={ClipboardPen} title="No requests found." description={status === 'pending' ? 'All caught up — nothing waiting for review.' : undefined} />
         </Card>
       ) : (
-        <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0">
+        <ul className="m-0 flex list-none flex-col gap-3 p-0">
           <AnimatePresence initial={false}>
             {items.map((it) => {
               const busy = acting?.id === it.id
               return (
                 <m.li key={it.id} layout variants={slideUp} initial="hidden" animate="visible" exit={{ opacity: 0, x: 24, transition: transitions.fast }}>
-                  <Card className="tw:gap-3 tw:px-5 tw:py-4">
-                    <div className="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-3">
-                      <div className="tw:flex tw:items-center tw:gap-3">
+                  <Card className="gap-3 px-5 py-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
                         <UserAvatar name={it.user?.name ?? 'User'} image={it.user?.profile_img} />
                         <div>
-                          <div className="tw:font-semibold tw:text-foreground">{it.user?.name ?? 'User'}</div>
-                          <div className="tw:text-xs tw:capitalize tw:text-muted-foreground">{it.user?.role}</div>
+                          <div className="font-semibold text-foreground">{it.user?.name ?? 'User'}</div>
+                          <div className="text-xs capitalize text-muted-foreground">{it.user?.role}</div>
                         </div>
                       </div>
-                      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-sm">
-                        <span className="tw:font-medium">{formatDate(it.attendance_date)}</span>
+                      <div className="flex flex-wrap items-center gap-2 text-sm">
+                        <span className="font-medium">{formatDate(it.attendance_date)}</span>
                         <StatusChip s={it.current_status} />
-                        <ArrowRight className="tw:size-4 tw:text-muted-foreground" aria-label="to" />
+                        <ArrowRight className="size-4 text-muted-foreground" aria-label="to" />
                         <StatusChip s={it.requested_status} />
                       </div>
                     </div>
-                    <p className="tw:m-0 tw:rounded-lg tw:bg-muted/60 tw:px-3 tw:py-2 tw:text-sm tw:text-foreground">“{it.reason}”</p>
+                    <p className="m-0 rounded-lg bg-muted/60 px-3 py-2 text-sm text-foreground">“{it.reason}”</p>
                     {it.status === 'pending' ? (
-                      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Input
-                          className="tw:h-9 tw:min-w-56 tw:flex-1"
+                          className="h-9 min-w-56 flex-1"
                           placeholder="Optional comment"
                           aria-label={`Comment for ${it.user?.name ?? 'this request'}`}
                           value={comments[it.id] ?? ''}
                           onChange={(e) => setComments((c) => ({ ...c, [it.id]: e.target.value }))}
                           disabled={busy}
                         />
-                        <Button size="sm" className="tw:bg-success tw:text-success-foreground tw:hover:bg-success/90" loading={busy && acting?.approved} disabled={busy} onClick={() => void act(it, true)}>
+                        <Button size="sm" className="bg-success text-success-foreground hover:bg-success/90" loading={busy && acting?.approved} disabled={busy} onClick={() => void act(it, true)}>
                           {!(busy && acting?.approved) && <Check aria-hidden="true" />}
                           {busy && acting?.approved ? 'Saving…' : 'Approve'}
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
-                          className="tw:border-destructive/40 tw:text-destructive tw:hover:bg-destructive-soft tw:hover:text-destructive"
+                          className="border-destructive/40 text-destructive hover:bg-destructive-soft hover:text-destructive"
                           loading={busy && !acting?.approved}
                           disabled={busy}
                           onClick={() => void act(it, false)}
@@ -134,7 +134,7 @@ export default function CorrectionsAdminPage() {
                         </Button>
                       </div>
                     ) : (
-                      <Badge variant={it.status === 'approved' ? 'success' : 'destructive'} className="tw:capitalize">
+                      <Badge variant={it.status === 'approved' ? 'success' : 'destructive'} className="capitalize">
                         {it.status}
                       </Badge>
                     )}

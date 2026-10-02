@@ -21,10 +21,10 @@ export function ReadOnlyMark({ what }: { what: string }) {
       <TooltipTrigger asChild>
         <span
           tabIndex={0}
-          className="tw:inline-flex tw:size-8 tw:items-center tw:justify-center tw:rounded-md tw:text-muted-foreground tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50"
+          className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
           aria-label={`Base ${what} — read-only`}
         >
-          <Lock className="tw:size-4" aria-hidden="true" />
+          <Lock className="size-4" aria-hidden="true" />
         </span>
       </TooltipTrigger>
       <TooltipContent>Base {what}s are shared and can&apos;t be edited</TooltipContent>

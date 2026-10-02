@@ -22,7 +22,7 @@ import { useStudentsData, type StatusFilter } from '../hooks/useStudentsData'
 import { classLabelFor, filterStudents, subjectNamesFor } from '../lib/studentRows'
 import { deleteStudent, type Student } from '../services/studentsService'
 
-const FIELD = 'tw:m-0 tw:flex tw:flex-col tw:gap-1.5 tw:text-sm tw:font-medium tw:text-foreground'
+const FIELD = 'm-0 flex flex-col gap-1.5 text-sm font-medium text-foreground'
 
 /**
  * Route gate: students.view | students.manage | role teacher.
@@ -68,10 +68,10 @@ export default function StudentsPage() {
           type="button"
           onClick={() => setViewUserId(row.original.id)}
           title="View profile"
-          className="tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:border-0 tw:bg-transparent tw:p-0 tw:text-left tw:outline-none tw:hover:underline tw:focus-visible:underline"
+          className="m-0 flex cursor-pointer items-center gap-3 border-0 bg-transparent p-0 text-left outline-none hover:underline focus-visible:underline"
         >
-          <UserAvatar name={row.original.name} className="tw:size-8" toneClassName="tw:bg-info-soft tw:text-info" />
-          <span className="tw:font-medium tw:text-foreground">{row.original.name}</span>
+          <UserAvatar name={row.original.name} className="size-8" toneClassName="bg-info-soft text-info" />
+          <span className="font-medium text-foreground">{row.original.name}</span>
         </button>
       ),
     },
@@ -79,7 +79,7 @@ export default function StudentsPage() {
       accessorKey: 'email',
       header: 'Email',
       cell: ({ row }) => (
-        <span className="tw:inline-block tw:max-w-40 tw:truncate tw:align-middle tw:text-muted-foreground" title={row.original.email}>
+        <span className="inline-block max-w-40 truncate align-middle text-muted-foreground" title={row.original.email}>
           {row.original.email}
         </span>
       ),
@@ -92,9 +92,9 @@ export default function StudentsPage() {
       accessorFn: (s) => subjectNamesFor(s, data.subjects).join(', '),
       cell: ({ row }) => {
         const names = subjectNamesFor(row.original, data.subjects)
-        if (names.length === 0) return <span className="tw:text-muted-foreground">-</span>
+        if (names.length === 0) return <span className="text-muted-foreground">-</span>
         return (
-          <span className="tw:flex tw:flex-wrap tw:items-center tw:gap-1" title={names.join(', ')}>
+          <span className="flex flex-wrap items-center gap-1" title={names.join(', ')}>
             {names.slice(0, 2).map((n) => (
               <Badge key={n} variant="secondary">
                 {n}
@@ -112,7 +112,7 @@ export default function StudentsPage() {
             id: 'phone',
             header: 'Phone',
             accessorFn: (s) => s.student_profile?.phone || '',
-            cell: ({ row }) => row.original.student_profile?.phone || <span className="tw:text-muted-foreground">-</span>,
+            cell: ({ row }) => row.original.student_profile?.phone || <span className="text-muted-foreground">-</span>,
           },
           {
             id: 'status',
@@ -125,7 +125,7 @@ export default function StudentsPage() {
       : []),
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">{isAdmin ? 'Actions' : 'Profile'}</span>,
+      header: () => <span className="sr-only">{isAdmin ? 'Actions' : 'Profile'}</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) => {
@@ -145,7 +145,7 @@ export default function StudentsPage() {
                 <MoreVertical aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="tw:w-48">
+            <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onSelect={() => setViewUserId(s.id)}>
                 <Eye aria-hidden="true" /> View Profile
               </DropdownMenuItem>
@@ -197,7 +197,7 @@ export default function StudentsPage() {
         }
       />
 
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+      <Card className="gap-0 overflow-hidden py-0">
         <DataTable
           columns={columns}
           data={filtered}
@@ -207,12 +207,12 @@ export default function StudentsPage() {
           emptyTitle="No students found."
           pageSize={25}
           toolbar={
-            <div className="tw:grid tw:w-full tw:grid-cols-1 tw:items-end tw:gap-3 tw:sm:grid-cols-2 tw:lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]">
+            <div className="grid w-full grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]">
               <label className={FIELD}>
                 Search by Name
-                <span className="tw:relative">
-                  <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-                  <Input type="search" placeholder="Student name..." value={search} onChange={(e) => setSearch(e.target.value)} className="tw:pl-9" />
+                <span className="relative">
+                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                  <Input type="search" placeholder="Student name..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
                 </span>
               </label>
               <label className={FIELD}>
@@ -248,12 +248,12 @@ export default function StudentsPage() {
                   </NativeSelect>
                 </label>
               ) : (
-                <span className="tw:hidden tw:lg:block" />
+                <span className="hidden lg:block" />
               )}
-              <div className="tw:flex tw:items-center tw:gap-2 tw:pb-2 tw:text-sm tw:text-muted-foreground">
+              <div className="flex items-center gap-2 pb-2 text-sm text-muted-foreground">
                 {hasLocalFilter && (
                   <>
-                    <span className="tw:whitespace-nowrap">
+                    <span className="whitespace-nowrap">
                       {filtered.length} of {data.rows.length}
                     </span>
                     <Button

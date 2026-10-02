@@ -29,15 +29,15 @@ export default function LibraryChaptersPage() {
   const noSubjects = !subjects.loading && (subjects.data ?? []).length === 0
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-5">
-      <PageHeader title="Library — Chapters" description="Chapters for the subjects your students take. Open one to see its topics, explanations and questions." className="tw:mb-0" />
+    <div className="flex flex-col gap-5">
+      <PageHeader title="Library — Chapters" description="Chapters for the subjects your students take. Open one to see its topics, explanations and questions." className="mb-0" />
 
       {!noSubjects && (
-        <Card className="tw:flex-row tw:flex-wrap tw:items-center tw:gap-3 tw:p-3">
+        <Card className="flex-row flex-wrap items-center gap-3 p-3">
           <SubjectChips subjects={subjects.data ?? []} value={subject} onChange={setSubject} allLabel="All my subjects" />
-          <div className="tw:relative tw:ml-auto tw:w-full tw:sm:w-64">
-            <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-            <Input type="search" className="tw:h-9 tw:pl-9" placeholder="Search chapters" aria-label="Search chapters" value={q} onChange={(e) => setQ(e.target.value)} />
+          <div className="relative ml-auto w-full sm:w-64">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Input type="search" className="h-9 pl-9" placeholder="Search chapters" aria-label="Search chapters" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
         </Card>
       )}
@@ -47,9 +47,9 @@ export default function LibraryChaptersPage() {
           <EmptyState icon={GraduationCap} title="No subjects yet" description={NO_SUBJECTS} />
         </Card>
       ) : list.loading && !list.data ? (
-        <div className="tw:grid tw:gap-3 tw:sm:grid-cols-2 tw:lg:grid-cols-3" role="status" aria-label="Loading chapters">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading chapters">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="tw:h-24 tw:rounded-xl" />
+            <Skeleton key={i} className="h-24 rounded-xl" />
           ))}
         </div>
       ) : chapters.length === 0 ? (
@@ -57,26 +57,26 @@ export default function LibraryChaptersPage() {
           <EmptyState icon={BookMarked} title={q ? `No chapters match “${q}”.` : 'No chapters found for this subject.'} />
         </Card>
       ) : (
-        <ul className={cn('tw:m-0 tw:grid tw:list-none tw:gap-3 tw:p-0 tw:sm:grid-cols-2 tw:lg:grid-cols-3', list.loading && 'tw:opacity-70')}>
+        <ul className={cn('m-0 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3', list.loading && 'opacity-70')}>
           {chapters.map((c) => {
             const n = c.topics_count ?? 0
             return (
               <li key={c.id}>
                 <Link
                   to={`/library/chapters/${c.id}`}
-                  className="tw:group tw:flex tw:h-full tw:items-start tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4 tw:text-foreground tw:no-underline tw:transition-colors tw:hover:border-primary/40 tw:hover:bg-primary-soft/30"
+                  className="group flex h-full items-start gap-3 rounded-xl border border-solid border-border bg-card p-4 text-foreground no-underline transition-colors hover:border-primary/40 hover:bg-primary-soft/30"
                 >
-                  <span className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-lg tw:bg-primary-soft tw:text-primary">
-                    <BookMarked className="tw:size-5" aria-hidden="true" />
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                    <BookMarked className="size-5" aria-hidden="true" />
                   </span>
-                  <span className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1.5">
-                    <span className="tw:font-semibold">{c.name}</span>
-                    <span className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-xs tw:text-muted-foreground">
+                  <span className="flex min-w-0 flex-1 flex-col gap-1.5">
+                    <span className="font-semibold">{c.name}</span>
+                    <span className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                       <Badge variant="soft">{c.subject?.subject ?? subjectName(c.subject_id) ?? '-'}</Badge>
                       {n} {n === 1 ? 'topic' : 'topics'}
                     </span>
                   </span>
-                  <ChevronRight className="tw:mt-2 tw:size-4 tw:shrink-0 tw:text-muted-foreground tw:transition-transform tw:group-hover:translate-x-0.5" aria-hidden="true" />
+                  <ChevronRight className="mt-2 size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
                 </Link>
               </li>
             )

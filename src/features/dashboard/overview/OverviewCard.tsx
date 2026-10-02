@@ -19,15 +19,15 @@ export default function OverviewCard({ title, count, countTone = 'primary', view
   return (
     <WidgetCard
       title={
-        <span className="tw:flex tw:items-center tw:gap-2">
+        <span className="flex items-center gap-2">
           {title}
           {count !== undefined && count > 0 && <Badge variant={countTone === 'danger' ? 'destructive' : 'default'}>{count}</Badge>}
         </span>
       }
       action={
         viewAllTo ? (
-          <Link to={viewAllTo} className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:font-medium tw:text-primary tw:no-underline tw:hover:underline">
-            View all <ArrowRight className="tw:size-3.5" aria-hidden="true" />
+          <Link to={viewAllTo} className="inline-flex items-center gap-1 text-sm font-medium text-primary no-underline hover:underline">
+            View all <ArrowRight className="size-3.5" aria-hidden="true" />
           </Link>
         ) : undefined
       }

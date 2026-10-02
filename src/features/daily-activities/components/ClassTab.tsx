@@ -58,15 +58,15 @@ export default function ClassTab({ date, classes, subjects, loading, onDirtyChan
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="tw:flex tw:items-center tw:gap-2">
-          <Users className="tw:size-4 tw:text-primary" aria-hidden="true" /> Same lesson for a whole class
+        <CardTitle className="flex items-center gap-2">
+          <Users className="size-4 text-primary" aria-hidden="true" /> Same lesson for a whole class
         </CardTitle>
         <CardDescription>Saved for every active student in the class who takes the subject (only your assigned students if you are a teacher).</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(submit)} noValidate className="tw:flex tw:flex-col tw:gap-5">
-            <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+          <form onSubmit={form.handleSubmit(submit)} noValidate className="flex flex-col gap-5">
+            <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="class_id"
@@ -164,7 +164,7 @@ export default function ClassTab({ date, classes, subjects, loading, onDirtyChan
               </Alert>
             )}
 
-            <div className="tw:flex tw:justify-end">
+            <div className="flex justify-end">
               <Button type="submit" loading={isSubmitting} disabled={loading || !!dateErr}>
                 {isSubmitting ? 'Saving…' : 'Save for whole class'}
               </Button>

@@ -63,9 +63,9 @@ export default function RemarksDialog({ open, onClose, title, description, submi
         name="remarks"
         render={({ field }) => (
           <FormItem>
-            <div className="tw:flex tw:items-baseline tw:justify-between">
+            <div className="flex items-baseline justify-between">
               <FormLabel required>Remarks for the teacher</FormLabel>
-              <span className={remarks.length > MAX ? 'tw:text-xs tw:text-destructive' : 'tw:text-xs tw:text-muted-foreground'}>
+              <span className={remarks.length > MAX ? 'text-xs text-destructive' : 'text-xs text-muted-foreground'}>
                 {remarks.length}/{MAX}
               </span>
             </div>
@@ -73,13 +73,13 @@ export default function RemarksDialog({ open, onClose, title, description, submi
               <Textarea rows={4} autoFocus placeholder="What needs to be regenerated or fixed?" {...field} />
             </FormControl>
             {suggestions.length > 0 && (
-              <FormDescription className="tw:flex tw:flex-wrap tw:gap-1.5">
+              <FormDescription className="flex flex-wrap gap-1.5">
                 {suggestions.map((s) => (
                   <button
                     key={s}
                     type="button"
                     onClick={() => form.setValue('remarks', remarks ? `${remarks.trimEnd()} ${s}` : s, { shouldDirty: true, shouldValidate: true })}
-                    className="tw:m-0 tw:cursor-pointer tw:rounded-full tw:border tw:border-solid tw:border-border tw:bg-muted/50 tw:px-2.5 tw:py-0.5 tw:text-xs tw:text-foreground tw:hover:bg-muted"
+                    className="m-0 cursor-pointer rounded-full border border-solid border-border bg-muted/50 px-2.5 py-0.5 text-xs text-foreground hover:bg-muted"
                   >
                     {s}
                   </button>

@@ -36,9 +36,9 @@ const SUGGESTIONS = ['The explanation is off-topic.', 'Homework is too long for 
 function ContentTabs({ item }: { item: GeneratedContent }) {
   const present = SECTIONS.filter((s) => !!item[s.key])
   const [tab, setTab] = useState<string>(present[0]?.key ?? '')
-  if (!present.length) return <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">No content was generated.</p>
+  if (!present.length) return <p className="m-0 text-sm text-muted-foreground">No content was generated.</p>
   return (
-    <Tabs value={tab} onValueChange={setTab} className="tw:gap-2">
+    <Tabs value={tab} onValueChange={setTab} className="gap-2">
       <TabsList aria-label="Generated content">
         {present.map((s) => (
           <TabsTrigger key={s.key} value={s.key}>
@@ -50,7 +50,7 @@ function ContentTabs({ item }: { item: GeneratedContent }) {
         <TabsContent key={s.key} value={s.key}>
           {/* AI output — always sanitised (as before). */}
           <div
-            className="tw:max-h-72 tw:overflow-y-auto tw:rounded-lg tw:border tw:border-solid tw:border-border tw:bg-muted/30 tw:p-3 tw:text-sm tw:leading-relaxed tw:[&_ol]:list-decimal tw:[&_ol]:pl-5 tw:[&_p]:my-1 tw:[&_ul]:list-disc tw:[&_ul]:pl-5"
+            className="max-h-72 overflow-y-auto rounded-lg border border-solid border-border bg-muted/30 p-3 text-sm leading-relaxed [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-5"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(item[s.key] || '') }}
           />
         </TabsContent>
@@ -94,8 +94,8 @@ export default function GeneratedContentApprovalsPage() {
 
   if (!isAdmin) {
     return (
-      <div className="tw:flex tw:flex-col tw:gap-6">
-        <PageHeader title="AI Content Approvals" className="tw:mb-0" />
+      <div className="flex flex-col gap-6">
+        <PageHeader title="AI Content Approvals" className="mb-0" />
         <Card>
           <EmptyState icon={ShieldAlert} title="You are not authorized to view this page." />
         </Card>
@@ -127,16 +127,16 @@ export default function GeneratedContentApprovalsPage() {
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-5">
-      <PageHeader title="AI Content Approvals" description="Review AI-generated explanations, homework and sample questions before they reach teachers and students." className="tw:mb-0" />
+    <div className="flex flex-col gap-5">
+      <PageHeader title="AI Content Approvals" description="Review AI-generated explanations, homework and sample questions before they reach teachers and students." className="mb-0" />
 
       <Alert>
         <Clock aria-hidden="true" />
         <AlertDescription>Approving releases all of the content to the teacher immediately; sample-question solutions unlock for students 48 hours after approval.</AlertDescription>
       </Alert>
 
-      <div className="tw:flex tw:flex-col tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4">
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
+      <div className="flex flex-col gap-3 rounded-xl border border-solid border-border bg-card p-4">
+        <div className="flex flex-wrap items-center gap-3">
           <SegmentedControl
             label="Status"
             value={status}
@@ -146,7 +146,7 @@ export default function GeneratedContentApprovalsPage() {
               { value: 'approved', label: 'Approved' },
             ]}
           />
-          <div role="group" aria-label="Date range" className="tw:flex tw:flex-wrap tw:items-center tw:gap-1">
+          <div role="group" aria-label="Date range" className="flex flex-wrap items-center gap-1">
             {QUICK_FILTERS.map((f) => (
               <Button
                 key={f.value}
@@ -165,7 +165,7 @@ export default function GeneratedContentApprovalsPage() {
             <Input
               type="date"
               aria-label="Pick a date"
-              className={cn('tw:h-8 tw:w-40', quick === 'custom' && 'tw:border-primary')}
+              className={cn('h-8 w-40', quick === 'custom' && 'border-primary')}
               value={customDate}
               onChange={(e) => {
                 setCustomDate(e.target.value)
@@ -173,14 +173,14 @@ export default function GeneratedContentApprovalsPage() {
               }}
             />
           </div>
-          <Button type="button" size="icon-sm" variant="outline" className="tw:ml-auto" onClick={list.reload} disabled={list.loading} aria-label="Refresh">
-            <RefreshCw className={cn(list.loading && 'tw:animate-spin tw:motion-reduce:animate-none')} aria-hidden="true" />
+          <Button type="button" size="icon-sm" variant="outline" className="ml-auto" onClick={list.reload} disabled={list.loading} aria-label="Refresh">
+            <RefreshCw className={cn(list.loading && 'animate-spin motion-reduce:animate-none')} aria-hidden="true" />
           </Button>
         </div>
-        <div className="tw:grid tw:gap-3 tw:sm:grid-cols-[1fr_16rem]">
-          <div className="tw:relative">
-            <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-            <Input type="search" className="tw:pl-9" placeholder="Search student, teacher, subject or topic" aria-label="Search" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="grid gap-3 sm:grid-cols-[1fr_16rem]">
+          <div className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Input type="search" className="pl-9" placeholder="Search student, teacher, subject or topic" aria-label="Search" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
           <NativeSelect aria-label="Student" value={studentId} onChange={(e) => setStudentId(e.target.value)}>
             <option value="">All students</option>
@@ -194,9 +194,9 @@ export default function GeneratedContentApprovalsPage() {
       </div>
 
       {list.loading && !list.data ? (
-        <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading generated content">
-          <Skeleton className="tw:h-56 tw:rounded-xl" />
-          <Skeleton className="tw:h-56 tw:rounded-xl" />
+        <div className="flex flex-col gap-3" role="status" aria-label="Loading generated content">
+          <Skeleton className="h-56 rounded-xl" />
+          <Skeleton className="h-56 rounded-xl" />
         </div>
       ) : list.error ? (
         <ErrorState title="Unable to load generated content. Please try again later." onRetry={list.reload} />
@@ -205,40 +205,40 @@ export default function GeneratedContentApprovalsPage() {
           <EmptyState icon={Bot} title={q ? 'Nothing matches your search.' : status === 'pending' ? 'Nothing waiting for review.' : 'No generated content found for the selected filters.'} />
         </Card>
       ) : (
-        <ul className={cn('tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0', list.loading && 'tw:opacity-70')}>
+        <ul className={cn('m-0 flex list-none flex-col gap-3 p-0', list.loading && 'opacity-70')}>
           {shown.map((item) => {
             const a = item.daily_activity
             return (
               <li key={item.id}>
-                <article aria-label={`${a?.student?.name ?? 'Student'} · ${a?.subject?.subject ?? ''}`} className="tw:flex tw:flex-col tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4">
-                  <header className="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1.5">
-                    <span className="tw:text-sm tw:font-semibold tw:text-foreground">{a?.student?.name ?? '-'}</span>
+                <article aria-label={`${a?.student?.name ?? 'Student'} · ${a?.subject?.subject ?? ''}`} className="flex flex-col gap-3 rounded-xl border border-solid border-border bg-card p-4">
+                  <header className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                    <span className="text-sm font-semibold text-foreground">{a?.student?.name ?? '-'}</span>
                     {a?.subject && <Badge variant="soft">{a.subject.subject}</Badge>}
-                    {a?.topic && <span className="tw:text-sm tw:text-foreground">{a.topic}</span>}
+                    {a?.topic && <span className="text-sm text-foreground">{a.topic}</span>}
                     {a?.teacher?.name && (
-                      <span className="tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:text-muted-foreground">
-                        <UserRound className="tw:size-3.5" aria-hidden="true" /> {a.teacher.name}
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <UserRound className="size-3.5" aria-hidden="true" /> {a.teacher.name}
                       </span>
                     )}
-                    <span className="tw:ml-auto tw:flex tw:items-center tw:gap-2">
-                      {a?.activity_date && <span className="tw:text-xs tw:text-muted-foreground">{formatDate(a.activity_date)}</span>}
+                    <span className="ml-auto flex items-center gap-2">
+                      {a?.activity_date && <span className="text-xs text-muted-foreground">{formatDate(a.activity_date)}</span>}
                       <Badge variant={item.is_admin_approved ? 'success' : 'warning'}>{item.is_admin_approved ? 'Approved' : 'Pending review'}</Badge>
                     </span>
                   </header>
 
                   {item.admin_feedback && (
-                    <p className="tw:m-0 tw:rounded-md tw:border-l-4 tw:border-solid tw:border-y-0 tw:border-r-0 tw:border-warning tw:bg-warning-soft tw:px-3 tw:py-1.5 tw:text-sm">
-                      <span className="tw:font-semibold">Feedback:</span>{' '}
+                    <p className="m-0 rounded-md border-l-4 border-solid border-y-0 border-r-0 border-warning bg-warning-soft px-3 py-1.5 text-sm">
+                      <span className="font-semibold">Feedback:</span>{' '}
                       {item.admin_feedback}
                     </p>
                   )}
 
                   <ContentTabs item={item} />
 
-                  <footer className="tw:flex tw:flex-wrap tw:items-center tw:justify-end tw:gap-2 tw:border-t tw:border-solid tw:border-border tw:pt-3">
+                  <footer className="flex flex-wrap items-center justify-end gap-2 border-t border-solid border-border pt-3">
                     {item.is_admin_approved ? (
                       <>
-                        <span className="tw:mr-auto tw:text-xs tw:text-muted-foreground">Approved {formatDateTime(item.approved_at)}</span>
+                        <span className="mr-auto text-xs text-muted-foreground">Approved {formatDateTime(item.approved_at)}</span>
                         <Button size="sm" variant="outline" disabled={busyId === item.id} onClick={() => setPendingFor(item)}>
                           <Undo2 aria-hidden="true" /> Mark pending
                         </Button>

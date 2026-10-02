@@ -18,7 +18,7 @@ export default function PhoneField<T extends FieldValues>({ control, name, label
             <FormControl>
               <Input type="tel" inputMode="tel" autoComplete="off" maxLength={20} placeholder="e.g. 98765 43210" {...field} />
             </FormControl>
-            {hint && <FormDescription className="tw:text-warning">This doesn't look like a 10-digit Indian mobile number — double-check it.</FormDescription>}
+            {hint && <FormDescription className="text-warning">This doesn't look like a 10-digit Indian mobile number — double-check it.</FormDescription>}
             <FormMessage />
           </FormItem>
         )

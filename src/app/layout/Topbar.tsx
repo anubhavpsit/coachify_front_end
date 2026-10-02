@@ -46,8 +46,8 @@ export default function Topbar({ isDesktop, sidebarCollapsed, onToggleSidebar, t
   }
 
   const searchForm = (className?: string) => (
-    <form role="search" className={cn('tw:relative', className)} onSubmit={handleSearchSubmit}>
-      <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
+    <form role="search" className={cn('relative', className)} onSubmit={handleSearchSubmit}>
+      <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
       <Input
         type="search"
         name="search"
@@ -55,7 +55,7 @@ export default function Topbar({ isDesktop, sidebarCollapsed, onToggleSidebar, t
         aria-label="Search"
         value={searchTerm}
         onChange={(event) => setSearchTerm(event.target.value)}
-        className="tw:rounded-full tw:bg-background tw:pl-9"
+        className="rounded-full bg-background pl-9"
       />
     </form>
   )
@@ -65,11 +65,11 @@ export default function Topbar({ isDesktop, sidebarCollapsed, onToggleSidebar, t
   return (
     <header
       className={cn(
-        'tw:sticky tw:top-0 tw:z-30 tw:border-b tw:border-solid tw:border-border tw:bg-card/85 tw:backdrop-blur-md tw:transition-shadow tw:duration-250',
-        scrolled && 'tw:shadow-md',
+        'sticky top-0 z-30 border-b border-solid border-border bg-card/85 backdrop-blur-md transition-shadow duration-250',
+        scrolled && 'shadow-md',
       )}
     >
-      <div className="tw:flex tw:h-16 tw:items-center tw:gap-3 tw:px-4 tw:md:px-6">
+      <div className="flex h-16 items-center gap-3 px-4 md:px-6">
         <Button
           variant="ghost"
           size="icon"
@@ -77,26 +77,26 @@ export default function Topbar({ isDesktop, sidebarCollapsed, onToggleSidebar, t
           aria-label="Toggle sidebar"
           aria-expanded={isDesktop ? !sidebarCollapsed : undefined}
         >
-          <SidebarIcon className="tw:size-5" aria-hidden="true" />
+          <SidebarIcon className="size-5" aria-hidden="true" />
         </Button>
 
-        {searchForm('tw:hidden tw:w-full tw:max-w-sm tw:md:block')}
+        {searchForm('hidden w-full max-w-sm md:block')}
 
-        <div className="tw:ml-auto tw:flex tw:items-center tw:gap-2">
+        <div className="ml-auto flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
-            className="tw:md:hidden"
+            className="md:hidden"
             aria-label="Search"
             aria-expanded={mobileSearch}
             onClick={() => setMobileSearch((v) => !v)}
           >
-            <Search className="tw:size-5" aria-hidden="true" />
+            <Search className="size-5" aria-hidden="true" />
           </Button>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="secondary" size="icon" className="tw:rounded-full" onClick={onToggleTheme} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-                {theme === 'dark' ? <Sun className="tw:size-5" aria-hidden="true" /> : <Moon className="tw:size-5" aria-hidden="true" />}
+              <Button variant="secondary" size="icon" className="rounded-full" onClick={onToggleTheme} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+                {theme === 'dark' ? <Sun className="size-5" aria-hidden="true" /> : <Moon className="size-5" aria-hidden="true" />}
               </Button>
             </TooltipTrigger>
             <TooltipContent>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</TooltipContent>
@@ -106,7 +106,7 @@ export default function Topbar({ isDesktop, sidebarCollapsed, onToggleSidebar, t
           <UserMenu user={user} />
         </div>
       </div>
-      {mobileSearch && <div className="tw:px-4 tw:pb-3 tw:md:hidden">{searchForm()}</div>}
+      {mobileSearch && <div className="px-4 pb-3 md:hidden">{searchForm()}</div>}
     </header>
   )
 }

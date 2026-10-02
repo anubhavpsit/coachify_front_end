@@ -84,30 +84,30 @@ export default function ShareSheet({ fact, onClose, onShared }: { fact: Fact | n
   }
 
   const channels: { ch: ShareChannel; label: string; icon: LucideIcon; cls: string }[] = [
-    { ch: 'WHATSAPP', label: 'WhatsApp', icon: MessageCircle, cls: 'tw:bg-[#25D366] tw:text-white' },
-    { ch: 'FACEBOOK', label: 'Facebook', icon: FacebookMark, cls: 'tw:bg-[#1877F2] tw:text-white' },
-    { ch: 'TWITTER', label: 'Twitter / X', icon: XMark, cls: 'tw:bg-black tw:text-white' },
-    { ch: 'EMAIL', label: 'Email', icon: Mail, cls: 'tw:bg-slate-500 tw:text-white' },
-    { ch: 'COPY_LINK', label: 'Copy link', icon: Copy, cls: 'tw:bg-muted tw:text-foreground' },
-    ...(canWebShare ? [{ ch: 'WEB_SHARE' as const, label: 'More options', icon: Share, cls: 'tw:bg-muted tw:text-foreground' }] : []),
+    { ch: 'WHATSAPP', label: 'WhatsApp', icon: MessageCircle, cls: 'bg-[#25D366] text-white' },
+    { ch: 'FACEBOOK', label: 'Facebook', icon: FacebookMark, cls: 'bg-[#1877F2] text-white' },
+    { ch: 'TWITTER', label: 'Twitter / X', icon: XMark, cls: 'bg-black text-white' },
+    { ch: 'EMAIL', label: 'Email', icon: Mail, cls: 'bg-slate-500 text-white' },
+    { ch: 'COPY_LINK', label: 'Copy link', icon: Copy, cls: 'bg-muted text-foreground' },
+    ...(canWebShare ? [{ ch: 'WEB_SHARE' as const, label: 'More options', icon: Share, cls: 'bg-muted text-foreground' }] : []),
   ]
 
   return (
     <Dialog open={!!fact} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="tw:sm:max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Share</DialogTitle>
-          <DialogDescription className="tw:line-clamp-1">{fact?.title}</DialogDescription>
+          <DialogDescription className="line-clamp-1">{fact?.title}</DialogDescription>
         </DialogHeader>
-        <div className="tw:grid tw:grid-cols-2 tw:gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5">
           {channels.map(({ ch, label, icon: Icon, cls }) => (
             <button
               key={ch}
               type="button"
               onClick={() => void share(ch)}
-              className={cn('tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-2.5 tw:rounded-xl tw:border-0 tw:px-3.5 tw:py-3 tw:text-sm tw:font-semibold tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50 tw:hover:opacity-90', cls)}
+              className={cn('m-0 flex cursor-pointer items-center gap-2.5 rounded-xl border-0 px-3.5 py-3 text-sm font-semibold outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 hover:opacity-90', cls)}
             >
-              <Icon className="tw:size-4" aria-hidden="true" /> {label}
+              <Icon className="size-4" aria-hidden="true" /> {label}
             </button>
           ))}
         </div>

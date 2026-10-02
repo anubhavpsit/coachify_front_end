@@ -62,31 +62,31 @@ export default function DailyActivitiesPage() {
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-5">
-      <PageHeader title="Daily Activities" description="Log what you taught so students and admins can follow along." className="tw:mb-0" />
+    <div className="flex flex-col gap-5">
+      <PageHeader title="Daily Activities" description="Log what you taught so students and admins can follow along." className="mb-0" />
 
       <Tabs value={mode} onValueChange={(v) => setMode(v as Mode)}>
         <TabsList aria-label="How to log">
           <TabsTrigger value="student">
             <UserRound aria-hidden="true" />
-            <span className="tw:sm:hidden">Students</span>
-            <span className="tw:hidden tw:sm:inline">Individual students</span>
+            <span className="sm:hidden">Students</span>
+            <span className="hidden sm:inline">Individual students</span>
           </TabsTrigger>
           <TabsTrigger value="batch">
             <Users aria-hidden="true" />
-            <span className="tw:sm:hidden">Class</span>
-            <span className="tw:hidden tw:sm:inline">Whole class</span>
+            <span className="sm:hidden">Class</span>
+            <span className="hidden sm:inline">Whole class</span>
           </TabsTrigger>
           <TabsTrigger value="history">
             <History aria-hidden="true" /> History
           </TabsTrigger>
         </TabsList>
-        <p className="tw:m-0 tw:-mt-1 tw:text-sm tw:text-muted-foreground">{descriptions[mode]}</p>
+        <p className="m-0 -mt-1 text-sm text-muted-foreground">{descriptions[mode]}</p>
 
         {mode !== 'history' && <DateBar value={date} onChange={requestDate} note={mode === 'batch' ? 'applies to every student in the class' : 'applies to all entries below'} />}
 
         {/* forceMount keeps unsaved work when switching tabs. */}
-        <TabsPrimitive.Content value="student" forceMount hidden={mode !== 'student'} className="tw:outline-none">
+        <TabsPrimitive.Content value="student" forceMount hidden={mode !== 'student'} className="outline-none">
           <StudentEntriesTab
             date={date}
             refreshKey={refreshKey}
@@ -97,7 +97,7 @@ export default function DailyActivitiesPage() {
             onDirtyChange={onStudentDirty}
           />
         </TabsPrimitive.Content>
-        <TabsPrimitive.Content value="batch" forceMount hidden={mode !== 'batch'} className="tw:outline-none">
+        <TabsPrimitive.Content value="batch" forceMount hidden={mode !== 'batch'} className="outline-none">
           <ClassTab
             date={date}
             classes={catalog.data?.classes ?? []}
@@ -107,7 +107,7 @@ export default function DailyActivitiesPage() {
             onSaved={() => !dirty.student && setRefreshKey((k) => k + 1)}
           />
         </TabsPrimitive.Content>
-        <TabsPrimitive.Content value="history" forceMount hidden={mode !== 'history'} className="tw:outline-none">
+        <TabsPrimitive.Content value="history" forceMount hidden={mode !== 'history'} className="outline-none">
           <HistoryTab
             active={mode === 'history'}
             initialDate={initialHistoryDate}

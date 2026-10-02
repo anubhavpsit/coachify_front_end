@@ -37,7 +37,7 @@ export default function GhostStudentsCard() {
       <StudentListCard
         title="Ghost Students"
         icon={Ghost}
-        iconClassName="tw:bg-warning-soft tw:text-warning"
+        iconClassName="bg-warning-soft text-warning"
         countLabel={`${students.length} not seen in ${DAYS}+ days`}
         badgeVariant="warning"
         loading={loading}
@@ -45,7 +45,7 @@ export default function GhostStudentsCard() {
         showStatus
         className={(s) => classLabel(classes, s.class)}
         action={(s) => (
-          <Button variant="outline" size="sm" className="tw:border-destructive/40 tw:text-destructive tw:hover:bg-destructive-soft tw:hover:text-destructive" onClick={() => setConfirming(s)}>
+          <Button variant="outline" size="sm" className="border-destructive/40 text-destructive hover:bg-destructive-soft hover:text-destructive" onClick={() => setConfirming(s)}>
             <UserMinus aria-hidden="true" />
             Mark Inactive
           </Button>

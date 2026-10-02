@@ -42,16 +42,16 @@ export default function AddTopicsPanel({ topics, loading, adding, onAdd, onCreat
     })
 
   return (
-    <Card className="tw:gap-4">
+    <Card className="gap-4">
       <CardHeader>
         <CardTitle>Add existing topics</CardTitle>
         <CardDescription>Your topics in this subject that aren&apos;t in this chapter yet.</CardDescription>
       </CardHeader>
-      <CardContent className="tw:flex tw:flex-col tw:gap-3">
+      <CardContent className="flex flex-col gap-3">
         {loading ? (
-          <div className="tw:flex tw:flex-col tw:gap-2" role="status" aria-label="Loading topics">
-            <Skeleton className="tw:h-10" />
-            <Skeleton className="tw:h-10" />
+          <div className="flex flex-col gap-2" role="status" aria-label="Loading topics">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
           </div>
         ) : topics.length === 0 ? (
           <EmptyState
@@ -63,16 +63,16 @@ export default function AddTopicsPanel({ topics, loading, adding, onAdd, onCreat
                 <Plus aria-hidden="true" /> New topic
               </Button>
             }
-            className="tw:py-4"
+            className="py-4"
           />
         ) : (
           <>
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
-              <div className="tw:relative tw:min-w-48 tw:flex-1">
-                <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-                <Input type="search" className="tw:h-9 tw:pl-9" placeholder="Search topics" aria-label="Search topics to add" value={q} onChange={(e) => setQ(e.target.value)} />
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative min-w-48 flex-1">
+                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                <Input type="search" className="h-9 pl-9" placeholder="Search topics" aria-label="Search topics to add" value={q} onChange={(e) => setQ(e.target.value)} />
               </div>
-              <label className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-sm">
+              <label className="m-0 flex items-center gap-2 text-sm">
                 <Checkbox
                   checked={allShown}
                   disabled={shown.length === 0}
@@ -87,16 +87,16 @@ export default function AddTopicsPanel({ topics, loading, adding, onAdd, onCreat
                 Select all{q ? ' shown' : ''}
               </label>
             </div>
-            <ul className="tw:m-0 tw:flex tw:max-h-80 tw:list-none tw:flex-col tw:divide-y tw:divide-border tw:overflow-y-auto tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-0">
+            <ul className="m-0 flex max-h-80 list-none flex-col divide-y divide-border overflow-y-auto rounded-lg border border-solid border-border p-0">
               {shown.length === 0 ? (
-                <li className="tw:px-3 tw:py-3 tw:text-sm tw:text-muted-foreground">No topics match “{q}”.</li>
+                <li className="px-3 py-3 text-sm text-muted-foreground">No topics match “{q}”.</li>
               ) : (
                 shown.map((t) => (
                   <li key={t.id}>
-                    <label className={cn('tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:px-3 tw:py-2.5 tw:text-sm tw:hover:bg-muted/50', selected.has(t.id) && 'tw:bg-primary-soft/50')}>
+                    <label className={cn('m-0 flex cursor-pointer items-center gap-3 px-3 py-2.5 text-sm hover:bg-muted/50', selected.has(t.id) && 'bg-primary-soft/50')}>
                       <Checkbox checked={selected.has(t.id)} onCheckedChange={() => toggle(t.id)} />
-                      <span className="tw:min-w-0 tw:flex-1 tw:font-medium tw:text-foreground">{t.name}</span>
-                      <span className="tw:text-xs tw:text-muted-foreground">{t.grade ? `Grade ${t.grade}` : 'All grades'}</span>
+                      <span className="min-w-0 flex-1 font-medium text-foreground">{t.name}</span>
+                      <span className="text-xs text-muted-foreground">{t.grade ? `Grade ${t.grade}` : 'All grades'}</span>
                       {t.chapter_id && (
                         <Badge variant="warning" title="Adding it here moves it out of its current chapter">
                           <ArrowRightLeft aria-hidden="true" /> in {t.chapter?.name ?? 'another chapter'}
@@ -107,19 +107,19 @@ export default function AddTopicsPanel({ topics, loading, adding, onAdd, onCreat
                 ))
               )}
             </ul>
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {moving > 0 && (
-                <span className="tw:text-xs tw:text-warning">
+                <span className="text-xs text-warning">
                   {moving} selected {moving === 1 ? 'topic is' : 'topics are'} in another chapter and will move here.
                 </span>
               )}
-              <span className="tw:ml-auto tw:hidden tw:text-xs tw:text-muted-foreground tw:sm:inline">
+              <span className="ml-auto hidden text-xs text-muted-foreground sm:inline">
                 Need something new?{' '}
-                <button type="button" onClick={onCreate} className="tw:m-0 tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0 tw:text-xs tw:font-medium tw:text-primary tw:hover:underline">
+                <button type="button" onClick={onCreate} className="m-0 cursor-pointer border-0 bg-transparent p-0 text-xs font-medium text-primary hover:underline">
                   Create a topic
                 </button>{' '}
                 or open{' '}
-                <Link to="/topics" className="tw:font-medium tw:text-primary tw:no-underline tw:hover:underline">
+                <Link to="/topics" className="font-medium text-primary no-underline hover:underline">
                   all topics
                 </Link>
                 .

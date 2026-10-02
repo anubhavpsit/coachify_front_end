@@ -85,12 +85,12 @@ export default function DataTable<T>({
   const filteredOut = !loading && data.length > 0 && rows.length === 0
 
   return (
-    <div className={cn('tw:flex tw:flex-col', className)}>
+    <div className={cn('flex flex-col', className)}>
       {(searchPlaceholder || toolbar) && (
-        <div className="tw:flex tw:flex-wrap tw:items-end tw:gap-3 tw:border-b tw:border-solid tw:border-border tw:p-4">
+        <div className="flex flex-wrap items-end gap-3 border-b border-solid border-border p-4">
           {searchPlaceholder && (
-            <div className="tw:relative tw:w-full tw:max-w-xs">
-              <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
+            <div className="relative w-full max-w-xs">
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
               <Input
                 type="search"
                 value={globalFilter}
@@ -100,7 +100,7 @@ export default function DataTable<T>({
                 }}
                 placeholder={searchPlaceholder}
                 aria-label={searchPlaceholder}
-                className="tw:pl-9"
+                className="pl-9"
               />
             </div>
           )}
@@ -111,7 +111,7 @@ export default function DataTable<T>({
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((hg) => (
-            <TableRow key={hg.id} className="tw:hover:bg-transparent">
+            <TableRow key={hg.id} className="hover:bg-transparent">
               {hg.headers.map((header) => {
                 const canSort = header.column.getCanSort()
                 const dir = header.column.getIsSorted()
@@ -122,16 +122,16 @@ export default function DataTable<T>({
                   <TableHead
                     key={header.id}
                     aria-sort={dir === 'asc' ? 'ascending' : dir === 'desc' ? 'descending' : canSort ? 'none' : undefined}
-                    className={cn(align === 'right' && 'tw:text-right', align === 'center' && 'tw:text-center')}
+                    className={cn(align === 'right' && 'text-right', align === 'center' && 'text-center')}
                   >
                     {canSort ? (
                       <button
                         type="button"
                         onClick={header.column.getToggleSortingHandler()}
-                        className="tw:m-0 tw:inline-flex tw:cursor-pointer tw:items-center tw:gap-1 tw:border-0 tw:bg-transparent tw:p-0 tw:text-inherit tw:uppercase tw:outline-none tw:hover:text-foreground tw:focus-visible:underline"
+                        className="m-0 inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-inherit uppercase outline-none hover:text-foreground focus-visible:underline"
                       >
                         {label}
-                        <Icon className={cn('tw:size-3.5', dir ? 'tw:text-foreground' : 'tw:opacity-50')} aria-hidden="true" />
+                        <Icon className={cn('size-3.5', dir ? 'text-foreground' : 'opacity-50')} aria-hidden="true" />
                       </button>
                     ) : (
                       label
@@ -145,10 +145,10 @@ export default function DataTable<T>({
         <TableBody>
           {loading &&
             Array.from({ length: 4 }, (_, i) => (
-              <TableRow key={`s${i}`} className="tw:hover:bg-transparent">
+              <TableRow key={`s${i}`} className="hover:bg-transparent">
                 {columns.map((_, j) => (
                   <TableCell key={j}>
-                    <Skeleton className="tw:h-5 tw:w-full tw:max-w-40" />
+                    <Skeleton className="h-5 w-full max-w-40" />
                   </TableCell>
                 ))}
               </TableRow>
@@ -164,12 +164,12 @@ export default function DataTable<T>({
                   exit={{ opacity: 0, transition: transitions.fast }}
                   data-slot="table-row"
                   id={rowProps?.(row.original).id}
-                  className={cn('tw:border-0 tw:border-b tw:border-solid tw:border-border tw:transition-colors tw:hover:bg-muted/50', rowProps?.(row.original).className)}
+                  className={cn('border-0 border-b border-solid border-border transition-colors hover:bg-muted/50', rowProps?.(row.original).className)}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const align = (cell.column.columnDef.meta as { align?: 'right' | 'center' } | undefined)?.align
                     return (
-                      <TableCell key={cell.id} className={cn(align === 'right' && 'tw:text-right', align === 'center' && 'tw:text-center')}>
+                      <TableCell key={cell.id} className={cn(align === 'right' && 'text-right', align === 'center' && 'text-center')}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     )
@@ -181,11 +181,11 @@ export default function DataTable<T>({
         </TableBody>
       </Table>
 
-      {!loading && data.length === 0 && <EmptyState icon={emptyIcon} title={emptyTitle} description={emptyDescription} action={emptyAction} className="tw:py-10" />}
-      {filteredOut && <EmptyState icon={SearchX} title={`No results for “${globalFilter}”`} className="tw:py-10" />}
+      {!loading && data.length === 0 && <EmptyState icon={emptyIcon} title={emptyTitle} description={emptyDescription} action={emptyAction} className="py-10" />}
+      {filteredOut && <EmptyState icon={SearchX} title={`No results for “${globalFilter}”`} className="py-10" />}
 
       {pageSize && !loading && table.getPageCount() > 1 && (
-        <div className="tw:border-t tw:border-solid tw:border-border tw:p-3">
+        <div className="border-t border-solid border-border p-3">
           <Pagination
             page={table.getState().pagination.pageIndex + 1}
             lastPage={table.getPageCount()}

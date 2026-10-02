@@ -45,25 +45,25 @@ export default function TeacherActivityGapsCard() {
       onRetry={reload}
       maxBodyHeight="360px"
     >
-      <m.ul className="tw:m-0 tw:list-none tw:divide-y tw:divide-border tw:p-0" variants={stagger(0.04)} initial="hidden" animate="visible">
+      <m.ul className="m-0 list-none divide-y divide-border p-0" variants={stagger(0.04)} initial="hidden" animate="visible">
         {teachers.map((teacher) => {
           const state = notify.stateOf(teacher.teacher_id)
           const message = notify.messageOf(teacher.teacher_id)
           return (
-            <m.li key={teacher.teacher_id} variants={slideUp} className="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-3 tw:py-3">
-              <div className="tw:flex tw:min-w-0 tw:items-start tw:gap-3">
+            <m.li key={teacher.teacher_id} variants={slideUp} className="flex flex-wrap items-start justify-between gap-3 py-3">
+              <div className="flex min-w-0 items-start gap-3">
                 <UserAvatar name={teacher.teacher_name} />
-                <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-0.5">
-                  <span className="tw:text-sm tw:font-semibold tw:text-foreground">{teacher.teacher_name}</span>
-                  {teacher.teacher_email && <span className="tw:text-xs tw:text-muted-foreground">{teacher.teacher_email}</span>}
-                  <div className="tw:mt-1 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
+                <div className="flex min-w-0 flex-col gap-0.5">
+                  <span className="text-sm font-semibold text-foreground">{teacher.teacher_name}</span>
+                  {teacher.teacher_email && <span className="text-xs text-muted-foreground">{teacher.teacher_email}</span>}
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
                     <Badge variant="warning">Missing days: {teacher.missing_days_count}</Badge>
                     {teacher.missing_dates.slice(0, 3).map((d) => (
                       <Badge key={d} variant="outline">
                         {formatDate(d)}
                       </Badge>
                     ))}
-                    {teacher.missing_dates.length > 3 && <span className="tw:text-xs tw:text-muted-foreground">…</span>}
+                    {teacher.missing_dates.length > 3 && <span className="text-xs text-muted-foreground">…</span>}
                   </div>
                   <AnimatePresence>
                     {message && (
@@ -73,7 +73,7 @@ export default function TeacherActivityGapsCard() {
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className={cn('tw:text-xs', state === 'error' ? 'tw:text-destructive' : 'tw:text-success')}
+                        className={cn('text-xs', state === 'error' ? 'text-destructive' : 'text-success')}
                       >
                         {message}
                       </m.span>

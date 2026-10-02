@@ -97,10 +97,10 @@ export default function FeesPage() {
   const submitting = form.formState.isSubmitting
 
   const columns: ColumnDef<StudentFee, unknown>[] = [
-    { id: 'student', header: 'Student', accessorFn: (f) => f.student?.name ?? '', cell: ({ row }) => <span className="tw:font-medium">{row.original.student?.name || '-'}</span> },
+    { id: 'student', header: 'Student', accessorFn: (f) => f.student?.name ?? '', cell: ({ row }) => <span className="font-medium">{row.original.student?.name || '-'}</span> },
     { id: 'from', header: 'From Date', accessorFn: (f) => f.from_date, cell: ({ row }) => formatDate(row.original.from_date) },
     { id: 'to', header: 'To Date', accessorFn: (f) => f.to_date, cell: ({ row }) => formatDate(row.original.to_date) },
-    { id: 'amount', header: 'Amount', meta: { align: 'right' }, accessorFn: (f) => Number(f.amount) || 0, cell: ({ row }) => <span className="tw:font-semibold tw:tabular-nums">{row.original.amount}</span> },
+    { id: 'amount', header: 'Amount', meta: { align: 'right' }, accessorFn: (f) => Number(f.amount) || 0, cell: ({ row }) => <span className="font-semibold tabular-nums">{row.original.amount}</span> },
     { id: 'mode', header: 'Mode', accessorFn: (f) => f.payment_mode, cell: ({ row }) => paymentModeLabel(row.original.payment_mode) },
     { id: 'submitted', header: 'Submitted On', accessorFn: (f) => f.submitted_on || f.created_at, cell: ({ row }) => formatDate(row.original.submitted_on || row.original.created_at) },
     {
@@ -108,13 +108,13 @@ export default function FeesPage() {
       header: 'Notes',
       enableSorting: false,
       accessorFn: (f) => f.notes ?? '',
-      cell: ({ row }) => <span className="tw:block tw:max-w-60 tw:whitespace-pre-wrap">{row.original.notes || '-'}</span>,
+      cell: ({ row }) => <span className="block max-w-60 whitespace-pre-wrap">{row.original.notes || '-'}</span>,
     },
     ...(canEditFees
       ? ([
           {
             id: 'edit',
-            header: () => <span className="tw:sr-only">Edit</span>,
+            header: () => <span className="sr-only">Edit</span>,
             enableSorting: false,
             meta: { align: 'right' },
             cell: ({ row }) => (
@@ -128,10 +128,10 @@ export default function FeesPage() {
   ]
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
-      <PageHeader title="Student Fees" description="Record tuition payments and review what was collected each month." className="tw:mb-0" />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Student Fees" description="Record tuition payments and review what was collected each month." className="mb-0" />
 
-      <m.div className="tw:grid tw:grid-cols-2 tw:gap-4 tw:lg:grid-cols-3" variants={stagger(0.05)} initial="hidden" animate="visible">
+      <m.div className="grid grid-cols-2 gap-4 lg:grid-cols-3" variants={stagger(0.05)} initial="hidden" animate="visible">
         <StatCard label="Collected this month" value={meta?.total_amount ?? 0} icon={IndianRupee} tone="success" format={formatCurrency} />
         <StatCard label="Payments" value={meta?.count ?? 0} icon={Wallet} tone="primary" />
         {!selected && <StatCard label="Students paid" value={meta?.students_count ?? 0} icon={Users} tone="violet" />}
@@ -144,7 +144,7 @@ export default function FeesPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(submit)} noValidate className="tw:flex tw:flex-col tw:gap-5">
+            <form onSubmit={form.handleSubmit(submit)} noValidate className="flex flex-col gap-5">
               <FeeFields
                 control={form.control}
                 students={students.data ?? []}
@@ -153,12 +153,12 @@ export default function FeesPage() {
                 studentHint={selected ? `${selected.email} · Phone: ${selected.student_profile?.phone || '-'}` : undefined}
                 fromHint={
                   suggest.loading ? (
-                    <span className="tw:flex tw:items-center tw:gap-1 tw:text-xs tw:text-muted-foreground">
-                      <LoaderCircle className="tw:size-3 tw:animate-spin" aria-hidden="true" /> Loading suggestion…
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <LoaderCircle className="size-3 animate-spin" aria-hidden="true" /> Loading suggestion…
                     </span>
                   ) : suggest.note ? (
-                    <span className="tw:flex tw:items-center tw:gap-1 tw:text-xs tw:text-muted-foreground">
-                      <Sparkles className="tw:size-3" aria-hidden="true" /> {suggest.note}
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Sparkles className="size-3" aria-hidden="true" /> {suggest.note}
                     </span>
                   ) : null
                 }
@@ -178,25 +178,25 @@ export default function FeesPage() {
           </Form>
 
           {selected && (
-            <section className="tw:mt-6 tw:flex tw:flex-col tw:gap-3 tw:border-t tw:border-solid tw:border-border tw:pt-5" aria-label={`${selected.name} fee history`}>
-              <h3 className="tw:m-0 tw:text-sm! tw:font-semibold">Fees history — {selected.name}</h3>
+            <section className="mt-6 flex flex-col gap-3 border-t border-solid border-border pt-5" aria-label={`${selected.name} fee history`}>
+              <h3 className="m-0 text-sm! font-semibold">Fees history — {selected.name}</h3>
               {history.loading ? (
-                <Skeleton className="tw:h-24" />
+                <Skeleton className="h-24" />
               ) : (history.data?.items ?? []).length === 0 ? (
-                <EmptyState icon={ReceiptIndianRupee} title="No fees history found." className="tw:py-4" />
+                <EmptyState icon={ReceiptIndianRupee} title="No fees history found." className="py-4" />
               ) : (
-                <div className="tw:overflow-hidden tw:rounded-lg tw:border tw:border-solid tw:border-border">
+                <div className="overflow-hidden rounded-lg border border-solid border-border">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Period</TableHead>
                         <TableHead>Paid On</TableHead>
-                        <TableHead className="tw:text-right">Amount</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
                         <TableHead>Mode</TableHead>
                         <TableHead>Notes</TableHead>
                         {canEditFees && (
                           <TableHead>
-                            <span className="tw:sr-only">Edit</span>
+                            <span className="sr-only">Edit</span>
                           </TableHead>
                         )}
                       </TableRow>
@@ -208,11 +208,11 @@ export default function FeesPage() {
                             {formatDate(item.from_date)} → {formatDate(item.to_date)}
                           </TableCell>
                           <TableCell>{item.paid_at ? formatDate(item.paid_at) : '-'}</TableCell>
-                          <TableCell className="tw:text-right tw:tabular-nums">₹{Number(item.amount).toFixed(2)}</TableCell>
+                          <TableCell className="text-right tabular-nums">₹{Number(item.amount).toFixed(2)}</TableCell>
                           <TableCell>{paymentModeLabel(item.payment_mode)}</TableCell>
-                          <TableCell className="tw:whitespace-pre-wrap">{item.notes || '-'}</TableCell>
+                          <TableCell className="whitespace-pre-wrap">{item.notes || '-'}</TableCell>
                           {canEditFees && (
-                            <TableCell className="tw:text-right">
+                            <TableCell className="text-right">
                               <IconAction
                                 label="Edit this fee entry"
                                 onClick={() =>
@@ -238,20 +238,20 @@ export default function FeesPage() {
                   </Table>
                 </div>
               )}
-              {history.data?.error && <p className="tw:m-0 tw:text-sm tw:text-destructive">{history.data.error}</p>}
+              {history.data?.error && <p className="m-0 text-sm text-destructive">{history.data.error}</p>}
             </section>
           )}
         </CardContent>
       </Card>
 
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
-        <CardHeader className="tw:border-b tw:border-solid tw:border-border tw:py-4">
+      <Card className="gap-0 overflow-hidden py-0">
+        <CardHeader className="border-b border-solid border-border py-4">
           <CardTitle>Fees Submitted (Month-wise) · {selected ? selected.name : 'All students'}</CardTitle>
           {meta && meta.count > 0 && (
             <CardDescription>
               {meta.count} payment{meta.count === 1 ? '' : 's'}
               {!selected && ` from ${meta.students_count} student${meta.students_count === 1 ? '' : 's'}`} ·{' '}
-              <strong className="tw:text-foreground">₹{meta.total_amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</strong> collected
+              <strong className="text-foreground">₹{meta.total_amount.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</strong> collected
             </CardDescription>
           )}
         </CardHeader>
@@ -264,9 +264,9 @@ export default function FeesPage() {
           emptyTitle={selected ? `${selected.name} has no fees submitted in this month.` : 'No fees submitted in this month.'}
           pageSize={25}
           toolbar={
-            <label className="tw:m-0 tw:flex tw:flex-col tw:gap-1.5 tw:text-sm tw:font-medium">
+            <label className="m-0 flex flex-col gap-1.5 text-sm font-medium">
               Month
-              <Input type="month" className="tw:w-48" value={month} onChange={(e) => setMonth(e.target.value)} />
+              <Input type="month" className="w-48" value={month} onChange={(e) => setMonth(e.target.value)} />
             </label>
           }
         />

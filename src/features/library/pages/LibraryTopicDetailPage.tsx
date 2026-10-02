@@ -13,8 +13,8 @@ import { fetchLibraryTopic } from '../services/libraryService'
 
 function Back() {
   return (
-    <Link to="/library/topics" className="tw:inline-flex tw:w-fit tw:items-center tw:gap-1.5 tw:text-sm tw:text-muted-foreground tw:no-underline tw:hover:text-foreground">
-      <ArrowLeft className="tw:size-4" aria-hidden="true" /> Back to Topics
+    <Link to="/library/topics" className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground no-underline hover:text-foreground">
+      <ArrowLeft className="size-4" aria-hidden="true" /> Back to Topics
     </Link>
   )
 }
@@ -38,54 +38,54 @@ export default function LibraryTopicDetailPage() {
 
   if (data.loading && !data.data)
     return (
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-col tw:gap-4" role="status" aria-label="Loading topic">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4" role="status" aria-label="Loading topic">
         <Back />
-        <Skeleton className="tw:h-14 tw:w-1/2" />
-        <Skeleton className="tw:h-40 tw:rounded-xl" />
+        <Skeleton className="h-14 w-1/2" />
+        <Skeleton className="h-40 rounded-xl" />
       </div>
     )
   if (data.error || !t)
     return (
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-col tw:gap-4">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
         <Back />
         <ErrorState title="You do not have access to this topic, or it does not exist." />
       </div>
     )
 
   return (
-    <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-col tw:gap-5">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
       <Back />
-      <div className="tw:flex tw:items-start tw:gap-3">
-        <span className="tw:flex tw:size-12 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-xl tw:bg-primary-soft tw:text-primary">
-          <BookOpen className="tw:size-6" aria-hidden="true" />
+      <div className="flex items-start gap-3">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+          <BookOpen className="size-6" aria-hidden="true" />
         </span>
-        <div className="tw:flex tw:flex-col tw:gap-1">
-          <h1 className="tw:m-0 tw:text-2xl! tw:font-bold tw:text-foreground">{t.name}</h1>
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-sm tw:text-muted-foreground">
+        <div className="flex flex-col gap-1">
+          <h1 className="m-0 text-2xl! font-bold text-foreground">{t.name}</h1>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {t.chapter?.name ?? 'No chapter'}
             <Badge variant="secondary">{t.grade ? `Grade ${t.grade}` : 'All grades'}</Badge>
           </div>
         </div>
       </div>
 
-      <Card className="tw:gap-3">
+      <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="tw:flex tw:items-center tw:gap-2">
-            <Lightbulb className="tw:size-4 tw:text-warning" aria-hidden="true" /> Explanation
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="size-4 text-warning" aria-hidden="true" /> Explanation
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {t.explanation_html ? <RichHtml html={t.explanation_html} className="tw:text-[15px]" /> : <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">No explanation has been written for this topic yet.</p>}
+          {t.explanation_html ? <RichHtml html={t.explanation_html} className="text-[15px]" /> : <p className="m-0 text-sm text-muted-foreground">No explanation has been written for this topic yet.</p>}
         </CardContent>
       </Card>
 
-      <Card className="tw:gap-3">
-        <CardHeader className="tw:flex tw:flex-row tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <CardTitle className="tw:flex tw:items-center tw:gap-2">
-            <MessageCircleQuestion className="tw:size-4 tw:text-primary" aria-hidden="true" /> Questions ({shown.length})
+      <Card className="gap-3">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircleQuestion className="size-4 text-primary" aria-hidden="true" /> Questions ({shown.length})
           </CardTitle>
           {grades.length > 1 && (
-            <NativeSelect size="sm" aria-label="Grade" className="tw:w-36" value={grade} onChange={(e) => setGrade(e.target.value)}>
+            <NativeSelect size="sm" aria-label="Grade" className="w-36" value={grade} onChange={(e) => setGrade(e.target.value)}>
               <option value="">All grades</option>
               {grades.map((g) => (
                 <option key={g} value={String(g)}>
@@ -97,9 +97,9 @@ export default function LibraryTopicDetailPage() {
         </CardHeader>
         <CardContent>
           {shown.length === 0 ? (
-            <EmptyState icon={MessageCircleQuestion} title="No questions have been added for this topic yet." className="tw:py-6" />
+            <EmptyState icon={MessageCircleQuestion} title="No questions have been added for this topic yet." className="py-6" />
           ) : (
-            <ol className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0">
+            <ol className="m-0 flex list-none flex-col gap-3 p-0">
               {shown.map((q, i) => (
                 <QuestionView key={q.id} q={q} n={i + 1} answers="on-demand" />
               ))}

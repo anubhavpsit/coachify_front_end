@@ -25,11 +25,11 @@ interface Props {
 /** Shared table layout for the Ghost / Unassigned student widgets. Rows collapse out when removed. */
 export default function StudentListCard({ title, icon: Icon, iconClassName, countLabel, badgeVariant, loading, students, showStatus, className, action }: Props) {
   return (
-    <Card className="tw:gap-0 tw:py-0">
-      <CardHeader className="tw:border-b tw:border-solid tw:border-border tw:py-4">
-        <CardTitle className="tw:flex tw:items-center tw:gap-2.5">
-          <span className={cn('tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-full', iconClassName)}>
-            <Icon className="tw:size-4" aria-hidden="true" />
+    <Card className="gap-0 py-0">
+      <CardHeader className="border-b border-solid border-border py-4">
+        <CardTitle className="flex items-center gap-2.5">
+          <span className={cn('flex size-8 items-center justify-center rounded-full', iconClassName)}>
+            <Icon className="size-4" aria-hidden="true" />
           </span>
           {title}
         </CardTitle>
@@ -40,19 +40,19 @@ export default function StudentListCard({ title, icon: Icon, iconClassName, coun
         )}
       </CardHeader>
       {loading ? (
-        <div className="tw:flex tw:flex-col tw:gap-3 tw:p-5" role="status" aria-label={`Loading ${title.toLowerCase()}`}>
+        <div className="flex flex-col gap-3 p-5" role="status" aria-label={`Loading ${title.toLowerCase()}`}>
           {Array.from({ length: 3 }, (_, i) => (
-            <Skeleton key={i} className="tw:h-10" />
+            <Skeleton key={i} className="h-10" />
           ))}
         </div>
       ) : (
-        <div className="tw:max-h-[350px] tw:overflow-y-auto">
+        <div className="max-h-[350px] overflow-y-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Student</TableHead>
                 <TableHead>Class</TableHead>
-                <TableHead className="tw:text-right">Action</TableHead>
+                <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -62,23 +62,23 @@ export default function StudentListCard({ title, icon: Icon, iconClassName, coun
                     key={s.id}
                     layout
                     exit={{ opacity: 0, x: 24, transition: transitions.fast }}
-                    className="tw:border-0 tw:border-b tw:border-solid tw:border-border tw:transition-colors tw:hover:bg-muted/50"
+                    className="border-0 border-b border-solid border-border transition-colors hover:bg-muted/50"
                   >
                     <TableCell>
-                      <div className="tw:flex tw:flex-col">
-                        <div className="tw:flex tw:items-center tw:gap-2">
-                          <span className="tw:font-medium">{s.name}</span>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{s.name}</span>
                           {showStatus && s.status && (
-                            <Badge variant={s.status === 'active' ? 'success' : 'secondary'} className="tw:capitalize">
+                            <Badge variant={s.status === 'active' ? 'success' : 'secondary'} className="capitalize">
                               {s.status}
                             </Badge>
                           )}
                         </div>
-                        <span className="tw:text-xs tw:text-muted-foreground">{s.email}</span>
+                        <span className="text-xs text-muted-foreground">{s.email}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="tw:text-muted-foreground">{className(s)}</TableCell>
-                    <TableCell className="tw:text-right">{action(s)}</TableCell>
+                    <TableCell className="text-muted-foreground">{className(s)}</TableCell>
+                    <TableCell className="text-right">{action(s)}</TableCell>
                   </m.tr>
                 ))}
               </AnimatePresence>

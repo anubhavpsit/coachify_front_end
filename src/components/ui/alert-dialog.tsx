@@ -13,12 +13,12 @@ const AlertDialogTrigger = (props: React.ComponentProps<typeof AlertDialogPrimit
 function AlertDialogContent({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
   return (
     <AlertDialogPrimitive.Portal>
-      <AlertDialogPrimitive.Overlay className="tw:fixed tw:inset-0 tw:z-[1050] tw:bg-black/50 tw:data-[state=open]:animate-in tw:data-[state=open]:fade-in-0 tw:data-[state=closed]:animate-out tw:data-[state=closed]:fade-out-0" />
+      <AlertDialogPrimitive.Overlay className="fixed inset-0 z-[1050] bg-black/50 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
       <AlertDialogPrimitive.Content
         data-slot="alert-dialog-content"
         className={cn(
-          'tw:fixed tw:top-1/2 tw:left-1/2 tw:z-[1060] tw:grid tw:w-full tw:max-w-[calc(100%-2rem)] tw:-translate-x-1/2 tw:-translate-y-1/2 tw:gap-4 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-6 tw:shadow-lg tw:duration-200 tw:sm:max-w-md',
-          'tw:data-[state=open]:animate-in tw:data-[state=open]:fade-in-0 tw:data-[state=open]:zoom-in-95 tw:data-[state=closed]:animate-out tw:data-[state=closed]:fade-out-0 tw:data-[state=closed]:zoom-out-95',
+          'fixed top-1/2 left-1/2 z-[1060] grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border border-solid border-border bg-card p-6 shadow-lg duration-200 sm:max-w-md',
+          'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           className,
         )}
         {...props}
@@ -28,19 +28,19 @@ function AlertDialogContent({ className, ...props }: React.ComponentProps<typeof
 }
 
 function AlertDialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div className={cn('tw:flex tw:flex-col tw:gap-2 tw:text-left', className)} {...props} />
+  return <div className={cn('flex flex-col gap-2 text-left', className)} {...props} />
 }
 
 function AlertDialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div className={cn('tw:flex tw:flex-col-reverse tw:gap-2 tw:sm:flex-row tw:sm:justify-end', className)} {...props} />
+  return <div className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)} {...props} />
 }
 
 function AlertDialogTitle({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Title>) {
-  return <AlertDialogPrimitive.Title className={cn('tw:m-0 tw:text-lg! tw:font-semibold tw:text-foreground', className)} {...props} />
+  return <AlertDialogPrimitive.Title className={cn('m-0 text-lg! font-semibold text-foreground', className)} {...props} />
 }
 
 function AlertDialogDescription({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Description>) {
-  return <AlertDialogPrimitive.Description className={cn('tw:m-0 tw:text-sm tw:text-muted-foreground', className)} {...props} />
+  return <AlertDialogPrimitive.Description className={cn('m-0 text-sm text-muted-foreground', className)} {...props} />
 }
 
 function AlertDialogAction({

@@ -28,7 +28,7 @@ const DASHBOARD_STAT_KEYS = [
   P.DASHBOARD_STATS_EXPENSES,
 ]
 
-const WIDGET_GRID = 'tw:grid tw:items-start tw:gap-4 tw:md:grid-cols-2 tw:2xl:grid-cols-3'
+const WIDGET_GRID = 'grid items-start gap-4 md:grid-cols-2 2xl:grid-cols-3'
 
 /**
  * Every gate below is carried over from the legacy page (PERMISSIONS_MAP.md §4).
@@ -52,11 +52,11 @@ export default function DashboardPage() {
   const skeletonCount = isTeacher ? 3 : isStudent ? 4 : isAdminOrStaff ? DASHBOARD_STAT_KEYS.filter((k) => can(k)).length : 0
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
-      <PageHeader title="Dashboard" description={user?.name ? `Welcome back, ${user.name}` : 'Overview'} className="tw:mb-0" />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Dashboard" description={user?.name ? `Welcome back, ${user.name}` : 'Overview'} className="mb-0" />
 
       {loading && skeletonCount > 0 && <StatsSkeleton count={skeletonCount} />}
-      {error && !loading && <ErrorState title="Couldn't load your stats" description={error} onRetry={() => void reload()} className="tw:py-6" />}
+      {error && !loading && <ErrorState title="Couldn't load your stats" description={error} onRetry={() => void reload()} className="py-6" />}
 
       {stats && !loading && !error && (
         <>

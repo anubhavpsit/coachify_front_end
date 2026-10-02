@@ -26,14 +26,14 @@ export default function ErrorState({
       variants={slideUp}
       initial="hidden"
       animate="visible"
-      className={cn('tw:flex tw:flex-col tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-dashed tw:border-border tw:bg-card tw:px-6 tw:py-10 tw:text-center', className)}
+      className={cn('flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center', className)}
     >
-      <span className="tw:flex tw:size-12 tw:items-center tw:justify-center tw:rounded-full tw:bg-destructive-soft tw:text-destructive">
-        <TriangleAlert className="tw:size-6" aria-hidden="true" />
+      <span className="flex size-12 items-center justify-center rounded-full bg-destructive-soft text-destructive">
+        <TriangleAlert className="size-6" aria-hidden="true" />
       </span>
-      <div className="tw:flex tw:flex-col tw:gap-1">
-        <h2 className="tw:m-0 tw:text-base! tw:font-semibold tw:text-foreground">{title}</h2>
-        <p className="tw:m-0 tw:max-w-md tw:text-sm tw:text-muted-foreground">{description}</p>
+      <div className="flex flex-col gap-1">
+        <h2 className="m-0 text-base! font-semibold text-foreground">{title}</h2>
+        <p className="m-0 max-w-md text-sm text-muted-foreground">{description}</p>
       </div>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>

@@ -11,12 +11,12 @@ interface Props {
 
 export default function PageHeader({ title, description, actions, className }: Props) {
   return (
-    <div className={cn('tw:mb-6 tw:flex tw:flex-wrap tw:items-end tw:justify-between tw:gap-3', className)}>
-      <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
-        <h1 className="tw:m-0 tw:text-2xl! tw:font-bold tw:tracking-tight tw:text-foreground">{title}</h1>
-        {description && <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">{description}</p>}
+    <div className={cn('mb-6 flex flex-wrap items-end justify-between gap-3', className)}>
+      <div className="flex min-w-0 flex-col gap-1">
+        <h1 className="m-0 text-2xl! font-bold tracking-tight text-foreground">{title}</h1>
+        {description && <p className="m-0 text-sm text-muted-foreground">{description}</p>}
       </div>
-      {actions && <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">{actions}</div>}
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
   )
 }

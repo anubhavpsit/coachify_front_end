@@ -23,7 +23,7 @@ export default function PersonFields({ control, mode, showDob = true, showGender
   const pw = useWatch({ control, name: 'password' })
   return (
     <>
-      <div className="tw:grid tw:gap-5 tw:sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <FormField
           control={control}
           name="name"
@@ -68,7 +68,7 @@ export default function PersonFields({ control, mode, showDob = true, showGender
         )}
       />
       {(showDob || showGender) && (
-        <div className="tw:grid tw:gap-5 tw:sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           {showDob && (
             <FormField
               control={control}

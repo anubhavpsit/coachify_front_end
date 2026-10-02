@@ -74,30 +74,30 @@ export default function ManageFactsPage() {
       cell: ({ row }) => {
         const f = row.original
         return (
-          <div className="tw:flex tw:max-w-md tw:items-center tw:gap-3">
+          <div className="flex max-w-md items-center gap-3">
             {f.image_url ? (
-              <img src={absoluteUrl(f.image_url)} alt="" className="tw:size-10 tw:shrink-0 tw:rounded-md tw:object-cover" />
+              <img src={absoluteUrl(f.image_url)} alt="" className="size-10 shrink-0 rounded-md object-cover" />
             ) : (
-              <span className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-md tw:bg-primary-soft tw:text-primary">
-                {f.content_type === 'image' ? <ImageIcon className="tw:size-4" aria-hidden="true" /> : <Lightbulb className="tw:size-4" aria-hidden="true" />}
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary-soft text-primary">
+                {f.content_type === 'image' ? <ImageIcon className="size-4" aria-hidden="true" /> : <Lightbulb className="size-4" aria-hidden="true" />}
               </span>
             )}
-            <div className="tw:flex tw:min-w-0 tw:flex-col">
-              <span className="tw:truncate tw:font-medium tw:text-foreground">{f.title}</span>
-              {(f.tags ?? []).length > 0 && <span className="tw:truncate tw:text-xs tw:text-muted-foreground">{(f.tags ?? []).map((t) => `#${t}`).join(' ')}</span>}
+            <div className="flex min-w-0 flex-col">
+              <span className="truncate font-medium text-foreground">{f.title}</span>
+              {(f.tags ?? []).length > 0 && <span className="truncate text-xs text-muted-foreground">{(f.tags ?? []).map((t) => `#${t}`).join(' ')}</span>}
             </div>
           </div>
         )
       },
     },
-    { id: 'type', header: 'Type', accessorFn: (f) => f.content_type, cell: ({ row }) => <span className="tw:capitalize">{row.original.content_type}</span> },
+    { id: 'type', header: 'Type', accessorFn: (f) => f.content_type, cell: ({ row }) => <span className="capitalize">{row.original.content_type}</span> },
     {
       id: 'audience',
       header: 'Audience',
       enableSorting: false,
       cell: ({ row }) => {
         const r = row.original.target_roles ?? []
-        return r.length ? <span className="tw:text-sm tw:capitalize">{r.join(', ')}</span> : <span className="tw:text-muted-foreground">Everyone</span>
+        return r.length ? <span className="text-sm capitalize">{r.join(', ')}</span> : <span className="text-muted-foreground">Everyone</span>
       },
     },
     {
@@ -107,9 +107,9 @@ export default function ManageFactsPage() {
       cell: ({ row }) => {
         const f = row.original
         return (
-          <div className="tw:flex tw:flex-col tw:items-start tw:gap-0.5">
+          <div className="flex flex-col items-start gap-0.5">
             <Badge variant={f.is_published ? 'success' : 'secondary'}>{f.is_published ? 'Published' : 'Draft'}</Badge>
-            {f.publish_at && <span className="tw:text-xs tw:text-muted-foreground">{formatDateTime(f.publish_at)}</span>}
+            {f.publish_at && <span className="text-xs text-muted-foreground">{formatDateTime(f.publish_at)}</span>}
           </div>
         )
       },
@@ -122,14 +122,14 @@ export default function ManageFactsPage() {
     },
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">Actions</span>,
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) => {
         const f = row.original
         if (!own(f)) return <Badge variant="soft">Featured</Badge>
         return (
-          <div className="tw:flex tw:items-center tw:justify-end tw:gap-0.5">
+          <div className="flex items-center justify-end gap-0.5">
             <IconAction label={`Edit ${f.title}`} onClick={() => openForm(f)}>
               <Pencil aria-hidden="true" />
             </IconAction>
@@ -146,13 +146,13 @@ export default function ManageFactsPage() {
   ]
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Manage Facts"
         description="Short facts that appear in your students' and teachers' Facts feed."
-        className="tw:mb-0"
+        className="mb-0"
         actions={
-          <div className="tw:flex tw:gap-2">
+          <div className="flex gap-2">
             <Button variant="outline" asChild>
               <Link to="/facts">View feed</Link>
             </Button>
@@ -166,7 +166,7 @@ export default function ManageFactsPage() {
       {list.error ? (
         <ErrorState title="Unable to load facts" onRetry={list.reload} />
       ) : (
-        <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+        <Card className="gap-0 overflow-hidden py-0">
           <DataTable
             columns={columns}
             data={list.data ?? []}
@@ -180,7 +180,7 @@ export default function ManageFactsPage() {
               </Button>
             }
             pageSize={25}
-            toolbar={<Input type="search" aria-label="Search facts" placeholder="Search facts (server)" className="tw:w-full tw:sm:w-64" value={search} onChange={(e) => setSearch(e.target.value)} />}
+            toolbar={<Input type="search" aria-label="Search facts" placeholder="Search facts (server)" className="w-full sm:w-64" value={search} onChange={(e) => setSearch(e.target.value)} />}
           />
         </Card>
       )}

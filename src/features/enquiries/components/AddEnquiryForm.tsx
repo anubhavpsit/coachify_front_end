@@ -51,12 +51,12 @@ export default function AddEnquiryForm({ onCreated }: { onCreated: (e: Enquiry) 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(submit)} noValidate className="tw:grid tw:gap-5 tw:sm:grid-cols-2 tw:lg:grid-cols-3">
+      <form onSubmit={form.handleSubmit(submit)} noValidate className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <FormField
           control={form.control}
           name="enquiry_type"
           render={({ field }) => (
-            <FormItem className="tw:sm:col-span-2 tw:lg:col-span-3">
+            <FormItem className="sm:col-span-2 lg:col-span-3">
               <FormLabel>Enquiry Type</FormLabel>
               <SegmentedControl<EnquiryType>
                 label="Enquiry type"
@@ -66,7 +66,7 @@ export default function AddEnquiryForm({ onCreated }: { onCreated: (e: Enquiry) 
                   { value: 'student', label: 'Student' },
                   { value: 'teacher', label: 'Teacher' },
                 ]}
-                className="tw:justify-self-start"
+                className="justify-self-start"
               />
             </FormItem>
           )}
@@ -91,7 +91,7 @@ export default function AddEnquiryForm({ onCreated }: { onCreated: (e: Enquiry) 
           control={form.control}
           name="description"
           render={({ field }) => (
-            <FormItem className="tw:sm:col-span-2 tw:lg:col-span-3">
+            <FormItem className="sm:col-span-2 lg:col-span-3">
               <FormLabel>Description / Remarks</FormLabel>
               <FormControl>
                 <Textarea rows={2} disabled={submitting} {...field} />
@@ -101,12 +101,12 @@ export default function AddEnquiryForm({ onCreated }: { onCreated: (e: Enquiry) 
           )}
         />
         {error && (
-          <Alert variant="destructive" className="tw:sm:col-span-2 tw:lg:col-span-3">
+          <Alert variant="destructive" className="sm:col-span-2 lg:col-span-3">
             <CircleAlert aria-hidden="true" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        <div className="tw:sm:col-span-2 tw:lg:col-span-3">
+        <div className="sm:col-span-2 lg:col-span-3">
           <Button type="submit" loading={submitting}>
             {submitting ? 'Saving...' : 'Save Enquiry'}
           </Button>

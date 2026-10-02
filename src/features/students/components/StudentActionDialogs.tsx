@@ -17,7 +17,7 @@ const toOpt = (v: string): Opt => (v === '' ? '' : Number(v))
 
 function Field({ id, label, children }: { id: string; label: string; children: ReactNode }) {
   return (
-    <div className="tw:grid tw:gap-2">
+    <div className="grid gap-2">
       <Label htmlFor={id}>{label}</Label>
       {children}
     </div>
@@ -87,7 +87,7 @@ export function PromoteDialog({ student, years, classes, onClose, onDone }: { st
             Pre-filled from {student.name}'s current enrolment. Adjust as needed.
           </DialogDescription>
         </DialogHeader>
-        <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Field id="promote-year" label="To Academic Year">
             <YearSelect id="promote-year" value={toYear} onChange={setToYear} years={years} disabled={busy} />
           </Field>
@@ -151,11 +151,11 @@ export function ReactivateDialog({
             Reactivating <strong>{student.name}</strong> resets their fee cycle from the rejoin date and creates a new enrollment for the selected academic year.
           </DialogDescription>
         </DialogHeader>
-        <div className="tw:grid tw:gap-4">
+        <div className="grid gap-4">
           <Field id="react-date" label="Rejoined Date">
             <Input id="react-date" type="date" value={date} max={todayInputValue()} onChange={(e) => setDate(e.target.value)} disabled={busy} />
           </Field>
-          <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field id="react-year" label="Academic Year">
               <YearSelect id="react-year" value={year} onChange={setYear} years={years} disabled={busy} />
             </Field>
@@ -187,7 +187,7 @@ export function BulkPromoteDialog({ years, classes, initialFromYear, onClose }: 
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="tw:flex tw:items-center tw:gap-2">
+          <DialogTitle className="flex items-center gap-2">
             Bulk Promote Students <Badge variant="warning">Coming soon</Badge>
           </DialogTitle>
           <DialogDescription>Move a whole class to the next academic year in one go.</DialogDescription>
@@ -196,7 +196,7 @@ export function BulkPromoteDialog({ years, classes, initialFromYear, onClose }: 
           <Info aria-hidden="true" />
           <AlertDescription>Bulk promote will be available in a future update. Use “Promote” on a student's row for now.</AlertDescription>
         </Alert>
-        <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <Field id="bulk-from-year" label="From Academic Year">
             <YearSelect id="bulk-from-year" value={fromYear} onChange={setFromYear} years={years} />
           </Field>

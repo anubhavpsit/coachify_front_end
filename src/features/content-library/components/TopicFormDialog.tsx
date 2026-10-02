@@ -67,7 +67,7 @@ export default function TopicFormDialog({ open, onClose, topic, subjects, subjec
       submitLabel={topic ? 'Update' : 'Save'}
       submittingLabel={topic ? 'Updating...' : 'Saving...'}
       error={error}
-      className="tw:sm:max-w-2xl"
+      className="sm:max-w-2xl"
     >
       <FormField
         control={form.control}
@@ -96,7 +96,7 @@ export default function TopicFormDialog({ open, onClose, topic, subjects, subjec
           </FormItem>
         )}
       />
-      <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="chapter_id"

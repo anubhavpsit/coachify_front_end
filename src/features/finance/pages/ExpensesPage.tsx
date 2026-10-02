@@ -77,27 +77,27 @@ export default function ExpensesPage() {
       header: 'Amount',
       meta: { align: 'right' },
       accessorFn: (e) => Number(e.amount) || 0,
-      cell: ({ row }) => <span className="tw:font-semibold tw:tabular-nums">{row.original.amount}</span>,
+      cell: ({ row }) => <span className="font-semibold tabular-nums">{row.original.amount}</span>,
     },
-    { id: 'description', header: 'Description', accessorFn: (e) => e.description ?? '', cell: ({ row }) => row.original.description || <span className="tw:text-muted-foreground">-</span> },
-    { id: 'by', header: 'Expense By', accessorFn: (e) => e.user?.name ?? '', cell: ({ row }) => row.original.user?.name || <span className="tw:text-muted-foreground">-</span> },
+    { id: 'description', header: 'Description', accessorFn: (e) => e.description ?? '', cell: ({ row }) => row.original.description || <span className="text-muted-foreground">-</span> },
+    { id: 'by', header: 'Expense By', accessorFn: (e) => e.user?.name ?? '', cell: ({ row }) => row.original.user?.name || <span className="text-muted-foreground">-</span> },
     {
       id: 'note',
       header: 'Note',
       enableSorting: false,
       accessorFn: (e) => e.note ?? '',
-      cell: ({ row }) => <span className="tw:inline-block tw:max-w-56 tw:truncate tw:align-middle">{row.original.note || '-'}</span>,
+      cell: ({ row }) => <span className="inline-block max-w-56 truncate align-middle">{row.original.note || '-'}</span>,
     },
-    { id: 'recorded', header: 'Recorded On', accessorFn: (e) => e.created_at, cell: ({ row }) => <span className="tw:text-muted-foreground">{formatDate(row.original.created_at)}</span> },
+    { id: 'recorded', header: 'Recorded On', accessorFn: (e) => e.created_at, cell: ({ row }) => <span className="text-muted-foreground">{formatDate(row.original.created_at)}</span> },
   ]
 
   const submitting = form.formState.isSubmitting
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
-      <PageHeader title="Operational Expenses" description="Record and review monthly running costs." className="tw:mb-0" />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Operational Expenses" description="Record and review monthly running costs." className="mb-0" />
 
-      <m.div className="tw:grid tw:grid-cols-2 tw:gap-4 tw:lg:grid-cols-4" variants={stagger(0.05)} initial="hidden" animate="visible">
+      <m.div className="grid grid-cols-2 gap-4 lg:grid-cols-4" variants={stagger(0.05)} initial="hidden" animate="visible">
         <StatCard label="Total for the month" value={total} icon={IndianRupee} tone="destructive" format={formatCurrency} />
         <StatCard label="Entries" value={expenses.length} icon={Hash} tone="info" />
       </m.div>
@@ -109,19 +109,19 @@ export default function ExpensesPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(submit)} noValidate className="tw:grid tw:gap-5 tw:md:grid-cols-3">
+            <form onSubmit={form.handleSubmit(submit)} noValidate className="grid gap-5 md:grid-cols-3">
               <FormField
                 control={form.control}
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel required>Expense Amount</FormLabel>
-                    <div className="tw:relative">
-                      <span className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:-translate-y-1/2 tw:text-sm tw:text-muted-foreground" aria-hidden="true">
+                    <div className="relative">
+                      <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground" aria-hidden="true">
                         ₹
                       </span>
                       <FormControl>
-                        <Input type="number" inputMode="decimal" min="0" step="0.01" placeholder="0.00" className="tw:pl-7" disabled={submitting} {...field} />
+                        <Input type="number" inputMode="decimal" min="0" step="0.01" placeholder="0.00" className="pl-7" disabled={submitting} {...field} />
                       </FormControl>
                     </div>
                     <FormMessage />
@@ -165,7 +165,7 @@ export default function ExpensesPage() {
                     </FormControl>
                     {selectedUser && (
                       <FormDescription>
-                        {selectedUser.email} · <span className="tw:capitalize">{selectedUser.role.replace(/_/g, ' ')}</span>
+                        {selectedUser.email} · <span className="capitalize">{selectedUser.role.replace(/_/g, ' ')}</span>
                       </FormDescription>
                     )}
                     <FormMessage />
@@ -176,7 +176,7 @@ export default function ExpensesPage() {
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItem className="tw:md:col-span-2">
+                  <FormItem className="md:col-span-2">
                     <FormLabel>Expense Description</FormLabel>
                     <FormControl>
                       <Input maxLength={500} placeholder="e.g. Electricity bill" disabled={submitting} {...field} />
@@ -192,19 +192,19 @@ export default function ExpensesPage() {
                   <FormItem>
                     <FormLabel>Note</FormLabel>
                     <FormControl>
-                      <Textarea rows={1} className="tw:min-h-10" disabled={submitting} {...field} />
+                      <Textarea rows={1} className="min-h-10" disabled={submitting} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               {formError && (
-                <Alert variant="destructive" className="tw:md:col-span-3">
+                <Alert variant="destructive" className="md:col-span-3">
                   <CircleAlert aria-hidden="true" />
                   <AlertDescription>{formError}</AlertDescription>
                 </Alert>
               )}
-              <div className="tw:md:col-span-3">
+              <div className="md:col-span-3">
                 <Button type="submit" loading={submitting} disabled={users.loading}>
                   {submitting ? 'Saving...' : 'Save Expense'}
                 </Button>
@@ -214,8 +214,8 @@ export default function ExpensesPage() {
         </CardContent>
       </Card>
 
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
-        <CardHeader className="tw:border-b tw:border-solid tw:border-border tw:py-4">
+      <Card className="gap-0 overflow-hidden py-0">
+        <CardHeader className="border-b border-solid border-border py-4">
           <CardTitle>Expenses (Month-wise)</CardTitle>
         </CardHeader>
         <DataTable
@@ -227,10 +227,10 @@ export default function ExpensesPage() {
           emptyTitle="No expenses found for this period."
           pageSize={25}
           toolbar={
-            <div className="tw:flex tw:flex-wrap tw:items-end tw:gap-3">
-              <label className="tw:m-0 tw:flex tw:flex-col tw:gap-1.5 tw:text-sm tw:font-medium">
+            <div className="flex flex-wrap items-end gap-3">
+              <label className="m-0 flex flex-col gap-1.5 text-sm font-medium">
                 User
-                <NativeSelect className="tw:w-48" value={userFilter} onChange={(e) => setUserFilter(e.target.value ? Number(e.target.value) : '')} disabled={users.loading}>
+                <NativeSelect className="w-48" value={userFilter} onChange={(e) => setUserFilter(e.target.value ? Number(e.target.value) : '')} disabled={users.loading}>
                   <option value="">All Users</option>
                   {(users.data ?? []).map((u) => (
                     <option key={u.id} value={u.id}>
@@ -239,9 +239,9 @@ export default function ExpensesPage() {
                   ))}
                 </NativeSelect>
               </label>
-              <label className="tw:m-0 tw:flex tw:flex-col tw:gap-1.5 tw:text-sm tw:font-medium">
+              <label className="m-0 flex flex-col gap-1.5 text-sm font-medium">
                 Month
-                <Input type="month" className="tw:w-48" value={month} onChange={(e) => setMonth(e.target.value)} />
+                <Input type="month" className="w-48" value={month} onChange={(e) => setMonth(e.target.value)} />
               </label>
             </div>
           }

@@ -6,7 +6,7 @@ import { fetchOverview } from './overviewApi'
 import { StudentAttendanceCard, StudentHomeworkCard, StudentNewContentCard, StudentResultsCard, StudentUpcomingCard } from './StudentWidgets'
 import { TeacherAttentionCard, TeacherGradingCard, TeacherPapersCard, TeacherTodayCard, TeacherUpcomingCard } from './TeacherWidgets'
 
-const GRID = 'tw:grid tw:items-start tw:gap-4 tw:md:grid-cols-2 tw:2xl:grid-cols-3'
+const GRID = 'grid items-start gap-4 md:grid-cols-2 2xl:grid-cols-3'
 
 /**
  * Teacher / student "smart" dashboard below the stats cards: prioritised
@@ -16,7 +16,7 @@ export default function SmartDashboard({ role }: { role: 'student' | 'teacher' }
   const { data, loading, error, reload } = useAsync(fetchOverview, [])
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
+    <div className="flex flex-col gap-4">
       {error ? (
         <WidgetCard title="Your insights" error="Unable to load your dashboard insights." onRetry={reload} maxBodyHeight={false} />
       ) : null}

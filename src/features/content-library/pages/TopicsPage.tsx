@@ -78,19 +78,19 @@ export default function TopicsPage() {
       cell: ({ row }) => {
         const preview = plainText(row.original.explanation_html)
         return (
-          <div className="tw:flex tw:max-w-md tw:flex-col">
-            <span className="tw:font-medium tw:text-foreground">{row.original.name}</span>
-            {preview && <span className="tw:truncate tw:text-xs tw:text-muted-foreground">{preview}</span>}
+          <div className="flex max-w-md flex-col">
+            <span className="font-medium text-foreground">{row.original.name}</span>
+            {preview && <span className="truncate text-xs text-muted-foreground">{preview}</span>}
           </div>
         )
       },
     },
-    { id: 'chapter', header: 'Chapter', accessorFn: (t) => t.chapter?.name ?? '', cell: ({ row }) => row.original.chapter?.name ?? <span className="tw:text-muted-foreground">-</span> },
+    { id: 'chapter', header: 'Chapter', accessorFn: (t) => t.chapter?.name ?? '', cell: ({ row }) => row.original.chapter?.name ?? <span className="text-muted-foreground">-</span> },
     {
       id: 'grade',
       header: 'Grade',
       accessorFn: (t) => t.grade ?? 0,
-      cell: ({ row }) => (row.original.grade ? `Grade ${row.original.grade}` : <span className="tw:text-muted-foreground">All</span>),
+      cell: ({ row }) => (row.original.grade ? `Grade ${row.original.grade}` : <span className="text-muted-foreground">All</span>),
     },
     { id: 'subject', header: 'Subject', accessorFn: (t) => subjectName(t), cell: ({ row }) => <Badge variant="soft">{subjectName(row.original)}</Badge> },
     { id: 'type', header: 'Type', accessorFn: (t) => (t.tenant_id === 0 ? 'Base' : 'Custom'), cell: ({ row }) => <ScopeBadge base={row.original.tenant_id === 0} /> },
@@ -99,21 +99,21 @@ export default function TopicsPage() {
       header: 'Questions',
       enableSorting: false,
       cell: ({ row }) => (
-        <Link to={questionsRoute(row.original.id)} className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:font-medium tw:text-primary tw:no-underline tw:hover:underline">
-          <MessageCircleQuestion className="tw:size-3.5" aria-hidden="true" /> Manage
+        <Link to={questionsRoute(row.original.id)} className="inline-flex items-center gap-1 text-sm font-medium text-primary no-underline hover:underline">
+          <MessageCircleQuestion className="size-3.5" aria-hidden="true" /> Manage
         </Link>
       ),
     },
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">Actions</span>,
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) =>
         canManage(row.original) ? (
           <RowActions name={row.original.name} onEdit={() => openForm(row.original)} onDelete={() => setDeleting(row.original)} />
         ) : (
-          <div className="tw:flex tw:justify-end">
+          <div className="flex justify-end">
             <ReadOnlyMark what="topic" />
           </div>
         ),
@@ -123,11 +123,11 @@ export default function TopicsPage() {
   const filtersActive = !!(subjectFilter || chapterFilter || gradeFilter)
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Topics"
         description="Topics are what teachers pick when they log a lesson. Base topics are shared; you can add your own."
-        className="tw:mb-0"
+        className="mb-0"
         actions={
           <Button onClick={() => openForm(null)}>
             <Plus aria-hidden="true" /> Add Topic
@@ -135,7 +135,7 @@ export default function TopicsPage() {
         }
       />
 
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+      <Card className="gap-0 overflow-hidden py-0">
         <DataTable
           columns={columns}
           data={topics}
@@ -152,10 +152,10 @@ export default function TopicsPage() {
           }
           pageSize={25}
           toolbar={
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <NativeSelect
                 aria-label="Subject"
-                className="tw:w-full tw:sm:w-40"
+                className="w-full sm:w-40"
                 value={subjectFilter}
                 onChange={(e) => {
                   setSubjectFilter(e.target.value)
@@ -169,7 +169,7 @@ export default function TopicsPage() {
                   </option>
                 ))}
               </NativeSelect>
-              <NativeSelect aria-label="Chapter" className="tw:w-full tw:sm:w-44" value={chapterFilter} onChange={(e) => setChapterFilter(e.target.value)}>
+              <NativeSelect aria-label="Chapter" className="w-full sm:w-44" value={chapterFilter} onChange={(e) => setChapterFilter(e.target.value)}>
                 <option value="">All chapters</option>
                 <option value="none">No chapter</option>
                 {(filterChapters.data ?? []).map((c) => (
@@ -178,7 +178,7 @@ export default function TopicsPage() {
                   </option>
                 ))}
               </NativeSelect>
-              <NativeSelect aria-label="Grade" className="tw:w-full tw:sm:w-40" value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)}>
+              <NativeSelect aria-label="Grade" className="w-full sm:w-40" value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)}>
                 <option value="">All grades</option>
                 <option value="none">All grades (shared)</option>
                 {GRADES.map((g) => (

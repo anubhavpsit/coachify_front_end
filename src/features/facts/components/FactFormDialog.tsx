@@ -89,9 +89,9 @@ export default function FactFormDialog({ open, onClose, fact, classes, onSaved }
       submitLabel={fact ? 'Update Fact' : 'Create Fact'}
       submittingLabel="Saving..."
       error={error}
-      className="tw:sm:max-w-2xl"
+      className="sm:max-w-2xl"
     >
-      <div className="tw:grid tw:gap-4 tw:sm:grid-cols-[1fr_12rem]">
+      <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
         <FormField
           control={form.control}
           name="title"
@@ -131,9 +131,9 @@ export default function FactFormDialog({ open, onClose, fact, classes, onSaved }
         name="content"
         render={({ field }) => (
           <FormItem>
-            <div className="tw:flex tw:items-baseline tw:justify-between">
+            <div className="flex items-baseline justify-between">
               <FormLabel>Content</FormLabel>
-              <span className="tw:text-xs tw:text-muted-foreground">{content.length}/5000</span>
+              <span className="text-xs text-muted-foreground">{content.length}/5000</span>
             </div>
             <FormControl>
               <Textarea rows={4} maxLength={5000} placeholder="The fact itself — keep it short and surprising." {...field} />
@@ -143,7 +143,7 @@ export default function FactFormDialog({ open, onClose, fact, classes, onSaved }
         )}
       />
 
-      <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="image_url"
@@ -151,20 +151,20 @@ export default function FactFormDialog({ open, onClose, fact, classes, onSaved }
             <FormItem>
               <FormLabel>Image</FormLabel>
               {imageUrl ? (
-                <div className="tw:relative tw:overflow-hidden tw:rounded-lg tw:border tw:border-solid tw:border-border">
-                  <img src={absoluteUrl(imageUrl)} alt="Fact image preview" className="tw:block tw:max-h-40 tw:w-full tw:object-cover" />
-                  <Button type="button" size="icon-sm" variant="secondary" className="tw:absolute tw:top-2 tw:right-2" aria-label="Remove image" onClick={() => form.setValue('image_url', '', { shouldDirty: true })}>
+                <div className="relative overflow-hidden rounded-lg border border-solid border-border">
+                  <img src={absoluteUrl(imageUrl)} alt="Fact image preview" className="block max-h-40 w-full object-cover" />
+                  <Button type="button" size="icon-sm" variant="secondary" className="absolute top-2 right-2" aria-label="Remove image" onClick={() => form.setValue('image_url', '', { shouldDirty: true })}>
                     <X aria-hidden="true" />
                   </Button>
                 </div>
               ) : (
-                <label className="tw:m-0 tw:flex tw:h-24 tw:cursor-pointer tw:flex-col tw:items-center tw:justify-center tw:gap-1 tw:px-3 tw:text-center tw:rounded-lg tw:border tw:border-dashed tw:border-input tw:text-sm tw:text-muted-foreground tw:hover:border-primary/60">
-                  <ImageUp className="tw:size-5" aria-hidden="true" />
+                <label className="m-0 flex h-24 cursor-pointer flex-col items-center justify-center gap-1 px-3 text-center rounded-lg border border-dashed border-input text-sm text-muted-foreground hover:border-primary/60">
+                  <ImageUp className="size-5" aria-hidden="true" />
                   {uploading ? 'Uploading…' : 'Upload — JPG, PNG, WebP or GIF, up to 4 MB'}
                   <input
                     type="file"
                     accept={IMAGE_ACCEPT}
-                    className="tw:sr-only"
+                    className="sr-only"
                     aria-label="Upload image"
                     disabled={uploading}
                     onChange={(e) => {
@@ -179,7 +179,7 @@ export default function FactFormDialog({ open, onClose, fact, classes, onSaved }
             </FormItem>
           )}
         />
-        <div className="tw:flex tw:flex-col tw:gap-4">
+        <div className="flex flex-col gap-4">
           <FormField
             control={form.control}
             name="source_url"
@@ -210,11 +210,11 @@ export default function FactFormDialog({ open, onClose, fact, classes, onSaved }
         </div>
       </div>
 
-      <fieldset className="tw:m-0 tw:flex tw:flex-col tw:gap-3 tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-3">
-        <legend className="tw:float-none tw:m-0 tw:w-auto tw:px-1 tw:text-sm tw:font-medium">Who sees it</legend>
-        <div className="tw:flex tw:flex-wrap tw:gap-4">
+      <fieldset className="m-0 flex flex-col gap-3 rounded-lg border border-solid border-border p-3">
+        <legend className="float-none m-0 w-auto px-1 text-sm font-medium">Who sees it</legend>
+        <div className="flex flex-wrap gap-4">
           {(['student', 'teacher'] as const).map((r) => (
-            <label key={r} className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:capitalize">
+            <label key={r} className="m-0 flex items-center gap-2 text-sm capitalize">
               <Checkbox checked={roles.includes(r)} onCheckedChange={(v) => toggleRole(r, v === true)} />
               {r}s
             </label>
@@ -228,13 +228,13 @@ export default function FactFormDialog({ open, onClose, fact, classes, onSaved }
               <FormItem>
                 <FormLabel>Target classes</FormLabel>
                 {classes.length === 0 ? (
-                  <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">No classes found for your institute.</p>
+                  <p className="m-0 text-sm text-muted-foreground">No classes found for your institute.</p>
                 ) : (
-                  <div className="tw:flex tw:flex-wrap tw:gap-2">
+                  <div className="flex flex-wrap gap-2">
                     {classes.map((c) => {
                       const on = field.value.includes(c.id)
                       return (
-                        <label key={c.id} className="tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-solid tw:border-input tw:px-3 tw:py-1 tw:text-sm tw:has-[[data-state=checked]]:border-primary tw:has-[[data-state=checked]]:bg-primary-soft">
+                        <label key={c.id} className="m-0 flex cursor-pointer items-center gap-2 rounded-full border border-solid border-input px-3 py-1 text-sm has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary-soft">
                           <Checkbox
                             checked={on}
                             onCheckedChange={() => {
@@ -257,16 +257,16 @@ export default function FactFormDialog({ open, onClose, fact, classes, onSaved }
         )}
       </fieldset>
 
-      <div className="tw:grid tw:items-start tw:gap-4 tw:sm:grid-cols-2">
+      <div className="grid items-start gap-4 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="is_published"
           render={({ field }) => (
-            <FormItem className="tw:flex tw:items-center tw:gap-3 tw:pt-6">
+            <FormItem className="flex items-center gap-3 pt-6">
               <FormControl>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
-              <FormLabel className="tw:m-0">{published ? 'Published' : 'Draft'}</FormLabel>
+              <FormLabel className="m-0">{published ? 'Published' : 'Draft'}</FormLabel>
             </FormItem>
           )}
         />

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import { moduleLabel, type DashboardUser, type LogFilters } from './activityLogService'
 
-const FIELD = 'tw:m-0 tw:flex tw:flex-col tw:gap-1.5 tw:text-sm tw:font-medium tw:text-foreground'
+const FIELD = 'm-0 flex flex-col gap-1.5 text-sm font-medium text-foreground'
 
 interface Props {
   filters: LogFilters
@@ -16,7 +16,7 @@ interface Props {
 
 export default function ActivityLogFilters({ filters, modules, users, onChange, onReset }: Props) {
   return (
-    <div className="tw:grid tw:grid-cols-1 tw:items-end tw:gap-3 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:2xl:grid-cols-6">
+    <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
       <label className={FIELD}>
         Module
         <NativeSelect value={filters.module} onChange={(e) => onChange({ module: e.target.value })} aria-label="Filter by module">

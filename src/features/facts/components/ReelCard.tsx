@@ -15,20 +15,20 @@ const GRADIENTS = [
 
 function RailButton({ label, pressed, onClick, children, caption, activeClass }: { label: string; pressed?: boolean; onClick: () => void; children: ReactNode; caption?: ReactNode; activeClass?: string }) {
   return (
-    <div className="tw:flex tw:flex-col tw:items-center tw:gap-1">
+    <div className="flex flex-col items-center gap-1">
       <button
         type="button"
         aria-label={label}
         aria-pressed={pressed}
         onClick={onClick}
         className={cn(
-          'tw:m-0 tw:flex tw:size-12 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full tw:border-0 tw:bg-black/40 tw:p-0 tw:text-white tw:backdrop-blur tw:transition-[transform,background-color] tw:outline-none tw:hover:bg-black/60 tw:focus-visible:ring-[3px] tw:focus-visible:ring-white/60 tw:active:scale-90',
+          'm-0 flex size-12 cursor-pointer items-center justify-center rounded-full border-0 bg-black/40 p-0 text-white backdrop-blur transition-[transform,background-color] outline-none hover:bg-black/60 focus-visible:ring-[3px] focus-visible:ring-white/60 active:scale-90',
           pressed && activeClass,
         )}
       >
         {children}
       </button>
-      {caption !== undefined && <span className="tw:text-[11px] tw:leading-none tw:font-semibold tw:text-white/85">{caption}</span>}
+      {caption !== undefined && <span className="text-[11px] leading-none font-semibold text-white/85">{caption}</span>}
     </div>
   )
 }
@@ -76,30 +76,30 @@ function ReelCard({ fact: f, index, featured, onLike, onSave, onShare, onRead, o
   }, [f.id, onRead])
 
   return (
-    <section ref={waypoint} aria-label={f.title} className="tw:flex tw:h-full tw:flex-none tw:snap-start tw:items-center tw:justify-center tw:bg-neutral-950 tw:px-4 tw:py-3">
+    <section ref={waypoint} aria-label={f.title} className="flex h-full flex-none snap-start items-center justify-center bg-neutral-950 px-4 py-3">
       <div
         ref={cardRef}
-        className="tw:relative tw:h-full tw:w-full tw:max-w-[400px] tw:overflow-hidden tw:rounded-[20px] tw:shadow-[0_8px_40px_rgba(0,0,0,0.6)]"
+        className="relative h-full w-full max-w-[400px] overflow-hidden rounded-[20px] shadow-[0_8px_40px_rgba(0,0,0,0.6)]"
         style={{ background: hasImage ? '#000' : GRADIENTS[index % GRADIENTS.length] }}
       >
-        {hasImage && <img src={factImageSrc(f)} alt={f.title} className="tw:absolute tw:inset-0 tw:block tw:size-full tw:object-cover" loading={index > 1 ? 'lazy' : undefined} />}
-        <div className="tw:pointer-events-none tw:absolute tw:inset-x-0 tw:top-0 tw:h-[35%] tw:bg-gradient-to-b tw:from-black/45 tw:to-transparent" />
-        <div className="tw:pointer-events-none tw:absolute tw:inset-x-0 tw:bottom-0 tw:h-[65%] tw:bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.5)_55%,transparent_100%)]" />
+        {hasImage && <img src={factImageSrc(f)} alt={f.title} className="absolute inset-0 block size-full object-cover" loading={index > 1 ? 'lazy' : undefined} />}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[35%] bg-gradient-to-b from-black/45 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[65%] bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.5)_55%,transparent_100%)]" />
 
         {/* Action rail */}
-        <div className="tw:absolute tw:right-3.5 tw:bottom-24 tw:z-[3] tw:flex tw:flex-col tw:items-center tw:gap-4">
-          <RailButton label={f.liked_by_me ? 'Unlike' : 'Like'} pressed={!!f.liked_by_me} activeClass="tw:text-rose-500" onClick={() => onLike(f)} caption={f.likes_count ?? 0}>
-            <Heart className={cn('tw:size-6', f.liked_by_me && 'tw:fill-current')} aria-hidden="true" />
+        <div className="absolute right-3.5 bottom-24 z-[3] flex flex-col items-center gap-4">
+          <RailButton label={f.liked_by_me ? 'Unlike' : 'Like'} pressed={!!f.liked_by_me} activeClass="text-rose-500" onClick={() => onLike(f)} caption={f.likes_count ?? 0}>
+            <Heart className={cn('size-6', f.liked_by_me && 'fill-current')} aria-hidden="true" />
           </RailButton>
-          <RailButton label={f.saved_by_me ? 'Remove from saved' : 'Save'} pressed={!!f.saved_by_me} activeClass="tw:text-yellow-400" onClick={() => onSave(f)} caption={f.saved_by_me ? 'Saved' : 'Save'}>
-            <Bookmark className={cn('tw:size-6', f.saved_by_me && 'tw:fill-current')} aria-hidden="true" />
+          <RailButton label={f.saved_by_me ? 'Remove from saved' : 'Save'} pressed={!!f.saved_by_me} activeClass="text-yellow-400" onClick={() => onSave(f)} caption={f.saved_by_me ? 'Saved' : 'Save'}>
+            <Bookmark className={cn('size-6', f.saved_by_me && 'fill-current')} aria-hidden="true" />
           </RailButton>
           <RailButton label="Share" onClick={() => onShare(f)} caption={typeof f.shares_count === 'number' ? f.shares_count : undefined}>
-            <Share2 className="tw:size-6" aria-hidden="true" />
+            <Share2 className="size-6" aria-hidden="true" />
           </RailButton>
           {f.source_url && (
             <RailButton label="Open source" onClick={() => window.open(absoluteUrl(f.source_url), '_blank', 'noopener,noreferrer')} caption="Source">
-              <ExternalLink className="tw:size-6" aria-hidden="true" />
+              <ExternalLink className="size-6" aria-hidden="true" />
             </RailButton>
           )}
         </div>
@@ -107,53 +107,53 @@ function ReelCard({ fact: f, index, featured, onLike, onSave, onShare, onRead, o
         {/* Text */}
         <div
           className={cn(
-            'tw:absolute tw:inset-y-0 tw:left-0 tw:right-[68px] tw:z-[2] tw:flex tw:flex-col tw:px-[18px] tw:text-white',
-            expanded ? 'tw:overflow-y-auto' : 'tw:overflow-hidden',
-            expanded || !hasImage ? 'tw:justify-start tw:py-[26px]' : 'tw:justify-end tw:pb-[26px]',
+            'absolute inset-y-0 left-0 right-[68px] z-[2] flex flex-col px-[18px] text-white',
+            expanded ? 'overflow-y-auto' : 'overflow-hidden',
+            expanded || !hasImage ? 'justify-start py-[26px]' : 'justify-end pb-[26px]',
           )}
         >
-          <div className="tw:mb-2 tw:flex tw:flex-wrap tw:gap-1.5">
+          <div className="mb-2 flex flex-wrap gap-1.5">
             {f.is_pinned && (
-              <span className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:bg-yellow-400/25 tw:px-2 tw:py-0.5 tw:text-[11px] tw:font-bold tw:tracking-wider tw:text-yellow-200 tw:uppercase">
-                <Pin className="tw:size-3" aria-hidden="true" /> Pinned
+              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-400/25 px-2 py-0.5 text-[11px] font-bold tracking-wider text-yellow-200 uppercase">
+                <Pin className="size-3" aria-hidden="true" /> Pinned
               </span>
             )}
             {featured && (
-              <span className="tw:inline-flex tw:items-center tw:gap-1 tw:rounded-full tw:bg-indigo-500/30 tw:px-2 tw:py-0.5 tw:text-[11px] tw:font-bold tw:tracking-wider tw:text-indigo-200 tw:uppercase">
-                <Sparkles className="tw:size-3" aria-hidden="true" /> Featured
+              <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/30 px-2 py-0.5 text-[11px] font-bold tracking-wider text-indigo-200 uppercase">
+                <Sparkles className="size-3" aria-hidden="true" /> Featured
               </span>
             )}
           </div>
           {(f.tags ?? []).length > 0 && (
-            <div className="tw:mb-2.5 tw:flex tw:flex-wrap tw:gap-1.5">
+            <div className="mb-2.5 flex flex-wrap gap-1.5">
               {(f.tags ?? []).slice(0, 4).map((t) => (
-                <span key={t} className="tw:rounded-full tw:bg-white/12 tw:px-2 tw:py-0.5 tw:text-[11px] tw:font-semibold tw:text-white/75">
+                <span key={t} className="rounded-full bg-white/12 px-2 py-0.5 text-[11px] font-semibold text-white/75">
                   #{t}
                 </span>
               ))}
             </div>
           )}
-          <h3 className="tw:m-0 tw:mb-2 tw:text-[clamp(17px,3.5vw,22px)]! tw:leading-tight tw:font-extrabold tw:text-white tw:[text-shadow:0_1px_6px_rgba(0,0,0,0.4)]">{f.title}</h3>
+          <h3 className="m-0 mb-2 text-[clamp(17px,3.5vw,22px)]! leading-tight font-extrabold text-white [text-shadow:0_1px_6px_rgba(0,0,0,0.4)]">{f.title}</h3>
           {f.content && (
             <div>
-              <p ref={textRef} className={cn('tw:m-0 tw:mb-1 tw:text-[clamp(13px,2.5vw,15px)] tw:leading-relaxed tw:whitespace-pre-line tw:text-white/90', !expanded && 'tw:line-clamp-[8]')}>
+              <p ref={textRef} className={cn('m-0 mb-1 text-[clamp(13px,2.5vw,15px)] leading-relaxed whitespace-pre-line text-white/90', !expanded && 'line-clamp-[8]')}>
                 {f.content}
               </p>
               {(truncated || expanded) && (
-                <button type="button" onClick={() => setExpanded((v) => !v)} className="tw:m-0 tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0 tw:text-[13px] tw:font-bold tw:text-indigo-300">
+                <button type="button" onClick={() => setExpanded((v) => !v)} className="m-0 cursor-pointer border-0 bg-transparent p-0 text-[13px] font-bold text-indigo-300">
                   {expanded ? 'Show less' : 'Read more'}
                 </button>
               )}
             </div>
           )}
           {featured && (
-            <div className="tw:mt-3.5">
+            <div className="mt-3.5">
               {f.is_opted_in ? (
-                <button type="button" onClick={() => onOptOut(f)} className="tw:m-0 tw:cursor-pointer tw:rounded-full tw:border tw:border-solid tw:border-red-500/40 tw:bg-red-500/20 tw:px-4 tw:py-1.5 tw:text-[13px] tw:text-red-300">
+                <button type="button" onClick={() => onOptOut(f)} className="m-0 cursor-pointer rounded-full border border-solid border-red-500/40 bg-red-500/20 px-4 py-1.5 text-[13px] text-red-300">
                   Opt-out
                 </button>
               ) : (
-                <button type="button" onClick={() => onOptIn(f)} className="tw:m-0 tw:cursor-pointer tw:rounded-full tw:border tw:border-solid tw:border-indigo-500/45 tw:bg-indigo-500/25 tw:px-4 tw:py-1.5 tw:text-[13px] tw:text-indigo-200">
+                <button type="button" onClick={() => onOptIn(f)} className="m-0 cursor-pointer rounded-full border border-solid border-indigo-500/45 bg-indigo-500/25 px-4 py-1.5 text-[13px] text-indigo-200">
                   + Opt-in
                 </button>
               )}

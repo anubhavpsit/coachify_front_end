@@ -211,8 +211,8 @@ export default function DailyActivityApprovalsPage() {
 
   if (!canAccess) {
     return (
-      <div className="tw:flex tw:flex-col tw:gap-6">
-        <PageHeader title="Activity Approvals" className="tw:mb-0" />
+      <div className="flex flex-col gap-6">
+        <PageHeader title="Activity Approvals" className="mb-0" />
         <Card>
           <EmptyState icon={ShieldAlert} title="You are not authorized to view this page." />
         </Card>
@@ -223,18 +223,18 @@ export default function DailyActivityApprovalsPage() {
   const pendingFilesInBulk = bulkIds ? activities.filter((a) => bulkIds.includes(a.id)).reduce((n, a) => n + (a.attachments ?? []).filter((f) => !f.is_admin_approved).length, 0) : 0
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-5">
+    <div className="flex flex-col gap-5">
       <PageHeader
         title="Activity Approvals"
         description={isApprover ? 'Review what teachers logged. Approved activities become visible to students.' : 'The review status of activities you logged.'}
-        className="tw:mb-0"
+        className="mb-0"
       />
 
       {/* Filters */}
-      <div className="tw:flex tw:flex-col tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4">
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
+      <div className="flex flex-col gap-3 rounded-xl border border-solid border-border bg-card p-4">
+        <div className="flex flex-wrap items-center gap-3">
           <SegmentedControl label="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
-          <div role="group" aria-label="Date range" className="tw:flex tw:flex-wrap tw:items-center tw:gap-1">
+          <div role="group" aria-label="Date range" className="flex flex-wrap items-center gap-1">
             {QUICK_FILTERS.map((f) => (
               <Button
                 key={f.value}
@@ -253,7 +253,7 @@ export default function DailyActivityApprovalsPage() {
             <Input
               type="date"
               aria-label="Pick a date"
-              className={cn('tw:h-8 tw:w-40', quick === 'custom' && 'tw:border-primary')}
+              className={cn('h-8 w-40', quick === 'custom' && 'border-primary')}
               value={customDate}
               onChange={(e) => {
                 setCustomDate(e.target.value)
@@ -261,16 +261,16 @@ export default function DailyActivityApprovalsPage() {
               }}
             />
           </div>
-          <Button type="button" size="icon-sm" variant="outline" className="tw:ml-auto" onClick={reload} disabled={list.loading} aria-label="Refresh">
-            <RefreshCw className={cn(list.loading && 'tw:animate-spin tw:motion-reduce:animate-none')} aria-hidden="true" />
+          <Button type="button" size="icon-sm" variant="outline" className="ml-auto" onClick={reload} disabled={list.loading} aria-label="Refresh">
+            <RefreshCw className={cn(list.loading && 'animate-spin motion-reduce:animate-none')} aria-hidden="true" />
           </Button>
         </div>
-        <div className="tw:grid tw:gap-3 tw:sm:grid-cols-[1fr_16rem]">
-          <div className="tw:relative">
-            <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
+        <div className="grid gap-3 sm:grid-cols-[1fr_16rem]">
+          <div className="relative">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <Input
               type="search"
-              className="tw:pl-9"
+              className="pl-9"
               placeholder={isApprover ? 'Search student, teacher, subject or topic' : 'Search student, subject or topic'}
               aria-label="Search activities"
               value={search}
@@ -290,16 +290,16 @@ export default function DailyActivityApprovalsPage() {
 
       {/* Bulk bar (approvers) */}
       {isApprover && pendingIds.length > 0 && (
-        <div className="tw:z-10 tw:flex tw:flex-wrap tw:sm:sticky tw:sm:top-16 tw:items-center tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-primary/30 tw:bg-primary-soft/95 tw:px-4 tw:py-3 tw:shadow-sm tw:backdrop-blur">
-          <label className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-semibold tw:text-foreground">
+        <div className="z-10 flex flex-wrap sm:sticky sm:top-16 items-center gap-3 rounded-xl border border-solid border-primary/30 bg-primary-soft/95 px-4 py-3 shadow-sm backdrop-blur">
+          <label className="m-0 flex items-center gap-2 text-sm font-semibold text-foreground">
             <Checkbox checked={allSelected ? true : selectedIds.length ? 'indeterminate' : false} onCheckedChange={() => setSelected(allSelected ? new Set() : new Set(pendingIds))} aria-label="Select all pending activities" />
             {selectedIds.length ? `${selectedIds.length} of ${pendingIds.length} selected` : `${pendingIds.length} awaiting review`}
           </label>
-          <label className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-sm">
+          <label className="m-0 flex items-center gap-2 text-sm">
             <Checkbox checked={includeFiles} onCheckedChange={(v) => setIncludeFiles(v === true)} />
             Also approve their attachments
           </label>
-          <div className="tw:ml-auto tw:flex tw:flex-wrap tw:gap-2">
+          <div className="ml-auto flex flex-wrap gap-2">
             <Button type="button" size="sm" variant="outline" disabled={!selectedIds.length} onClick={() => setBulkIds(selectedIds)}>
               Approve selected ({selectedIds.length})
             </Button>
@@ -310,16 +310,16 @@ export default function DailyActivityApprovalsPage() {
         </div>
       )}
       {isApprover && awaitingTeacher > 0 && status !== 'approved' && (
-        <p className="tw:-mt-2 tw:m-0 tw:text-xs tw:text-muted-foreground">
+        <p className="-mt-2 m-0 text-xs text-muted-foreground">
           {awaitingTeacher} sent back {awaitingTeacher === 1 ? 'is' : 'are'} waiting on the teacher and can&apos;t be bulk-approved until they fix {awaitingTeacher === 1 ? 'it' : 'them'}.
         </p>
       )}
 
       {/* List */}
       {list.loading && !list.data ? (
-        <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading activities">
-          <Skeleton className="tw:h-48 tw:rounded-xl" />
-          <Skeleton className="tw:h-48 tw:rounded-xl" />
+        <div className="flex flex-col gap-3" role="status" aria-label="Loading activities">
+          <Skeleton className="h-48 rounded-xl" />
+          <Skeleton className="h-48 rounded-xl" />
         </div>
       ) : list.error ? (
         <ErrorState title="Unable to load activities. Please try again later." onRetry={reload} />
@@ -332,12 +332,12 @@ export default function DailyActivityApprovalsPage() {
           />
         </Card>
       ) : (
-        <div className={cn('tw:flex tw:flex-col tw:gap-6 tw:transition-opacity', list.loading && 'tw:opacity-70')}>
+        <div className={cn('flex flex-col gap-6 transition-opacity', list.loading && 'opacity-70')}>
           {groups.map((g) => (
-            <section key={g.date} aria-label={dayLabel(g.date)} className="tw:flex tw:flex-col tw:gap-3">
-              <h2 className="tw:m-0 tw:flex tw:items-baseline tw:gap-2 tw:text-sm! tw:font-semibold tw:text-muted-foreground">
+            <section key={g.date} aria-label={dayLabel(g.date)} className="flex flex-col gap-3">
+              <h2 className="m-0 flex items-baseline gap-2 text-sm! font-semibold text-muted-foreground">
                 {dayLabel(g.date)}
-                <span className="tw:text-xs tw:font-normal">
+                <span className="text-xs font-normal">
                   {formatDate(g.date)} · {g.items.length} {g.items.length === 1 ? 'activity' : 'activities'}
                 </span>
               </h2>
@@ -362,7 +362,7 @@ export default function DailyActivityApprovalsPage() {
               ))}
             </section>
           ))}
-          {activities.length >= 200 && <p className="tw:m-0 tw:text-center tw:text-xs tw:text-muted-foreground">Showing the latest 200. Narrow the dates to see older ones.</p>}
+          {activities.length >= 200 && <p className="m-0 text-center text-xs text-muted-foreground">Showing the latest 200. Narrow the dates to see older ones.</p>}
         </div>
       )}
 

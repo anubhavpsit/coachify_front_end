@@ -66,9 +66,9 @@ export default function FeeEditDialog({ fee, students, onClose, onSaved }: { fee
       onSubmit={submit}
       submitLabel="Save changes"
       error={error}
-      className="tw:sm:max-w-2xl"
+      className="sm:max-w-2xl"
     >
-      <FeeFields control={form.control} students={students} className="tw:lg:grid-cols-2" />
+      <FeeFields control={form.control} students={students} className="lg:grid-cols-2" />
     </FormDialog>
   )
 }

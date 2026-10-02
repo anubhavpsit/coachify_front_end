@@ -21,7 +21,7 @@ interface Props<T extends FieldValues> {
 function Counter({ value }: { value: string }) {
   const near = value.length > TEXT_MAX * 0.9
   return (
-    <span className={cn('tw:ml-auto tw:text-xs tw:tabular-nums', near ? 'tw:text-destructive' : 'tw:text-muted-foreground')} aria-hidden={!near}>
+    <span className={cn('ml-auto text-xs tabular-nums', near ? 'text-destructive' : 'text-muted-foreground')} aria-hidden={!near}>
       {value.length}/{TEXT_MAX}
     </span>
   )
@@ -40,7 +40,7 @@ export default function LessonFields<T extends FieldValues>({ control, setValue,
 
   return (
     <>
-      <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           control={control}
           name={names.chapter}
@@ -93,13 +93,13 @@ export default function LessonFields<T extends FieldValues>({ control, setValue,
           )}
         />
       </div>
-      <div className="tw:grid tw:gap-4 tw:sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         <FormField
           control={control}
           name={names.notes}
           render={({ field }) => (
             <FormItem>
-              <div className="tw:flex tw:items-baseline tw:gap-2">
+              <div className="flex items-baseline gap-2">
                 <FormLabel>Class notes</FormLabel>
                 <Counter value={(field.value as string) ?? ''} />
               </div>
@@ -116,7 +116,7 @@ export default function LessonFields<T extends FieldValues>({ control, setValue,
           name={names.homework}
           render={({ field }) => (
             <FormItem>
-              <div className="tw:flex tw:items-baseline tw:gap-2">
+              <div className="flex items-baseline gap-2">
                 <FormLabel>Homework</FormLabel>
                 <Counter value={(field.value as string) ?? ''} />
               </div>

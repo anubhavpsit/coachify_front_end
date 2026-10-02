@@ -65,14 +65,14 @@ export default function TopicQuestionsPage() {
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-5">
-      <Link to="/topics" className="tw:inline-flex tw:w-fit tw:items-center tw:gap-1.5 tw:text-sm tw:text-muted-foreground tw:no-underline tw:hover:text-foreground">
-        <ArrowLeft className="tw:size-4" aria-hidden="true" /> Back to Topics
+    <div className="flex flex-col gap-5">
+      <Link to="/topics" className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground no-underline hover:text-foreground">
+        <ArrowLeft className="size-4" aria-hidden="true" /> Back to Topics
       </Link>
       <PageHeader
         title={topic.data ? `Questions — ${topic.data.name}` : 'Questions'}
         description={topic.data ? [topic.data.subject?.subject, topic.data.chapter?.name, topic.data.grade ? `Grade ${topic.data.grade}` : null].filter(Boolean).join(' · ') : 'Question bank for this topic.'}
-        className="tw:mb-0"
+        className="mb-0"
         actions={
           <Button onClick={() => openForm(null)}>
             <Plus aria-hidden="true" /> Add Question
@@ -80,12 +80,12 @@ export default function TopicQuestionsPage() {
         }
       />
 
-      <Card className="tw:flex-row tw:flex-wrap tw:items-center tw:gap-3 tw:p-4">
-        <div className="tw:relative tw:min-w-56 tw:flex-1">
-          <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-          <Input type="search" className="tw:pl-9" placeholder="Search question text" aria-label="Search questions" value={q} onChange={(e) => setQ(e.target.value)} />
+      <Card className="flex-row flex-wrap items-center gap-3 p-4">
+        <div className="relative min-w-56 flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <Input type="search" className="pl-9" placeholder="Search question text" aria-label="Search questions" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
-        <NativeSelect aria-label="Grade" className="tw:w-full tw:sm:w-36" value={grade} onChange={(e) => setGrade(e.target.value)}>
+        <NativeSelect aria-label="Grade" className="w-full sm:w-36" value={grade} onChange={(e) => setGrade(e.target.value)}>
           <option value="">All grades</option>
           {GRADES.map((g) => (
             <option key={g} value={String(g)}>
@@ -93,7 +93,7 @@ export default function TopicQuestionsPage() {
             </option>
           ))}
         </NativeSelect>
-        <NativeSelect aria-label="Question type" className="tw:w-full tw:sm:w-44" value={type} onChange={(e) => setType(e.target.value)}>
+        <NativeSelect aria-label="Question type" className="w-full sm:w-44" value={type} onChange={(e) => setType(e.target.value)}>
           <option value="">All types</option>
           {QUESTION_TYPES.filter((t) => t.value).map((t) => (
             <option key={t.value} value={t.value}>
@@ -102,16 +102,16 @@ export default function TopicQuestionsPage() {
           ))}
         </NativeSelect>
         {!list.loading && (
-          <span className="tw:text-xs tw:text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             {shown.length} of {all.length} questions{flagged ? ` · ${flagged} need an image` : ''}
           </span>
         )}
       </Card>
 
       {list.loading && !list.data ? (
-        <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading questions">
-          <Skeleton className="tw:h-32 tw:rounded-xl" />
-          <Skeleton className="tw:h-32 tw:rounded-xl" />
+        <div className="flex flex-col gap-3" role="status" aria-label="Loading questions">
+          <Skeleton className="h-32 rounded-xl" />
+          <Skeleton className="h-32 rounded-xl" />
         </div>
       ) : list.error ? (
         <ErrorState title="Couldn't load the questions." onRetry={list.reload} />
@@ -128,7 +128,7 @@ export default function TopicQuestionsPage() {
           />
         </Card>
       ) : (
-        <ol className={cn('tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0', list.loading && 'tw:opacity-70')}>
+        <ol className={cn('m-0 flex list-none flex-col gap-3 p-0', list.loading && 'opacity-70')}>
           {shown.map((x, i) => (
             <QuestionView
               key={x.id}
@@ -138,7 +138,7 @@ export default function TopicQuestionsPage() {
               headerEnd={
                 <>
                   <ScopeBadge base={x.tenant_id === 0} />
-                  <div className="tw:ml-auto tw:flex tw:items-center tw:gap-0.5">
+                  <div className="ml-auto flex items-center gap-0.5">
                     {x.tenant_id === tenantId ? (
                       <>
                         <IconAction label={`Edit question ${i + 1}`} onClick={() => openForm(x)}>
@@ -167,7 +167,7 @@ export default function TopicQuestionsPage() {
         title={`Delete question ${deleting?.n ?? ''}?`}
         description={
           <>
-            <span className="tw:line-clamp-2">“{deleting ? htmlText(deleting.q.question_html) : ''}”</span> will be deleted. This can&apos;t be undone.
+            <span className="line-clamp-2">“{deleting ? htmlText(deleting.q.question_html) : ''}”</span> will be deleted. This can&apos;t be undone.
           </>
         }
         confirmLabel="Yes, delete"

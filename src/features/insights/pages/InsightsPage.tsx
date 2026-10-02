@@ -37,22 +37,22 @@ function SubjectRow({ s, total, selected, onSelect }: { s: SubjectItem; total: n
         aria-pressed={selected}
         aria-label={`View chapters for ${s.subject}`}
         className={cn(
-          'tw:group tw:m-0 tw:flex tw:w-full tw:cursor-pointer tw:items-center tw:gap-4 tw:rounded-lg tw:border tw:border-solid tw:px-3 tw:py-2.5 tw:text-left tw:transition-colors tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50',
-          selected ? 'tw:border-primary/40 tw:bg-primary-soft' : 'tw:border-transparent tw:bg-transparent tw:hover:bg-muted/60',
+          'group m-0 flex w-full cursor-pointer items-center gap-4 rounded-lg border border-solid px-3 py-2.5 text-left transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+          selected ? 'border-primary/40 bg-primary-soft' : 'border-transparent bg-transparent hover:bg-muted/60',
         )}
       >
-        <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1.5">
-          <div className="tw:flex tw:items-baseline tw:justify-between tw:gap-3">
-            <span className="tw:truncate tw:text-sm tw:font-medium tw:text-foreground">{s.subject}</span>
-            <span className="tw:shrink-0 tw:text-xs tw:text-muted-foreground tw:tabular-nums">
-              {s.activity_count} · <span className="tw:font-semibold tw:text-foreground">{pct}%</span>
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="truncate text-sm font-medium text-foreground">{s.subject}</span>
+            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">
+              {s.activity_count} · <span className="font-semibold text-foreground">{pct}%</span>
             </span>
           </div>
-          <div className="tw:h-2 tw:overflow-hidden tw:rounded-full tw:bg-muted" aria-hidden="true">
-            <m.div className="tw:h-full tw:rounded-full tw:bg-primary" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.5, ease: 'easeOut' }} />
+          <div className="h-2 overflow-hidden rounded-full bg-muted" aria-hidden="true">
+            <m.div className="h-full rounded-full bg-primary" initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.5, ease: 'easeOut' }} />
           </div>
         </div>
-        <ChevronRight className={cn('tw:size-4 tw:shrink-0 tw:transition-transform', selected ? 'tw:text-primary' : 'tw:text-muted-foreground tw:group-hover:translate-x-0.5')} aria-hidden="true" />
+        <ChevronRight className={cn('size-4 shrink-0 transition-transform', selected ? 'text-primary' : 'text-muted-foreground group-hover:translate-x-0.5')} aria-hidden="true" />
       </button>
     </li>
   )
@@ -81,43 +81,43 @@ export default function InsightsPage() {
   const total = items.reduce((sum, i) => sum + i.activity_count, 0)
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title={`Insights (${windowLabel(days)})`}
         description="How daily activities are spread across subjects and chapters."
-        className="tw:mb-0"
+        className="mb-0"
         actions={
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <SegmentedControl label="Time window" size="sm" value={win} onChange={setWin} options={[...WINDOWS]} />
             <Button variant="outline" size="sm" onClick={subjects.reload} disabled={subjects.loading}>
-              <RefreshCw className={cn(subjects.loading && 'tw:animate-spin tw:motion-reduce:animate-none')} aria-hidden="true" /> Refresh
+              <RefreshCw className={cn(subjects.loading && 'animate-spin motion-reduce:animate-none')} aria-hidden="true" /> Refresh
             </Button>
           </div>
         }
       />
 
-      <m.div className="tw:grid tw:items-start tw:gap-4 tw:lg:grid-cols-12 tw:*:min-w-0" variants={stagger(0.06)} initial="hidden" animate="visible">
-        <m.div variants={slideUp} className="tw:flex tw:flex-col tw:gap-4 tw:lg:col-span-7">
+      <m.div className="grid items-start gap-4 lg:grid-cols-12 *:min-w-0" variants={stagger(0.06)} initial="hidden" animate="visible">
+        <m.div variants={slideUp} className="flex flex-col gap-4 lg:col-span-7">
           <Card>
             <CardHeader>
-              <CardTitle className="tw:flex tw:items-center tw:gap-2">
-                <Layers className="tw:size-4 tw:text-primary" aria-hidden="true" /> Subject Coverage
+              <CardTitle className="flex items-center gap-2">
+                <Layers className="size-4 text-primary" aria-hidden="true" /> Subject Coverage
               </CardTitle>
               <CardDescription>{total > 0 ? `${total} activities in this window. Select a subject to see its chapters.` : 'Activity count and share per subject.'}</CardDescription>
             </CardHeader>
             <CardContent>
               {subjects.loading && !subjects.data ? (
-                <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading subjects">
+                <div className="flex flex-col gap-3" role="status" aria-label="Loading subjects">
                   {[0, 1, 2, 3].map((i) => (
-                    <Skeleton key={i} className="tw:h-10" />
+                    <Skeleton key={i} className="h-10" />
                   ))}
                 </div>
               ) : subjects.error ? (
-                <ErrorState title="Unable to load insights." onRetry={subjects.reload} className="tw:border-0 tw:shadow-none" />
+                <ErrorState title="Unable to load insights." onRetry={subjects.reload} className="border-0 shadow-none" />
               ) : items.length === 0 ? (
                 <EmptyState icon={Layers} title="No activity in this window." description="Try a longer time window." />
               ) : (
-                <ul className={cn('tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-1 tw:p-0 tw:transition-opacity', subjects.loading && 'tw:opacity-60')}>
+                <ul className={cn('m-0 flex list-none flex-col gap-1 p-0 transition-opacity', subjects.loading && 'opacity-60')}>
                   {items.map((s) => (
                     <SubjectRow key={s.subject_id} s={s} total={total} selected={selected?.subject_id === s.subject_id} onSelect={() => selectSubject(s)} />
                   ))}
@@ -131,8 +131,8 @@ export default function InsightsPage() {
               <Sparkles aria-hidden="true" />
               <AlertTitle>Focus suggestions</AlertTitle>
               <AlertDescription>
-                <p className="tw:m-0 tw:text-xs">AI-generated suggestions based on recent activity patterns.</p>
-                <ul className="tw:m-0 tw:mt-1 tw:flex tw:list-disc tw:flex-col tw:gap-0.5 tw:pl-4">
+                <p className="m-0 text-xs">AI-generated suggestions based on recent activity patterns.</p>
+                <ul className="m-0 mt-1 flex list-disc flex-col gap-0.5 pl-4">
                   {notes.map((n, i) => (
                     <li key={i}>{n}</li>
                   ))}
@@ -142,11 +142,11 @@ export default function InsightsPage() {
           )}
         </m.div>
 
-        <m.div ref={chaptersRef} variants={slideUp} className="tw:scroll-mt-20 tw:lg:sticky tw:lg:top-20 tw:lg:col-span-5">
+        <m.div ref={chaptersRef} variants={slideUp} className="scroll-mt-20 lg:sticky lg:top-20 lg:col-span-5">
           <Card>
             <CardHeader>
-              <CardTitle className="tw:flex tw:items-center tw:gap-2">
-                <BookMarked className="tw:size-4 tw:text-primary" aria-hidden="true" /> Chapters{selected ? `: ${selected.subject}` : ''}
+              <CardTitle className="flex items-center gap-2">
+                <BookMarked className="size-4 text-primary" aria-hidden="true" /> Chapters{selected ? `: ${selected.subject}` : ''}
               </CardTitle>
               {!selected && <CardDescription>(select subject)</CardDescription>}
             </CardHeader>
@@ -154,21 +154,21 @@ export default function InsightsPage() {
               {!selected ? (
                 <EmptyState icon={BookMarked} title="Choose a subject to see chapters." />
               ) : chapters.loading ? (
-                <div className="tw:flex tw:flex-col tw:gap-2" role="status" aria-label="Loading chapters">
+                <div className="flex flex-col gap-2" role="status" aria-label="Loading chapters">
                   {[0, 1, 2].map((i) => (
-                    <Skeleton key={i} className="tw:h-8" />
+                    <Skeleton key={i} className="h-8" />
                   ))}
                 </div>
               ) : chapters.error ? (
-                <ErrorState title="Unable to load chapters." onRetry={chapters.reload} className="tw:border-0 tw:shadow-none" />
+                <ErrorState title="Unable to load chapters." onRetry={chapters.reload} className="border-0 shadow-none" />
               ) : (chapters.data ?? []).length === 0 ? (
                 <EmptyState icon={BookMarked} title="No chapter activity in this window." />
               ) : (
-                <ol className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:divide-y tw:divide-border tw:p-0">
+                <ol className="m-0 flex list-none flex-col divide-y divide-border p-0">
                   {chapters.data!.map((c, i) => (
-                    <li key={i} className="tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-2.5 tw:text-sm">
-                      <span className="tw:min-w-0 tw:break-words">{c.chapter}</span>
-                      <span className="tw:shrink-0 tw:rounded-full tw:bg-muted tw:px-2 tw:py-0.5 tw:text-xs tw:font-semibold tw:tabular-nums">{c.activity_count}</span>
+                    <li key={i} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                      <span className="min-w-0 break-words">{c.chapter}</span>
+                      <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-semibold tabular-nums">{c.activity_count}</span>
                     </li>
                   ))}
                 </ol>

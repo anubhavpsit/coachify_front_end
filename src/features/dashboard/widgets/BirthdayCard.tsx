@@ -21,13 +21,13 @@ export default function BirthdayCard({ title = 'Birthday this month' }: { title?
   const users = data ?? []
   return (
     <WidgetCard title={title} icon={CalendarHeart} loading={loading} empty={users.length === 0} emptyTitle="No birthdays this month." emptyIcon={CalendarHeart}>
-      <m.ul className="tw:m-0 tw:list-none tw:divide-y tw:divide-border tw:p-0" variants={stagger(0.04)} initial="hidden" animate="visible">
+      <m.ul className="m-0 list-none divide-y divide-border p-0" variants={stagger(0.04)} initial="hidden" animate="visible">
         {users.map((user) => (
           <m.li key={user.id} variants={slideUp}>
             <PersonRow
               name={user.name}
               image={user.profile_image}
-              subtitle={<span className="tw:capitalize">{user.role}</span>}
+              subtitle={<span className="capitalize">{user.role}</span>}
               status={user.role === 'student' ? user.status : undefined}
               avatarToneClassName={roleAvatarTone(user.role)}
             />

@@ -28,9 +28,9 @@ export function ReviewBadge({ review }: { review: Review }) {
 export function AdminFeedback({ review }: { review: Review }) {
   if (!isSentBack(review)) return null
   return (
-    <div role="note" className="tw:rounded-md tw:border-l-4 tw:border-solid tw:border-y-0 tw:border-r-0 tw:border-destructive tw:bg-destructive-soft tw:px-3 tw:py-2 tw:text-sm">
-      <div className="tw:font-semibold tw:text-destructive">Admin asked for changes</div>
-      <p className="tw:m-0 tw:whitespace-pre-wrap tw:text-foreground">{review.admin_feedback}</p>
+    <div role="note" className="rounded-md border-l-4 border-solid border-y-0 border-r-0 border-destructive bg-destructive-soft px-3 py-2 text-sm">
+      <div className="font-semibold text-destructive">Admin asked for changes</div>
+      <p className="m-0 whitespace-pre-wrap text-foreground">{review.admin_feedback}</p>
     </div>
   )
 }

@@ -112,7 +112,7 @@ export default function CatalogManager<T>({ adapter, title, description, noun, f
       id: 'name',
       header: Noun,
       accessorFn: (row) => adapter.nameOf(row),
-      cell: ({ row }) => <span className="tw:font-medium tw:text-foreground">{adapter.nameOf(row.original)}</span>,
+      cell: ({ row }) => <span className="font-medium text-foreground">{adapter.nameOf(row.original)}</span>,
     },
     {
       id: 'scope',
@@ -131,7 +131,7 @@ export default function CatalogManager<T>({ adapter, title, description, noun, f
     },
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">Actions</span>,
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) =>
@@ -153,7 +153,7 @@ export default function CatalogManager<T>({ adapter, title, description, noun, f
           </Button>
         }
       />
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+      <Card className="gap-0 overflow-hidden py-0">
         <DataTable
           columns={columns}
           data={items}

@@ -20,25 +20,25 @@ export default function ActivityLogCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="tw:flex tw:items-center tw:gap-2">
-          <History className="tw:size-4 tw:text-primary" aria-hidden="true" />
+        <CardTitle className="flex items-center gap-2">
+          <History className="size-4 text-primary" aria-hidden="true" />
           Recent Activity Logs
         </CardTitle>
         <CardDescription>Track who did what across your coaching in real time.</CardDescription>
       </CardHeader>
-      <CardContent className="tw:flex tw:flex-col tw:gap-5">
+      <CardContent className="flex flex-col gap-5">
         <ActivityLogFilters filters={log.filters} modules={log.modules} users={log.users} onChange={log.updateFilters} onReset={log.resetFilters} />
 
         {log.error && (
-          <p className="tw:m-0 tw:text-sm tw:text-destructive" role="alert">
+          <p className="m-0 text-sm text-destructive" role="alert">
             {log.error}
           </p>
         )}
 
         {firstLoad ? (
-          <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading logs">
+          <div className="flex flex-col gap-3" role="status" aria-label="Loading logs">
             {Array.from({ length: 4 }, (_, i) => (
-              <Skeleton key={i} className="tw:h-16" />
+              <Skeleton key={i} className="h-16" />
             ))}
           </div>
         ) : !log.error && log.groups.length === 0 ? (
@@ -52,37 +52,37 @@ export default function ActivityLogCard() {
               initial="hidden"
               animate="visible"
               aria-busy={log.loading}
-              className={cn('tw:flex tw:flex-col tw:gap-5 tw:transition-opacity', log.loading && 'tw:opacity-50')}
+              className={cn('flex flex-col gap-5 transition-opacity', log.loading && 'opacity-50')}
             >
               {log.groups.map((group) => (
                 <section key={group.date} aria-label={group.date}>
-                  <h4 className="tw:m-0 tw:mb-3 tw:text-xs! tw:font-semibold tw:uppercase tw:tracking-wide tw:text-muted-foreground">{group.date}</h4>
-                  <ol className="tw:relative tw:m-0 tw:list-none tw:border-0 tw:border-l tw:border-solid tw:border-border tw:p-0 tw:pl-5">
+                  <h4 className="m-0 mb-3 text-xs! font-semibold uppercase tracking-wide text-muted-foreground">{group.date}</h4>
+                  <ol className="relative m-0 list-none border-0 border-l border-solid border-border p-0 pl-5">
                     {group.items.map((item) => (
-                      <li key={item.id} className="tw:relative tw:pb-4 tw:last:pb-0">
-                        <span className="tw:absolute tw:top-1.5 tw:-left-[1.625rem] tw:size-2.5 tw:rounded-full tw:bg-primary tw:ring-4 tw:ring-card" aria-hidden="true" />
-                        <div className="tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-x-4 tw:gap-y-1">
-                          <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
-                            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-                              <span className="tw:text-sm tw:font-semibold tw:capitalize tw:text-foreground">{item.action.replace(/_/g, ' ')}</span>
+                      <li key={item.id} className="relative pb-4 last:pb-0">
+                        <span className="absolute top-1.5 -left-[1.625rem] size-2.5 rounded-full bg-primary ring-4 ring-card" aria-hidden="true" />
+                        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+                          <div className="flex min-w-0 flex-col gap-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-sm font-semibold capitalize text-foreground">{item.action.replace(/_/g, ' ')}</span>
                               <Badge variant="soft">{moduleLabel(item.module)}</Badge>
                             </div>
-                            {item.description && <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">{item.description}</p>}
+                            {item.description && <p className="m-0 text-sm text-muted-foreground">{item.description}</p>}
                             {item.metadata && typeof item.metadata === 'object' && (
-                              <div className="tw:flex tw:flex-wrap tw:gap-1.5">
+                              <div className="flex flex-wrap gap-1.5">
                                 {Object.entries(item.metadata).map(([key, value]) => (
-                                  <Badge key={key} variant="outline" className="tw:font-normal">
+                                  <Badge key={key} variant="outline" className="font-normal">
                                     {key}: {String(value)}
                                   </Badge>
                                 ))}
                               </div>
                             )}
                           </div>
-                          <div className="tw:shrink-0 tw:text-right">
-                            <p className="tw:m-0 tw:text-sm tw:text-foreground">
-                              {item.user?.name || 'System'} <span className="tw:text-muted-foreground">({item.user_role || 'N/A'})</span>
+                          <div className="shrink-0 text-right">
+                            <p className="m-0 text-sm text-foreground">
+                              {item.user?.name || 'System'} <span className="text-muted-foreground">({item.user_role || 'N/A'})</span>
                             </p>
-                            <p className="tw:m-0 tw:text-xs tw:text-muted-foreground">{formatTime(item.created_at)}</p>
+                            <p className="m-0 text-xs text-muted-foreground">{formatTime(item.created_at)}</p>
                           </div>
                         </div>
                       </li>

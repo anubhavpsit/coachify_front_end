@@ -33,33 +33,33 @@ export default function InsightsTab({ studentId }: { studentId: number }) {
   const least = items.length > 1 ? items.reduce((a, b) => (a.activity_count <= b.activity_count ? a : b)) : null
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
-      <SegmentedControl size="sm" label="Insights window" value={String(windowDays)} onChange={(v) => setWindowDays(Number(v))} options={WINDOWS} className="tw:self-start" />
+    <div className="flex flex-col gap-4">
+      <SegmentedControl size="sm" label="Insights window" value={String(windowDays)} onChange={(v) => setWindowDays(Number(v))} options={WINDOWS} className="self-start" />
       {subjects.loading ? (
-        <div className="tw:flex tw:flex-col tw:gap-2" role="status" aria-label="Loading insights">
-          <Skeleton className="tw:h-16" />
-          <Skeleton className="tw:h-24" />
+        <div className="flex flex-col gap-2" role="status" aria-label="Loading insights">
+          <Skeleton className="h-16" />
+          <Skeleton className="h-24" />
         </div>
       ) : items.length === 0 ? (
         <EmptyState icon={BarChart3} title="No activity in this window." />
       ) : (
         <>
-          <div className="tw:grid tw:gap-2 tw:sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2">
             {top && (
-              <div className="tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-3">
-                <div className="tw:text-xs tw:text-muted-foreground">Top Subject</div>
-                <div className="tw:flex tw:items-baseline tw:justify-between">
-                  <span className="tw:font-semibold">{top.subject}</span>
-                  <span className="tw:text-sm tw:text-muted-foreground">{Math.round((top.activity_count / total) * 100)}%</span>
+              <div className="rounded-lg border border-solid border-border p-3">
+                <div className="text-xs text-muted-foreground">Top Subject</div>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-semibold">{top.subject}</span>
+                  <span className="text-sm text-muted-foreground">{Math.round((top.activity_count / total) * 100)}%</span>
                 </div>
               </div>
             )}
             {least && (
-              <div className="tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-3">
-                <div className="tw:text-xs tw:text-muted-foreground">Least Covered</div>
-                <div className="tw:flex tw:items-baseline tw:justify-between">
-                  <span className="tw:font-semibold">{least.subject}</span>
-                  <span className="tw:text-sm tw:text-muted-foreground">{Math.round((least.activity_count / total) * 100)}%</span>
+              <div className="rounded-lg border border-solid border-border p-3">
+                <div className="text-xs text-muted-foreground">Least Covered</div>
+                <div className="flex items-baseline justify-between">
+                  <span className="font-semibold">{least.subject}</span>
+                  <span className="text-sm text-muted-foreground">{Math.round((least.activity_count / total) * 100)}%</span>
                 </div>
               </div>
             )}
@@ -70,7 +70,7 @@ export default function InsightsTab({ studentId }: { studentId: number }) {
               <AlertDescription>{n}</AlertDescription>
             </Alert>
           ))}
-          <ul className="tw:m-0 tw:flex tw:max-h-60 tw:list-none tw:flex-col tw:gap-2 tw:overflow-y-auto tw:p-0">
+          <ul className="m-0 flex max-h-60 list-none flex-col gap-2 overflow-y-auto p-0">
             {items.map((s) => {
               const pct = Math.round((s.activity_count / total) * 100)
               const series = s.series || []
@@ -83,23 +83,23 @@ export default function InsightsTab({ studentId }: { studentId: number }) {
                     onClick={() => setSubjectId(s.subject_id)}
                     aria-pressed={selected}
                     className={cn(
-                      'tw:m-0 tw:w-full tw:cursor-pointer tw:rounded-lg tw:border tw:border-solid tw:bg-transparent tw:p-3 tw:text-left tw:outline-none tw:transition-colors tw:hover:bg-accent tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50',
-                      selected ? 'tw:border-primary tw:bg-primary-soft/50' : 'tw:border-border',
+                      'm-0 w-full cursor-pointer rounded-lg border border-solid bg-transparent p-3 text-left outline-none transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                      selected ? 'border-primary bg-primary-soft/50' : 'border-border',
                     )}
                   >
-                    <div className="tw:mb-1.5 tw:flex tw:items-center tw:justify-between">
-                      <span className="tw:font-medium tw:text-foreground">{s.subject}</span>
-                      <span className="tw:flex tw:items-center tw:gap-2 tw:text-xs tw:text-muted-foreground">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="font-medium text-foreground">{s.subject}</span>
+                      <span className="flex items-center gap-2 text-xs text-muted-foreground">
                         {s.activity_count} • {pct}%{selected && <Badge variant="soft">Selected</Badge>}
                       </span>
                     </div>
-                    <div className="tw:h-2 tw:overflow-hidden tw:rounded-full tw:bg-muted">
-                      <m.div className="tw:h-full tw:origin-left tw:rounded-full tw:bg-primary" style={{ width: `${pct}%` }} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={transitions.slow} />
+                    <div className="h-2 overflow-hidden rounded-full bg-muted">
+                      <m.div className="h-full origin-left rounded-full bg-primary" style={{ width: `${pct}%` }} initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={transitions.slow} />
                     </div>
                     {series.length > 0 && (
-                      <div className="tw:mt-2 tw:flex tw:h-5 tw:items-end tw:gap-0.5" aria-hidden="true">
+                      <div className="mt-2 flex h-5 items-end gap-0.5" aria-hidden="true">
                         {series.map((v, idx) => (
-                          <div key={idx} className="tw:w-1 tw:rounded-sm tw:bg-primary/60" style={{ height: Math.max(2, Math.round((v / maxVal) * 20)) }} />
+                          <div key={idx} className="w-1 rounded-sm bg-primary/60" style={{ height: Math.max(2, Math.round((v / maxVal) * 20)) }} />
                         ))}
                       </div>
                     )}
@@ -108,30 +108,30 @@ export default function InsightsTab({ studentId }: { studentId: number }) {
               )
             })}
           </ul>
-          <section className="tw:flex tw:flex-col tw:gap-2">
-            <h3 className="tw:m-0 tw:text-sm! tw:font-semibold">
+          <section className="flex flex-col gap-2">
+            <h3 className="m-0 text-sm! font-semibold">
               {subjectId === null ? 'Chapters (select a subject)' : `Chapters — ${items.find((it) => it.subject_id === subjectId)?.subject ?? ''}`}
             </h3>
             {subjectId === null ? (
-              <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">Choose a subject to see chapters.</p>
+              <p className="m-0 text-sm text-muted-foreground">Choose a subject to see chapters.</p>
             ) : chapters.loading ? (
-              <Skeleton className="tw:h-20" />
+              <Skeleton className="h-20" />
             ) : (chapters.data ?? []).length === 0 ? (
-              <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">No chapter activity in this window.</p>
+              <p className="m-0 text-sm text-muted-foreground">No chapter activity in this window.</p>
             ) : (
-              <div className="tw:overflow-hidden tw:rounded-lg tw:border tw:border-solid tw:border-border">
+              <div className="overflow-hidden rounded-lg border border-solid border-border">
                 <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Chapter</TableHead>
-                      <TableHead className="tw:text-right">Count</TableHead>
+                      <TableHead className="text-right">Count</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {(chapters.data ?? []).map((c, idx) => (
                       <TableRow key={idx}>
                         <TableCell>{c.chapter}</TableCell>
-                        <TableCell className="tw:text-right tw:tabular-nums">{c.activity_count}</TableCell>
+                        <TableCell className="text-right tabular-nums">{c.activity_count}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

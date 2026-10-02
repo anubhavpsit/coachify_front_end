@@ -27,9 +27,9 @@ import {
 } from './pendingActionsFilters'
 
 const SEVERITY_DOT: Record<string, string> = {
-  high: 'tw:bg-destructive',
-  medium: 'tw:bg-warning',
-  low: 'tw:bg-info',
+  high: 'bg-destructive',
+  medium: 'bg-warning',
+  low: 'bg-info',
 }
 
 /**
@@ -78,9 +78,9 @@ export default function PendingActionsCard() {
       emptyTitle="You're all caught up — no pending actions."
       maxBodyHeight={false}
     >
-      <div className="tw:mb-3 tw:flex tw:flex-wrap tw:items-end tw:gap-3">
+      <div className="mb-3 flex flex-wrap items-end gap-3">
         {options.types.length > 1 && (
-          <label className="tw:m-0 tw:flex tw:min-w-40 tw:flex-col tw:gap-1 tw:text-xs tw:text-muted-foreground">
+          <label className="m-0 flex min-w-40 flex-col gap-1 text-xs text-muted-foreground">
             Action
             <NativeSelect size="sm" value={filters.type} onChange={(e) => setFilters((f) => ({ ...f, type: e.target.value }))}>
               <option value="all">All actions</option>
@@ -92,12 +92,12 @@ export default function PendingActionsCard() {
             </NativeSelect>
           </label>
         )}
-        <label className="tw:m-0 tw:flex tw:flex-col tw:gap-1 tw:text-xs tw:text-muted-foreground">
+        <label className="m-0 flex flex-col gap-1 text-xs text-muted-foreground">
           Date
-          <Input type="date" className="tw:h-8 tw:w-44" value={filters.date} onChange={(e) => setFilters((f) => ({ ...f, date: e.target.value }))} />
+          <Input type="date" className="h-8 w-44" value={filters.date} onChange={(e) => setFilters((f) => ({ ...f, date: e.target.value }))} />
         </label>
         {options.hasUserAttribution && (
-          <label className="tw:m-0 tw:flex tw:min-w-36 tw:flex-col tw:gap-1 tw:text-xs tw:text-muted-foreground">
+          <label className="m-0 flex min-w-36 flex-col gap-1 text-xs text-muted-foreground">
             Role
             <NativeSelect size="sm" value={filters.role} onChange={(e) => setFilters((f) => ({ ...f, role: e.target.value as RoleFilter, userId: '' }))}>
               <option value="all">All roles</option>
@@ -107,7 +107,7 @@ export default function PendingActionsCard() {
           </label>
         )}
         {options.hasUserAttribution && filters.role !== 'all' && (
-          <label className="tw:m-0 tw:flex tw:min-w-40 tw:flex-col tw:gap-1 tw:text-xs tw:text-muted-foreground">
+          <label className="m-0 flex min-w-40 flex-col gap-1 text-xs text-muted-foreground">
             User
             <NativeSelect size="sm" value={filters.userId} onChange={(e) => setFilters((f) => ({ ...f, userId: e.target.value }))}>
               <option value="">{filters.role === 'teacher' ? 'All teachers' : 'All students'}</option>
@@ -127,9 +127,9 @@ export default function PendingActionsCard() {
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState icon={SearchX} title="No pending actions for the selected filters." className="tw:py-4" />
+        <EmptyState icon={SearchX} title="No pending actions for the selected filters." className="py-4" />
       ) : (
-        <ul className="tw:m-0 tw:max-h-[300px] tw:list-none tw:divide-y tw:divide-border tw:overflow-y-auto tw:p-0 tw:pr-2">
+        <ul className="m-0 max-h-[300px] list-none divide-y divide-border overflow-y-auto p-0 pr-2">
           <AnimatePresence initial={false}>
             {rows.map(({ action, key }) => {
               const state = notify.stateOf(key)
@@ -143,20 +143,20 @@ export default function PendingActionsCard() {
                   initial="hidden"
                   animate="visible"
                   exit={{ opacity: 0, transition: transitions.fast }}
-                  className="tw:flex tw:items-start tw:justify-between tw:gap-3 tw:py-3"
+                  className="flex items-start justify-between gap-3 py-3"
                 >
-                  <div className="tw:flex tw:min-w-0 tw:items-start tw:gap-2.5">
+                  <div className="flex min-w-0 items-start gap-2.5">
                     <span
-                      className={cn('tw:mt-1.5 tw:size-2 tw:shrink-0 tw:rounded-full', SEVERITY_DOT[action.severity ?? ''] ?? 'tw:bg-muted-foreground/40')}
+                      className={cn('mt-1.5 size-2 shrink-0 rounded-full', SEVERITY_DOT[action.severity ?? ''] ?? 'bg-muted-foreground/40')}
                       aria-label={action.severity ? `${action.severity} priority` : undefined}
                     />
-                    <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-0.5">
-                      <span className="tw:text-sm tw:font-semibold tw:text-foreground">{action.title}</span>
-                      <span className="tw:text-sm tw:text-muted-foreground">{action.description}</span>
-                      {message && <span className={cn('tw:text-xs', state === 'error' ? 'tw:text-destructive' : 'tw:text-success')}>{message}</span>}
+                    <div className="flex min-w-0 flex-col gap-0.5">
+                      <span className="text-sm font-semibold text-foreground">{action.title}</span>
+                      <span className="text-sm text-muted-foreground">{action.description}</span>
+                      {message && <span className={cn('text-xs', state === 'error' ? 'text-destructive' : 'text-success')}>{message}</span>}
                     </div>
                   </div>
-                  <div className="tw:flex tw:shrink-0 tw:flex-col tw:items-end tw:gap-1">
+                  <div className="flex shrink-0 flex-col items-end gap-1">
                     {notifiable && (
                       <NotifyButton
                         state={state}

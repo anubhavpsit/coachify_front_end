@@ -29,21 +29,21 @@ export default function UserMenu({ user }: { user: AuthUser | null }) {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-full tw:border-0 tw:bg-transparent tw:p-0.5 tw:pr-2 tw:outline-none tw:transition-colors tw:hover:bg-accent tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50"
+          className="m-0 flex cursor-pointer items-center gap-2 rounded-full border-0 bg-transparent p-0.5 pr-2 outline-none transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50"
           aria-label="Account menu"
         >
-          <Avatar className="tw:size-9">
+          <Avatar className="size-9">
             {image && <AvatarImage src={image} alt={name} />}
             <AvatarFallback>{initials(name)}</AvatarFallback>
           </Avatar>
-          <span className="tw:hidden tw:max-w-[9rem] tw:truncate tw:text-sm tw:font-medium tw:text-foreground tw:lg:inline">{name}</span>
-          <ChevronDown className="tw:hidden tw:size-4 tw:text-muted-foreground tw:lg:inline" aria-hidden="true" />
+          <span className="hidden max-w-[9rem] truncate text-sm font-medium text-foreground lg:inline">{name}</span>
+          <ChevronDown className="hidden size-4 text-muted-foreground lg:inline" aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="tw:w-60">
-        <DropdownMenuLabel className="tw:flex tw:flex-col tw:gap-0.5 tw:rounded-md tw:bg-primary-soft tw:px-3 tw:py-2.5">
-          <span className="tw:truncate tw:text-sm tw:font-semibold tw:text-foreground">{name}</span>
-          <span className="tw:text-xs tw:font-medium tw:capitalize tw:text-muted-foreground">{formatRole(user?.role)}</span>
+      <DropdownMenuContent align="end" className="w-60">
+        <DropdownMenuLabel className="flex flex-col gap-0.5 rounded-md bg-primary-soft px-3 py-2.5">
+          <span className="truncate text-sm font-semibold text-foreground">{name}</span>
+          <span className="text-xs font-medium capitalize text-muted-foreground">{formatRole(user?.role)}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate(ROUTES.PROFILE)}>

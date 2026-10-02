@@ -46,11 +46,11 @@ export default function TodayBirthdayCard({ title = 'Today Birthdays' }: { title
       maxBodyHeight={false}
       action={
         users.length > 1 ? (
-          <div className="tw:flex tw:items-center tw:gap-1">
+          <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon-sm" onClick={() => go(-1)} aria-label="Previous birthday">
               <ChevronLeft aria-hidden="true" />
             </Button>
-            <span className="tw:text-xs tw:tabular-nums tw:text-muted-foreground" aria-live="polite">
+            <span className="text-xs tabular-nums text-muted-foreground" aria-live="polite">
               {index + 1}/{users.length}
             </span>
             <Button variant="ghost" size="icon-sm" onClick={() => go(1)} aria-label="Next birthday">
@@ -62,7 +62,7 @@ export default function TodayBirthdayCard({ title = 'Today Birthdays' }: { title
     >
       <div
         ref={trackRef}
-        className="tw:flex tw:snap-x tw:snap-mandatory tw:overflow-x-auto tw:scroll-smooth tw:[scrollbar-width:none] tw:[&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         onScroll={(e) => {
           const el = e.currentTarget
           setIndex(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)))
@@ -74,22 +74,22 @@ export default function TodayBirthdayCard({ title = 'Today Birthdays' }: { title
         {users.map((user, i) => (
           <div
             key={user.id}
-            className="tw:w-full tw:shrink-0 tw:snap-center"
+            className="w-full shrink-0 snap-center"
             role="group"
             aria-roledescription="slide"
             aria-label={`${i + 1} of ${users.length}`}
           >
-            <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:rounded-xl tw:bg-gradient-to-br tw:from-primary-soft tw:to-transparent tw:px-4 tw:py-5 tw:text-center">
-              <UserAvatar name={user.name} image={user.profile_image} className="tw:size-14 tw:text-base" />
-              <span className="tw:text-base tw:font-semibold tw:text-foreground">{user.name}</span>
-              <span className="tw:text-sm tw:capitalize tw:text-muted-foreground">Role: {user.role}</span>
+            <div className="flex flex-col items-center gap-2 rounded-xl bg-gradient-to-br from-primary-soft to-transparent px-4 py-5 text-center">
+              <UserAvatar name={user.name} image={user.profile_image} className="size-14 text-base" />
+              <span className="text-base font-semibold text-foreground">{user.name}</span>
+              <span className="text-sm capitalize text-muted-foreground">Role: {user.role}</span>
               {user.role === 'student' && user.status && (
-                <Badge variant={user.status === 'active' ? 'success' : 'secondary'} className="tw:capitalize">
+                <Badge variant={user.status === 'active' ? 'success' : 'secondary'} className="capitalize">
                   {user.status}
                 </Badge>
               )}
               <m.span variants={pop} initial="hidden" animate="visible">
-                <Badge variant="default" className="tw:gap-1.5 tw:px-3 tw:py-1">
+                <Badge variant="default" className="gap-1.5 px-3 py-1">
                   <PartyPopper aria-hidden="true" /> Birthday Today
                 </Badge>
               </m.span>

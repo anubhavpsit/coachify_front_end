@@ -76,23 +76,23 @@ export default function EnquiriesPage() {
     {
       accessorKey: 'enquiry_type',
       header: 'Type',
-      cell: ({ row }) => <Badge variant={row.original.enquiry_type === 'teacher' ? 'info' : 'soft'} className="tw:capitalize">{row.original.enquiry_type}</Badge>,
+      cell: ({ row }) => <Badge variant={row.original.enquiry_type === 'teacher' ? 'info' : 'soft'} className="capitalize">{row.original.enquiry_type}</Badge>,
     },
-    { accessorKey: 'name', header: 'Name', cell: ({ row }) => <span className="tw:font-medium">{row.original.name}</span> },
+    { accessorKey: 'name', header: 'Name', cell: ({ row }) => <span className="font-medium">{row.original.name}</span> },
     {
       accessorKey: 'contact_number',
       header: 'Contact',
       cell: ({ row }) => (
-        <a href={`tel:${row.original.contact_number}`} className="tw:text-foreground tw:no-underline tw:hover:underline">
+        <a href={`tel:${row.original.contact_number}`} className="text-foreground no-underline hover:underline">
           {row.original.contact_number}
         </a>
       ),
     },
-    { id: 'email', header: 'Email', accessorFn: (e) => e.email ?? '', cell: ({ row }) => row.original.email || <span className="tw:text-muted-foreground">-</span> },
+    { id: 'email', header: 'Email', accessorFn: (e) => e.email ?? '', cell: ({ row }) => row.original.email || <span className="text-muted-foreground">-</span> },
     {
       accessorKey: 'status',
       header: 'Status',
-      cell: ({ row }) => <Badge variant={row.original.status === 'active' ? 'success' : 'secondary'} className="tw:capitalize">{row.original.status}</Badge>,
+      cell: ({ row }) => <Badge variant={row.original.status === 'active' ? 'success' : 'secondary'} className="capitalize">{row.original.status}</Badge>,
     },
     {
       id: 'last',
@@ -102,21 +102,21 @@ export default function EnquiriesPage() {
         row.original.last_communication_at ? (
           formatDateTime(row.original.last_communication_at)
         ) : (
-          <span className="tw:text-muted-foreground" title="No communications logged yet">
+          <span className="text-muted-foreground" title="No communications logged yet">
             —
           </span>
         ),
     },
-    { accessorKey: 'created_at', header: 'Created At', cell: ({ row }) => <span className="tw:text-muted-foreground">{formatDateTime(row.original.created_at)}</span> },
+    { accessorKey: 'created_at', header: 'Created At', cell: ({ row }) => <span className="text-muted-foreground">{formatDateTime(row.original.created_at)}</span> },
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">Actions</span>,
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) => {
         const e = row.original
         return (
-          <div className="tw:flex tw:items-center tw:justify-end tw:gap-1">
+          <div className="flex items-center justify-end gap-1">
             <IconAction label={`View ${e.name}`} onClick={() => void openDetail(e.id)}>
               <Eye aria-hidden="true" />
             </IconAction>
@@ -130,8 +130,8 @@ export default function EnquiriesPage() {
   ]
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
-      <PageHeader title="Enquiries" description="Track admission and hiring enquiries and follow-ups." className="tw:mb-0" />
+    <div className="flex flex-col gap-6">
+      <PageHeader title="Enquiries" description="Track admission and hiring enquiries and follow-ups." className="mb-0" />
 
       <Card>
         <CardHeader>
@@ -143,12 +143,12 @@ export default function EnquiriesPage() {
         </CardContent>
       </Card>
 
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
-        <CardHeader className="tw:border-b tw:border-solid tw:border-border tw:py-4">
+      <Card className="gap-0 overflow-hidden py-0">
+        <CardHeader className="border-b border-solid border-border py-4">
           <CardTitle>Enquiries</CardTitle>
         </CardHeader>
         {listError && (
-          <p className="tw:m-0 tw:px-5 tw:pt-4 tw:text-sm tw:text-destructive" role="alert">
+          <p className="m-0 px-5 pt-4 text-sm text-destructive" role="alert">
             {listError}
           </p>
         )}
@@ -162,9 +162,9 @@ export default function EnquiriesPage() {
           emptyTitle="No enquiries found."
           pageSize={25}
           toolbar={
-            <label className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium">
+            <label className="m-0 flex items-center gap-2 text-sm font-medium">
               Status
-              <NativeSelect className="tw:w-36" value={status} onChange={(e) => setStatus(e.target.value as StatusFilter)}>
+              <NativeSelect className="w-36" value={status} onChange={(e) => setStatus(e.target.value as StatusFilter)}>
                 <option value="all">All</option>
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>

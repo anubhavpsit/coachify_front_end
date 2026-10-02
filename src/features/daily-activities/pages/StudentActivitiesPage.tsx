@@ -39,37 +39,37 @@ function ActivityCard({ a, onPreview }: { a: StudentActivity; onPreview: (f: Act
   const hasHomework = !!(a.homework || a.homework_status || files.length)
 
   return (
-    <article aria-label={`${a.subject?.subject ?? 'Activity'} · ${formatDate(a.activity_date)}`} className="tw:flex tw:flex-col tw:overflow-hidden tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card">
-      <header className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:border-b tw:border-solid tw:border-border tw:bg-muted/40 tw:px-4 tw:py-2.5">
-        <span className="tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-lg tw:bg-primary-soft tw:text-primary">
-          <GraduationCap className="tw:size-4" aria-hidden="true" />
+    <article aria-label={`${a.subject?.subject ?? 'Activity'} · ${formatDate(a.activity_date)}`} className="flex flex-col overflow-hidden rounded-xl border border-solid border-border bg-card">
+      <header className="flex flex-wrap items-center gap-2 border-b border-solid border-border bg-muted/40 px-4 py-2.5">
+        <span className="flex size-8 items-center justify-center rounded-lg bg-primary-soft text-primary">
+          <GraduationCap className="size-4" aria-hidden="true" />
         </span>
-        <span className="tw:font-semibold tw:text-foreground">{a.subject?.subject ?? 'Subject not set'}</span>
+        <span className="font-semibold text-foreground">{a.subject?.subject ?? 'Subject not set'}</span>
         {a.teacher?.name && (
-          <span className="tw:ml-auto tw:inline-flex tw:items-center tw:gap-1 tw:text-xs tw:text-muted-foreground">
-            <UserRound className="tw:size-3.5" aria-hidden="true" /> {a.teacher.name}
+          <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
+            <UserRound className="size-3.5" aria-hidden="true" /> {a.teacher.name}
           </span>
         )}
       </header>
 
-      <div className="tw:flex tw:flex-col tw:gap-4 tw:p-4">
+      <div className="flex flex-col gap-4 p-4">
         {hasTaught && (
-          <section aria-label="Taught" className="tw:flex tw:flex-col tw:gap-1.5">
-            <span className="tw:text-xs tw:font-semibold tw:tracking-wide tw:text-muted-foreground tw:uppercase">What we covered</span>
+          <section aria-label="Taught" className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">What we covered</span>
             {(chapter || topic) && (
-              <p className="tw:m-0 tw:flex tw:items-start tw:gap-1.5 tw:text-sm tw:font-medium tw:text-foreground">
-                <BookOpen className="tw:mt-0.5 tw:size-4 tw:shrink-0 tw:text-primary" aria-hidden="true" />
+              <p className="m-0 flex items-start gap-1.5 text-sm font-medium text-foreground">
+                <BookOpen className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
                 {[chapter, topic].filter(Boolean).join(' › ')}
               </p>
             )}
             {a.notes && (
-              <p className="tw:m-0 tw:flex tw:items-start tw:gap-1.5 tw:text-sm tw:whitespace-pre-wrap tw:text-foreground">
-                <NotebookPen className="tw:mt-0.5 tw:size-4 tw:shrink-0 tw:text-muted-foreground" aria-hidden="true" />
+              <p className="m-0 flex items-start gap-1.5 text-sm whitespace-pre-wrap text-foreground">
+                <NotebookPen className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                 {a.notes}
               </p>
             )}
             {a.topic_id && (
-              <Button asChild size="sm" variant="soft" className="tw:mt-1 tw:w-fit">
+              <Button asChild size="sm" variant="soft" className="mt-1 w-fit">
                 <Link to={`/students/activities/${a.id}/topic`}>
                   <BookOpen aria-hidden="true" /> View Explanation &amp; Practice Questions
                 </Link>
@@ -79,14 +79,14 @@ function ActivityCard({ a, onPreview }: { a: StudentActivity; onPreview: (f: Act
         )}
 
         {hasHomework && (
-          <section aria-label="Homework" className={cn('tw:flex tw:flex-col tw:gap-1.5', hasTaught && 'tw:border-t tw:border-solid tw:border-border tw:pt-3')}>
-            <div className="tw:flex tw:items-center tw:gap-2">
-              <span className="tw:text-xs tw:font-semibold tw:tracking-wide tw:text-muted-foreground tw:uppercase">Homework</span>
+          <section aria-label="Homework" className={cn('flex flex-col gap-1.5', hasTaught && 'border-t border-solid border-border pt-3')}>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">Homework</span>
               {hw && <Badge variant={hw.variant}>{hw.label}</Badge>}
             </div>
             {a.homework && (
-              <p className="tw:m-0 tw:flex tw:items-start tw:gap-1.5 tw:text-sm tw:whitespace-pre-wrap tw:text-foreground">
-                <ClipboardList className="tw:mt-0.5 tw:size-4 tw:shrink-0 tw:text-muted-foreground" aria-hidden="true" />
+              <p className="m-0 flex items-start gap-1.5 text-sm whitespace-pre-wrap text-foreground">
+                <ClipboardList className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                 {a.homework}
               </p>
             )}
@@ -95,11 +95,11 @@ function ActivityCard({ a, onPreview }: { a: StudentActivity; onPreview: (f: Act
         )}
 
         {a.remarks && (
-          <div className="tw:flex tw:items-start tw:gap-2 tw:rounded-lg tw:border tw:border-solid tw:border-warning/30 tw:bg-warning-soft tw:px-3 tw:py-2">
-            <MessageSquareQuote className="tw:mt-0.5 tw:size-4 tw:shrink-0 tw:text-warning" aria-hidden="true" />
-            <div className="tw:flex tw:flex-col">
-              <span className="tw:text-xs tw:font-semibold tw:text-warning">Teacher&apos;s remarks</span>
-              <p className="tw:m-0 tw:text-sm tw:text-foreground">{a.remarks}</p>
+          <div className="flex items-start gap-2 rounded-lg border border-solid border-warning/30 bg-warning-soft px-3 py-2">
+            <MessageSquareQuote className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden="true" />
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-warning">Teacher&apos;s remarks</span>
+              <p className="m-0 text-sm text-foreground">{a.remarks}</p>
             </div>
           </div>
         )}
@@ -143,21 +143,21 @@ export default function StudentActivitiesPage() {
   ]
 
   return (
-    <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-col tw:gap-5">
-      <PageHeader title="My Activities" description="What was taught in each class, your homework and your teachers' remarks." className="tw:mb-0" />
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
+      <PageHeader title="My Activities" description="What was taught in each class, your homework and your teachers' remarks." className="mb-0" />
 
-      <Card className="tw:flex-row tw:flex-wrap tw:items-center tw:gap-2 tw:p-3">
+      <Card className="flex-row flex-wrap items-center gap-2 p-3">
         {quick.map((q) => (
           <Button key={q.label} type="button" size="sm" variant={date === q.value ? 'soft' : 'ghost'} aria-pressed={date === q.value} onClick={() => setDate(q.value)}>
             {q.label}
           </Button>
         ))}
-        <div className="tw:relative">
-          <CalendarDays className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-2.5 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-          <Input type="date" aria-label="Pick a date" className="tw:h-8 tw:w-44 tw:pl-8" max={todayISO()} value={date} onChange={(e) => setDate(e.target.value)} />
+        <div className="relative">
+          <CalendarDays className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <Input type="date" aria-label="Pick a date" className="h-8 w-44 pl-8" max={todayISO()} value={date} onChange={(e) => setDate(e.target.value)} />
         </div>
         {subjects.length > 1 && (
-          <div role="group" aria-label="Subject" className="tw:flex tw:flex-wrap tw:gap-1.5 tw:sm:ml-auto">
+          <div role="group" aria-label="Subject" className="flex flex-wrap gap-1.5 sm:ml-auto">
             {[['', 'All subjects'] as [string | number, string], ...subjects].map(([id, name]) => (
               <button
                 key={String(id)}
@@ -165,8 +165,8 @@ export default function StudentActivitiesPage() {
                 aria-pressed={subject === String(id)}
                 onClick={() => setSubject(String(id))}
                 className={cn(
-                  'tw:m-0 tw:cursor-pointer tw:rounded-full tw:border tw:border-solid tw:px-2.5 tw:py-1 tw:text-xs tw:font-medium',
-                  subject === String(id) ? 'tw:border-primary tw:bg-primary tw:text-primary-foreground' : 'tw:border-border tw:bg-transparent tw:text-muted-foreground tw:hover:bg-muted',
+                  'm-0 cursor-pointer rounded-full border border-solid px-2.5 py-1 text-xs font-medium',
+                  subject === String(id) ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-transparent text-muted-foreground hover:bg-muted',
                 )}
               >
                 {name}
@@ -177,16 +177,16 @@ export default function StudentActivitiesPage() {
       </Card>
 
       {!list.loading && pendingHw > 0 && (
-        <p className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:text-muted-foreground">
-          <ClipboardList className="tw:size-4 tw:text-warning" aria-hidden="true" />
+        <p className="m-0 flex items-center gap-2 text-sm text-muted-foreground">
+          <ClipboardList className="size-4 text-warning" aria-hidden="true" />
           {pendingHw} homework {pendingHw === 1 ? 'task is' : 'tasks are'} not marked done yet.
         </p>
       )}
 
       {list.loading && !list.data ? (
-        <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading activities">
-          <Skeleton className="tw:h-40 tw:rounded-xl" />
-          <Skeleton className="tw:h-40 tw:rounded-xl" />
+        <div className="flex flex-col gap-3" role="status" aria-label="Loading activities">
+          <Skeleton className="h-40 rounded-xl" />
+          <Skeleton className="h-40 rounded-xl" />
         </div>
       ) : list.error ? (
         <ErrorState title="Couldn't load your activities." onRetry={list.reload} />
@@ -195,12 +195,12 @@ export default function StudentActivitiesPage() {
           <EmptyState icon={ClipboardList} title="No activities found." description={date ? 'Nothing was logged for this day. Try another date.' : 'Your teachers’ daily notes will appear here.'} />
         </Card>
       ) : (
-        <div className={cn('tw:flex tw:flex-col tw:gap-6', list.loading && 'tw:opacity-70')}>
+        <div className={cn('flex flex-col gap-6', list.loading && 'opacity-70')}>
           {groups.map((g) => (
-            <section key={g.day} aria-label={dayHeading(g.day)} className="tw:flex tw:flex-col tw:gap-3">
-              <h2 className="tw:m-0 tw:flex tw:items-baseline tw:gap-2 tw:text-sm! tw:font-semibold tw:text-muted-foreground">
+            <section key={g.day} aria-label={dayHeading(g.day)} className="flex flex-col gap-3">
+              <h2 className="m-0 flex items-baseline gap-2 text-sm! font-semibold text-muted-foreground">
                 {dayHeading(g.day)}
-                <span className="tw:text-xs tw:font-normal">{formatDate(g.day)}</span>
+                <span className="text-xs font-normal">{formatDate(g.day)}</span>
               </h2>
               {g.items.map((a) => (
                 <ActivityCard key={a.id} a={a} onPreview={setPreview} />

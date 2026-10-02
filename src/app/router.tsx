@@ -11,14 +11,14 @@ import PageFallback from './layout/PageFallback'
 // (see PERMISSIONS_MAP.md §2); only the per-group <DashboardLayout> copies were merged
 // into one shell so the sidebar no longer remounts on every section change.
 const SignInPage = lazy(() => import('@/features/auth/pages/SignInPage'))
-const SignUpPage = lazy(() => import('@/pages/auth/SignUpPage'))
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
+const SignUpPage = lazy(() => import('@/features/auth/pages/SignUpPage'))
+const NotFoundPage = lazy(() => import('@/app/NotFoundPage'))
 const DashboardPage = lazy(() => import('@/features/dashboard/pages/DashboardPage'))
 const DailyAttendance = lazy(() => import('@/features/attendance/pages/DailyAttendancePage'))
-const CompanyPage = lazy(() => import('@/pages/settings/CompanyPage'))
-const NotificationPage = lazy(() => import('@/pages/settings/NotificationPage'))
-const NotificationAlertPage = lazy(() => import('@/pages/settings/NotificationAlertPage'))
-const ThemePage = lazy(() => import('@/pages/settings/ThemePage'))
+const CompanyPage = lazy(() => import('@/features/settings/pages/CompanyPage'))
+const NotificationPage = lazy(() => import('@/features/settings/pages/NotificationPage'))
+const NotificationAlertPage = lazy(() => import('@/features/settings/pages/NotificationAlertPage'))
+const ThemePage = lazy(() => import('@/features/settings/pages/ThemePage'))
 const SubjectsPage = lazy(() => import('@/features/academics/pages/SubjectsPage'))
 const ClassesPage = lazy(() => import('@/features/academics/pages/ClassesPage'))
 const FeeComponent = lazy(() => import('@/features/finance/pages/FeesPage'))
@@ -64,7 +64,7 @@ function Guard({ anyOf, orRoles, children }: { anyOf: string[]; orRoles?: string
 
 function StandaloneSuspense({ children }: { children: ReactNode }) {
   return (
-    <Suspense fallback={<div className="tw:p-6"><PageFallback /></div>}>{children}</Suspense>
+    <Suspense fallback={<div className="p-6"><PageFallback /></div>}>{children}</Suspense>
   )
 }
 

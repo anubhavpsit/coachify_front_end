@@ -18,15 +18,15 @@ interface Props {
 /** Avatar + name + subtitle row used by dashboard people lists. */
 export default function PersonRow({ name, image, subtitle, status, trailing, avatarToneClassName, className }: Props) {
   return (
-    <div className={cn('tw:flex tw:items-center tw:justify-between tw:gap-3 tw:py-2', className)}>
-      <div className="tw:flex tw:min-w-0 tw:items-center tw:gap-3">
+    <div className={cn('flex items-center justify-between gap-3 py-2', className)}>
+      <div className="flex min-w-0 items-center gap-3">
         <UserAvatar name={name} image={image} toneClassName={avatarToneClassName} />
-        <div className="tw:flex tw:min-w-0 tw:flex-col">
-          <span className="tw:truncate tw:text-sm tw:font-medium tw:text-foreground">{name}</span>
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5 tw:text-xs tw:text-muted-foreground">
+        <div className="flex min-w-0 flex-col">
+          <span className="truncate text-sm font-medium text-foreground">{name}</span>
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
             {subtitle}
             {status && (
-              <Badge variant={status === 'active' ? 'success' : 'secondary'} className="tw:capitalize">
+              <Badge variant={status === 'active' ? 'success' : 'secondary'} className="capitalize">
                 {status}
               </Badge>
             )}

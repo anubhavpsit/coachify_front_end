@@ -17,24 +17,24 @@ export default function BrandMark({ collapsed }: { collapsed?: boolean }) {
   return (
     <NavLink
       to={ROUTES.DASHBOARD}
-      className="tw:flex tw:h-full tw:min-w-0 tw:items-center tw:gap-2 tw:text-foreground tw:no-underline tw:hover:text-foreground"
+      className="flex h-full min-w-0 items-center gap-2 text-foreground no-underline hover:text-foreground"
       aria-label={`${brandName} — dashboard`}
     >
       {logoUrl ? (
         <img
           src={logoUrl}
           alt={`${brandName} logo`}
-          className={cn('tw:max-h-10 tw:object-contain tw:object-left', collapsed ? 'tw:w-10' : 'tw:max-w-[11rem]')}
+          className={cn('max-h-10 object-contain object-left', collapsed ? 'w-10' : 'max-w-[11rem]')}
         />
       ) : collapsed ? (
         <span
-          className="tw:flex tw:size-10 tw:items-center tw:justify-center tw:rounded-lg tw:bg-primary tw:text-base tw:font-bold tw:text-primary-foreground"
+          className="flex size-10 items-center justify-center rounded-lg bg-primary text-base font-bold text-primary-foreground"
           title={brandName}
         >
           {brandInitials(brandName)}
         </span>
       ) : (
-        <span className="tw:truncate tw:text-xl tw:font-bold" title={brandName}>
+        <span className="truncate text-xl font-bold" title={brandName}>
           {brandName}
         </span>
       )}

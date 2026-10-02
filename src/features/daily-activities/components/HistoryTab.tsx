@@ -49,13 +49,13 @@ function HistoryItem({ act, onPreview, onEdit, onStatus }: { act: ActivityRecord
 
   return (
     <li>
-      <Card className={cn('tw:gap-3 tw:py-4', isSentBack(act) && 'tw:border-destructive/40')}>
-        <CardContent className="tw:flex tw:flex-col tw:gap-3 tw:px-4">
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1.5">
-            <span className="tw:text-sm tw:font-semibold tw:text-foreground">{act.student?.name ?? '-'}</span>
+      <Card className={cn('gap-3 py-4', isSentBack(act) && 'border-destructive/40')}>
+        <CardContent className="flex flex-col gap-3 px-4">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <span className="text-sm font-semibold text-foreground">{act.student?.name ?? '-'}</span>
             <Badge variant="soft">{act.subject?.subject ?? '-'}</Badge>
-            <span className="tw:text-xs tw:text-muted-foreground">{formatDate(act.activity_date)}</span>
-            <span className="tw:ml-auto">
+            <span className="text-xs text-muted-foreground">{formatDate(act.activity_date)}</span>
+            <span className="ml-auto">
               <ReviewBadge review={act} />
             </span>
           </div>
@@ -67,27 +67,27 @@ function HistoryItem({ act, onPreview, onEdit, onStatus }: { act: ActivityRecord
               </Button>
             </div>
           )}
-          <dl className="tw:m-0 tw:grid tw:gap-2 tw:text-sm tw:sm:grid-cols-[8rem_1fr]">
-            <dt className="tw:flex tw:items-center tw:gap-1.5 tw:font-normal! tw:text-muted-foreground">
-              <BookOpen className="tw:size-3.5" aria-hidden="true" /> Lesson
+          <dl className="m-0 grid gap-2 text-sm sm:grid-cols-[8rem_1fr]">
+            <dt className="flex items-center gap-1.5 font-normal! text-muted-foreground">
+              <BookOpen className="size-3.5" aria-hidden="true" /> Lesson
             </dt>
-            <dd className="tw:m-0">{lesson || <span className="tw:text-muted-foreground">-</span>}</dd>
-            <dt className="tw:flex tw:items-center tw:gap-1.5 tw:font-normal! tw:text-muted-foreground">
-              <NotebookPen className="tw:size-3.5" aria-hidden="true" /> Class notes
+            <dd className="m-0">{lesson || <span className="text-muted-foreground">-</span>}</dd>
+            <dt className="flex items-center gap-1.5 font-normal! text-muted-foreground">
+              <NotebookPen className="size-3.5" aria-hidden="true" /> Class notes
             </dt>
-            <dd className="tw:m-0 tw:whitespace-pre-wrap">{act.notes || <span className="tw:text-muted-foreground">-</span>}</dd>
-            <dt className="tw:flex tw:items-center tw:gap-1.5 tw:font-normal! tw:text-muted-foreground">
-              <ClipboardList className="tw:size-3.5" aria-hidden="true" /> Homework
+            <dd className="m-0 whitespace-pre-wrap">{act.notes || <span className="text-muted-foreground">-</span>}</dd>
+            <dt className="flex items-center gap-1.5 font-normal! text-muted-foreground">
+              <ClipboardList className="size-3.5" aria-hidden="true" /> Homework
             </dt>
-            <dd className="tw:m-0 tw:whitespace-pre-wrap">{act.homework || <span className="tw:text-muted-foreground">-</span>}</dd>
+            <dd className="m-0 whitespace-pre-wrap">{act.homework || <span className="text-muted-foreground">-</span>}</dd>
           </dl>
           <AttachmentChips attachments={act.attachments ?? []} onPreview={onPreview} />
-          <div className="tw:grid tw:gap-3 tw:border-t tw:border-solid tw:border-border tw:pt-3 tw:sm:grid-cols-[10rem_1fr]">
-            <div className="tw:flex tw:flex-col tw:gap-1.5">
-              <label htmlFor={`hw-status-${act.id}`} className="tw:m-0 tw:text-xs tw:font-medium tw:text-muted-foreground">
+          <div className="grid gap-3 border-t border-solid border-border pt-3 sm:grid-cols-[10rem_1fr]">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={`hw-status-${act.id}`} className="m-0 text-xs font-medium text-muted-foreground">
                 Homework status
               </label>
-              <NativeSelect id={`hw-status-${act.id}`} size="sm" className="tw:font-normal" value={act.homework_status ?? 'not_done'} onChange={(e) => onStatus(e.target.value as HomeworkStatus)}>
+              <NativeSelect id={`hw-status-${act.id}`} size="sm" className="font-normal" value={act.homework_status ?? 'not_done'} onChange={(e) => onStatus(e.target.value as HomeworkStatus)}>
                 {STATUS_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>
                     {o.label}
@@ -95,15 +95,15 @@ function HistoryItem({ act, onPreview, onEdit, onStatus }: { act: ActivityRecord
                 ))}
               </NativeSelect>
             </div>
-            <div className="tw:flex tw:flex-col tw:gap-1.5">
-              <label htmlFor={`remarks-${act.id}`} className="tw:m-0 tw:text-xs tw:font-medium tw:text-muted-foreground">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={`remarks-${act.id}`} className="m-0 text-xs font-medium text-muted-foreground">
                 Your remarks (to student)
               </label>
-              <div className="tw:flex tw:flex-col tw:gap-2 tw:sm:flex-row tw:sm:items-start">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
                 <Textarea
                   id={`remarks-${act.id}`}
                   rows={1}
-                  className="tw:min-h-9 tw:flex-1"
+                  className="min-h-9 flex-1"
                   placeholder="e.g. Good work! / Improve your writing."
                   value={remarks}
                   aria-invalid={tooLong || undefined}
@@ -113,7 +113,7 @@ function HistoryItem({ act, onPreview, onEdit, onStatus }: { act: ActivityRecord
                   {saving ? 'Saving…' : 'Save remarks'}
                 </Button>
               </div>
-              {tooLong && <p className="tw:m-0 tw:text-xs tw:text-destructive">Remarks must be {TEXT_MAX} characters or fewer.</p>}
+              {tooLong && <p className="m-0 text-xs text-destructive">Remarks must be {TEXT_MAX} characters or fewer.</p>}
             </div>
           </div>
         </CardContent>
@@ -146,20 +146,20 @@ export default function HistoryTab({ active, initialDate, onPreview, onEdit }: {
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-4">
-      <div className="tw:flex tw:flex-wrap tw:items-end tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4">
-        <label className="tw:m-0 tw:flex tw:flex-col tw:gap-1.5 tw:text-sm tw:font-medium">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-solid border-border bg-card p-4">
+        <label className="m-0 flex flex-col gap-1.5 text-sm font-medium">
           Date
-          <Input type="date" className="tw:h-9 tw:w-44" value={date} onChange={(e) => setDate(e.target.value)} />
+          <Input type="date" className="h-9 w-44" value={date} onChange={(e) => setDate(e.target.value)} />
         </label>
         {date ? (
           <Button type="button" size="sm" variant="ghost" onClick={() => setDate('')}>
             Show all dates
           </Button>
         ) : (
-          <span className="tw:pb-2 tw:text-xs tw:text-muted-foreground">Showing all dates (latest 200).</span>
+          <span className="pb-2 text-xs text-muted-foreground">Showing all dates (latest 200).</span>
         )}
-        <label className="tw:m-0 tw:ml-auto tw:flex tw:items-center tw:gap-2 tw:pb-1.5 tw:text-sm tw:font-medium">
+        <label className="m-0 ml-auto flex items-center gap-2 pb-1.5 text-sm font-medium">
           <Switch checked={needsChangesOnly} onCheckedChange={setNeedsChangesOnly} />
           Needs changes only
           {sentBackCount > 0 && <Badge variant="destructive">{sentBackCount}</Badge>}
@@ -167,9 +167,9 @@ export default function HistoryTab({ active, initialDate, onPreview, onEdit }: {
       </div>
 
       {history.loading && !history.data ? (
-        <div className="tw:flex tw:flex-col tw:gap-3" role="status" aria-label="Loading history">
-          <Skeleton className="tw:h-44 tw:rounded-xl" />
-          <Skeleton className="tw:h-44 tw:rounded-xl" />
+        <div className="flex flex-col gap-3" role="status" aria-label="Loading history">
+          <Skeleton className="h-44 rounded-xl" />
+          <Skeleton className="h-44 rounded-xl" />
         </div>
       ) : history.error ? (
         <ErrorState title="Couldn't load your activities." onRetry={history.reload} />
@@ -178,7 +178,7 @@ export default function HistoryTab({ active, initialDate, onPreview, onEdit }: {
           <EmptyState icon={ClipboardList} title={needsChangesOnly ? 'Nothing sent back — all good.' : 'No activities found.'} />
         </Card>
       ) : (
-        <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0">
+        <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {shown.map((act) => (
             <HistoryItem key={act.id} act={act} onPreview={onPreview} onEdit={() => onEdit(act.activity_date.slice(0, 10))} onStatus={(s) => void changeStatus(act, s)} />
           ))}

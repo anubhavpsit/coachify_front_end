@@ -50,17 +50,17 @@ export function FilePicker({ onFiles, onRejected, disabled, busy, label = 'Add f
       onDragLeave={() => setDragging(false)}
       onDrop={onDrop}
       className={cn(
-        'tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-3 tw:rounded-lg tw:border tw:border-dashed tw:border-input tw:px-4 tw:py-3 tw:text-sm tw:transition-colors tw:hover:border-primary/60 tw:hover:bg-primary-soft/40',
-        dragging && 'tw:border-primary tw:bg-primary-soft/60',
-        disabled && 'tw:pointer-events-none tw:opacity-50',
+        'm-0 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-input px-4 py-3 text-sm transition-colors hover:border-primary/60 hover:bg-primary-soft/40',
+        dragging && 'border-primary bg-primary-soft/60',
+        disabled && 'pointer-events-none opacity-50',
       )}
     >
-      <span className="tw:flex tw:size-9 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:bg-muted tw:text-muted-foreground">
-        {busy ? <LoaderCircle className="tw:size-4 tw:animate-spin tw:motion-reduce:animate-none" aria-hidden="true" /> : <Paperclip className="tw:size-4" aria-hidden="true" />}
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+        {busy ? <LoaderCircle className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Paperclip className="size-4" aria-hidden="true" />}
       </span>
-      <span className="tw:flex tw:flex-col">
-        <span className="tw:font-medium tw:text-foreground">{busy ? 'Uploading…' : `${label} — click or drop here`}</span>
-        <span className="tw:text-xs tw:text-muted-foreground">{hint}</span>
+      <span className="flex flex-col">
+        <span className="font-medium text-foreground">{busy ? 'Uploading…' : `${label} — click or drop here`}</span>
+        <span className="text-xs text-muted-foreground">{hint}</span>
       </span>
       <input
         ref={inputRef}
@@ -69,7 +69,7 @@ export function FilePicker({ onFiles, onRejected, disabled, busy, label = 'Add f
         multiple
         accept={ATTACHMENT_ACCEPT}
         disabled={disabled}
-        className="tw:sr-only"
+        className="sr-only"
         onChange={(e) => {
           take(e.target.files)
           e.target.value = ''
@@ -83,19 +83,19 @@ export function FilePicker({ onFiles, onRejected, disabled, busy, label = 'Add f
 export function PendingFiles({ files, onRemove }: { files: File[]; onRemove: (index: number) => void }) {
   if (!files.length) return null
   return (
-    <ul className="tw:m-0 tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
+    <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
       {files.map((f, i) => (
-        <li key={`${f.name}-${i}`} className="tw:flex tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-solid tw:border-border tw:bg-muted/50 tw:py-1 tw:pr-1 tw:pl-3 tw:text-xs">
-          {isPdf(f.name) ? <FileText className="tw:size-3.5 tw:text-destructive" aria-hidden="true" /> : <ImageIcon className="tw:size-3.5 tw:text-info" aria-hidden="true" />}
-          <span className="tw:max-w-48 tw:truncate">{f.name}</span>
-          <span className="tw:text-muted-foreground">{sizeLabel(f.size)}</span>
+        <li key={`${f.name}-${i}`} className="flex items-center gap-2 rounded-full border border-solid border-border bg-muted/50 py-1 pr-1 pl-3 text-xs">
+          {isPdf(f.name) ? <FileText className="size-3.5 text-destructive" aria-hidden="true" /> : <ImageIcon className="size-3.5 text-info" aria-hidden="true" />}
+          <span className="max-w-48 truncate">{f.name}</span>
+          <span className="text-muted-foreground">{sizeLabel(f.size)}</span>
           <button
             type="button"
             onClick={() => onRemove(i)}
             aria-label={`Remove ${f.name}`}
-            className="tw:m-0 tw:flex tw:size-5 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full tw:border-0 tw:bg-transparent tw:p-0 tw:text-muted-foreground tw:hover:bg-background tw:hover:text-foreground"
+            className="m-0 flex size-5 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-muted-foreground hover:bg-background hover:text-foreground"
           >
-            <X className="tw:size-3" aria-hidden="true" />
+            <X className="size-3" aria-hidden="true" />
           </button>
         </li>
       ))}
@@ -119,18 +119,18 @@ export function AttachmentChips({
 }) {
   if (!attachments.length) return null
   return (
-    <ul className="tw:m-0 tw:flex tw:list-none tw:flex-wrap tw:gap-2 tw:p-0">
+    <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
       {attachments.map((a) => (
-        <li key={a.id} className="tw:flex tw:items-center tw:gap-1 tw:rounded-full tw:border tw:border-solid tw:border-border tw:bg-card tw:py-1 tw:pr-1 tw:pl-3 tw:text-xs">
+        <li key={a.id} className="flex items-center gap-1 rounded-full border border-solid border-border bg-card py-1 pr-1 pl-3 text-xs">
           {a.file_type === 'pdf' || isPdf(a.original_name) ? (
-            <FileText className="tw:size-3.5 tw:text-destructive" aria-hidden="true" />
+            <FileText className="size-3.5 text-destructive" aria-hidden="true" />
           ) : (
-            <ImageIcon className="tw:size-3.5 tw:text-info" aria-hidden="true" />
+            <ImageIcon className="size-3.5 text-info" aria-hidden="true" />
           )}
           <button
             type="button"
             onClick={() => onPreview(a)}
-            className="tw:m-0 tw:max-w-48 tw:cursor-pointer tw:truncate tw:border-0 tw:bg-transparent tw:p-0 tw:pr-2 tw:text-xs tw:text-foreground tw:underline-offset-2 tw:hover:underline"
+            className="m-0 max-w-48 cursor-pointer truncate border-0 bg-transparent p-0 pr-2 text-xs text-foreground underline-offset-2 hover:underline"
           >
             {a.original_name}
           </button>
@@ -140,9 +140,9 @@ export function AttachmentChips({
               onClick={() => onDelete(a)}
               disabled={deletingId === a.id}
               aria-label={`Delete ${a.original_name}`}
-              className="tw:m-0 tw:flex tw:size-5 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full tw:border-0 tw:bg-transparent tw:p-0 tw:text-muted-foreground tw:hover:bg-destructive-soft tw:hover:text-destructive tw:disabled:opacity-50"
+              className="m-0 flex size-5 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0 text-muted-foreground hover:bg-destructive-soft hover:text-destructive disabled:opacity-50"
             >
-              <X className="tw:size-3" aria-hidden="true" />
+              <X className="size-3" aria-hidden="true" />
             </button>
           )}
         </li>

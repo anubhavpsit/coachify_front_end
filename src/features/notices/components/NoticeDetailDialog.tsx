@@ -77,11 +77,11 @@ export default function NoticeDetailDialog({ noticeId, canManage, onHide, onOpen
   return (
     <>
       <Dialog open={noticeId !== null} onOpenChange={(open) => !open && onHide()}>
-        <DialogContent className="tw:sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{notice?.title ?? (loading ? 'Loading…' : 'Notice')}</DialogTitle>
             <DialogDescription asChild>
-              <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {notice && <NoticeBadges notice={notice} />}
                 {notice && (
                   <span>
@@ -94,52 +94,52 @@ export default function NoticeDetailDialog({ noticeId, canManage, onHide, onOpen
           </DialogHeader>
 
           {loading && (
-            <div className="tw:flex tw:flex-col tw:gap-2" role="status" aria-label="Loading notice">
-              <Skeleton className="tw:h-4 tw:w-full" />
-              <Skeleton className="tw:h-4 tw:w-11/12" />
-              <Skeleton className="tw:h-4 tw:w-3/5" />
+            <div className="flex flex-col gap-2" role="status" aria-label="Loading notice">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-11/12" />
+              <Skeleton className="h-4 w-3/5" />
             </div>
           )}
           {error && (
-            <p className="tw:m-0 tw:text-sm tw:text-destructive" role="alert">
+            <p className="m-0 text-sm text-destructive" role="alert">
               {error}
             </p>
           )}
 
           {notice && (
-            <div className="tw:flex tw:flex-col tw:gap-4">
-              <div className="tw:text-sm tw:leading-relaxed tw:text-foreground tw:whitespace-pre-wrap tw:break-words">{notice.body}</div>
+            <div className="flex flex-col gap-4">
+              <div className="text-sm leading-relaxed text-foreground whitespace-pre-wrap break-words">{notice.body}</div>
 
               {notice.attachment &&
                 (isImage ? (
-                  <a href={notice.attachment.url} target="_blank" rel="noreferrer" className="tw:block tw:w-fit">
-                    <img src={notice.attachment.url} alt={notice.attachment.name} className="tw:max-h-80 tw:max-w-full tw:rounded-lg tw:border tw:border-solid tw:border-border" />
+                  <a href={notice.attachment.url} target="_blank" rel="noreferrer" className="block w-fit">
+                    <img src={notice.attachment.url} alt={notice.attachment.name} className="max-h-80 max-w-full rounded-lg border border-solid border-border" />
                   </a>
                 ) : (
                   <a
                     href={notice.attachment.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="tw:flex tw:w-fit tw:items-center tw:gap-3 tw:rounded-lg tw:border tw:border-solid tw:border-border tw:px-3 tw:py-2 tw:text-sm tw:text-foreground tw:no-underline tw:transition-colors tw:hover:bg-accent"
+                    className="flex w-fit items-center gap-3 rounded-lg border border-solid border-border px-3 py-2 text-sm text-foreground no-underline transition-colors hover:bg-accent"
                   >
-                    <FileText className="tw:size-5 tw:text-destructive" aria-hidden="true" />
+                    <FileText className="size-5 text-destructive" aria-hidden="true" />
                     {notice.attachment.name}
-                    <Download className="tw:size-4 tw:text-muted-foreground" aria-hidden="true" />
+                    <Download className="size-4 text-muted-foreground" aria-hidden="true" />
                   </a>
                 ))}
 
               {canManage && (
-                <dl className="tw:m-0 tw:grid tw:grid-cols-[auto_1fr] tw:gap-x-4 tw:gap-y-1 tw:rounded-lg tw:bg-muted/60 tw:p-3 tw:text-sm">
-                  <dt className="tw:text-muted-foreground">Audience</dt>
-                  <dd className="tw:m-0 tw:text-foreground">{notice.target_roles.map((t) => AUDIENCE_LABELS[t] ?? t).join(', ')}</dd>
+                <dl className="m-0 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-lg bg-muted/60 p-3 text-sm">
+                  <dt className="text-muted-foreground">Audience</dt>
+                  <dd className="m-0 text-foreground">{notice.target_roles.map((t) => AUDIENCE_LABELS[t] ?? t).join(', ')}</dd>
                   {notice.expires_at && (
                     <>
-                      <dt className="tw:text-muted-foreground">Expires</dt>
-                      <dd className="tw:m-0 tw:text-foreground">{formatNoticeDate(notice.expires_at)}</dd>
+                      <dt className="text-muted-foreground">Expires</dt>
+                      <dd className="m-0 text-foreground">{formatNoticeDate(notice.expires_at)}</dd>
                     </>
                   )}
-                  <dt className="tw:text-muted-foreground">Push</dt>
-                  <dd className="tw:m-0 tw:text-foreground">
+                  <dt className="text-muted-foreground">Push</dt>
+                  <dd className="m-0 text-foreground">
                     {notice.push_dispatched_at
                       ? `sent ${formatNoticeDate(notice.push_dispatched_at)} to ${notice.push_recipients_count ?? 0} user(s)`
                       : notice.send_push
@@ -154,8 +154,8 @@ export default function NoticeDetailDialog({ noticeId, canManage, onHide, onOpen
           )}
 
           {canManage && notice && (
-            <DialogFooter className="tw:sm:justify-between">
-              <Button variant="outline" className="tw:border-destructive/40 tw:text-destructive tw:hover:bg-destructive-soft tw:hover:text-destructive" onClick={() => setConfirmDelete(true)}>
+            <DialogFooter className="sm:justify-between">
+              <Button variant="outline" className="border-destructive/40 text-destructive hover:bg-destructive-soft hover:text-destructive" onClick={() => setConfirmDelete(true)}>
                 <Trash2 aria-hidden="true" />
                 Delete
               </Button>

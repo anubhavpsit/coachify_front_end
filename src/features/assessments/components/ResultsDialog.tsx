@@ -21,7 +21,7 @@ interface Props {
 export default function ResultsDialog(p: Props) {
   return (
     <Dialog open={!!p.assessment} onOpenChange={(o) => !o && p.onClose()}>
-      <DialogContent className="tw:sm:max-w-3xl">{p.assessment && <ResultsBody key={p.assessment.id} {...p} assessment={p.assessment} />}</DialogContent>
+      <DialogContent className="sm:max-w-3xl">{p.assessment && <ResultsBody key={p.assessment.id} {...p} assessment={p.assessment} />}</DialogContent>
     </Dialog>
   )
 }
@@ -100,73 +100,73 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
       </DialogHeader>
 
       {detail.loading || !rows ? (
-        <div className="tw:flex tw:flex-col tw:gap-2" role="status" aria-label="Loading results">
-          <Skeleton className="tw:h-12" />
-          <Skeleton className="tw:h-12" />
+        <div className="flex flex-col gap-2" role="status" aria-label="Loading results">
+          <Skeleton className="h-12" />
+          <Skeleton className="h-12" />
         </div>
       ) : rows.length === 0 ? (
-        <EmptyState icon={ClipboardList} title="No students assigned yet." description="Assign students first, then come back to enter marks." className="tw:py-6" />
+        <EmptyState icon={ClipboardList} title="No students assigned yet." description="Assign students first, then come back to enter marks." className="py-6" />
       ) : (
-        <div className="tw:max-h-[60vh] tw:overflow-y-auto tw:rounded-lg tw:border tw:border-solid tw:border-border">
-          <ul className="tw:m-0 tw:list-none tw:divide-y tw:divide-border tw:p-0">
+        <div className="max-h-[60vh] overflow-y-auto rounded-lg border border-solid border-border">
+          <ul className="m-0 list-none divide-y divide-border p-0">
             {rows.map((r, i) => {
               const e = errors[i]
               const percent = pct(r.marks_obtained, r.total_marks)
               const id = `res-${r.student_id}`
               return (
-                <li key={r.student_id} className="tw:grid tw:gap-3 tw:p-3 tw:sm:grid-cols-[minmax(8rem,1fr)_auto_minmax(10rem,1.2fr)_auto] tw:sm:items-start">
-                  <div className="tw:flex tw:items-center tw:gap-2 tw:pt-2">
-                    <span className="tw:text-sm tw:font-medium">{r.student_name}</span>
+                <li key={r.student_id} className="grid gap-3 p-3 sm:grid-cols-[minmax(8rem,1fr)_auto_minmax(10rem,1.2fr)_auto] sm:items-start">
+                  <div className="flex items-center gap-2 pt-2">
+                    <span className="text-sm font-medium">{r.student_name}</span>
                     {percent !== null && !e.marks_obtained && (
-                      <span className={cn('tw:rounded-full tw:px-1.5 tw:text-xs tw:font-semibold', percent >= 75 ? 'tw:bg-success-soft tw:text-success' : percent >= 40 ? 'tw:bg-warning-soft tw:text-warning' : 'tw:bg-destructive-soft tw:text-destructive')}>
+                      <span className={cn('rounded-full px-1.5 text-xs font-semibold', percent >= 75 ? 'bg-success-soft text-success' : percent >= 40 ? 'bg-warning-soft text-warning' : 'bg-destructive-soft text-destructive')}>
                         {percent}%
                       </span>
                     )}
                   </div>
-                  <div className="tw:flex tw:flex-col tw:gap-1">
-                    <div className="tw:flex tw:items-center tw:gap-1.5">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1.5">
                       <Input
                         id={`${id}-m`}
                         aria-label={`Marks for ${r.student_name}`}
                         type="number"
                         inputMode="decimal"
                         min={0}
-                        className="tw:h-9 tw:w-20"
+                        className="h-9 w-20"
                         value={r.marks_obtained}
                         aria-invalid={!!e.marks_obtained || undefined}
                         onChange={(ev) => set(i, { marks_obtained: ev.target.value })}
                       />
-                      <span className="tw:text-sm tw:text-muted-foreground">/</span>
+                      <span className="text-sm text-muted-foreground">/</span>
                       <Input
                         aria-label={`Total marks for ${r.student_name}`}
                         type="number"
                         inputMode="decimal"
                         min={1}
-                        className="tw:h-9 tw:w-20"
+                        className="h-9 w-20"
                         value={r.total_marks}
                         aria-invalid={!!e.total_marks || undefined}
                         onChange={(ev) => set(i, { total_marks: ev.target.value })}
                       />
                     </div>
-                    {(e.marks_obtained || e.total_marks) && <p className="tw:m-0 tw:text-xs tw:text-destructive">{e.marks_obtained ?? e.total_marks}</p>}
+                    {(e.marks_obtained || e.total_marks) && <p className="m-0 text-xs text-destructive">{e.marks_obtained ?? e.total_marks}</p>}
                   </div>
-                  <Input aria-label={`Notes for ${r.student_name}`} className="tw:h-9" placeholder="Notes (optional)" value={r.teacher_notes} onChange={(ev) => set(i, { teacher_notes: ev.target.value })} />
-                  <div className="tw:flex tw:flex-col tw:gap-1">
+                  <Input aria-label={`Notes for ${r.student_name}`} className="h-9" placeholder="Notes (optional)" value={r.teacher_notes} onChange={(ev) => set(i, { teacher_notes: ev.target.value })} />
+                  <div className="flex flex-col gap-1">
                     {r.answerFile ? (
-                      <span className="tw:flex tw:h-9 tw:max-w-44 tw:items-center tw:gap-1.5 tw:rounded-md tw:border tw:border-solid tw:border-border tw:pr-1 tw:pl-2 tw:text-xs">
-                        <FileCheck2 className="tw:size-3.5 tw:shrink-0 tw:text-success" aria-hidden="true" />
-                        <span className="tw:truncate">{r.answerFile.name}</span>
-                        <button type="button" aria-label={`Remove answer sheet for ${r.student_name}`} onClick={() => set(i, { answerFile: null })} className="tw:m-0 tw:ml-auto tw:flex tw:size-6 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-sm tw:border-0 tw:bg-transparent tw:p-0 tw:text-muted-foreground tw:hover:bg-muted">
-                          <X className="tw:size-3" aria-hidden="true" />
+                      <span className="flex h-9 max-w-44 items-center gap-1.5 rounded-md border border-solid border-border pr-1 pl-2 text-xs">
+                        <FileCheck2 className="size-3.5 shrink-0 text-success" aria-hidden="true" />
+                        <span className="truncate">{r.answerFile.name}</span>
+                        <button type="button" aria-label={`Remove answer sheet for ${r.student_name}`} onClick={() => set(i, { answerFile: null })} className="m-0 ml-auto flex size-6 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent p-0 text-muted-foreground hover:bg-muted">
+                          <X className="size-3" aria-hidden="true" />
                         </button>
                       </span>
                     ) : (
-                      <label className="tw:m-0 tw:flex tw:h-9 tw:cursor-pointer tw:items-center tw:gap-1.5 tw:rounded-md tw:border tw:border-dashed tw:border-input tw:px-2.5 tw:text-xs tw:text-muted-foreground tw:hover:border-primary/60 tw:hover:text-foreground">
-                        <Paperclip className="tw:size-3.5" aria-hidden="true" /> Answer sheet
-                        <input type="file" accept={FILE_ACCEPT} className="tw:sr-only" aria-label={`Answer sheet for ${r.student_name}`} onChange={(ev) => set(i, { answerFile: ev.target.files?.[0] ?? null })} />
+                      <label className="m-0 flex h-9 cursor-pointer items-center gap-1.5 rounded-md border border-dashed border-input px-2.5 text-xs text-muted-foreground hover:border-primary/60 hover:text-foreground">
+                        <Paperclip className="size-3.5" aria-hidden="true" /> Answer sheet
+                        <input type="file" accept={FILE_ACCEPT} className="sr-only" aria-label={`Answer sheet for ${r.student_name}`} onChange={(ev) => set(i, { answerFile: ev.target.files?.[0] ?? null })} />
                       </label>
                     )}
-                    {e.answerFile && <p className="tw:m-0 tw:text-xs tw:text-destructive">{e.answerFile}</p>}
+                    {e.answerFile && <p className="m-0 text-xs text-destructive">{e.answerFile}</p>}
                   </div>
                 </li>
               )
@@ -174,7 +174,7 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
           </ul>
         </div>
       )}
-      {tried && nothing && rows && rows.length > 0 && <p className="tw:m-0 tw:text-sm tw:text-destructive">Enter marks for at least one student.</p>}
+      {tried && nothing && rows && rows.length > 0 && <p className="m-0 text-sm text-destructive">Enter marks for at least one student.</p>}
 
       <DialogFooter>
         <Button variant="outline" onClick={onClose} disabled={saving}>

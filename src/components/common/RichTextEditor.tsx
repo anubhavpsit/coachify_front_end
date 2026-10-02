@@ -27,8 +27,8 @@ function Tool({ label, active, onClick, disabled, children }: { label: string; a
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       className={cn(
-        'tw:m-0 tw:flex tw:size-8 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-md tw:border-0 tw:p-0 tw:transition-colors tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50 tw:disabled:opacity-50',
-        active ? 'tw:bg-primary-soft tw:text-primary' : 'tw:bg-transparent tw:text-muted-foreground tw:hover:bg-muted tw:hover:text-foreground',
+        'm-0 flex size-8 cursor-pointer items-center justify-center rounded-md border-0 p-0 transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:opacity-50',
+        active ? 'bg-primary-soft text-primary' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
       )}
     >
       {children}
@@ -50,7 +50,7 @@ export default function RichTextEditor({ value, onChange, disabled, id, placehol
         'aria-multiline': 'true',
         ...(aria['aria-describedby'] ? { 'aria-describedby': aria['aria-describedby'] } : {}),
         ...(aria['aria-invalid'] ? { 'aria-invalid': 'true' } : {}),
-        class: 'tw:min-h-36 tw:px-3 tw:py-2 tw:text-sm tw:outline-none tw:[&_ol]:list-decimal tw:[&_ol]:pl-5 tw:[&_ul]:list-disc tw:[&_ul]:pl-5 tw:[&_p]:my-1 tw:[&_h3]:mt-2 tw:[&_h3]:mb-1 tw:[&_h3]:text-base!',
+        class: 'min-h-36 px-3 py-2 text-sm outline-none [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:my-1 [&_h3]:mt-2 [&_h3]:mb-1 [&_h3]:text-base!',
       },
     },
     // An empty document is "" rather than "<p></p>" so blank stays blank.
@@ -71,31 +71,31 @@ export default function RichTextEditor({ value, onChange, disabled, id, placehol
   return (
     <div
       className={cn(
-        'tw:overflow-hidden tw:rounded-md tw:border tw:border-solid tw:border-input tw:bg-transparent tw:shadow-xs tw:transition-[border-color,box-shadow] tw:focus-within:border-ring tw:focus-within:ring-[3px] tw:focus-within:ring-ring/50',
-        aria['aria-invalid'] && 'tw:border-destructive',
-        disabled && 'tw:opacity-60',
+        'overflow-hidden rounded-md border border-solid border-input bg-transparent shadow-xs transition-[border-color,box-shadow] focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50',
+        aria['aria-invalid'] && 'border-destructive',
+        disabled && 'opacity-60',
       )}
     >
-      <div role="toolbar" aria-label="Formatting" className="tw:flex tw:flex-wrap tw:items-center tw:gap-0.5 tw:border-b tw:border-solid tw:border-border tw:bg-muted/40 tw:px-1.5 tw:py-1">
+      <div role="toolbar" aria-label="Formatting" className="flex flex-wrap items-center gap-0.5 border-b border-solid border-border bg-muted/40 px-1.5 py-1">
         <Tool label="Bold" active={editor.isActive('bold')} disabled={disabled} onClick={() => editor.chain().focus().toggleBold().run()}>
-          <Bold className="tw:size-4" aria-hidden="true" />
+          <Bold className="size-4" aria-hidden="true" />
         </Tool>
         <Tool label="Italic" active={editor.isActive('italic')} disabled={disabled} onClick={() => editor.chain().focus().toggleItalic().run()}>
-          <Italic className="tw:size-4" aria-hidden="true" />
+          <Italic className="size-4" aria-hidden="true" />
         </Tool>
-        <span className="tw:mx-1 tw:h-5 tw:w-px tw:bg-border" aria-hidden="true" />
+        <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
         <Tool label="Bulleted list" active={editor.isActive('bulletList')} disabled={disabled} onClick={() => editor.chain().focus().toggleBulletList().run()}>
-          <List className="tw:size-4" aria-hidden="true" />
+          <List className="size-4" aria-hidden="true" />
         </Tool>
         <Tool label="Numbered list" active={editor.isActive('orderedList')} disabled={disabled} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
-          <ListOrdered className="tw:size-4" aria-hidden="true" />
+          <ListOrdered className="size-4" aria-hidden="true" />
         </Tool>
         <Tool label="Heading" active={editor.isActive('heading', { level: 3 })} disabled={disabled} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
-          <Heading3 className="tw:size-4" aria-hidden="true" />
+          <Heading3 className="size-4" aria-hidden="true" />
         </Tool>
       </div>
-      <div className="tw:relative">
-        {empty && placeholder && <p className="tw:pointer-events-none tw:absolute tw:top-2 tw:left-3 tw:m-0 tw:my-1 tw:text-sm tw:text-muted-foreground/60">{placeholder}</p>}
+      <div className="relative">
+        {empty && placeholder && <p className="pointer-events-none absolute top-2 left-3 m-0 my-1 text-sm text-muted-foreground/60">{placeholder}</p>}
         <EditorContent editor={editor} />
       </div>
     </div>

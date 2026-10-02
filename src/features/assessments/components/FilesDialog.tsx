@@ -27,7 +27,7 @@ const TYPE_LABEL: Record<string, string> = { question_paper: 'Question paper', a
 export default function FilesDialog(p: Props) {
   return (
     <Dialog open={!!p.assessment} onOpenChange={(o) => !o && p.onClose()}>
-      <DialogContent className="tw:sm:max-w-2xl">{p.assessment && <FilesBody key={p.assessment.id} {...p} assessment={p.assessment} />}</DialogContent>
+      <DialogContent className="sm:max-w-2xl">{p.assessment && <FilesBody key={p.assessment.id} {...p} assessment={p.assessment} />}</DialogContent>
     </Dialog>
   )
 }
@@ -102,73 +102,73 @@ function FilesBody({ assessment, isAdmin, onClose, onPreview }: Props & { assess
         <DialogDescription>{assessment.title} · files are approved separately from the assessment.</DialogDescription>
       </DialogHeader>
 
-      <div className="tw:flex tw:flex-col tw:gap-2 tw:rounded-lg tw:border tw:border-solid tw:border-border tw:bg-muted/30 tw:p-3">
-        <span className="tw:text-sm tw:font-medium">Upload a question paper or document</span>
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-          <NativeSelect aria-label="File type" className="tw:w-40" value={type} onChange={(e) => setType(e.target.value as AssessmentFileType)}>
+      <div className="flex flex-col gap-2 rounded-lg border border-solid border-border bg-muted/30 p-3">
+        <span className="text-sm font-medium">Upload a question paper or document</span>
+        <div className="flex flex-wrap items-center gap-2">
+          <NativeSelect aria-label="File type" className="w-40" value={type} onChange={(e) => setType(e.target.value as AssessmentFileType)}>
             <option value="question_paper">Question paper</option>
             <option value="other">Other</option>
           </NativeSelect>
           {file ? (
-            <span className="tw:flex tw:h-10 tw:min-w-0 tw:flex-1 tw:items-center tw:gap-2 tw:rounded-md tw:border tw:border-solid tw:border-border tw:bg-card tw:pr-1 tw:pl-3 tw:text-sm">
-              <Paperclip className="tw:size-4 tw:shrink-0 tw:text-muted-foreground" aria-hidden="true" />
-              <span className="tw:truncate">{file.name}</span>
-              <button type="button" aria-label="Clear file" onClick={() => pick(null)} className="tw:m-0 tw:ml-auto tw:flex tw:size-7 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-sm tw:border-0 tw:bg-transparent tw:p-0 tw:text-muted-foreground tw:hover:bg-muted">
-                <X className="tw:size-3.5" aria-hidden="true" />
+            <span className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-md border border-solid border-border bg-card pr-1 pl-3 text-sm">
+              <Paperclip className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <span className="truncate">{file.name}</span>
+              <button type="button" aria-label="Clear file" onClick={() => pick(null)} className="m-0 ml-auto flex size-7 cursor-pointer items-center justify-center rounded-sm border-0 bg-transparent p-0 text-muted-foreground hover:bg-muted">
+                <X className="size-3.5" aria-hidden="true" />
               </button>
             </span>
           ) : (
-            <label className="tw:m-0 tw:flex tw:h-10 tw:min-w-0 tw:flex-1 tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-md tw:border tw:border-dashed tw:border-input tw:bg-card tw:px-3 tw:text-sm tw:text-muted-foreground tw:hover:border-primary/60">
-              <Paperclip className="tw:size-4" aria-hidden="true" /> Choose a file — JPG, PNG, WebP or PDF, up to 20 MB
-              <input type="file" accept={FILE_ACCEPT} className="tw:sr-only" aria-label="File to upload" onChange={(e) => pick(e.target.files?.[0] ?? null)} />
+            <label className="m-0 flex h-10 min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-md border border-dashed border-input bg-card px-3 text-sm text-muted-foreground hover:border-primary/60">
+              <Paperclip className="size-4" aria-hidden="true" /> Choose a file — JPG, PNG, WebP or PDF, up to 20 MB
+              <input type="file" accept={FILE_ACCEPT} className="sr-only" aria-label="File to upload" onChange={(e) => pick(e.target.files?.[0] ?? null)} />
             </label>
           )}
           <Button onClick={upload} loading={uploading} disabled={!file || !!fileError || uploading}>
             <Upload aria-hidden="true" /> {uploading ? 'Uploading...' : 'Upload'}
           </Button>
         </div>
-        {fileError && <p className="tw:m-0 tw:text-sm tw:text-destructive">{fileError}</p>}
+        {fileError && <p className="m-0 text-sm text-destructive">{fileError}</p>}
       </div>
 
-      <div className="tw:flex tw:flex-col tw:gap-2">
-        <span className="tw:text-sm tw:font-semibold">Uploaded files</span>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-semibold">Uploaded files</span>
         {files.loading && !files.data ? (
-          <Skeleton className="tw:h-20" />
+          <Skeleton className="h-20" />
         ) : list.length === 0 ? (
-          <EmptyState icon={Paperclip} title="No files uploaded yet." className="tw:py-4" />
+          <EmptyState icon={Paperclip} title="No files uploaded yet." className="py-4" />
         ) : (
-          <ul className="tw:m-0 tw:max-h-[45vh] tw:list-none tw:divide-y tw:divide-border tw:overflow-y-auto tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-0">
+          <ul className="m-0 max-h-[45vh] list-none divide-y divide-border overflow-y-auto rounded-lg border border-solid border-border p-0">
             {list.map((f) => {
               const pdf = f.file_type === 'pdf' || f.original_name.toLowerCase().endsWith('.pdf')
               return (
-                <li key={f.id} className="tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1.5 tw:px-3 tw:py-2.5">
-                  {pdf ? <FileText className="tw:size-4 tw:text-destructive" aria-hidden="true" /> : <ImageIcon className="tw:size-4 tw:text-info" aria-hidden="true" />}
-                  <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-                    <button type="button" onClick={() => onPreview(f)} className="tw:m-0 tw:cursor-pointer tw:truncate tw:border-0 tw:bg-transparent tw:p-0 tw:text-left tw:text-sm tw:font-medium tw:text-foreground tw:underline-offset-2 tw:hover:underline">
+                <li key={f.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-3 py-2.5">
+                  {pdf ? <FileText className="size-4 text-destructive" aria-hidden="true" /> : <ImageIcon className="size-4 text-info" aria-hidden="true" />}
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <button type="button" onClick={() => onPreview(f)} className="m-0 cursor-pointer truncate border-0 bg-transparent p-0 text-left text-sm font-medium text-foreground underline-offset-2 hover:underline">
                       {f.original_name}
                     </button>
-                    <span className="tw:text-xs tw:text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {TYPE_LABEL[f.type] ?? f.type}
                       {f.student ? ` · ${f.student.name}` : f.student_id ? ` · Student #${f.student_id}` : ''}
                       {f.uploaded_at ? ` · ${formatDateTime(f.uploaded_at)}` : ''}
                     </span>
                   </div>
                   <Badge variant={f.is_admin_approved ? 'success' : 'warning'}>{f.is_admin_approved ? 'Approved' : 'Pending'}</Badge>
-                  <a href={fileUrl(f)} target="_blank" rel="noreferrer" aria-label={`Download ${f.original_name}`} className="tw:flex tw:size-8 tw:items-center tw:justify-center tw:rounded-md tw:text-muted-foreground tw:hover:bg-muted tw:hover:text-foreground">
-                    <Download className="tw:size-4" aria-hidden="true" />
+                  <a href={fileUrl(f)} target="_blank" rel="noreferrer" aria-label={`Download ${f.original_name}`} className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">
+                    <Download className="size-4" aria-hidden="true" />
                   </a>
                   {isAdmin && (
-                    <div className="tw:flex tw:items-center tw:gap-1">
+                    <div className="flex items-center gap-1">
                       {f.is_admin_approved ? (
                         <Button size="xs" variant="ghost" disabled={busyId === f.id} onClick={() => setConfirm({ kind: 'pending', file: f })}>
                           <Undo2 aria-hidden="true" /> Mark pending
                         </Button>
                       ) : (
-                        <Button size="xs" variant="ghost" className="tw:text-success" disabled={busyId === f.id} onClick={() => void approve(f, true).catch(() => {})}>
+                        <Button size="xs" variant="ghost" className="text-success" disabled={busyId === f.id} onClick={() => void approve(f, true).catch(() => {})}>
                           <Check aria-hidden="true" /> Approve
                         </Button>
                       )}
-                      <Button size="xs" variant="ghost" className="tw:text-destructive" disabled={busyId === f.id} onClick={() => setConfirm({ kind: 'remove', file: f })} aria-label={`Remove ${f.original_name}`}>
+                      <Button size="xs" variant="ghost" className="text-destructive" disabled={busyId === f.id} onClick={() => setConfirm({ kind: 'remove', file: f })} aria-label={`Remove ${f.original_name}`}>
                         <Trash2 aria-hidden="true" />
                       </Button>
                     </div>

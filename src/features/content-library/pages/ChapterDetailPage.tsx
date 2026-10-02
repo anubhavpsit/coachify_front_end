@@ -58,7 +58,7 @@ export default function ChapterDetailPage() {
   if (detail.error) {
     const notFound = axios.isAxiosError(detail.error) && detail.error.response?.status === 404
     return (
-      <div className="tw:flex tw:flex-col tw:gap-4">
+      <div className="flex flex-col gap-4">
         <BackLink />
         {notFound ? (
           <Card>
@@ -72,10 +72,10 @@ export default function ChapterDetailPage() {
   }
   if (!chapter)
     return (
-      <div className="tw:flex tw:flex-col tw:gap-4" role="status" aria-label="Loading chapter">
+      <div className="flex flex-col gap-4" role="status" aria-label="Loading chapter">
         <BackLink />
-        <Skeleton className="tw:h-24 tw:rounded-xl" />
-        <Skeleton className="tw:h-64 tw:rounded-xl" />
+        <Skeleton className="h-24 rounded-xl" />
+        <Skeleton className="h-64 rounded-xl" />
       </div>
     )
 
@@ -117,17 +117,17 @@ export default function ChapterDetailPage() {
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-5">
+    <div className="flex flex-col gap-5">
       <BackLink />
 
-      <Card className="tw:gap-0 tw:py-0">
-        <div className="tw:flex tw:flex-wrap tw:items-start tw:gap-4 tw:p-5">
-          <span className="tw:flex tw:size-12 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-xl tw:bg-primary-soft tw:text-primary">
-            <BookMarked className="tw:size-6" aria-hidden="true" />
+      <Card className="gap-0 py-0">
+        <div className="flex flex-wrap items-start gap-4 p-5">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+            <BookMarked className="size-6" aria-hidden="true" />
           </span>
-          <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col tw:gap-1.5">
-            <h1 className="tw:m-0 tw:text-xl! tw:font-bold tw:text-foreground">{chapter.name}</h1>
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-sm tw:text-muted-foreground">
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+            <h1 className="m-0 text-xl! font-bold text-foreground">{chapter.name}</h1>
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <Badge variant="soft">{subjectName}</Badge>
               <ScopeBadge base={chapter.tenant_id === 0} />
               <span>
@@ -136,7 +136,7 @@ export default function ChapterDetailPage() {
             </div>
           </div>
           {canManage && (
-            <div className="tw:flex tw:flex-wrap tw:gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={() => setEditOpen(true)}>
                 <Pencil aria-hidden="true" /> Edit chapter
               </Button>
@@ -147,18 +147,18 @@ export default function ChapterDetailPage() {
           )}
         </div>
         {!canManage && (
-          <Alert className="tw:rounded-t-none tw:border-x-0 tw:border-b-0">
+          <Alert className="rounded-t-none border-x-0 border-b-0">
             <Info aria-hidden="true" />
             <AlertDescription>This is a base chapter — shared and read-only. To group your own topics, create a chapter of your own.</AlertDescription>
           </Alert>
         )}
       </Card>
 
-      <div className={canManage ? 'tw:grid tw:items-start tw:gap-5 tw:lg:grid-cols-2 tw:*:min-w-0' : ''}>
-        <Card className="tw:gap-4">
+      <div className={canManage ? 'grid items-start gap-5 lg:grid-cols-2 *:min-w-0' : ''}>
+        <Card className="gap-4">
           <CardHeader>
-            <CardTitle className="tw:flex tw:items-center tw:gap-2">
-              <ListChecks className="tw:size-4 tw:text-primary" aria-hidden="true" /> Topics in this chapter
+            <CardTitle className="flex items-center gap-2">
+              <ListChecks className="size-4 text-primary" aria-hidden="true" /> Topics in this chapter
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -174,20 +174,20 @@ export default function ChapterDetailPage() {
                     </Button>
                   ) : undefined
                 }
-                className="tw:py-6"
+                className="py-6"
               />
             ) : (
-              <ol className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:divide-y tw:divide-border tw:p-0">
+              <ol className="m-0 flex list-none flex-col divide-y divide-border p-0">
                 {topics.map((t, i) => (
-                  <li key={t.id} className="tw:flex tw:items-center tw:gap-3 tw:py-2.5">
-                    <span className="tw:w-6 tw:shrink-0 tw:text-right tw:text-xs tw:text-muted-foreground tw:tabular-nums">{i + 1}.</span>
-                    <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-                      <span className="tw:truncate tw:text-sm tw:font-medium tw:text-foreground">{t.name}</span>
-                      <span className="tw:text-xs tw:text-muted-foreground">{t.grade ? `Grade ${t.grade}` : 'All grades'}</span>
+                  <li key={t.id} className="flex items-center gap-3 py-2.5">
+                    <span className="w-6 shrink-0 text-right text-xs text-muted-foreground tabular-nums">{i + 1}.</span>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                      <span className="truncate text-sm font-medium text-foreground">{t.name}</span>
+                      <span className="text-xs text-muted-foreground">{t.grade ? `Grade ${t.grade}` : 'All grades'}</span>
                     </div>
                     {t.tenant_id === 0 && <ScopeBadge base />}
-                    <Link to={questionsRoute(t.id)} className="tw:inline-flex tw:items-center tw:gap-1 tw:text-sm tw:font-medium tw:text-primary tw:no-underline tw:hover:underline">
-                      <MessageCircleQuestion className="tw:size-3.5" aria-hidden="true" /> Questions
+                    <Link to={questionsRoute(t.id)} className="inline-flex items-center gap-1 text-sm font-medium text-primary no-underline hover:underline">
+                      <MessageCircleQuestion className="size-3.5" aria-hidden="true" /> Questions
                     </Link>
                     {canManage && (
                       <>
@@ -262,8 +262,8 @@ export default function ChapterDetailPage() {
 
 function BackLink() {
   return (
-    <Link to="/chapters" className="tw:inline-flex tw:w-fit tw:items-center tw:gap-1.5 tw:text-sm tw:text-muted-foreground tw:no-underline tw:hover:text-foreground">
-      <ArrowLeft className="tw:size-4" aria-hidden="true" /> Back to Chapters
+    <Link to="/chapters" className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground no-underline hover:text-foreground">
+      <ArrowLeft className="size-4" aria-hidden="true" /> Back to Chapters
     </Link>
   )
 }

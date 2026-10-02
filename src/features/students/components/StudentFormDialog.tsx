@@ -75,10 +75,10 @@ export default function StudentFormDialog({ open, student, classes, subjects, on
       submitLabel={student ? 'Update' : 'Save'}
       submittingLabel={student ? 'Updating...' : 'Saving...'}
       error={formError}
-      className="tw:sm:max-w-2xl"
+      className="sm:max-w-2xl"
     >
       <PersonFields control={form.control as unknown as Control<PersonBase>} mode={mode} afterEmail={<PhoneField control={form.control} name="phone" />} />
-      <div className="tw:grid tw:gap-5 tw:sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <FormField
           control={form.control}
           name="class"
@@ -127,9 +127,9 @@ export default function StudentFormDialog({ open, student, classes, subjects, on
           <FormItem>
             <FormLabel>Subjects</FormLabel>
             {subjects.length === 0 ? (
-              <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">No subjects available.</p>
+              <p className="m-0 text-sm text-muted-foreground">No subjects available.</p>
             ) : (
-              <div role="group" aria-label="Subjects" className="tw:flex tw:flex-wrap tw:gap-2">
+              <div role="group" aria-label="Subjects" className="flex flex-wrap gap-2">
                 {subjects.map((s) => {
                   const id = `student-subject-${s.id}`
                   const checked = field.value.includes(s.id)
@@ -137,7 +137,7 @@ export default function StudentFormDialog({ open, student, classes, subjects, on
                     <label
                       key={s.id}
                       htmlFor={id}
-                      className="tw:m-0 tw:flex tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-full tw:border tw:border-solid tw:border-input tw:px-3 tw:py-1.5 tw:text-sm tw:transition-colors tw:has-[[data-state=checked]]:border-primary tw:has-[[data-state=checked]]:bg-primary-soft"
+                      className="m-0 flex cursor-pointer items-center gap-2 rounded-full border border-solid border-input px-3 py-1.5 text-sm transition-colors has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary-soft"
                     >
                       <Checkbox
                         id={id}

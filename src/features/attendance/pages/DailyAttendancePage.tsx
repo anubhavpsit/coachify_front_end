@@ -110,16 +110,16 @@ export default function DailyAttendancePage() {
   }
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6 tw:pb-20">
+    <div className="flex flex-col gap-6 pb-20">
       <PageHeader
         title="Daily Attendance"
         description="Mark who was present today. Nothing is saved until you press Save."
-        className="tw:mb-0"
+        className="mb-0"
         actions={
           <>
-            <label className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium">
-              <span className="tw:sr-only">Date</span>
-              <Input type="date" value={date} onChange={(e) => e.target.value && changeDate(e.target.value)} className="tw:w-44" />
+            <label className="m-0 flex items-center gap-2 text-sm font-medium">
+              <span className="sr-only">Date</span>
+              <Input type="date" value={date} onChange={(e) => e.target.value && changeDate(e.target.value)} className="w-44" />
             </label>
             {isAdmin && (
               <Button
@@ -151,21 +151,21 @@ export default function DailyAttendancePage() {
       {day.error ? (
         <ErrorState title="Couldn't load attendance" description="Check your connection and try again." onRetry={day.reload} />
       ) : (
-        <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
-          <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-3 tw:border-b tw:border-solid tw:border-border tw:p-4">
-            <div className="tw:relative tw:w-full tw:max-w-xs">
-              <Search className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
-              <Input type="search" placeholder="Find a person" aria-label="Find a person" value={search} onChange={(e) => setSearch(e.target.value)} className="tw:pl-9" />
+        <Card className="gap-0 overflow-hidden py-0">
+          <div className="flex flex-wrap items-center gap-3 border-b border-solid border-border p-4">
+            <div className="relative w-full max-w-xs">
+              <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+              <Input type="search" placeholder="Find a person" aria-label="Find a person" value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
             </div>
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2" aria-live="polite">
+            <div className="flex flex-wrap items-center gap-2" aria-live="polite">
               {STATUSES.map((s) => (
                 <Badge key={s} variant={SUMMARY_TONE[s]}>
                   {STATUS_META[s].label}: {counts[s]}
                 </Badge>
               ))}
             </div>
-            <div className="tw:ml-auto tw:flex tw:flex-wrap tw:items-center tw:gap-1.5">
-              <span className="tw:text-xs tw:text-muted-foreground">Mark everyone:</span>
+            <div className="ml-auto flex flex-wrap items-center gap-1.5">
+              <span className="text-xs text-muted-foreground">Mark everyone:</span>
               {STATUSES.map((s) => (
                 <Button
                   key={s}
@@ -183,9 +183,9 @@ export default function DailyAttendancePage() {
           </div>
 
           {day.loading && users.length === 0 ? (
-            <div className="tw:flex tw:flex-col tw:gap-2 tw:p-4" role="status" aria-label="Loading users">
+            <div className="flex flex-col gap-2 p-4" role="status" aria-label="Loading users">
               {Array.from({ length: 6 }, (_, i) => (
-                <Skeleton key={i} className="tw:h-11" />
+                <Skeleton key={i} className="h-11" />
               ))}
             </div>
           ) : users.length === 0 ? (
@@ -193,14 +193,14 @@ export default function DailyAttendancePage() {
           ) : visible.length === 0 ? (
             <EmptyState icon={Search} title={`No one matches “${search}”.`} />
           ) : (
-            <div className="tw:max-h-[60vh] tw:overflow-auto">
-              <table className="tw:m-0 tw:w-full tw:border-collapse tw:text-sm">
-                <thead className="tw:sticky tw:top-0 tw:z-10 tw:bg-card">
-                  <tr className="tw:border-0 tw:border-b tw:border-solid tw:border-border">
-                    <th className="tw:w-12 tw:px-4 tw:py-2.5 tw:text-left tw:text-xs tw:font-semibold tw:uppercase tw:text-muted-foreground">S.no</th>
-                    <th className="tw:px-4 tw:py-2.5 tw:text-left tw:text-xs tw:font-semibold tw:uppercase tw:text-muted-foreground">Name</th>
-                    <th className="tw:px-4 tw:py-2.5 tw:text-left tw:text-xs tw:font-semibold tw:uppercase tw:text-muted-foreground">Role</th>
-                    <th className="tw:px-4 tw:py-2.5 tw:text-right tw:text-xs tw:font-semibold tw:uppercase tw:text-muted-foreground">Status</th>
+            <div className="max-h-[60vh] overflow-auto">
+              <table className="m-0 w-full border-collapse text-sm">
+                <thead className="sticky top-0 z-10 bg-card">
+                  <tr className="border-0 border-b border-solid border-border">
+                    <th className="w-12 px-4 py-2.5 text-left text-xs font-semibold uppercase text-muted-foreground">S.no</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase text-muted-foreground">Name</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase text-muted-foreground">Role</th>
+                    <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase text-muted-foreground">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -210,13 +210,13 @@ export default function DailyAttendancePage() {
                     return (
                       <tr
                         key={u.id}
-                        className={cn('tw:border-0 tw:border-b tw:border-solid tw:border-border tw:transition-colors', unmarked && 'tw:bg-warning-soft/50')}
+                        className={cn('border-0 border-b border-solid border-border transition-colors', unmarked && 'bg-warning-soft/50')}
                         title={unmarked ? 'Attendance not yet marked for this person' : undefined}
                       >
-                        <td className="tw:px-4 tw:py-2 tw:align-middle tw:text-muted-foreground tw:tabular-nums">{users.indexOf(u) + 1}</td>
-                        <td className="tw:px-4 tw:py-2 tw:align-middle tw:font-medium tw:text-foreground">{u.name}</td>
-                        <td className="tw:px-4 tw:py-2 tw:align-middle tw:capitalize tw:text-muted-foreground">{u.role}</td>
-                        <td className="tw:px-4 tw:py-2 tw:align-middle tw:text-right">
+                        <td className="px-4 py-2 align-middle text-muted-foreground tabular-nums">{users.indexOf(u) + 1}</td>
+                        <td className="px-4 py-2 align-middle font-medium text-foreground">{u.name}</td>
+                        <td className="px-4 py-2 align-middle capitalize text-muted-foreground">{u.role}</td>
+                        <td className="px-4 py-2 align-middle text-right">
                           <StatusPills name={`status_${u.id}`} label={`Attendance for ${u.name}`} value={status} disabled={isHoliday} onChange={(s) => setStatus([u.id], s)} />
                         </td>
                       </tr>
@@ -230,9 +230,9 @@ export default function DailyAttendancePage() {
       )}
 
       {/* Sticky save bar */}
-      <div className="tw:fixed tw:inset-x-0 tw:bottom-0 tw:z-20 tw:flex tw:justify-end tw:border-t tw:border-solid tw:border-border tw:bg-card/90 tw:px-4 tw:py-3 tw:backdrop-blur tw:md:px-6">
-        <div className="tw:flex tw:items-center tw:gap-3">
-          {dirty && !isHoliday && <span className="tw:text-sm tw:text-warning">Unsaved changes</span>}
+      <div className="fixed inset-x-0 bottom-0 z-20 flex justify-end border-t border-solid border-border bg-card/90 px-4 py-3 backdrop-blur md:px-6">
+        <div className="flex items-center gap-3">
+          {dirty && !isHoliday && <span className="text-sm text-warning">Unsaved changes</span>}
           <Button onClick={() => void save()} loading={saving} disabled={isHoliday || users.length === 0}>
             <ClipboardCheck aria-hidden="true" />
             {isHoliday ? 'Holiday (No Attendance)' : saving ? 'Saving...' : 'Save Attendance'}

@@ -22,7 +22,7 @@ function Rich({ html, className }: { html: string; className?: string }) {
   return (
     <div
       className={cn(
-        'tw:text-sm tw:leading-relaxed tw:text-foreground tw:[&_h3]:mt-3 tw:[&_h3]:mb-1 tw:[&_h3]:text-base! tw:[&_img]:my-2 tw:[&_img]:max-h-72 tw:[&_img]:rounded-md tw:[&_li]:my-0.5 tw:[&_ol]:list-decimal tw:[&_ol]:pl-5 tw:[&_ul]:list-disc tw:[&_p]:my-1.5 tw:[&_ul]:pl-5',
+        'text-sm leading-relaxed text-foreground [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:text-base! [&_img]:my-2 [&_img]:max-h-72 [&_img]:rounded-md [&_li]:my-0.5 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_p]:my-1.5 [&_ul]:pl-5',
         className,
       )}
       dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
@@ -33,12 +33,12 @@ function Rich({ html, className }: { html: string; className?: string }) {
 function QuestionItem({ q, n, solutionsVisible }: { q: TopicContent['questions'][number]; n: number; solutionsVisible: boolean }) {
   const [open, setOpen] = useState(false)
   return (
-    <li className="tw:flex tw:flex-col tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:p-4">
-      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <span className="tw:flex tw:size-7 tw:items-center tw:justify-center tw:rounded-full tw:bg-primary-soft tw:text-xs tw:font-bold tw:text-primary">{n}</span>
+    <li className="flex flex-col gap-3 rounded-xl border border-solid border-border p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="flex size-7 items-center justify-center rounded-full bg-primary-soft text-xs font-bold text-primary">{n}</span>
         <Badge variant="soft">Grade {q.grade}</Badge>
         {q.difficulty && (
-          <Badge variant={DIFF[q.difficulty] ?? 'secondary'} className="tw:capitalize">
+          <Badge variant={DIFF[q.difficulty] ?? 'secondary'} className="capitalize">
             {q.difficulty}
           </Badge>
         )}
@@ -48,11 +48,11 @@ function QuestionItem({ q, n, solutionsVisible }: { q: TopicContent['questions']
         <div>
           <Button type="button" size="sm" variant={open ? 'soft' : 'outline'} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
             <Lightbulb aria-hidden="true" /> {open ? 'Hide solution' : 'Show solution'}
-            <ChevronDown className={cn('tw:transition-transform', open && 'tw:rotate-180')} aria-hidden="true" />
+            <ChevronDown className={cn('transition-transform', open && 'rotate-180')} aria-hidden="true" />
           </Button>
           {open && (
-            <div className="tw:mt-2 tw:rounded-lg tw:border-l-4 tw:border-solid tw:border-y-0 tw:border-r-0 tw:border-success tw:bg-success-soft/60 tw:px-3 tw:py-2">
-              <span className="tw:text-xs tw:font-semibold tw:text-success">Solution</span>
+            <div className="mt-2 rounded-lg border-l-4 border-solid border-y-0 border-r-0 border-success bg-success-soft/60 px-3 py-2">
+              <span className="text-xs font-semibold text-success">Solution</span>
               <Rich html={q.solution_html} />
             </div>
           )}
@@ -64,8 +64,8 @@ function QuestionItem({ q, n, solutionsVisible }: { q: TopicContent['questions']
 
 function BackLink() {
   return (
-    <Link to="/students/activities" className="tw:inline-flex tw:w-fit tw:items-center tw:gap-1.5 tw:text-sm tw:text-muted-foreground tw:no-underline tw:hover:text-foreground">
-      <ArrowLeft className="tw:size-4" aria-hidden="true" /> Back to My Activities
+    <Link to="/students/activities" className="inline-flex w-fit items-center gap-1.5 text-sm text-muted-foreground no-underline hover:text-foreground">
+      <ArrowLeft className="size-4" aria-hidden="true" /> Back to My Activities
     </Link>
   )
 }
@@ -86,11 +86,11 @@ export default function StudentTopicContentPage() {
 
   if (content.loading && !c)
     return (
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-col tw:gap-4" role="status" aria-label="Loading topic">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4" role="status" aria-label="Loading topic">
         <BackLink />
-        <Skeleton className="tw:h-10 tw:w-2/3" />
-        <Skeleton className="tw:h-48 tw:rounded-xl" />
-        <Skeleton className="tw:h-40 tw:rounded-xl" />
+        <Skeleton className="h-10 w-2/3" />
+        <Skeleton className="h-48 rounded-xl" />
+        <Skeleton className="h-40 rounded-xl" />
       </div>
     )
 
@@ -99,7 +99,7 @@ export default function StudentTopicContentPage() {
       content.error instanceof Error && !axios.isAxiosError(content.error) ? content.error.message : 'Could not load this topic. It may not be linked to your account.'
     if (content.error) console.error('Error fetching topic content:', content.error)
     return (
-      <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-col tw:gap-4">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
         <BackLink />
         <ErrorState title={message} onRetry={axios.isAxiosError(content.error) ? content.reload : undefined} />
       </div>
@@ -111,16 +111,16 @@ export default function StudentTopicContentPage() {
   const chapterLabel = c.chapter?.name ?? (c.chapter_number ? `Chapter ${c.chapter_number}` : null)
 
   return (
-    <div className="tw:mx-auto tw:flex tw:w-full tw:max-w-4xl tw:flex-col tw:gap-5">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-5">
       <BackLink />
 
-      <div className="tw:flex tw:items-start tw:gap-3">
-        <span className="tw:flex tw:size-12 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-xl tw:bg-primary-soft tw:text-primary">
-          <BookOpen className="tw:size-6" aria-hidden="true" />
+      <div className="flex items-start gap-3">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+          <BookOpen className="size-6" aria-hidden="true" />
         </span>
-        <div className="tw:flex tw:flex-col tw:gap-0.5">
-          <h1 className="tw:m-0 tw:text-2xl! tw:font-bold tw:text-foreground">{c.topic.name}</h1>
-          {chapterLabel && <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">{chapterLabel}</p>}
+        <div className="flex flex-col gap-0.5">
+          <h1 className="m-0 text-2xl! font-bold text-foreground">{c.topic.name}</h1>
+          {chapterLabel && <p className="m-0 text-sm text-muted-foreground">{chapterLabel}</p>}
         </div>
       </div>
 
@@ -133,43 +133,43 @@ export default function StudentTopicContentPage() {
         </Alert>
       )}
 
-      <Card className="tw:gap-3">
+      <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="tw:flex tw:items-center tw:gap-2">
-            <Lightbulb className="tw:size-4 tw:text-warning" aria-hidden="true" /> Explanation
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="size-4 text-warning" aria-hidden="true" /> Explanation
           </CardTitle>
         </CardHeader>
         <CardContent>
           {c.topic.explanation_html ? (
-            <Rich html={c.topic.explanation_html} className="tw:text-[15px]" />
+            <Rich html={c.topic.explanation_html} className="text-[15px]" />
           ) : (
-            <p className="tw:m-0 tw:text-sm tw:text-muted-foreground">No explanation has been added for this topic yet.</p>
+            <p className="m-0 text-sm text-muted-foreground">No explanation has been added for this topic yet.</p>
           )}
         </CardContent>
       </Card>
 
-      <Card className="tw:gap-3">
+      <Card className="gap-3">
         <CardHeader>
-          <CardTitle className="tw:flex tw:items-center tw:gap-2">
-            <MessageCircleQuestion className="tw:size-4 tw:text-primary" aria-hidden="true" /> Practice questions ({c.questions.length})
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircleQuestion className="size-4 text-primary" aria-hidden="true" /> Practice questions ({c.questions.length})
           </CardTitle>
         </CardHeader>
-        <CardContent className="tw:flex tw:flex-col tw:gap-3">
+        <CardContent className="flex flex-col gap-3">
           {c.questions.length === 0 ? (
-            <EmptyState icon={MessageCircleQuestion} title="No practice questions are available for this topic yet." className="tw:py-6" />
+            <EmptyState icon={MessageCircleQuestion} title="No practice questions are available for this topic yet." className="py-6" />
           ) : (
             <>
               {!c.solutions_visible ? (
                 <Alert>
                   <LockKeyhole aria-hidden="true" />
                   <AlertDescription>
-                    Solutions unlock {remaining !== null ? <strong className="tw:tabular-nums">in {formatCountdown(remaining)}</strong> : 'once this activity is approved'}. Try the questions first!
+                    Solutions unlock {remaining !== null ? <strong className="tabular-nums">in {formatCountdown(remaining)}</strong> : 'once this activity is approved'}. Try the questions first!
                   </AlertDescription>
                 </Alert>
               ) : (
-                <p className="tw:m-0 tw:text-xs tw:text-muted-foreground">Have a go at each question before opening its solution.</p>
+                <p className="m-0 text-xs text-muted-foreground">Have a go at each question before opening its solution.</p>
               )}
-              <ol className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3 tw:p-0">
+              <ol className="m-0 flex list-none flex-col gap-3 p-0">
                 {c.questions.map((q, i) => (
                   <QuestionItem key={q.id} q={q} n={i + 1} solutionsVisible={c.solutions_visible} />
                 ))}

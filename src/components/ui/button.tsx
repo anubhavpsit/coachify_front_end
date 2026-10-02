@@ -6,26 +6,26 @@ import { cn } from '@/lib/utils'
 
 // Explicit border/margin resets: Tailwind preflight is off while Bootstrap's reboot is the base.
 const buttonVariants = cva(
-  'tw:inline-flex tw:items-center tw:justify-center tw:gap-2 tw:m-0 tw:shrink-0 tw:whitespace-nowrap tw:rounded-md tw:border tw:border-solid tw:border-transparent tw:text-sm tw:font-medium tw:leading-none tw:no-underline tw:cursor-pointer tw:select-none tw:outline-none tw:transition-[color,background-color,border-color,box-shadow,transform] tw:duration-150 tw:ease-standard tw:active:scale-[0.98] tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50 tw:disabled:pointer-events-none tw:disabled:opacity-50 tw:aria-invalid:ring-destructive/30 tw:[&_svg]:pointer-events-none tw:[&_svg]:shrink-0 tw:[&_svg:not([class*=size-])]:size-4',
+  'inline-flex items-center justify-center gap-2 m-0 shrink-0 whitespace-nowrap rounded-md border border-solid border-transparent text-sm font-medium leading-none no-underline cursor-pointer select-none outline-none transition-[color,background-color,border-color,box-shadow,transform] duration-150 ease-standard active:scale-[0.98] focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:ring-destructive/30 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=size-])]:size-4',
   {
     variants: {
       variant: {
-        default: 'tw:bg-primary tw:text-primary-foreground tw:shadow-xs tw:hover:bg-primary-hover tw:active:bg-primary-active',
-        destructive: 'tw:bg-destructive tw:text-destructive-foreground tw:shadow-xs tw:hover:bg-destructive/90',
-        success: 'tw:bg-success tw:text-success-foreground tw:shadow-xs tw:hover:bg-success/90',
-        outline: 'tw:border-border tw:bg-card tw:text-foreground tw:shadow-xs tw:hover:bg-accent tw:hover:text-accent-foreground',
-        secondary: 'tw:bg-secondary tw:text-secondary-foreground tw:hover:bg-secondary/80',
-        soft: 'tw:bg-primary-soft tw:text-primary-soft-foreground tw:hover:bg-primary-soft/70',
-        ghost: 'tw:bg-transparent tw:text-foreground tw:hover:bg-accent tw:hover:text-accent-foreground',
-        link: 'tw:bg-transparent tw:text-primary tw:underline-offset-4 tw:hover:underline tw:active:scale-100',
+        default: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary-hover active:bg-primary-active',
+        destructive: 'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90',
+        success: 'bg-success text-success-foreground shadow-xs hover:bg-success/90',
+        outline: 'border-border bg-card text-foreground shadow-xs hover:bg-accent hover:text-accent-foreground',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        soft: 'bg-primary-soft text-primary-soft-foreground hover:bg-primary-soft/70',
+        ghost: 'bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground',
+        link: 'bg-transparent text-primary underline-offset-4 hover:underline active:scale-100',
       },
       size: {
-        default: 'tw:h-10 tw:px-4',
-        sm: 'tw:h-8 tw:px-3 tw:text-xs',
-        xs: 'tw:h-7 tw:gap-1 tw:rounded-sm tw:px-2 tw:text-xs tw:[&_svg:not([class*=size-])]:size-3.5',
-        lg: 'tw:h-11 tw:px-6 tw:text-base',
-        icon: 'tw:size-10 tw:p-0',
-        'icon-sm': 'tw:size-8 tw:p-0',
+        default: 'h-10 px-4',
+        sm: 'h-8 px-3 text-xs',
+        xs: 'h-7 gap-1 rounded-sm px-2 text-xs [&_svg:not([class*=size-])]:size-3.5',
+        lg: 'h-11 px-6 text-base',
+        icon: 'size-10 p-0',
+        'icon-sm': 'size-8 p-0',
       },
     },
     defaultVariants: { variant: 'default', size: 'default' },
@@ -52,7 +52,7 @@ function Button({ className, variant, size, asChild = false, loading = false, di
         children
       ) : (
         <>
-          {loading && <LoaderCircle className="tw:animate-spin" aria-hidden="true" />}
+          {loading && <LoaderCircle className="animate-spin" aria-hidden="true" />}
           {children}
         </>
       )}

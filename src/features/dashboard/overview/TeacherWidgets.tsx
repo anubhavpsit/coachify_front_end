@@ -7,22 +7,22 @@ import { formatDate } from '@/utils/date'
 import OverviewCard from './OverviewCard'
 import { whenLabel, type TeacherOverview } from './overviewApi'
 
-const ROW = 'tw:flex tw:items-start tw:justify-between tw:gap-3 tw:py-2.5'
+const ROW = 'flex items-start justify-between gap-3 py-2.5'
 
 export function TeacherUpcomingCard({ items }: { items: TeacherOverview['upcoming_assessments'] }) {
   return (
     <OverviewCard title="Upcoming Assessments" count={items.length} viewAllTo="/assessments" isEmpty={items.length === 0} empty="No assessments in the next 7 days.">
-      <div className="tw:divide-y tw:divide-border">
+      <div className="divide-y divide-border">
         {items.map((a) => (
           <Link
             key={a.assessment_id}
             to={`/assessments?assessment=${a.assessment_id}`}
-            className={cn(ROW, 'tw:-mx-2 tw:rounded-md tw:px-2 tw:text-inherit tw:no-underline tw:transition-colors tw:hover:bg-accent')}
+            className={cn(ROW, '-mx-2 rounded-md px-2 text-inherit no-underline transition-colors hover:bg-accent')}
             title="Open assessment"
           >
-            <div className="tw:min-w-0">
-              <div className="tw:text-sm tw:font-semibold tw:text-foreground">{a.title}</div>
-              <div className="tw:text-xs tw:text-muted-foreground">
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-foreground">{a.title}</div>
+              <div className="text-xs text-muted-foreground">
                 {a.subject} · {formatDate(a.scheduled_date)} · {a.students_count} student{a.students_count === 1 ? '' : 's'}
               </div>
             </div>
@@ -37,12 +37,12 @@ export function TeacherUpcomingCard({ items }: { items: TeacherOverview['upcomin
 export function TeacherPapersCard({ items }: { items: TeacherOverview['papers_to_approve'] }) {
   return (
     <OverviewCard title="Question Papers to Approve" count={items.length} countTone="danger" viewAllTo="/assessments" isEmpty={items.length === 0} empty="No papers waiting for approval.">
-      <div className="tw:divide-y tw:divide-border">
+      <div className="divide-y divide-border">
         {items.map((p) => (
           <div key={p.assessment_id} className={ROW}>
-            <div className="tw:min-w-0">
-              <div className="tw:text-sm tw:font-semibold tw:text-foreground">{p.title}</div>
-              <div className="tw:text-xs tw:text-muted-foreground">
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-foreground">{p.title}</div>
+              <div className="text-xs text-muted-foreground">
                 {p.subject} · test on {formatDate(p.scheduled_date)}
               </div>
             </div>
@@ -57,12 +57,12 @@ export function TeacherPapersCard({ items }: { items: TeacherOverview['papers_to
 export function TeacherGradingCard({ items }: { items: TeacherOverview['results_to_enter'] }) {
   return (
     <OverviewCard title="Results to Enter" count={items.length} countTone="danger" viewAllTo="/assessments" isEmpty={items.length === 0} empty="All results are entered.">
-      <div className="tw:divide-y tw:divide-border">
+      <div className="divide-y divide-border">
         {items.map((r) => (
           <div key={r.assessment_id} className={ROW}>
-            <div className="tw:min-w-0">
-              <div className="tw:text-sm tw:font-semibold tw:text-foreground">{r.title}</div>
-              <div className="tw:text-xs tw:text-muted-foreground">
+            <div className="min-w-0">
+              <div className="text-sm font-semibold text-foreground">{r.title}</div>
+              <div className="text-xs text-muted-foreground">
                 {r.subject} · held {formatDate(r.scheduled_date)} · {r.pending_count} pending
               </div>
             </div>
@@ -80,35 +80,35 @@ export function TeacherTodayCard({ data }: { data: TeacherOverview['today_activi
   return (
     <OverviewCard title="Today's Activity Log" viewAllTo="/teachers/daily-activities" isEmpty={data.total_students === 0} empty="No students assigned to you yet.">
       {data.is_holiday ? (
-        <div className="tw:flex tw:items-center tw:gap-2 tw:text-sm tw:text-muted-foreground">
-          <PartyPopper className="tw:size-4" aria-hidden="true" />
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <PartyPopper className="size-4" aria-hidden="true" />
           Today is a holiday — no activities needed.
         </div>
       ) : (
-        <div className="tw:flex tw:flex-col tw:gap-3">
-          <div className="tw:flex tw:items-center tw:gap-4">
-            <ProgressRing value={pct} size={72} stroke={7} toneClassName={done ? 'tw:text-success' : 'tw:text-warning'} label={`${data.logged_count} of ${data.total_students} students logged today`} />
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-4">
+            <ProgressRing value={pct} size={72} stroke={7} toneClassName={done ? 'text-success' : 'text-warning'} label={`${data.logged_count} of ${data.total_students} students logged today`} />
             <div>
-              <div className={cn('tw:text-2xl tw:font-bold tw:tabular-nums', done ? 'tw:text-success' : 'tw:text-warning')}>
+              <div className={cn('text-2xl font-bold tabular-nums', done ? 'text-success' : 'text-warning')}>
                 {data.logged_count}/{data.total_students}
               </div>
-              <div className="tw:text-sm tw:text-muted-foreground">students logged today</div>
+              <div className="text-sm text-muted-foreground">students logged today</div>
             </div>
           </div>
           {done ? (
-            <p className="tw:m-0 tw:flex tw:items-center tw:gap-1.5 tw:text-sm tw:text-success">
-              <CheckCircle2 className="tw:size-4" aria-hidden="true" /> All done for today. 👍
+            <p className="m-0 flex items-center gap-1.5 text-sm text-success">
+              <CheckCircle2 className="size-4" aria-hidden="true" /> All done for today. 👍
             </p>
           ) : (
-            <div className="tw:flex tw:flex-col tw:gap-1.5">
-              <div className="tw:text-xs tw:text-muted-foreground">Still to add:</div>
-              <div className="tw:flex tw:flex-wrap tw:gap-1">
+            <div className="flex flex-col gap-1.5">
+              <div className="text-xs text-muted-foreground">Still to add:</div>
+              <div className="flex flex-wrap gap-1">
                 {data.missing.map((s) => (
                   <Badge key={s.id} variant="secondary">
                     {s.name}
                   </Badge>
                 ))}
-                {data.missing_count > data.missing.length && <span className="tw:text-xs tw:text-muted-foreground">+{data.missing_count - data.missing.length} more</span>}
+                {data.missing_count > data.missing.length && <span className="text-xs text-muted-foreground">+{data.missing_count - data.missing.length} more</span>}
               </div>
             </div>
           )}
@@ -124,11 +124,11 @@ const REASON_LABEL = (r: TeacherOverview['students_attention'][number]['reasons'
 export function TeacherAttentionCard({ items }: { items: TeacherOverview['students_attention'] }) {
   return (
     <OverviewCard title="Students Needing Attention" count={items.length} countTone="danger" viewAllTo="/students" isEmpty={items.length === 0} empty="All your students are on track.">
-      <div className="tw:divide-y tw:divide-border">
+      <div className="divide-y divide-border">
         {items.map((s) => (
-          <div key={s.student_id} className="tw:flex tw:flex-col tw:gap-1.5 tw:py-2.5">
-            <div className="tw:text-sm tw:font-semibold tw:text-foreground">{s.name}</div>
-            <div className="tw:flex tw:flex-wrap tw:gap-1">
+          <div key={s.student_id} className="flex flex-col gap-1.5 py-2.5">
+            <div className="text-sm font-semibold text-foreground">{s.name}</div>
+            <div className="flex flex-wrap gap-1">
               {s.reasons.map((r) => (
                 <Badge key={r.type} variant="destructive">
                   {REASON_LABEL(r)}

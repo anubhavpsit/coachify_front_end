@@ -94,17 +94,17 @@ export default function MyAttendancePage() {
   const monthLabel = new Date(year, month - 1, 1).toLocaleString(undefined, { month: 'long', year: 'numeric' })
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="My Attendance"
         description="Your attendance by month. Tap an absent or leave day to request a correction."
-        className="tw:mb-0"
+        className="mb-0"
         actions={
-          <div className="tw:flex tw:items-center tw:gap-1" role="group" aria-label="Month">
+          <div className="flex items-center gap-1" role="group" aria-label="Month">
             <Button variant="outline" size="icon" aria-label="Previous month" onClick={() => shift(-1)}>
               <ChevronLeft aria-hidden="true" />
             </Button>
-            <span className="tw:min-w-36 tw:text-center tw:text-sm tw:font-semibold" aria-live="polite">
+            <span className="min-w-36 text-center text-sm font-semibold" aria-live="polite">
               {monthLabel}
             </span>
             <Button variant="outline" size="icon" aria-label="Next month" onClick={() => shift(1)}>
@@ -117,32 +117,32 @@ export default function MyAttendancePage() {
       {data.error ? (
         <ErrorState title="Failed to load attendance." onRetry={data.reload} />
       ) : !derived || !ins ? (
-        <div className="tw:grid tw:gap-4 tw:lg:grid-cols-3" role="status" aria-label="Loading attendance">
-          <Skeleton className="tw:h-48" />
-          <Skeleton className="tw:h-48 tw:lg:col-span-2" />
+        <div className="grid gap-4 lg:grid-cols-3" role="status" aria-label="Loading attendance">
+          <Skeleton className="h-48" />
+          <Skeleton className="h-48 lg:col-span-2" />
         </div>
       ) : (
         <>
-          <div className="tw:grid tw:gap-4 tw:lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-3">
             <Card>
-              <CardContent className="tw:flex tw:flex-col tw:items-center tw:gap-3 tw:py-2">
+              <CardContent className="flex flex-col items-center gap-3 py-2">
                 <ProgressRing
                   value={stats?.percentage ?? ins.percentage}
                   size={120}
                   stroke={10}
-                  toneClassName={(stats?.percentage ?? ins.percentage) < 75 ? 'tw:text-destructive' : 'tw:text-success'}
+                  toneClassName={(stats?.percentage ?? ins.percentage) < 75 ? 'text-destructive' : 'text-success'}
                   label={`Attendance ${stats?.percentage ?? ins.percentage}%`}
                 />
-                <div className="tw:text-sm tw:text-muted-foreground" title="Calculated as: Present ÷ (Present + Absent) × 100">
+                <div className="text-sm text-muted-foreground" title="Calculated as: Present ÷ (Present + Absent) × 100">
                   Attendance
                 </div>
-                <div className="tw:flex tw:items-center tw:gap-2 tw:rounded-full tw:bg-warning-soft tw:px-3 tw:py-1 tw:text-sm tw:font-semibold tw:text-warning">
-                  <Flame className="tw:size-4" aria-hidden="true" />
+                <div className="flex items-center gap-2 rounded-full bg-warning-soft px-3 py-1 text-sm font-semibold text-warning">
+                  <Flame className="size-4" aria-hidden="true" />
                   Longest present streak: {ins.longestPresent} day{ins.longestPresent === 1 ? '' : 's'}
                 </div>
               </CardContent>
             </Card>
-            <m.div className="tw:grid tw:grid-cols-2 tw:gap-4 tw:lg:col-span-2" variants={stagger(0.05)} initial="hidden" animate="visible">
+            <m.div className="grid grid-cols-2 gap-4 lg:col-span-2" variants={stagger(0.05)} initial="hidden" animate="visible">
               <StatCard label="Present" value={stats?.lifetime?.present ?? ins.present} icon={CalendarCheck2} tone="success" />
               <StatCard label="Absent" value={stats?.lifetime?.absent ?? ins.absent} icon={CalendarCheck2} tone="destructive" />
               <StatCard label="Leave" value={stats?.lifetime?.leave ?? ins.leave} icon={CalendarCheck2} tone="warning" />
@@ -150,7 +150,7 @@ export default function MyAttendancePage() {
             </m.div>
           </div>
 
-          <div className="tw:grid tw:gap-4 tw:lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
             <Card>
               <CardHeader>
                 <CardTitle>{monthLabel}</CardTitle>
@@ -174,7 +174,7 @@ export default function MyAttendancePage() {
                 <CardTitle>Request a correction</CardTitle>
                 <CardDescription>Corrections can only be requested for Absent or Leave days.</CardDescription>
               </CardHeader>
-              <CardContent className="tw:px-0">
+              <CardContent className="px-0">
                 {derived.correctable.length === 0 ? (
                   <EmptyState icon={CalendarCheck2} title="No attendance records." description="Nothing to correct this month." />
                 ) : (
@@ -184,11 +184,11 @@ export default function MyAttendancePage() {
                         <TableRow key={r.attendance_date}>
                           <TableCell>{formatDate(r.attendance_date)}</TableCell>
                           <TableCell>
-                            <Badge variant={r.status === 'absent' ? 'destructive' : 'warning'} className="tw:capitalize">
+                            <Badge variant={r.status === 'absent' ? 'destructive' : 'warning'} className="capitalize">
                               {r.status.replace('_', ' ')}
                             </Badge>
                           </TableCell>
-                          <TableCell className="tw:text-right">
+                          <TableCell className="text-right">
                             <Button variant="outline" size="sm" onClick={() => openRequest(r.attendance_date)}>
                               Request Correction
                             </Button>
@@ -202,15 +202,15 @@ export default function MyAttendancePage() {
             </Card>
           </div>
 
-          <Card className="tw:gap-0 tw:pb-0">
-            <CardHeader className="tw:pb-4">
-              <CardTitle className="tw:flex tw:items-center tw:gap-2">
-                <History className="tw:size-4 tw:text-muted-foreground" aria-hidden="true" />
+          <Card className="gap-0 pb-0">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2">
+                <History className="size-4 text-muted-foreground" aria-hidden="true" />
                 My Correction Requests
               </CardTitle>
             </CardHeader>
             {data.data!.requests.length === 0 ? (
-              <EmptyState icon={History} title="No requests yet." className="tw:pb-6" />
+              <EmptyState icon={History} title="No requests yet." className="pb-6" />
             ) : (
               <Table>
                 <TableHeader>
@@ -227,15 +227,15 @@ export default function MyAttendancePage() {
                   {data.data!.requests.map((r) => (
                     <TableRow key={r.id}>
                       <TableCell>{formatDate(r.attendance_date)}</TableCell>
-                      <TableCell className="tw:capitalize">{r.current_status?.replace('_', ' ') ?? '—'}</TableCell>
-                      <TableCell className="tw:capitalize">{r.requested_status}</TableCell>
+                      <TableCell className="capitalize">{r.current_status?.replace('_', ' ') ?? '—'}</TableCell>
+                      <TableCell className="capitalize">{r.requested_status}</TableCell>
                       <TableCell>
-                        <Badge variant={REQUEST_TONE[r.status]} className="tw:capitalize">
+                        <Badge variant={REQUEST_TONE[r.status]} className="capitalize">
                           {r.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="tw:max-w-64 tw:whitespace-normal">{r.reason}</TableCell>
-                      <TableCell className="tw:max-w-64 tw:whitespace-normal tw:text-muted-foreground">{r.admin_comment ?? '—'}</TableCell>
+                      <TableCell className="max-w-64 whitespace-normal">{r.reason}</TableCell>
+                      <TableCell className="max-w-64 whitespace-normal text-muted-foreground">{r.admin_comment ?? '—'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

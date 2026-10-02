@@ -23,17 +23,17 @@ export default function LowAttendanceCard() {
       emptyTitle="No users below threshold"
       emptyIcon={UserX}
     >
-      <m.ul className="tw:m-0 tw:list-none tw:divide-y tw:divide-border tw:p-0" variants={stagger(0.04)} initial="hidden" animate="visible">
+      <m.ul className="m-0 list-none divide-y divide-border p-0" variants={stagger(0.04)} initial="hidden" animate="visible">
         {users.map((user) => (
           <m.li key={user.id} variants={slideUp}>
             <PersonRow
               name={user.name}
               image={user.profile_image}
-              subtitle={<span className="tw:capitalize">{user.role}</span>}
+              subtitle={<span className="capitalize">{user.role}</span>}
               status={user.role === 'student' ? user.status : undefined}
               avatarToneClassName={roleAvatarTone(user.role)}
               trailing={
-                <span className={cn('tw:text-sm tw:font-semibold tw:tabular-nums', user.attendance_percentage < 50 ? 'tw:text-destructive' : 'tw:text-warning')}>
+                <span className={cn('text-sm font-semibold tabular-nums', user.attendance_percentage < 50 ? 'text-destructive' : 'text-warning')}>
                   {user.attendance_percentage}%
                 </span>
               }

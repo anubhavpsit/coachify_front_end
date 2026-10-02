@@ -14,7 +14,7 @@ export function RichHtml({ html, className }: { html: string; className?: string
   return (
     <div
       className={cn(
-        'tw:text-sm tw:leading-relaxed tw:text-foreground tw:[&_h3]:mt-3 tw:[&_h3]:mb-1 tw:[&_h3]:text-base! tw:[&_img]:my-2 tw:[&_img]:max-h-72 tw:[&_img]:rounded-md tw:[&_ol]:list-decimal tw:[&_ol]:pl-5 tw:[&_ul]:list-disc tw:[&_ul]:pl-5 tw:[&_p]:my-1',
+        'text-sm leading-relaxed text-foreground [&_h3]:mt-3 [&_h3]:mb-1 [&_h3]:text-base! [&_img]:my-2 [&_img]:max-h-72 [&_img]:rounded-md [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_p]:my-1',
         className,
       )}
       dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html || '') }}
@@ -43,12 +43,12 @@ export default function QuestionView({ q, n, headerEnd, answers }: Props) {
   const hasAnswer = !!q.solution_html || (written && !!q.answer_key) || !!q.correct_answer
 
   return (
-    <li className="tw:flex tw:flex-col tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4">
-      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <span className="tw:text-sm tw:font-semibold tw:text-muted-foreground">Q{n}</span>
+    <li className="flex flex-col gap-3 rounded-xl border border-solid border-border bg-card p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-sm font-semibold text-muted-foreground">Q{n}</span>
         <Badge variant="soft">Grade {q.grade}</Badge>
         {q.difficulty && (
-          <Badge variant={DIFF[q.difficulty] ?? 'secondary'} className="tw:capitalize">
+          <Badge variant={DIFF[q.difficulty] ?? 'secondary'} className="capitalize">
             {q.difficulty}
           </Badge>
         )}
@@ -64,13 +64,13 @@ export default function QuestionView({ q, n, headerEnd, answers }: Props) {
       <RichHtml html={q.question_html} />
 
       {q.question_type === 'mcq' && opts.length > 0 && (
-        <ul className="tw:m-0 tw:grid tw:list-none tw:gap-2 tw:p-0 tw:sm:grid-cols-2">
+        <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
           {opts.map(([k, v]) => {
             const right = reveal && q.correct_answer === k
             return (
-              <li key={k} className={cn('tw:flex tw:items-center tw:gap-2 tw:rounded-lg tw:border tw:border-solid tw:px-3 tw:py-1.5 tw:text-sm', right ? 'tw:border-success/50 tw:bg-success-soft' : 'tw:border-border')}>
-                <span className={cn('tw:flex tw:size-6 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full tw:text-xs tw:font-bold', right ? 'tw:bg-success tw:text-success-foreground' : 'tw:bg-muted tw:text-muted-foreground')}>
-                  {right ? <Check className="tw:size-3.5" aria-label="Correct" /> : k.toUpperCase()}
+              <li key={k} className={cn('flex items-center gap-2 rounded-lg border border-solid px-3 py-1.5 text-sm', right ? 'border-success/50 bg-success-soft' : 'border-border')}>
+                <span className={cn('flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold', right ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground')}>
+                  {right ? <Check className="size-3.5" aria-label="Correct" /> : k.toUpperCase()}
                 </span>
                 <span>{v}</span>
               </li>
@@ -80,8 +80,8 @@ export default function QuestionView({ q, n, headerEnd, answers }: Props) {
       )}
 
       {answers === 'always' && q.question_type === 'true_false' && q.correct_answer && (
-        <p className="tw:m-0 tw:text-sm">
-          Answer: <strong className="tw:capitalize tw:text-success">{q.correct_answer}</strong>
+        <p className="m-0 text-sm">
+          Answer: <strong className="capitalize text-success">{q.correct_answer}</strong>
         </p>
       )}
 
@@ -89,25 +89,25 @@ export default function QuestionView({ q, n, headerEnd, answers }: Props) {
         <div>
           <Button type="button" size="sm" variant={open ? 'soft' : 'outline'} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
             {answers === 'always' ? (open ? 'Hide answer & solution' : 'Show answer & solution') : open ? 'Hide answer' : 'Show answer'}
-            <ChevronDown className={cn('tw:transition-transform', open && 'tw:rotate-180')} aria-hidden="true" />
+            <ChevronDown className={cn('transition-transform', open && 'rotate-180')} aria-hidden="true" />
           </Button>
           {open && (
-            <div className="tw:mt-2 tw:flex tw:flex-col tw:gap-2 tw:rounded-lg tw:border-l-4 tw:border-solid tw:border-y-0 tw:border-r-0 tw:border-success tw:bg-success-soft/50 tw:px-3 tw:py-2">
+            <div className="mt-2 flex flex-col gap-2 rounded-lg border-l-4 border-solid border-y-0 border-r-0 border-success bg-success-soft/50 px-3 py-2">
               {answers === 'on-demand' && q.question_type === 'true_false' && q.correct_answer && (
-                <p className="tw:m-0 tw:text-sm">
-                  <span className="tw:font-semibold">Correct answer: </span>
+                <p className="m-0 text-sm">
+                  <span className="font-semibold">Correct answer: </span>
                   {q.correct_answer === 'true' ? 'True' : 'False'}
                 </p>
               )}
               {written && q.answer_key && (
-                <div className="tw:text-sm">
-                  <span className="tw:font-semibold">Answer key</span>
-                  <RichHtml html={q.answer_key} className="tw:whitespace-pre-wrap" />
+                <div className="text-sm">
+                  <span className="font-semibold">Answer key</span>
+                  <RichHtml html={q.answer_key} className="whitespace-pre-wrap" />
                 </div>
               )}
               {q.solution_html && (
                 <div>
-                  <span className="tw:text-sm tw:font-semibold">Solution</span>
+                  <span className="text-sm font-semibold">Solution</span>
                   <RichHtml html={q.solution_html} />
                 </div>
               )}

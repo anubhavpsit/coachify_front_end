@@ -17,26 +17,26 @@ export default function DateBar({ value, onChange, note }: { value: string; onCh
   const yesterday = yesterdayISO()
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-3 tw:rounded-xl tw:border tw:border-solid tw:border-border tw:bg-card tw:p-4 tw:sm:flex-row tw:sm:items-center">
-      <div className="tw:flex tw:items-center tw:gap-3">
-        <span className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-lg tw:bg-primary-soft tw:text-primary">
-          <CalendarDays className="tw:size-5" aria-hidden="true" />
+    <div className="flex flex-col gap-3 rounded-xl border border-solid border-border bg-card p-4 sm:flex-row sm:items-center">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+          <CalendarDays className="size-5" aria-hidden="true" />
         </span>
-        <div className="tw:flex tw:flex-col">
-          <label htmlFor={id} className="tw:m-0 tw:text-sm tw:font-semibold tw:text-foreground">
+        <div className="flex flex-col">
+          <label htmlFor={id} className="m-0 text-sm font-semibold text-foreground">
             Lesson date
           </label>
-          <span className="tw:text-xs tw:text-muted-foreground">{problem ?? `${friendly(value)} · ${note}`}</span>
+          <span className="text-xs text-muted-foreground">{problem ?? `${friendly(value)} · ${note}`}</span>
         </div>
       </div>
-      <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:sm:ml-auto">
+      <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
         <Button type="button" size="sm" variant={value === today ? 'soft' : 'outline'} aria-pressed={value === today} onClick={() => onChange(today)}>
           Today
         </Button>
         <Button type="button" size="sm" variant={value === yesterday ? 'soft' : 'outline'} aria-pressed={value === yesterday} onClick={() => onChange(yesterday)}>
           Yesterday
         </Button>
-        <Input id={id} type="date" className="tw:h-9 tw:w-40" max={today} value={value} aria-invalid={!!problem || undefined} onChange={(e) => onChange(e.target.value)} />
+        <Input id={id} type="date" className="h-9 w-40" max={today} value={value} aria-invalid={!!problem || undefined} onChange={(e) => onChange(e.target.value)} />
       </div>
     </div>
   )

@@ -8,18 +8,18 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        'tw:peer tw:m-0 tw:size-[1.125rem] tw:shrink-0 tw:cursor-pointer tw:rounded-[5px] tw:border tw:border-solid tw:border-input tw:bg-card tw:p-0 tw:shadow-xs tw:outline-none tw:transition-[background-color,border-color,box-shadow] tw:duration-150',
-        'tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50 tw:disabled:cursor-not-allowed tw:disabled:opacity-50',
-        'tw:data-[state=checked]:border-primary tw:data-[state=checked]:bg-primary tw:data-[state=checked]:text-primary-foreground tw:aria-invalid:border-destructive',
+        'peer m-0 size-[1.125rem] shrink-0 cursor-pointer rounded-[5px] border border-solid border-input bg-card p-0 shadow-xs outline-none transition-[background-color,border-color,box-shadow] duration-150',
+        'focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50',
+        'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground aria-invalid:border-destructive',
         className,
       )}
       {...props}
     >
       <CheckboxPrimitive.Indicator
         data-slot="checkbox-indicator"
-        className="tw:flex tw:items-center tw:justify-center tw:text-current tw:data-[state=checked]:animate-in tw:data-[state=checked]:zoom-in-50 tw:data-[state=checked]:duration-150"
+        className="flex items-center justify-center text-current data-[state=checked]:animate-in data-[state=checked]:zoom-in-50 data-[state=checked]:duration-150"
       >
-        <Check className="tw:size-3.5" strokeWidth={3} aria-hidden="true" />
+        <Check className="size-3.5" strokeWidth={3} aria-hidden="true" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )

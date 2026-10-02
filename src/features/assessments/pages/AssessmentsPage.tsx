@@ -121,8 +121,8 @@ export default function AssessmentsPage() {
       cell: ({ row }) => {
         const a = row.original
         return (
-          <div className="tw:flex tw:max-w-xs tw:flex-col tw:gap-0.5">
-            <span className="tw:flex tw:flex-wrap tw:items-center tw:gap-1.5 tw:font-medium tw:text-foreground">
+          <div className="flex max-w-xs flex-col gap-0.5">
+            <span className="flex flex-wrap items-center gap-1.5 font-medium text-foreground">
               {a.title}
               {a.source === 'auto' && (
                 <Badge variant="soft" title="Created automatically">
@@ -130,7 +130,7 @@ export default function AssessmentsPage() {
                 </Badge>
               )}
             </span>
-            <span className="tw:truncate tw:text-xs tw:text-muted-foreground">
+            <span className="truncate text-xs text-muted-foreground">
               {a.total_marks} marks{a.description ? ` · ${a.description}` : ''}
             </span>
           </div>
@@ -138,20 +138,20 @@ export default function AssessmentsPage() {
       },
     },
     { id: 'subject', header: 'Subject', accessorFn: (a) => a.subject?.subject ?? '', cell: ({ row }) => (row.original.subject ? <Badge variant="soft">{row.original.subject.subject}</Badge> : '-') },
-    { id: 'class', header: 'Class', accessorFn: (a) => a.class?.name ?? '', cell: ({ row }) => row.original.class?.name ?? <span className="tw:text-muted-foreground">Any</span> },
-    { id: 'teacher', header: 'Teacher', accessorFn: (a) => a.teacher?.name ?? '', cell: ({ row }) => row.original.teacher?.name ?? <span className="tw:text-muted-foreground">-</span> },
+    { id: 'class', header: 'Class', accessorFn: (a) => a.class?.name ?? '', cell: ({ row }) => row.original.class?.name ?? <span className="text-muted-foreground">Any</span> },
+    { id: 'teacher', header: 'Teacher', accessorFn: (a) => a.teacher?.name ?? '', cell: ({ row }) => row.original.teacher?.name ?? <span className="text-muted-foreground">-</span> },
     {
       id: 'date',
       header: 'Date',
       accessorFn: (a) => a.scheduled_date ?? '',
-      cell: ({ row }) => (row.original.scheduled_date ? formatDate(row.original.scheduled_date) : <span className="tw:text-muted-foreground">Not set</span>),
+      cell: ({ row }) => (row.original.scheduled_date ? formatDate(row.original.scheduled_date) : <span className="text-muted-foreground">Not set</span>),
     },
     {
       id: 'status',
       header: 'Status',
       accessorFn: (a) => a.status,
       cell: ({ row }) => (
-        <Badge variant={STATUS_VARIANT[row.original.status] ?? 'secondary'} className="tw:capitalize">
+        <Badge variant={STATUS_VARIANT[row.original.status] ?? 'secondary'} className="capitalize">
           {row.original.status}
         </Badge>
       ),
@@ -163,13 +163,13 @@ export default function AssessmentsPage() {
       cell: ({ row }) => {
         const a = row.original
         return (
-          <div className="tw:flex tw:flex-col tw:items-start tw:gap-1">
+          <div className="flex flex-col items-start gap-1">
             <Badge variant={a.is_admin_approved ? 'success' : 'warning'}>{a.is_admin_approved ? 'Approved' : 'Pending'}</Badge>
             {isAdmin && (
               <button
                 type="button"
                 onClick={() => setApprovalFor(a)}
-                className="tw:m-0 tw:cursor-pointer tw:border-0 tw:bg-transparent tw:p-0 tw:text-xs tw:font-medium tw:text-primary tw:hover:underline"
+                className="m-0 cursor-pointer border-0 bg-transparent p-0 text-xs font-medium text-primary hover:underline"
               >
                 {a.is_admin_approved ? 'Mark as pending' : 'Approve'}
               </button>
@@ -180,13 +180,13 @@ export default function AssessmentsPage() {
     },
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">Actions</span>,
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) => {
         const a = row.original
         return (
-          <div className="tw:flex tw:items-center tw:justify-end tw:gap-0.5">
+          <div className="flex items-center justify-end gap-0.5">
             <IconAction label={`Assign students to ${a.title}`} onClick={() => setAssignFor(a)}>
               <UserPlus aria-hidden="true" />
             </IconAction>
@@ -197,12 +197,12 @@ export default function AssessmentsPage() {
               <Paperclip aria-hidden="true" />
             </IconAction>
             {(isAdmin || isTeacher) && (
-              <span className="tw:relative">
+              <span className="relative">
                 <IconAction label={`Question paper for ${a.title}`} onClick={() => setPaperFor(a.id)}>
                   <FileText aria-hidden="true" />
                 </IconAction>
                 {typeof a.paper_questions_count === 'number' && a.paper_questions_count > 0 && (
-                  <span className="tw:pointer-events-none tw:absolute tw:-top-1 tw:-right-1 tw:min-w-4 tw:rounded-full tw:bg-info tw:px-1 tw:text-center tw:text-[10px] tw:leading-4 tw:font-bold tw:text-white" aria-hidden="true">
+                  <span className="pointer-events-none absolute -top-1 -right-1 min-w-4 rounded-full bg-info px-1 text-center text-[10px] leading-4 font-bold text-white" aria-hidden="true">
                     {a.paper_questions_count}
                   </span>
                 )}
@@ -215,11 +215,11 @@ export default function AssessmentsPage() {
   ]
 
   return (
-    <div className="tw:flex tw:flex-col tw:gap-6">
+    <div className="flex flex-col gap-6">
       <PageHeader
         title="Assessments"
         description="Create tests, assign them to students, build question papers and enter results."
-        className="tw:mb-0"
+        className="mb-0"
         actions={
           <Button onClick={() => setCreateOpen(true)}>
             <Plus aria-hidden="true" /> Create Assessment
@@ -228,21 +228,21 @@ export default function AssessmentsPage() {
       />
 
       {isAdmin && (
-        <Card className="tw:py-4">
-          <CardContent className="tw:flex tw:flex-wrap tw:items-center tw:gap-4">
-            <span className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-lg tw:bg-primary-soft tw:text-primary">
-              <Sparkles className="tw:size-5" aria-hidden="true" />
+        <Card className="py-4">
+          <CardContent className="flex flex-wrap items-center gap-4">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+              <Sparkles className="size-5" aria-hidden="true" />
             </span>
-            <div className="tw:flex tw:min-w-0 tw:flex-1 tw:flex-col">
-              <span id="auto-label" className="tw:text-sm tw:font-semibold">
+            <div className="flex min-w-0 flex-1 flex-col">
+              <span id="auto-label" className="text-sm font-semibold">
                 Auto-generate assessments
               </span>
-              <span className="tw:text-xs tw:text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 When on, the system creates an assessment for any topic taught more than 10 days ago that has no assessment yet, drafts a question paper for the teacher to review, and notifies the
                 teacher and students.
               </span>
             </div>
-            <label className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:font-medium">
+            <label className="m-0 flex items-center gap-2 text-sm font-medium">
               <Switch aria-labelledby="auto-label" checked={autoOn} disabled={auto.loading} onCheckedChange={(v) => setAutoConfirm(v)} />
               {autoOn ? 'On' : 'Off'}
             </label>
@@ -250,13 +250,13 @@ export default function AssessmentsPage() {
         </Card>
       )}
 
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+      <Card className="gap-0 overflow-hidden py-0">
         <DataTable
           columns={columns}
           data={shown}
           loading={list.loading && assessments.length === 0}
           getRowId={(a) => String(a.id)}
-          rowProps={(a) => ({ id: `assessment-row-${a.id}`, className: a.id === focusId ? 'tw:bg-primary-soft/50 tw:shadow-[inset_4px_0_0_var(--color-primary)]' : undefined })}
+          rowProps={(a) => ({ id: `assessment-row-${a.id}`, className: a.id === focusId ? 'bg-primary-soft/50 shadow-[inset_4px_0_0_var(--color-primary)]' : undefined })}
           searchPlaceholder="Search assessments"
           emptyIcon={ClipboardList}
           emptyTitle="No assessments found."
@@ -267,8 +267,8 @@ export default function AssessmentsPage() {
           }
           pageSize={focusId ? undefined : 25}
           toolbar={
-            <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-              <NativeSelect aria-label="Subject" className="tw:w-full tw:sm:w-40" value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)}>
+            <div className="flex flex-wrap items-center gap-2">
+              <NativeSelect aria-label="Subject" className="w-full sm:w-40" value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)}>
                 <option value="">All subjects</option>
                 {(catalog.data?.subjects ?? []).map((s) => (
                   <option key={s.id} value={String(s.id)}>
@@ -276,7 +276,7 @@ export default function AssessmentsPage() {
                   </option>
                 ))}
               </NativeSelect>
-              <NativeSelect aria-label="Approval" className="tw:w-full tw:sm:w-40" value={approvalFilter} onChange={(e) => setApprovalFilter(e.target.value)}>
+              <NativeSelect aria-label="Approval" className="w-full sm:w-40" value={approvalFilter} onChange={(e) => setApprovalFilter(e.target.value)}>
                 <option value="">Any approval</option>
                 <option value="pending">Pending</option>
                 <option value="approved">Approved</option>

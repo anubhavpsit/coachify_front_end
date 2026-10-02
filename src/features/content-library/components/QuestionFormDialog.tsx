@@ -116,9 +116,9 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
       submitLabel={question ? 'Update' : 'Save'}
       submittingLabel={question ? 'Updating...' : 'Saving...'}
       error={error}
-      className="tw:sm:max-w-3xl"
+      className="sm:max-w-3xl"
     >
-      <div className="tw:grid tw:gap-4 tw:sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3">
         <FormField
           control={form.control}
           name="grade"
@@ -202,9 +202,9 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
       />
 
       {type === 'mcq' && (
-        <fieldset className="tw:m-0 tw:flex tw:flex-col tw:gap-3 tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-3">
-          <legend className="tw:float-none tw:m-0 tw:w-auto tw:px-1 tw:text-sm tw:font-medium">Options — tick the correct one</legend>
-          <div role="radiogroup" aria-label="Correct option" className="tw:grid tw:gap-3 tw:sm:grid-cols-2">
+        <fieldset className="m-0 flex flex-col gap-3 rounded-lg border border-solid border-border p-3">
+          <legend className="float-none m-0 w-auto px-1 text-sm font-medium">Options — tick the correct one</legend>
+          <div role="radiogroup" aria-label="Correct option" className="grid gap-3 sm:grid-cols-2">
             {OPTIONS.map(([name, key, label]) => (
               <FormField
                 key={name}
@@ -212,7 +212,7 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
                 name={name}
                 render={({ field }) => (
                   <FormItem>
-                    <div className="tw:flex tw:items-center tw:gap-2">
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
                         role="radio"
@@ -220,11 +220,11 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
                         aria-label={`Option ${label} is correct`}
                         onClick={() => form.setValue('correctAnswer', key, { shouldDirty: true, shouldValidate: true })}
                         className={cn(
-                          'tw:m-0 tw:flex tw:size-9 tw:shrink-0 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-solid tw:text-sm tw:font-bold tw:transition-colors tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50',
-                          correct === key ? 'tw:border-success tw:bg-success tw:text-success-foreground' : 'tw:border-input tw:bg-transparent tw:text-muted-foreground tw:hover:bg-muted',
+                          'm-0 flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-solid text-sm font-bold transition-colors outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                          correct === key ? 'border-success bg-success text-success-foreground' : 'border-input bg-transparent text-muted-foreground hover:bg-muted',
                         )}
                       >
-                        {correct === key ? <Check className="tw:size-4" aria-hidden="true" /> : label}
+                        {correct === key ? <Check className="size-4" aria-hidden="true" /> : label}
                       </button>
                       <FormControl>
                         <Input placeholder={`Option ${label}`} maxLength={255} {...field} />
@@ -247,7 +247,7 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
           render={() => (
             <FormItem>
               <FormLabel required>Correct answer</FormLabel>
-              <div role="radiogroup" aria-label="Correct answer" className="tw:flex tw:gap-2">
+              <div role="radiogroup" aria-label="Correct answer" className="flex gap-2">
                 {(['true', 'false'] as const).map((v) => (
                   <button
                     key={v}
@@ -256,8 +256,8 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
                     aria-checked={correct === v}
                     onClick={() => form.setValue('correctAnswer', v, { shouldDirty: true, shouldValidate: true })}
                     className={cn(
-                      'tw:m-0 tw:cursor-pointer tw:rounded-full tw:border tw:border-solid tw:px-5 tw:py-1.5 tw:text-sm tw:font-medium tw:capitalize tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50',
-                      correct === v ? 'tw:border-success tw:bg-success tw:text-success-foreground' : 'tw:border-input tw:bg-transparent tw:hover:bg-muted',
+                      'm-0 cursor-pointer rounded-full border border-solid px-5 py-1.5 text-sm font-medium capitalize outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                      correct === v ? 'border-success bg-success text-success-foreground' : 'border-input bg-transparent hover:bg-muted',
                     )}
                   >
                     {v}
@@ -301,16 +301,16 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
         )}
       />
 
-      <div className="tw:grid tw:items-start tw:gap-4 tw:sm:grid-cols-[auto_1fr]">
+      <div className="grid items-start gap-4 sm:grid-cols-[auto_1fr]">
         <FormField
           control={form.control}
           name="needsImage"
           render={({ field }) => (
-            <FormItem className="tw:flex tw:items-center tw:gap-2 tw:pt-2">
+            <FormItem className="flex items-center gap-2 pt-2">
               <FormControl>
                 <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(v === true)} />
               </FormControl>
-              <FormLabel className="tw:m-0">Needs an image</FormLabel>
+              <FormLabel className="m-0">Needs an image</FormLabel>
             </FormItem>
           )}
         />
@@ -331,14 +331,14 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
       </div>
 
       {question ? (
-        <div className="tw:flex tw:flex-col tw:gap-2 tw:rounded-lg tw:border tw:border-solid tw:border-border tw:bg-muted/30 tw:p-3">
-          <span className="tw:text-sm tw:font-medium">Upload an image</span>
-          <label className="tw:m-0 tw:flex tw:h-10 tw:cursor-pointer tw:items-center tw:gap-2 tw:rounded-md tw:border tw:border-dashed tw:border-input tw:bg-card tw:px-3 tw:text-sm tw:text-muted-foreground tw:hover:border-primary/60">
-            <ImageUp className="tw:size-4" aria-hidden="true" /> {uploading ? 'Uploading…' : 'Choose an image — JPG, PNG or WebP, up to 5 MB'}
+        <div className="flex flex-col gap-2 rounded-lg border border-solid border-border bg-muted/30 p-3">
+          <span className="text-sm font-medium">Upload an image</span>
+          <label className="m-0 flex h-10 cursor-pointer items-center gap-2 rounded-md border border-dashed border-input bg-card px-3 text-sm text-muted-foreground hover:border-primary/60">
+            <ImageUp className="size-4" aria-hidden="true" /> {uploading ? 'Uploading…' : 'Choose an image — JPG, PNG or WebP, up to 5 MB'}
             <input
               type="file"
               accept={IMAGE_ACCEPT}
-              className="tw:sr-only"
+              className="sr-only"
               disabled={uploading}
               aria-label="Upload image"
               onChange={(e) => {
@@ -349,10 +349,10 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
             />
           </label>
           {uploadedUrl && (
-            <div className="tw:flex tw:flex-col tw:gap-1">
-              <span className="tw:text-xs tw:text-muted-foreground">Uploaded — copy this link into the question or solution:</span>
-              <div className="tw:flex tw:gap-2">
-                <Input readOnly value={uploadedUrl} aria-label="Uploaded image link" onFocus={(e) => e.target.select()} className="tw:h-9" />
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-muted-foreground">Uploaded — copy this link into the question or solution:</span>
+              <div className="flex gap-2">
+                <Input readOnly value={uploadedUrl} aria-label="Uploaded image link" onFocus={(e) => e.target.select()} className="h-9" />
                 <Button type="button" size="sm" variant="outline" onClick={copy}>
                   {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />} {copied ? 'Copied' : 'Copy'}
                 </Button>
@@ -361,7 +361,7 @@ export default function QuestionFormDialog({ open, onClose, topicId, question, p
           )}
         </div>
       ) : (
-        <p className="tw:m-0 tw:text-xs tw:text-muted-foreground">Image upload becomes available once the question is first saved.</p>
+        <p className="m-0 text-xs text-muted-foreground">Image upload becomes available once the question is first saved.</p>
       )}
     </FormDialog>
   )

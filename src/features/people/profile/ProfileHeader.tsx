@@ -50,28 +50,28 @@ export default function ProfileHeader({ user, canEditImage, onUpdated }: { user:
   }
 
   return (
-    <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-4">
-      <div className="tw:relative">
+    <div className="flex flex-wrap items-center gap-4">
+      <div className="relative">
         {preview ? (
-          <img src={preview} alt="New profile image preview" className="tw:size-16 tw:rounded-full tw:object-cover tw:ring-2 tw:ring-primary" />
+          <img src={preview} alt="New profile image preview" className="size-16 rounded-full object-cover ring-2 ring-primary" />
         ) : (
-          <UserAvatar name={user.name} image={user.profile_image} className="tw:size-16 tw:text-lg" />
+          <UserAvatar name={user.name} image={user.profile_image} className="size-16 text-lg" />
         )}
         {canEditImage && (
           <>
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="tw:absolute tw:-right-1 tw:-bottom-1 tw:m-0 tw:flex tw:size-7 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-full tw:border-2 tw:border-solid tw:border-card tw:bg-primary tw:p-0 tw:text-primary-foreground tw:outline-none tw:focus-visible:ring-[3px] tw:focus-visible:ring-ring/50"
+              className="absolute -right-1 -bottom-1 m-0 flex size-7 cursor-pointer items-center justify-center rounded-full border-2 border-solid border-card bg-primary p-0 text-primary-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
               aria-label="Change profile image"
             >
-              <Camera className="tw:size-3.5" aria-hidden="true" />
+              <Camera className="size-3.5" aria-hidden="true" />
             </button>
             <input
               ref={inputRef}
               type="file"
               accept="image/*"
-              className="tw:sr-only"
+              className="sr-only"
               aria-label="Profile image"
               onChange={(e) => {
                 pick(e.target.files?.[0])
@@ -81,18 +81,18 @@ export default function ProfileHeader({ user, canEditImage, onUpdated }: { user:
           </>
         )}
       </div>
-      <div className="tw:min-w-0 tw:flex-1">
-        <div className="tw:truncate tw:text-lg tw:font-semibold tw:text-foreground">{user.name}</div>
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2 tw:text-sm tw:text-muted-foreground">
-          <span className="tw:truncate">{user.email}</span>
-          <Badge variant="secondary" className="tw:capitalize">
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-lg font-semibold text-foreground">{user.name}</div>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+          <span className="truncate">{user.email}</span>
+          <Badge variant="secondary" className="capitalize">
             {user.role.replace(/_/g, ' ')}
           </Badge>
         </div>
       </div>
       {canEditImage && (file || error) && (
-        <div className="tw:flex tw:w-full tw:items-center tw:justify-end tw:gap-2 tw:sm:w-auto">
-          {error && <span className="tw:text-xs tw:text-destructive">{error}</span>}
+        <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+          {error && <span className="text-xs text-destructive">{error}</span>}
           {file && (
             <>
               <Button variant="ghost" size="sm" onClick={() => setFile(null)} disabled={uploading}>

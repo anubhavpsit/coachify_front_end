@@ -27,10 +27,10 @@ export default function NoticeBoardButton() {
           asChild
           variant={active ? 'soft' : 'secondary'}
           size="icon"
-          className={cn('tw:relative tw:rounded-full', active && 'tw:text-primary')}
+          className={cn('relative rounded-full', active && 'text-primary')}
         >
           <Link to={ROUTES.NOTICES} aria-label={unread > 0 ? `Notice Board, ${unread} unread` : 'Notice Board'} aria-current={active ? 'page' : undefined}>
-            <Megaphone className="tw:size-5" aria-hidden="true" />
+            <Megaphone className="size-5" aria-hidden="true" />
             <AnimatePresence>
               {unread > 0 && (
                 <m.span
@@ -39,7 +39,7 @@ export default function NoticeBoardButton() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="tw:absolute tw:-top-1 tw:-right-1 tw:min-w-[1.125rem] tw:rounded-full tw:bg-destructive tw:px-1 tw:text-center tw:text-[10px] tw:font-bold tw:leading-[1.125rem] tw:text-destructive-foreground"
+                  className="absolute -top-1 -right-1 min-w-[1.125rem] rounded-full bg-destructive px-1 text-center text-[10px] font-bold leading-[1.125rem] text-destructive-foreground"
                 >
                   {label}
                 </m.span>

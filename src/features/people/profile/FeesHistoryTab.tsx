@@ -12,25 +12,25 @@ export default function FeesHistoryTab({ studentId }: { studentId: number }) {
   const { data, loading } = useAsync(() => fetchFeeHistory(studentId), [studentId])
   if (loading)
     return (
-      <div className="tw:flex tw:flex-col tw:gap-2" role="status" aria-label="Loading history">
+      <div className="flex flex-col gap-2" role="status" aria-label="Loading history">
         {Array.from({ length: 3 }, (_, i) => (
-          <Skeleton key={i} className="tw:h-9" />
+          <Skeleton key={i} className="h-9" />
         ))}
       </div>
     )
   const items = data?.items ?? []
   return (
-    <div className="tw:flex tw:flex-col tw:gap-2">
+    <div className="flex flex-col gap-2">
       {items.length === 0 ? (
         <EmptyState icon={ReceiptIndianRupee} title="No fees history found." />
       ) : (
-        <div className="tw:overflow-hidden tw:rounded-lg tw:border tw:border-solid tw:border-border">
+        <div className="overflow-hidden rounded-lg border border-solid border-border">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Period</TableHead>
                 <TableHead>Paid On</TableHead>
-                <TableHead className="tw:text-right">Amount</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Mode</TableHead>
               </TableRow>
             </TableHeader>
@@ -41,7 +41,7 @@ export default function FeesHistoryTab({ studentId }: { studentId: number }) {
                     {formatDate(item.from_date)} → {formatDate(item.to_date)}
                   </TableCell>
                   <TableCell>{formatDate(item.paid_at)}</TableCell>
-                  <TableCell className="tw:text-right tw:tabular-nums">₹{Number(item.amount).toFixed(2)}</TableCell>
+                  <TableCell className="text-right tabular-nums">₹{Number(item.amount).toFixed(2)}</TableCell>
                   <TableCell>{paymentModeLabel(item.payment_mode)}</TableCell>
                 </TableRow>
               ))}
@@ -49,7 +49,7 @@ export default function FeesHistoryTab({ studentId }: { studentId: number }) {
           </Table>
         </div>
       )}
-      {data?.error && <p className="tw:m-0 tw:text-sm tw:text-destructive">{data.error}</p>}
+      {data?.error && <p className="m-0 text-sm text-destructive">{data.error}</p>}
     </div>
   )
 }

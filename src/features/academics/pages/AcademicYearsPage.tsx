@@ -80,7 +80,7 @@ export default function AcademicYearsPage() {
   }
 
   const columns: ColumnDef<AcademicYear, unknown>[] = [
-    { accessorKey: 'name', header: 'Name', cell: ({ row }) => <span className="tw:font-medium">{row.original.name}</span> },
+    { accessorKey: 'name', header: 'Name', cell: ({ row }) => <span className="font-medium">{row.original.name}</span> },
     { accessorKey: 'starts_on', header: 'Starts', cell: ({ row }) => formatDate(row.original.starts_on) },
     { accessorKey: 'ends_on', header: 'Ends', cell: ({ row }) => formatDate(row.original.ends_on) },
     {
@@ -93,16 +93,16 @@ export default function AcademicYearsPage() {
             Current
           </Badge>
         ) : (
-          <span className="tw:text-muted-foreground">No</span>
+          <span className="text-muted-foreground">No</span>
         ),
     },
     {
       id: 'actions',
-      header: () => <span className="tw:sr-only">Actions</span>,
+      header: () => <span className="sr-only">Actions</span>,
       enableSorting: false,
       meta: { align: 'right' },
       cell: ({ row }) => (
-        <div className="tw:flex tw:items-center tw:justify-end tw:gap-1">
+        <div className="flex items-center justify-end gap-1">
           {!row.original.is_current && (
             <Button
               variant="ghost"
@@ -134,7 +134,7 @@ export default function AcademicYearsPage() {
           </Button>
         }
       />
-      <Card className="tw:gap-0 tw:overflow-hidden tw:py-0">
+      <Card className="gap-0 overflow-hidden py-0">
         <DataTable
           columns={columns}
           data={years}
@@ -170,7 +170,7 @@ export default function AcademicYearsPage() {
                     type="button"
                     variant="link"
                     size="sm"
-                    className="tw:h-auto tw:p-0 tw:text-xs"
+                    className="h-auto p-0 text-xs"
                     onClick={() => form.setValue('name', suggestYearName(startsOn), { shouldDirty: true, shouldValidate: true })}
                   >
                     Use “{suggestYearName(startsOn)}”
@@ -181,7 +181,7 @@ export default function AcademicYearsPage() {
             </FormItem>
           )}
         />
-        <div className="tw:grid tw:gap-5 tw:sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="starts_on"
@@ -213,11 +213,11 @@ export default function AcademicYearsPage() {
           control={form.control}
           name="is_current"
           render={({ field }) => (
-            <FormItem className="tw:flex tw:flex-row tw:items-start tw:gap-3 tw:rounded-lg tw:border tw:border-solid tw:border-border tw:p-3">
+            <FormItem className="flex flex-row items-start gap-3 rounded-lg border border-solid border-border p-3">
               <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(v === true)} className="tw:mt-0.5" />
+                <Checkbox checked={field.value} onCheckedChange={(v) => field.onChange(v === true)} className="mt-0.5" />
               </FormControl>
-              <div className="tw:grid tw:gap-1">
+              <div className="grid gap-1">
                 <FormLabel>Set as current</FormLabel>
                 <FormDescription>Makes this the default year across the app.</FormDescription>
               </div>

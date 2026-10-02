@@ -84,11 +84,11 @@ export default function NoticeBoardCard({
   const all = [...feed.pinned, ...feed.items]
 
   const content = (
-    <Card className={cn('tw:gap-0 tw:py-0', compact ? 'tw:h-full' : '', !compact && !fullPage && 'tw:mb-6')}>
-      <div className={cn('tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2 tw:border-b tw:border-solid tw:border-border', compact ? 'tw:px-4 tw:py-3' : 'tw:px-6 tw:py-4')}>
-        <div className="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-          <h2 className="tw:m-0 tw:flex tw:items-center tw:gap-2 tw:text-base! tw:font-semibold tw:text-foreground">
-            <Megaphone className="tw:size-4 tw:text-muted-foreground" aria-hidden="true" />
+    <Card className={cn('gap-0 py-0', compact ? 'h-full' : '', !compact && !fullPage && 'mb-6')}>
+      <div className={cn('flex flex-wrap items-center justify-between gap-2 border-b border-solid border-border', compact ? 'px-4 py-3' : 'px-6 py-4')}>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="m-0 flex items-center gap-2 text-base! font-semibold text-foreground">
+            <Megaphone className="size-4 text-muted-foreground" aria-hidden="true" />
             Notice Board
             <AnimatePresence>
               {feed.unread > 0 && (
@@ -119,31 +119,31 @@ export default function NoticeBoardCard({
         )}
       </div>
 
-      <div ref={scrollRef} className={cn(!fullPage && 'tw:overflow-y-auto', !fullPage && (compact ? 'tw:max-h-[300px]' : 'tw:max-h-[480px]'))}>
+      <div ref={scrollRef} className={cn(!fullPage && 'overflow-y-auto', !fullPage && (compact ? 'max-h-[300px]' : 'max-h-[480px]'))}>
         {feed.loading && (
-          <div className="tw:flex tw:flex-col tw:gap-4 tw:p-5" role="status" aria-label="Loading notices">
+          <div className="flex flex-col gap-4 p-5" role="status" aria-label="Loading notices">
             {Array.from({ length: 3 }, (_, i) => (
-              <div key={i} className="tw:flex tw:flex-col tw:gap-2">
-                <Skeleton className="tw:h-4 tw:w-1/2" />
-                <Skeleton className="tw:h-3 tw:w-full" />
-                <Skeleton className="tw:h-3 tw:w-1/3" />
+              <div key={i} className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-1/3" />
               </div>
             ))}
           </div>
         )}
 
         {feed.error && !feed.loading && (
-          <div className="tw:flex tw:items-center tw:gap-2 tw:px-6 tw:py-4 tw:text-sm" role="alert">
-            <span className="tw:text-destructive">{feed.error}</span>
-            <Button variant="link" size="sm" className="tw:h-auto tw:p-0" onClick={() => void feed.loadFirstPage()}>
+          <div className="flex items-center gap-2 px-6 py-4 text-sm" role="alert">
+            <span className="text-destructive">{feed.error}</span>
+            <Button variant="link" size="sm" className="h-auto p-0" onClick={() => void feed.loadFirstPage()}>
               Retry
             </Button>
           </div>
         )}
 
         {isEmpty && (
-          <div className="tw:flex tw:flex-col tw:items-center tw:gap-2 tw:py-8 tw:text-sm tw:text-muted-foreground">
-            <BellOff className="tw:size-6" aria-hidden="true" />
+          <div className="flex flex-col items-center gap-2 py-8 text-sm text-muted-foreground">
+            <BellOff className="size-6" aria-hidden="true" />
             {feed.tab === 'expired' ? 'No expired notices' : 'No notices yet'}
           </div>
         )}
@@ -158,17 +158,17 @@ export default function NoticeBoardCard({
           </m.div>
         )}
 
-        {!feed.loading && feed.hasMore && <div ref={sentinelRef} className="tw:h-px" />}
+        {!feed.loading && feed.hasMore && <div ref={sentinelRef} className="h-px" />}
 
         {feed.loadingMore && (
-          <div className="tw:flex tw:flex-col tw:gap-2 tw:p-4" role="status" aria-label="Loading more notices">
-            <Skeleton className="tw:h-4 tw:w-1/2" />
-            <Skeleton className="tw:h-3 tw:w-full" />
+          <div className="flex flex-col gap-2 p-4" role="status" aria-label="Loading more notices">
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-3 w-full" />
           </div>
         )}
 
         {!feed.loading && !isEmpty && !feed.hasMore && !feed.error && (
-          <div className="tw:py-3 tw:text-center tw:text-xs tw:text-muted-foreground">
+          <div className="py-3 text-center text-xs text-muted-foreground">
             {feed.tab === 'expired' ? 'No older expired notices.' : "You're all caught up — no older notices."}
           </div>
         )}

@@ -29,21 +29,21 @@ export default function SignInPage() {
 
   return (
     <AuthLayout brandName={displayBrandName}>
-      <m.div variants={slideUp} initial="hidden" animate="visible" className="tw:flex tw:flex-col tw:gap-8">
-        <div className="tw:flex tw:flex-col tw:gap-6">
+      <m.div variants={slideUp} initial="hidden" animate="visible" className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {!isResolved ? (
-            <div className="tw:flex tw:flex-col tw:gap-2" role="status">
-              <Skeleton className="tw:h-10 tw:w-40" />
-              <span className="tw:text-sm tw:text-muted-foreground">Preparing your workspace...</span>
+            <div className="flex flex-col gap-2" role="status">
+              <Skeleton className="h-10 w-40" />
+              <span className="text-sm text-muted-foreground">Preparing your workspace...</span>
             </div>
           ) : logoUrl ? (
-            <img src={logoUrl} alt={`${displayBrandName} logo`} className="tw:max-h-14 tw:max-w-[18rem] tw:object-contain tw:object-left" />
+            <img src={logoUrl} alt={`${displayBrandName} logo`} className="max-h-14 max-w-[18rem] object-contain object-left" />
           ) : (
-            <div className="tw:text-2xl tw:font-bold tw:text-foreground">{displayBrandName}</div>
+            <div className="text-2xl font-bold text-foreground">{displayBrandName}</div>
           )}
-          <div className="tw:flex tw:flex-col tw:gap-2">
-            <h1 className="tw:m-0 tw:text-2xl! tw:font-bold tw:tracking-tight tw:text-foreground">Sign in to your account</h1>
-            <p className="tw:m-0 tw:text-muted-foreground">Welcome back! Please enter your credentials.</p>
+          <div className="flex flex-col gap-2">
+            <h1 className="m-0 text-2xl! font-bold tracking-tight text-foreground">Sign in to your account</h1>
+            <p className="m-0 text-muted-foreground">Welcome back! Please enter your credentials.</p>
           </div>
         </div>
 
@@ -59,15 +59,15 @@ export default function SignInPage() {
         </AnimatePresence>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(submit)} noValidate className="tw:flex tw:flex-col tw:gap-5">
+          <form onSubmit={form.handleSubmit(submit)} noValidate className="flex flex-col gap-5">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel required>Email</FormLabel>
-                  <div className="tw:relative">
-                    <Mail className="tw:pointer-events-none tw:absolute tw:top-1/2 tw:left-3 tw:size-4 tw:-translate-y-1/2 tw:text-muted-foreground" aria-hidden="true" />
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                     <FormControl>
                       <Input
                         type="email"
@@ -76,7 +76,7 @@ export default function SignInPage() {
                         autoCapitalize="none"
                         spellCheck={false}
                         placeholder="you@example.com"
-                        className="tw:h-12 tw:pl-10"
+                        className="h-12 pl-10"
                         {...field}
                       />
                     </FormControl>
@@ -92,14 +92,14 @@ export default function SignInPage() {
                 <FormItem>
                   <FormLabel required>Password</FormLabel>
                   <FormControl>
-                    <PasswordInput autoComplete="current-password" placeholder="Password" className="tw:h-12" {...field} />
+                    <PasswordInput autoComplete="current-password" placeholder="Password" className="h-12" {...field} />
                   </FormControl>
                   <FormDescription>Enter your password to continue.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" size="lg" className="tw:mt-1 tw:h-12 tw:w-full" loading={submitting} disabled={!isResolved}>
+            <Button type="submit" size="lg" className="mt-1 h-12 w-full" loading={submitting} disabled={!isResolved}>
               {submitting ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
