@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
-import DOMPurify from 'dompurify'
 import { BadgeCheck, CircleAlert, Info, Plus, Printer, Search, Trash2, Undo2 } from 'lucide-react'
 import { toast } from 'sonner'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
@@ -14,16 +13,10 @@ import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import QuestionBody, { stripHtml } from './QuestionBody'
 import { fetchAvailableQuestions, fetchPaper, fetchPaperPdf, removePaperQuestion, replacePaper, setPaperApproval, type Paper, type PaperQuestion } from '../services/assessmentsService'
 
 const apiMessage = (err: unknown, fallback: string) => (axios.isAxiosError(err) && err.response?.data?.message ? String(err.response.data.message) : fallback)
-const stripHtml = (html?: string | null) => {
-  if (!html) return ''
-  const el = document.createElement('div')
-  el.innerHTML = DOMPurify.sanitize(html)
-  return (el.textContent || '').trim()
-}
-
 const STATUS: Record<Paper['status'], { label: string; variant: 'secondary' | 'warning' | 'success' | 'info' }> = {
   none: { label: 'No paper', variant: 'secondary' },
   pending: { label: 'Pending approval', variant: 'warning' },
@@ -33,25 +26,6 @@ const STATUS: Record<Paper['status'], { label: string; variant: 'secondary' | 'w
 
 /** Backend: marks nullable|integer|min:1|max:100. */
 const marksProblem = (v: string) => (v.trim() === '' ? null : !/^\d+$/.test(v.trim()) || Number(v) < 1 || Number(v) > 100 ? '1–100' : null)
-
-function QuestionBody({ q }: { q: PaperQuestion }) {
-  const opts = (['a', 'b', 'c', 'd'] as const).map((k) => [k, q[`option_${k}`]] as const).filter(([, v]) => !!v)
-  return (
-    <div className="tw:flex tw:min-w-0 tw:flex-col tw:gap-1">
-      {/* Sanitised as before. */}
-      <div className="tw:text-sm tw:text-foreground tw:[&_p]:m-0" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(q.question_html || '') }} />
-      {opts.length > 0 && (
-        <ul className="tw:m-0 tw:grid tw:list-none tw:gap-x-4 tw:gap-y-0.5 tw:p-0 tw:sm:grid-cols-2">
-          {opts.map(([k, v]) => (
-            <li key={k} className="tw:text-xs tw:text-muted-foreground">
-              ({k}) {stripHtml(String(v))}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
-}
 
 interface Props {
   assessmentId: number | null

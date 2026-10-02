@@ -183,3 +183,41 @@ export async function fetchPaperPdf(id: number): Promise<Blob> {
   const res = await axios.get(`${paperBase(id)}/print`, { headers: json(), responseType: 'blob' })
   return new Blob([res.data], { type: 'application/pdf' })
 }
+
+// ---- Student (self) ----
+export type StudentAssignment = {
+  id: number
+  scheduled_date: string
+  status: string
+  attempted_at?: string | null
+  assessment: {
+    id: number
+    title: string
+    total_marks: number
+    source?: string | null
+    question_paper_released_at?: string | null
+    subject?: { id: number; subject: string }
+    teacher?: { id: number; name: string }
+  }
+  result?: { marks_obtained: number; total_marks: number; percentage: number; teacher_notes?: string | null }
+}
+export type StudentFile = { id: number; type: AssessmentFileType; path: string; original_name: string; uploaded_at?: string | null }
+export type StudentFiles = { question_papers: StudentFile[]; answer_sheets: StudentFile[] }
+
+/** Legacy links used the storage path (not `url`). */
+export const studentFileUrl = (f: StudentFile) => `${STORAGE_BASE}/${f.path}`
+
+export async function fetchMyAssessments(): Promise<{ upcoming: StudentAssignment[]; history: StudentAssignment[] }> {
+  const [u, h] = await Promise.all([axios.get(`${API_BASE_URL}/student/assessments/upcoming`, { headers: auth() }), axios.get(`${API_BASE_URL}/student/assessments/history`, { headers: auth() })])
+  return { upcoming: u.data.success ? u.data.data || [] : [], history: h.data.success ? h.data.data || [] : [] }
+}
+
+export async function fetchMyAssessmentFiles(assessmentId: number): Promise<StudentFiles | null> {
+  const res = await axios.get(`${API_BASE_URL}/student/assessments/${assessmentId}/files`, { headers: auth() })
+  return res.data.success ? res.data.data : null
+}
+
+export async function fetchReleasedPaper(assessmentId: number): Promise<{ questions: PaperQuestion[]; total_marks: number | null }> {
+  const res = await axios.get(`${API_BASE_URL}/student/assessments/${assessmentId}/question-paper`, { headers: json() })
+  return { questions: res.data.data.questions || [], total_marks: res.data.data.total_marks ?? null }
+}
