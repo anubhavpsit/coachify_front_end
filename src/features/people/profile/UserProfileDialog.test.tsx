@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import axios from 'axios'
 import UserProfileDialog from './UserProfileDialog'
 
-const student = { id: 9, name: 'Isha Verma', email: 'isha@x.in', role: 'student', tenant_id: 4, attendance_percentage: 82.5, created_at: '2026-06-01', student_profile: { class: '10', phone: '98765', fee_due_date: '2026-10-05', trial_days: 3 }, teachers: [{ id: 2, name: 'Meera Iyer', email: 'm@x.in' }] }
+const student = { id: 9, name: 'Isha Verma', email: 'isha@x.in', role: 'student', tenant_id: 4, attendance_percentage: 82.5, created_at: '2026-06-01', admission_date: '2026-05-28', subject_names: ['Mathematics', 'Physics'], student_profile: { class: '10', phone: '98765', fee_due_date: '2026-10-05', trial_days: 3 }, teachers: [{ id: 2, name: 'Meera Iyer', email: 'm@x.in' }] }
 
 function login(role: string) {
   localStorage.setItem('authToken', 'tok')
@@ -36,6 +36,17 @@ describe('UserProfileDialog gates (legacy parity)', () => {
     expect(tabNames()).toEqual(['Overview', 'Assessments', 'Fees History', 'Insights'])
     expect(screen.getByRole('button', { name: 'Change profile image' })).toBeTruthy()
     expect(get).toHaveBeenCalledWith(expect.stringMatching(/\/users\/9$/), { headers: { Authorization: 'Bearer tok', Accept: 'application/json' } })
+  })
+
+  it('student overview: Admission = real start, Added On = record date, subjects listed', async () => {
+    login('coaching_admin')
+    mockApi()
+    render(<UserProfileDialog show userId={9} onHide={() => {}} canEditImage />)
+    expect(await screen.findByText('Isha Verma')).toBeTruthy()
+    expect(screen.getByText('Admission').nextElementSibling?.textContent).toBe('28/05/2026')
+    expect(screen.getByText('Added On').nextElementSibling?.textContent).toBe('01/06/2026')
+    expect(screen.getByText('Mathematics')).toBeTruthy()
+    expect(screen.getByText('Physics')).toBeTruthy()
   })
 
   it('teacher viewing a student: assessments + insights only, no fees, no upload', async () => {

@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { personFields } from '@/features/people/schemas/person'
+import { personFields, todayInputValue } from '@/features/people/schemas/person'
+import { optionalPastDate } from '@/lib/validation'
 import type { Student, StudentPayload } from '../services/studentsService'
 import { normalizeSubjectIds } from '../lib/studentRows'
 
@@ -16,11 +17,13 @@ export const studentSchema = (mode: 'create' | 'edit') =>
     grade: z.union([z.number().int().min(1, 'Grade must be between 1 and 12.').max(12, 'Grade must be between 1 and 12.'), z.literal('')]),
     subjects: z.array(z.number().int()),
     phone: z.string().trim().max(20, 'Phone must be at most 20 characters.'),
+    // Backend: joining_date nullable|date|before_or_equal:today (blank = today)
+    joining_date: optionalPastDate('Joining date'),
   })
 export type StudentValues = z.infer<ReturnType<typeof studentSchema>>
 
 export function studentDefaults(s: Student | null): StudentValues {
-  if (!s) return { name: '', email: '', password: '', class: '', grade: '', subjects: [], phone: '', dob: '', gender: '' as StudentValues['gender'] }
+  if (!s) return { name: '', email: '', password: '', class: '', grade: '', subjects: [], phone: '', dob: '', gender: '' as StudentValues['gender'], joining_date: todayInputValue() }
   // Prefer the resolved current_class_id for the selected/current academic year (legacy).
   const cls = s.current_class_id ?? (typeof s.student_profile?.class === 'number' ? s.student_profile.class : null)
   return {
@@ -34,12 +37,13 @@ export function studentDefaults(s: Student | null): StudentValues {
     phone: s.student_profile?.phone || '',
     dob: (s.dob || '').slice(0, 10),
     gender: (s.gender || '') as StudentValues['gender'],
+    joining_date: (s.joined_date || s.created_at || '').slice(0, 10),
   }
 }
 
 /** The legacy page POSTed/PUT its whole form object; same keys and value types. */
 export function toStudentPayload(v: StudentValues): StudentPayload {
-  return { name: v.name, email: v.email, password: v.password, class: v.class, grade: v.grade, subjects: v.subjects, phone: v.phone, dob: v.dob, gender: v.gender }
+  return { name: v.name, email: v.email, password: v.password, class: v.class, grade: v.grade, subjects: v.subjects, phone: v.phone, dob: v.dob, gender: v.gender, joining_date: v.joining_date }
 }
 
-export const STUDENT_FIELDS = ['name', 'email', 'password', 'dob', 'gender', 'class', 'grade', 'subjects', 'phone'] as const
+export const STUDENT_FIELDS = ['name', 'email', 'password', 'dob', 'gender', 'class', 'grade', 'subjects', 'phone', 'joining_date'] as const

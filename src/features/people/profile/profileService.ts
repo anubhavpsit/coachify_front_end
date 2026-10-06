@@ -17,6 +17,10 @@ export type UserProfile = {
   not_marked_days?: number
   dob?: string | null
   created_at?: string | null
+  /** Students: day they actually started (joining date / first enrollment). */
+  admission_date?: string | null
+  /** Students: names of their subjects. */
+  subject_names?: string[]
   profile_img?: string | null
   profile_image?: string | null
   tenant_id: number

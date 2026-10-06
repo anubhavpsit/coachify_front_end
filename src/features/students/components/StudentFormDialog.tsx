@@ -5,11 +5,13 @@ import { toast } from 'sonner'
 import FormDialog from '@/components/common/FormDialog'
 import { Checkbox } from '@/components/ui/checkbox'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import PersonFields from '@/features/people/components/PersonFields'
 import PhoneField from '@/features/people/components/PhoneField'
-import type { PersonBase } from '@/features/people/schemas/person'
+import { todayInputValue, type PersonBase } from '@/features/people/schemas/person'
 import { applyServerErrors } from '@/lib/forms'
+import { formatDate } from '@/utils/date'
 import { enrichStudent } from '../lib/studentRows'
 import { STUDENT_FIELDS, studentDefaults, studentSchema, toStudentPayload, type StudentValues } from '../schemas/studentForm'
 import { createStudent, updateStudent, type ClassOption, type Student, type SubjectOption } from '../services/studentsService'
@@ -120,6 +122,33 @@ export default function StudentFormDialog({ open, student, classes, subjects, on
           )}
         />
       </div>
+      {student?.fees_recorded ? (
+        // Locked: once a fee is recorded the paid periods decide the next due date.
+        <div className="space-y-1">
+          <p className="m-0 text-sm font-medium">Joining Date</p>
+          <p className="m-0 text-sm">{formatDate(student.joined_date || student.created_at)}</p>
+          <p className="m-0 text-xs text-muted-foreground">
+            This can't be changed because fees have already been recorded for this student — the next due date now follows the paid fee periods.
+          </p>
+        </div>
+      ) : (
+        <FormField
+          control={form.control}
+          name="joining_date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Joining Date</FormLabel>
+              <FormControl>
+                <Input type="date" max={todayInputValue()} {...field} />
+              </FormControl>
+              <p className="m-0 text-xs text-muted-foreground">
+                The day the student actually started. Trial days and the first fee due date are counted from it.
+              </p>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      )}
       <FormField
         control={form.control}
         name="subjects"

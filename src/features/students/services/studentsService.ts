@@ -44,6 +44,10 @@ export type Student = {
   gender?: string | null
   created_at?: string | null
   status?: string | null
+  /** Day the student actually started (fee trial counts from it). */
+  joined_date?: string | null
+  /** Any fee recorded → joining date is locked on Edit Student. */
+  fees_recorded?: boolean
 }
 export type YearOption = { id: number; name: string; is_current: boolean }
 export type ClassOption = { id: number; name: string }
@@ -59,6 +63,7 @@ export type StudentPayload = {
   phone: string
   dob: string
   gender: string
+  joining_date: string
 }
 
 export async function fetchYearOptions(): Promise<YearOption[]> {

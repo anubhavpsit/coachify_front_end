@@ -46,7 +46,11 @@ export default function OverviewTab({ user, showFees, fees, showAdminStudentFiel
     details.push(['Class', user.current_class_name ?? user.student_profile.class ?? '-'])
     details.push(['Phone', user.student_profile.phone || '-'])
   }
-  if (isStudent) details.push(['Admission', formatDate(user.created_at)])
+  if (isStudent) {
+    // Admission = when they actually started; Added On = when the record was created.
+    details.push(['Admission', formatDate(user.admission_date ?? user.created_at)])
+    details.push(['Added On', formatDate(user.created_at)])
+  }
   if (showAdminStudentFields && user.student_profile) {
     details.push(['Next Fee Due', formatDate(user.student_profile.fee_due_date ?? null)])
     details.push(['Trial Days', user.student_profile.trial_days ?? '-'])
@@ -125,6 +129,22 @@ export default function OverviewTab({ user, showFees, fees, showAdminStudentFiel
               <dd className="m-0 text-sm font-medium text-foreground">{value}</dd>
             </div>
           ))}
+          {isStudent && (
+            <div className="col-span-full">
+              <dt className="text-xs text-muted-foreground">Subjects</dt>
+              <dd className="m-0 mt-1 flex flex-wrap gap-1.5">
+                {user.subject_names && user.subject_names.length > 0 ? (
+                  user.subject_names.map((n) => (
+                    <Badge key={n} variant="secondary">
+                      {n}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className="text-sm text-muted-foreground">No subjects assigned</span>
+                )}
+              </dd>
+            </div>
+          )}
         </dl>
       )}
     </div>

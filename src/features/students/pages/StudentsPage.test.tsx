@@ -18,7 +18,7 @@ function login(role: string, permissions: string[] = []) {
   localStorage.setItem('authUser', JSON.stringify({ id: 1, name: 'A', email: 'a@x', role, tenant_id: 4, permissions }))
 }
 
-function mockGets(list = students) {
+function mockGets(list: object[] = students) {
   return vi.spyOn(axios, 'get').mockImplementation((url: string) => {
     if (url.endsWith('/academic-years')) return Promise.resolve({ data: { success: true, data: [{ id: 11, name: '2026-2027', is_current: true }] } })
     if (url.includes('/subjects/')) return Promise.resolve({ data: { status: true, data: [{ id: 7, subject: 'Physics' }] } })
@@ -96,8 +96,37 @@ describe('StudentsPage (Q4 preserved)', () => {
     await userEvent.click(within(d).getByRole('checkbox', { name: 'Physics' }))
     await userEvent.click(within(d).getByRole('button', { name: 'Save' }))
     await waitFor(() => expect(post).toHaveBeenCalled())
-    expect(post.mock.calls[0][1]).toEqual({ name: 'Kabir', email: 'k@x.in', password: 'student99', class: 3, grade: 10, subjects: [7], phone: '', dob: '', gender: 'male' })
+    expect(post.mock.calls[0][1]).toEqual({ name: 'Kabir', email: 'k@x.in', password: 'student99', class: 3, grade: 10, subjects: [7], phone: '', dob: '', gender: 'male', joining_date: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) })
     expect(await screen.findByText('Kabir')).toBeTruthy()
+  })
+
+  it('edit: joining date is editable until a fee is recorded and is sent on save', async () => {
+    login('coaching_admin')
+    mockGets([{ ...students[0], gender: 'male', joined_date: '2026-09-01', fees_recorded: false }])
+    const put = vi.spyOn(axios, 'put').mockResolvedValue({ data: { success: true, data: { ...students[0], joined_date: '2026-08-28', fees_recorded: false } } })
+    render(<StudentsPage />)
+    await userEvent.click(await screen.findByRole('button', { name: 'Actions for Aarav Mehta' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: /Edit/ }))
+    const d = await screen.findByRole('dialog')
+    const input = within(d).getByLabelText(/^Joining Date/) as HTMLInputElement
+    expect(input.value).toBe('2026-09-01')
+    await userEvent.clear(input)
+    await userEvent.type(input, '2026-08-28')
+    await userEvent.click(within(d).getByRole('button', { name: 'Update' }))
+    await waitFor(() => expect(put).toHaveBeenCalled())
+    expect(put.mock.calls[0][1]).toMatchObject({ joining_date: '2026-08-28' })
+  })
+
+  it('edit: joining date is shown as plain text with the reason once fees are recorded', async () => {
+    login('coaching_admin')
+    mockGets([{ ...students[0], joined_date: '2026-09-01', fees_recorded: true }])
+    render(<StudentsPage />)
+    await userEvent.click(await screen.findByRole('button', { name: 'Actions for Aarav Mehta' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: /Edit/ }))
+    const d = await screen.findByRole('dialog')
+    expect(within(d).queryByLabelText(/^Joining Date/)).toBeNull()
+    expect(within(d).getByText('01/09/2026')).toBeTruthy()
+    expect(within(d).getByText(/can't be changed because fees have already been recorded/)).toBeTruthy()
   })
 
   it('reactivate sends the legacy body and updates the row', async () => {
