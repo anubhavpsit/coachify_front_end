@@ -1,1 +1,0 @@
-import{r as o}from"./index-BJm6cHw4.js";function u(e){o.useEffect(()=>{if(!e)return;const r=n=>{n.preventDefault(),n.returnValue=""};return window.addEventListener("beforeunload",r),()=>window.removeEventListener("beforeunload",r)},[e])}export{u};
