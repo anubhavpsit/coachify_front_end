@@ -66,7 +66,7 @@ export default function QuestionView({ q, n, headerEnd, answers }: Props) {
       {q.question_type === 'mcq' && opts.length > 0 && (
         <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
           {opts.map(([k, v]) => {
-            const right = reveal && q.correct_answer === k
+            const right = reveal && (q.correct_answer ?? '').split(',').includes(k) // "a,c" = multiple correct
             return (
               <li key={k} className={cn('flex items-center gap-2 rounded-lg border border-solid px-3 py-1.5 text-sm', right ? 'border-success/50 bg-success-soft' : 'border-border')}>
                 <span className={cn('flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold', right ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground')}>
