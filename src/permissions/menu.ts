@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   ClipboardPen,
   FilePenLine,
+  FileStack,
   GraduationCap,
   House,
   IndianRupee,
@@ -103,6 +104,12 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: FilePenLine,
         visible: (p) =>
           p.hasRole(ROLES.TEACHER) || p.can(P.ASSESSMENTS_VIEW) || p.can(P.ASSESSMENTS_MANAGE) || p.can(P.ASSESSMENTS_GRADE),
+      },
+      {
+        to: ROUTES.WORKSHEETS,
+        label: 'Worksheets',
+        icon: FileStack,
+        visible: (p) => p.hasRole(ROLES.TEACHER) || p.can(P.WORKSHEETS_MANAGE),
       },
       {
         to: ROUTES.APPROVALS,

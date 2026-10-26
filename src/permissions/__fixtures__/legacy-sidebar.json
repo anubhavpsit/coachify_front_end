@@ -22,7 +22,8 @@
   "/fees|Fees",
   "/enquiries|Enquiries",
   "/admin/attendance-corrections|Attendance Corrections",
-  "/notifications|Notifications"
+  "/notifications|Notifications",
+  "/worksheets|Worksheets"
  ],
  "super_admin": [
   "/dashboard|Dashboard",
@@ -47,7 +48,8 @@
   "/fees|Fees",
   "/enquiries|Enquiries",
   "/admin/attendance-corrections|Attendance Corrections",
-  "/notifications|Notifications"
+  "/notifications|Notifications",
+  "/worksheets|Worksheets"
  ],
  "anonymous": [
   "/dashboard|Dashboard",
@@ -274,7 +276,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+facts.manage": [
   "/dashboard|Dashboard",
@@ -289,7 +292,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+content_library.manage": [
   "/dashboard|Dashboard",
@@ -305,7 +309,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+insights.view": [
   "/dashboard|Dashboard",
@@ -319,7 +324,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+students.view": [
   "/dashboard|Dashboard",
@@ -333,7 +339,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+students.manage": [
   "/dashboard|Dashboard",
@@ -347,7 +354,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+assessments.view": [
   "/dashboard|Dashboard",
@@ -361,7 +369,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+assessments.manage": [
   "/dashboard|Dashboard",
@@ -375,7 +384,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+assessments.grade": [
   "/dashboard|Dashboard",
@@ -389,7 +399,8 @@
   "/students|Students",
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+teachers.view": [
   "/dashboard|Dashboard",
@@ -404,7 +415,8 @@
   "/assessments|Assessments",
   "/teachers|Teachers",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+teachers.manage": [
   "/dashboard|Dashboard",
@@ -419,7 +431,8 @@
   "/assessments|Assessments",
   "/teachers|Teachers",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+staff.manage": [
   "/dashboard|Dashboard",
@@ -434,7 +447,8 @@
   "/assessments|Assessments",
   "/staff|Staff",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+expenses.view": [
   "/dashboard|Dashboard",
@@ -449,7 +463,8 @@
   "/assessments|Assessments",
   "/expenses|Expenses",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+expenses.manage": [
   "/dashboard|Dashboard",
@@ -464,7 +479,8 @@
   "/assessments|Assessments",
   "/expenses|Expenses",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+attendance.mark": [
   "/dashboard|Dashboard",
@@ -479,7 +495,8 @@
   "/assessments|Assessments",
   "/dashboard/attendance|Daily Attendance",
   "/teachers/daily-activities|Daily Activities",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+daily_activities.approve": [
   "/dashboard|Dashboard",
@@ -494,7 +511,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/approvals|Approvals"
+  "/approvals|Approvals",
+  "/worksheets|Worksheets"
  ],
  "teacher+generated_content.approve": [
   "/dashboard|Dashboard",
@@ -509,7 +527,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/approvals/generated-content|AI Content"
+  "/approvals/generated-content|AI Content",
+  "/worksheets|Worksheets"
  ],
  "teacher+subjects.manage": [
   "/dashboard|Dashboard",
@@ -524,7 +543,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/subjects|Subjects"
+  "/subjects|Subjects",
+  "/worksheets|Worksheets"
  ],
  "teacher+classes.manage": [
   "/dashboard|Dashboard",
@@ -539,7 +559,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/classes|Classes"
+  "/classes|Classes",
+  "/worksheets|Worksheets"
  ],
  "teacher+academic_years.manage": [
   "/dashboard|Dashboard",
@@ -554,7 +575,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/academic-years|Academic Years"
+  "/academic-years|Academic Years",
+  "/worksheets|Worksheets"
  ],
  "teacher+fees.view": [
   "/dashboard|Dashboard",
@@ -569,7 +591,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/fees|Fees"
+  "/fees|Fees",
+  "/worksheets|Worksheets"
  ],
  "teacher+fees.manage": [
   "/dashboard|Dashboard",
@@ -584,7 +607,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/fees|Fees"
+  "/fees|Fees",
+  "/worksheets|Worksheets"
  ],
  "teacher+enquiries.view": [
   "/dashboard|Dashboard",
@@ -599,7 +623,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/enquiries|Enquiries"
+  "/enquiries|Enquiries",
+  "/worksheets|Worksheets"
  ],
  "teacher+enquiries.manage": [
   "/dashboard|Dashboard",
@@ -614,7 +639,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/enquiries|Enquiries"
+  "/enquiries|Enquiries",
+  "/worksheets|Worksheets"
  ],
  "teacher+attendance.corrections": [
   "/dashboard|Dashboard",
@@ -629,7 +655,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/admin/attendance-corrections|Attendance Corrections"
+  "/admin/attendance-corrections|Attendance Corrections",
+  "/worksheets|Worksheets"
  ],
  "teacher+notifications.manage": [
   "/dashboard|Dashboard",
@@ -644,7 +671,8 @@
   "/assessments|Assessments",
   "/teachers/daily-activities|Daily Activities",
   "/approvals|Approvals",
-  "/notifications|Notifications"
+  "/notifications|Notifications",
+  "/worksheets|Worksheets"
  ],
  "teacher+ALL": [
   "/dashboard|Dashboard",
@@ -674,7 +702,8 @@
   "/fees|Fees",
   "/enquiries|Enquiries",
   "/admin/attendance-corrections|Attendance Corrections",
-  "/notifications|Notifications"
+  "/notifications|Notifications",
+  "/worksheets|Worksheets"
  ],
  "student": [
   "/dashboard|Dashboard",

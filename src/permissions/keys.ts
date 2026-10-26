@@ -39,6 +39,7 @@ export const PERMISSIONS = {
   DAILY_ACTIVITIES_APPROVE: 'daily_activities.approve',
   GENERATED_CONTENT_APPROVE: 'generated_content.approve',
   CONTENT_LIBRARY_MANAGE: 'content_library.manage',
+  WORKSHEETS_MANAGE: 'worksheets.manage',
   FACTS_MANAGE: 'facts.manage',
   INSIGHTS_VIEW: 'insights.view',
   NOTIFICATIONS_MANAGE: 'notifications.manage',

@@ -22,6 +22,7 @@ export const ROUTES = {
   STUDENT_ACTIVITY_TOPIC: '/students/activities/:activityId/topic',
   STUDENT_ASSESSMENTS: '/students/assessments',
   ASSESSMENTS: '/assessments',
+  WORKSHEETS: '/worksheets',
   SEARCH: '/search',
   APPROVALS: '/approvals',
   APPROVALS_GENERATED_CONTENT: '/approvals/generated-content',

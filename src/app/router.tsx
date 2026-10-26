@@ -32,6 +32,7 @@ const StudentActivitiesPage = lazy(() => import('@/features/daily-activities/pag
 const StudentTopicContentPage = lazy(() => import('@/features/daily-activities/pages/StudentTopicContentPage'))
 const StudentAssessmentsPage = lazy(() => import('@/features/assessments/pages/StudentAssessmentsPage'))
 const AssessmentsPage = lazy(() => import('@/features/assessments/pages/AssessmentsPage'))
+const WorksheetsPage = lazy(() => import('@/features/worksheets/pages/WorksheetsPage'))
 const SearchResultsPage = lazy(() => import('@/features/search/pages/SearchResultsPage'))
 const DailyActivityApprovalsPage = lazy(() => import('@/features/approvals/pages/DailyActivityApprovalsPage'))
 const GeneratedContentApprovalsPage = lazy(() => import('@/features/approvals/pages/GeneratedContentApprovalsPage'))
@@ -104,6 +105,7 @@ export default function AppRoutes() {
             path={R.ASSESSMENTS}
             element={<Guard anyOf={[P.ASSESSMENTS_VIEW, P.ASSESSMENTS_MANAGE, P.ASSESSMENTS_GRADE]} orRoles={['teacher']}><AssessmentsPage /></Guard>}
           />
+          <Route path={R.WORKSHEETS} element={<Guard anyOf={[P.WORKSHEETS_MANAGE]} orRoles={['teacher']}><WorksheetsPage /></Guard>} />
           <Route path={R.SEARCH} element={<SearchResultsPage />} />
           <Route path={R.APPROVALS} element={<Guard anyOf={[P.DAILY_ACTIVITIES_APPROVE]} orRoles={['teacher']}><DailyActivityApprovalsPage /></Guard>} />
           <Route path={R.APPROVALS_GENERATED_CONTENT} element={<Guard anyOf={[P.GENERATED_CONTENT_APPROVE]}><GeneratedContentApprovalsPage /></Guard>} />
