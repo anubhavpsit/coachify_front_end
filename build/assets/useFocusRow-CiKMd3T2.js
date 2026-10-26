@@ -1,0 +1,1 @@
+import{Z as c,r as a}from"./index-DCpseisl.js";function i(s,o,r){const[n]=c(),t=Number(n.get(s)),e=Number.isInteger(t)&&t>0?t:null;return a.useEffect(()=>{if(!r||e===null)return;const u=window.setTimeout(()=>{document.getElementById(`${o}${e}`)?.scrollIntoView({behavior:"smooth",block:"center"})},50);return()=>window.clearTimeout(u)},[r,e,o]),e}export{i as u};
