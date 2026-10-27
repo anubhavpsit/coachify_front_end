@@ -142,21 +142,21 @@ describe('AssessmentsPage — forms', () => {
     mockGets()
     const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { success: true } })
     renderPage()
-    await userEvent.click(within(await row()).getByRole('button', { name: 'Enter results for Unit Test 1' }))
+    await userEvent.click(within(await row()).getByRole('button', { name: 'Results for Unit Test 1' }))
     const d = await screen.findByRole('dialog')
     const marks = await within(d).findByRole('spinbutton', { name: 'Marks for Asha' })
     await userEvent.type(marks, '60')
     expect(within(d).getByText("Can't be more than 50.")).toBeTruthy()
-    await userEvent.click(within(d).getByRole('button', { name: /Save results/ }))
+    await userEvent.click(within(d).getByRole('button', { name: /^Save/ }))
     expect(screen.queryByRole('alertdialog')).toBeNull()
     await userEvent.clear(marks)
     await userEvent.type(marks, '42')
-    await userEvent.click(within(d).getByRole('button', { name: /Save results/ }))
+    await userEvent.click(within(d).getByRole('button', { name: 'Save (1 result)' }))
     const confirm = await screen.findByRole('alertdialog')
-    expect(within(confirm).getByText(/students are notified that results are out/)).toBeTruthy()
+    expect(within(confirm).getByText(/told their result is out/)).toBeTruthy()
     await userEvent.click(within(confirm).getByRole('button', { name: 'Yes, save' }))
     await waitFor(() =>
-      expect(post).toHaveBeenCalledWith(expect.stringMatching(/\/assessments\/7\/results$/), { results: [{ student_id: 3, marks_obtained: 42, total_marks: 50, teacher_notes: undefined }] }, auth),
+      expect(post).toHaveBeenCalledWith(expect.stringMatching(/\/assessments\/7\/results$/), { results: [{ student_id: 3, marks_obtained: 42, total_marks: 50, teacher_notes: undefined }] }, json),
     )
   })
 })
@@ -215,3 +215,96 @@ describe('AssessmentsPage — confirmations', () => {
     await waitFor(() => expect(del).toHaveBeenCalledWith(expect.stringMatching(/\/assessments\/7\/question-paper\/questions\/91$/), json))
   })
 })
+
+describe('AssessmentsPage — tracking', () => {
+  const progress = (stage: string, extra = {}) => ({ total: 2, upcoming: 0, today: 0, awaiting_results: 0, result_out: 0, absent: 0, cancelled: 0, next_date: null, oldest_pending_date: null, stage, ...extra })
+  const list = [
+    { ...asm, progress: progress('needs_results', { awaiting_results: 2, oldest_pending_date: '2026-10-14' }) },
+    { ...asm, id: 8, title: 'Weekly Quiz', progress: progress('upcoming', { upcoming: 2, next_date: '2026-10-30' }) },
+    { ...asm, id: 9, title: 'Old Test', progress: progress('done', { result_out: 2 }) },
+  ]
+  const trackDetail = {
+    ...detail,
+    assignments: [
+      { id: 1, student_id: 3, scheduled_date: '2026-10-14', status: 'upcoming', stage: 'awaiting_results', student: { id: 3, name: 'Asha' } },
+      { id: 2, student_id: 4, scheduled_date: '2026-10-14', status: 'upcoming', stage: 'awaiting_results', student: { id: 4, name: 'Ravi' } },
+    ],
+  }
+  function mockTracking() {
+    return vi.spyOn(axios, 'get').mockImplementation((url: string) => {
+      const ok = (data: unknown) => Promise.resolve({ data: { success: true, data } })
+      if (url.endsWith('/assessments')) return ok(list)
+      if (url.endsWith('/assessments/7')) return ok(trackDetail)
+      if (url.endsWith('/subjects/4')) return Promise.resolve({ data: { status: true, data: [{ id: 5, subject: 'Maths' }] } })
+      if (url.endsWith('/classes/4')) return ok([{ id: 1, name: 'Class 9' }])
+      if (url.endsWith('/tenant/auto-assessment')) return ok({ enabled: false })
+      return ok([])
+    })
+  }
+
+  it('opens on "Needs results" with counts; other tabs filter the list', async () => {
+    signIn('teacher')
+    mockTracking()
+    renderPage()
+    const tab = await screen.findByRole('tab', { name: 'Needs results (1)' })
+    expect(tab.getAttribute('aria-selected')).toBe('true')
+    expect(await screen.findByText('Unit Test 1')).toBeTruthy()
+    expect(screen.queryByText('Weekly Quiz')).toBeNull()
+    expect(screen.getByText('Pending since 14/10/2026')).toBeTruthy()
+    await userEvent.click(screen.getByRole('tab', { name: 'Upcoming (1)' }))
+    expect(await screen.findByText('Weekly Quiz')).toBeTruthy()
+    expect(screen.queryByText('Unit Test 1')).toBeNull()
+    await userEvent.click(screen.getByRole('tab', { name: 'All (3)' }))
+    expect(await screen.findByText('Old Test')).toBeTruthy()
+  })
+
+  it('Enter results: marks for one, Absent for the other, sent together', async () => {
+    signIn('teacher')
+    mockTracking()
+    const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { success: true } })
+    renderPage()
+    await userEvent.click(await screen.findByRole('button', { name: /Enter results/ }))
+    const d = await screen.findByRole('dialog')
+    await userEvent.type(await within(d).findByRole('spinbutton', { name: 'Marks for Asha' }), '40')
+    await userEvent.click(within(d).getByRole('switch', { name: 'Ravi was absent' }))
+    expect((within(d).getByRole('spinbutton', { name: 'Marks for Ravi' }) as HTMLInputElement).disabled).toBe(true)
+    await userEvent.click(within(d).getByRole('button', { name: 'Save (1 result · 1 absent)' }))
+    await userEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Yes, save' }))
+    await waitFor(() => expect(post).toHaveBeenCalled())
+    expect(post.mock.calls[0][1]).toEqual({ results: [{ student_id: 3, marks_obtained: 40, total_marks: 50, teacher_notes: undefined }, { student_id: 4, absent: true }] })
+  })
+
+  it('bulk: reschedule the selected students', async () => {
+    signIn('teacher')
+    mockTracking()
+    const post = vi.spyOn(axios, 'post').mockResolvedValue({ data: { success: true, message: 'Rescheduled 1 student.', data: { progress: progress('upcoming') } } })
+    renderPage()
+    await userEvent.click(await screen.findByRole('button', { name: /Enter results/ }))
+    const d = await screen.findByRole('dialog')
+    await userEvent.click(await within(d).findByRole('checkbox', { name: 'Select Ravi' }))
+    await userEvent.click(within(d).getByRole('button', { name: 'Reschedule' }))
+    const confirm = await screen.findByRole('alertdialog')
+    const date = within(confirm).getByLabelText('New date')
+    await userEvent.clear(date)
+    await userEvent.type(date, '2030-01-15')
+    await userEvent.click(within(confirm).getByRole('button', { name: 'Yes, reschedule' }))
+    await waitFor(() => expect(post).toHaveBeenCalled())
+    expect(post.mock.calls[0][0]).toMatch(/\/assessments\/7\/assignments\/bulk$/)
+    expect(post.mock.calls[0][1]).toEqual({ student_ids: [4], action: 'reschedule', scheduled_date: '2030-01-15' })
+  })
+
+  it('a notification link (?assessment=7&results=1) opens the results straight away', async () => {
+    signIn('teacher')
+    mockTracking()
+    Element.prototype.scrollIntoView = vi.fn() // jsdom has no scrolling; the page scrolls to the focused row
+    render(
+      <MemoryRouter initialEntries={['/assessments?assessment=7&results=1']}>
+        <AssessmentsPage />
+      </MemoryRouter>,
+    )
+    const d = await screen.findByRole('dialog')
+    expect(within(d).getByText('Results — Unit Test 1')).toBeTruthy()
+    expect(await within(d).findByRole('spinbutton', { name: 'Marks for Asha' })).toBeTruthy()
+  })
+})
+

@@ -93,6 +93,7 @@ export default function StudentAssessmentsPage() {
   }, [data.loading, focusId])
 
   const scored = history.filter((a) => a.result)
+  const absentCount = history.filter((a) => a.stage === 'absent').length
   const average = scored.length ? scored.reduce((s, a) => s + Number(a.result!.percentage), 0) / scored.length : null
 
   const filesBlock = (a: StudentAssignment, includeAnswers: boolean) => {
@@ -130,7 +131,7 @@ export default function StudentAssessmentsPage() {
       ) : (
         <m.div className="grid grid-cols-1 gap-4 sm:grid-cols-3" variants={stagger(0.05)} initial="hidden" animate="visible">
           <StatCard label="Upcoming" value={upcoming.length} icon={CalendarClock} tone="info" />
-          <StatCard label="Completed" value={history.length} icon={CheckCircle2} tone="success" />
+          <StatCard label="Completed" value={scored.length} icon={CheckCircle2} tone="success" />
           <StatCard label="Average score" value={average === null ? 0 : Math.round(average)} icon={TrendingUp} tone="primary" format={(v) => (average === null ? '—' : `${v}%`)} />
         </m.div>
       )}
@@ -184,6 +185,7 @@ export default function StudentAssessmentsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="size-4 text-success" aria-hidden="true" /> Completed
+            {absentCount > 0 && <span className="text-xs font-normal text-muted-foreground">· {absentCount} missed</span>}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -199,6 +201,8 @@ export default function StudentAssessmentsPage() {
                   <li key={a.id} className="flex flex-wrap items-start gap-4 rounded-xl border border-solid border-border p-3">
                     {pct !== null ? (
                       <ProgressRing value={pct} size={56} stroke={6} toneClassName={tone(pct)} label={`Score ${pct.toFixed(2)}%`} />
+                    ) : a.stage === 'absent' ? (
+                      <span className="flex size-14 items-center justify-center rounded-full bg-muted text-center text-[11px] leading-tight font-semibold text-muted-foreground">Absent</span>
                     ) : (
                       <span className="flex size-14 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">—</span>
                     )}
@@ -213,7 +217,8 @@ export default function StudentAssessmentsPage() {
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         {a.assessment.subject && <Badge variant="soft">{a.assessment.subject.subject}</Badge>}
-                        <span>{formatDate(a.attempted_at)}</span>
+                        {a.stage === 'absent' && <Badge variant="secondary">Absent</Badge>}
+                        <span>{formatDate(a.attempted_at ?? a.scheduled_date)}</span>
                       </div>
                       {a.result?.teacher_notes && (
                         <p className="m-0 flex items-start gap-1.5 rounded-md bg-muted/60 px-2.5 py-1.5 text-sm">

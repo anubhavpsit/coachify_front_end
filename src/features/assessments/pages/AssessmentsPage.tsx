@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react'
-import { ClipboardList, FileText, Paperclip, Plus, Sparkles, UserPlus } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { ClipboardList, FileText, Paperclip, PenLine, Plus, Sparkles, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
 import AttachmentPreviewModal from '@/components/common/AttachmentPreviewModal'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
 import DataTable, { type ColumnDef } from '@/components/common/DataTable'
 import PageHeader from '@/components/common/PageHeader'
+import SegmentedControl from '@/components/common/SegmentedControl'
 import { IconAction } from '@/components/common/RowActions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,6 +23,7 @@ import CreateAssessmentDialog from '../components/CreateAssessmentDialog'
 import FilesDialog from '../components/FilesDialog'
 import QuestionPaperDialog from '../components/QuestionPaperDialog'
 import ResultsDialog from '../components/ResultsDialog'
+import { ASSESSMENT_STAGE, STAGE_TAB_LABEL, STAGE_TABS, tabFor, type StageTab } from '../lib/stages'
 import {
   fetchAssessments,
   fetchAutoAssessment,
@@ -33,13 +36,6 @@ import {
   type AssessmentFile,
 } from '../services/assessmentsService'
 
-const STATUS_VARIANT: Record<string, 'secondary' | 'info' | 'success' | 'destructive' | 'warning'> = {
-  draft: 'secondary',
-  scheduled: 'info',
-  upcoming: 'info',
-  completed: 'success',
-  cancelled: 'destructive',
-}
 
 /**
  * Route gate: assessments.view | .manage | .grade | role teacher (unchanged).
@@ -71,11 +67,23 @@ export default function AssessmentsPage() {
   const autoOn = autoOverride ?? auto.data ?? false
 
   const focusId = useFocusRow('assessment', 'assessment-row-', !list.loading)
+  const [searchParams, setSearchParams] = useSearchParams()
   const [subjectFilter, setSubjectFilter] = useState('')
   const [approvalFilter, setApprovalFilter] = useState('')
-  const shown = assessments.filter(
+  const filtered = assessments.filter(
     (a) => (!subjectFilter || String(a.subject_id) === subjectFilter) && (!approvalFilter || (approvalFilter === 'approved' ? a.is_admin_approved : !a.is_admin_approved)),
   )
+  const tabCounts = useMemo(() => {
+    const c: Record<StageTab, number> = { needs_results: 0, today: 0, upcoming: 0, done: 0, all: filtered.length }
+    for (const a of filtered) c[tabFor(a.progress?.stage)]++
+    return c
+  }, [filtered])
+  // ?tab= from a notification; a focused row shows in "All"; otherwise open on
+  // "Needs results" when something is waiting.
+  const urlTab = searchParams.get('tab') as StageTab | null
+  const [tabChoice, setTabChoice] = useState<StageTab | null>(urlTab && STAGE_TABS.includes(urlTab) ? urlTab : null)
+  const tab: StageTab = tabChoice ?? (focusId ? 'all' : tabCounts.needs_results > 0 ? 'needs_results' : 'all')
+  const shown = tab === 'all' ? filtered : filtered.filter((a) => tabFor(a.progress?.stage) === tab)
 
   const [createOpen, setCreateOpen] = useState(false)
   const [assignFor, setAssignFor] = useState<Assessment | null>(null)
@@ -85,6 +93,27 @@ export default function AssessmentsPage() {
   const [preview, setPreview] = useState<AssessmentFile | null>(null)
   const [approvalFor, setApprovalFor] = useState<Assessment | null>(null)
   const [autoConfirm, setAutoConfirm] = useState<boolean | null>(null)
+
+  // "Enter results" notification → open that assessment's results straight away (once).
+  const openResultsId = searchParams.get('results') === '1' ? focusId : null
+  const [deepLinked, setDeepLinked] = useState<number | null>(null)
+  if (openResultsId !== null && !list.loading && deepLinked !== openResultsId) {
+    setDeepLinked(openResultsId)
+    const target = assessments.find((a) => a.id === openResultsId)
+    if (target) setResultsFor(target)
+  }
+  // …and drop ?results=1 so closing the dialog doesn't reopen it.
+  useEffect(() => {
+    if (deepLinked === null) return
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        next.delete('results')
+        return next
+      },
+      { replace: true },
+    )
+  }, [deepLinked, setSearchParams])
 
   const changeApproval = async () => {
     const a = approvalFor!
@@ -147,14 +176,32 @@ export default function AssessmentsPage() {
       cell: ({ row }) => (row.original.scheduled_date ? formatDate(row.original.scheduled_date) : <span className="text-muted-foreground">Not set</span>),
     },
     {
-      id: 'status',
-      header: 'Status',
-      accessorFn: (a) => a.status,
-      cell: ({ row }) => (
-        <Badge variant={STATUS_VARIANT[row.original.status] ?? 'secondary'} className="capitalize">
-          {row.original.status}
-        </Badge>
-      ),
+      id: 'progress',
+      header: 'Progress',
+      accessorFn: (a) => a.progress?.stage ?? '',
+      cell: ({ row }) => {
+        const a = row.original
+        const p = a.progress
+        if (!p) return <span className="text-muted-foreground">-</span>
+        const stage = ASSESSMENT_STAGE[p.stage]
+        const closed = p.result_out + p.absent
+        return (
+          <div className="flex flex-col items-start gap-1">
+            <Badge variant={stage.variant}>{stage.label}</Badge>
+            {p.total > 0 && (
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {p.result_out}/{p.total - p.cancelled} results{p.absent ? ` · ${p.absent} absent` : ''}
+              </span>
+            )}
+            {p.stage === 'needs_results' && p.oldest_pending_date && <span className="text-xs text-destructive">Pending since {formatDate(p.oldest_pending_date)}</span>}
+            {(p.stage === 'needs_results' || p.stage === 'today') && (
+              <Button size="xs" variant={p.stage === 'needs_results' ? 'destructive' : 'outline'} onClick={() => setResultsFor(a)}>
+                <PenLine aria-hidden="true" /> Enter results{p.awaiting_results + p.today > 0 && closed > 0 ? ` (${p.awaiting_results + p.today} left)` : ''}
+              </Button>
+            )}
+          </div>
+        )
+      },
     },
     {
       id: 'approval',
@@ -190,7 +237,7 @@ export default function AssessmentsPage() {
             <IconAction label={`Assign students to ${a.title}`} onClick={() => setAssignFor(a)}>
               <UserPlus aria-hidden="true" />
             </IconAction>
-            <IconAction label={`Enter results for ${a.title}`} onClick={() => setResultsFor(a)}>
+            <IconAction label={`Results for ${a.title}`} onClick={() => setResultsFor(a)}>
               <ClipboardList aria-hidden="true" />
             </IconAction>
             <IconAction label={`Files for ${a.title}`} onClick={() => setFilesFor(a)}>
@@ -250,6 +297,24 @@ export default function AssessmentsPage() {
         </Card>
       )}
 
+      <SegmentedControl<StageTab>
+        label="Assessments by stage"
+        className="flex-wrap self-start"
+        value={tab}
+        onChange={(v) => {
+          setTabChoice(v)
+          setSearchParams(
+            (prev) => {
+              const next = new URLSearchParams(prev)
+              next.delete('tab')
+              return next
+            },
+            { replace: true },
+          )
+        }}
+        options={STAGE_TABS.map((t) => ({ value: t, label: `${STAGE_TAB_LABEL[t]} (${tabCounts[t]})` }))}
+      />
+
       <Card className="gap-0 overflow-hidden py-0">
         <DataTable
           columns={columns}
@@ -259,7 +324,7 @@ export default function AssessmentsPage() {
           rowProps={(a) => ({ id: `assessment-row-${a.id}`, className: a.id === focusId ? 'bg-primary-soft/50 shadow-[inset_4px_0_0_var(--color-primary)]' : undefined })}
           searchPlaceholder="Search assessments"
           emptyIcon={ClipboardList}
-          emptyTitle="No assessments found."
+          emptyTitle={tab === 'needs_results' ? 'No results waiting — all caught up. 🎉' : 'No assessments found.'}
           emptyAction={
             <Button size="sm" variant="soft" onClick={() => setCreateOpen(true)}>
               <Plus aria-hidden="true" /> Create the first one

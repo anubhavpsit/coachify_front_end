@@ -151,10 +151,22 @@ export function notificationLink(n: InboxNotification, role: string | undefined)
     case 'assessment_assigned':
     case 'assessment_rescheduled':
     case 'assessment_reminder':
-    case 'assessment_result_out': {
+    case 'assessment_result_out':
+    case 'assessment_today':
+    case 'assessment_cancelled':
+    case 'assessment_tomorrow_teacher': {
       const id = Number(d.assessment_id)
       const q = Number.isInteger(id) && id > 0 ? `?assessment=${id}` : ''
       return role === 'student' ? `/students/assessments${q}` : `/assessments${q}`
+    }
+    // Teacher "enter results" / admin escalation & daily summary: open that
+    // assessment's results, or the "Needs results" tab when it covers several.
+    case 'assessment_results_due':
+    case 'assessment_results_overdue':
+    case 'assessment_daily_digest': {
+      const id = Number(d.assessment_id)
+      if (Number.isInteger(id) && id > 0) return `/assessments?assessment=${id}&results=1`
+      return type === 'assessment_daily_digest' && (str(d.action_route) ?? '').includes('tab=today') ? '/assessments?tab=today' : '/assessments?tab=needs_results'
     }
     case 'generated_content_ready_for_review':
     case 'generated_content_reopened_for_review':

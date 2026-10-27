@@ -7,7 +7,23 @@ const json = () => ({ ...auth(), Accept: 'application/json' })
 const STORAGE_BASE = import.meta.env.VITE_STORAGE_BASE_URL ?? 'http://coachify.local/storage'
 
 export type AssessmentResult = { marks_obtained: number; total_marks: number; percentage: number; teacher_notes?: string | null }
-export type AssessmentAssignment = { id: number; student_id: number; scheduled_date: string; status: string; student?: { id: number; name: string }; result?: AssessmentResult }
+/** Per-student stage, derived by the API from status + date (IST). */
+export type AssignmentStage = 'upcoming' | 'today' | 'awaiting_results' | 'result_out' | 'absent' | 'cancelled'
+export type AssessmentAssignment = { id: number; student_id: number; scheduled_date: string; status: string; stage?: AssignmentStage; student?: { id: number; name: string }; result?: AssessmentResult }
+/** Whole-assessment stage, most urgent first (AssessmentProgress). */
+export type AssessmentStage = 'needs_results' | 'today' | 'upcoming' | 'done' | 'not_assigned' | 'cancelled'
+export type AssessmentProgress = {
+  total: number
+  upcoming: number
+  today: number
+  awaiting_results: number
+  result_out: number
+  absent: number
+  cancelled: number
+  next_date: string | null
+  oldest_pending_date: string | null
+  stage: AssessmentStage
+}
 export type Assessment = {
   id: number
   title: string
@@ -29,6 +45,7 @@ export type Assessment = {
   class?: { id: number; name: string }
   teacher?: { id: number; name: string }
   assignments?: AssessmentAssignment[]
+  progress?: AssessmentProgress | null
 }
 export type StudentOption = { id: number; name: string; classId: number | null }
 export type AssessmentFileType = 'question_paper' | 'answer_sheet' | 'other'
@@ -47,7 +64,10 @@ export type AssessmentFile = {
   is_admin_approved?: boolean
 }
 export type CreatePayload = { title: string; description: string | null; subject_id: number; class_id: number | null; total_marks: number; scheduled_date: string | null }
-export type ResultPayload = { student_id: number; marks_obtained: number; total_marks: number | undefined; teacher_notes: string | undefined }
+export type ResultPayload =
+  | { student_id: number; marks_obtained: number; total_marks: number | undefined; teacher_notes: string | undefined }
+  | { student_id: number; absent: true }
+export type BulkAction = 'reschedule' | 'absent' | 'cancel' | 'reopen'
 
 export const fileUrl = (f: AssessmentFile) => f.url || `${STORAGE_BASE}/${f.path}`
 
@@ -99,8 +119,18 @@ export async function assignStudents(id: number, assignments: { student_id: numb
 }
 
 export async function saveResults(id: number, results: ResultPayload[]): Promise<void> {
-  const res = await axios.post(`${API_BASE_URL}/assessments/${id}/results`, { results }, { headers: auth() })
+  const res = await axios.post(`${API_BASE_URL}/assessments/${id}/results`, { results }, { headers: json() })
   if (!res.data.success) throw new Error('Failed to save results')
+}
+
+/** Reschedule / mark absent / cancel / reopen students whose test didn't happen as planned. */
+export async function bulkUpdateAssignments(id: number, studentIds: number[], action: BulkAction, scheduledDate?: string): Promise<{ message: string; progress: AssessmentProgress }> {
+  const res = await axios.post(
+    `${API_BASE_URL}/assessments/${id}/assignments/bulk`,
+    { student_ids: studentIds, action, ...(action === 'reschedule' ? { scheduled_date: scheduledDate } : {}) },
+    { headers: json() },
+  )
+  return { message: res.data.message, progress: res.data.data.progress }
 }
 
 export async function uploadAnswerSheet(id: number, studentId: number, file: File): Promise<void> {
@@ -189,6 +219,7 @@ export type StudentAssignment = {
   id: number
   scheduled_date: string
   status: string
+  stage?: AssignmentStage
   attempted_at?: string | null
   assessment: {
     id: number

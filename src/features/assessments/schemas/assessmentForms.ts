@@ -40,7 +40,20 @@ export function fileProblem(f: File): string | null {
   return null
 }
 
-export type ResultRow = { student_id: number; student_name: string; marks_obtained: string; total_marks: string; teacher_notes: string; answerFile: File | null }
+export type ResultRow = {
+  student_id: number
+  student_name: string
+  marks_obtained: string
+  total_marks: string
+  teacher_notes: string
+  answerFile: File | null
+  /** Marked absent in this dialog (sent as `absent: true`). */
+  absent: boolean
+  /** As loaded — to show the student's date / stage and send only what changed. */
+  scheduled_date?: string | null
+  stage?: string
+  initialAbsent?: boolean
+}
 
 /**
  * Backend: marks_obtained required|numeric|min:0; total_marks nullable|numeric|min:1.
@@ -50,7 +63,7 @@ export function resultRowErrors(r: ResultRow): Partial<Record<'marks_obtained' |
   const e: Partial<Record<'marks_obtained' | 'total_marks' | 'answerFile', string>> = {}
   const total = r.total_marks.trim() === '' ? null : Number(r.total_marks)
   if (total !== null && (Number.isNaN(total) || total < 1)) e.total_marks = 'At least 1.'
-  if (r.marks_obtained.trim() !== '') {
+  if (!r.absent && r.marks_obtained.trim() !== '') {
     const m = Number(r.marks_obtained)
     if (Number.isNaN(m) || m < 0) e.marks_obtained = 'Must be 0 or more.'
     else if (total !== null && !Number.isNaN(total) && m > total) e.marks_obtained = `Can't be more than ${total}.`
@@ -62,12 +75,17 @@ export function resultRowErrors(r: ResultRow): Partial<Record<'marks_obtained' |
   return e
 }
 
+/** Marks entered → a result; newly ticked Absent → `absent: true`; empty → skipped. */
 export const toResultPayloads = (rows: ResultRow[]): ResultPayload[] =>
-  rows
-    .filter((r) => r.marks_obtained !== '')
-    .map((r) => ({
-      student_id: r.student_id,
-      marks_obtained: Number(r.marks_obtained),
-      total_marks: r.total_marks ? Number(r.total_marks) : undefined,
-      teacher_notes: r.teacher_notes || undefined,
-    }))
+  rows.flatMap((r): ResultPayload[] => {
+    if (r.absent) return r.initialAbsent ? [] : [{ student_id: r.student_id, absent: true }]
+    if (r.marks_obtained === '') return []
+    return [
+      {
+        student_id: r.student_id,
+        marks_obtained: Number(r.marks_obtained),
+        total_marks: r.total_marks ? Number(r.total_marks) : undefined,
+        teacher_notes: r.teacher_notes || undefined,
+      },
+    ]
+  })
