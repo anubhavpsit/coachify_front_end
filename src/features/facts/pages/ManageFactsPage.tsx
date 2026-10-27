@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Eye, EyeOff, ImageIcon, Lightbulb, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, ImageIcon, Lightbulb, Pencil, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
 import DataTable, { type ColumnDef } from '@/components/common/DataTable'
@@ -9,12 +9,23 @@ import PageHeader from '@/components/common/PageHeader'
 import { IconAction } from '@/components/common/RowActions'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { useAsync } from '@/hooks/useAsync'
 import { formatDateTime } from '@/utils/date'
 import FactFormDialog from '../components/FactFormDialog'
-import { absoluteUrl, deleteFact, fetchClassOptions, fetchManagedFacts, updateFact, type Fact } from '../services/factsService'
+import {
+  absoluteUrl,
+  deleteFact,
+  fetchAiFactsSetting,
+  fetchClassOptions,
+  fetchManagedFacts,
+  updateAiFactsSetting,
+  updateFact,
+  type AiFactsSetting,
+  type Fact,
+} from '../services/factsService'
 
 /**
  * Route gate: facts.manage (unchanged). The list API also requires role
@@ -41,6 +52,26 @@ export default function ManageFactsPage() {
   const [editing, setEditing] = useState<Fact | null>(null)
   const [formOpen, setFormOpen] = useState(false)
   const [confirm, setConfirm] = useState<{ kind: 'delete' | 'toggle'; fact: Fact } | null>(null)
+  // AI facts switch: null = not changed on this page yet (show what the API said)
+  const aiSetting = useAsync(() => fetchAiFactsSetting(), [])
+  const [aiOverride, setAiOverride] = useState<AiFactsSetting | null>(null)
+  const [aiSaving, setAiSaving] = useState(false)
+  const ai = aiOverride ?? aiSetting.data ?? { students: false, teachers: false }
+
+  const setAi = async (key: keyof AiFactsSetting, value: boolean) => {
+    setAiSaving(true)
+    try {
+      const r = await updateAiFactsSetting({ ...ai, [key]: value })
+      setAiOverride(r.setting)
+      toast.success(r.message)
+      list.reload()
+    } catch (err) {
+      console.error('Error updating AI facts setting:', err)
+      toast.error('Could not change the AI facts setting.')
+    } finally {
+      setAiSaving(false)
+    }
+  }
 
   const own = (f: Fact) => f.tenant_id === undefined || f.tenant_id === tenantId
   const openForm = (f: Fact | null) => {
@@ -127,7 +158,7 @@ export default function ManageFactsPage() {
       meta: { align: 'right' },
       cell: ({ row }) => {
         const f = row.original
-        if (!own(f)) return <Badge variant="soft">Featured</Badge>
+        if (!own(f)) return <Badge variant="soft">{f.origin === 'ai_activity' ? 'AI fact' : 'Featured'}</Badge>
         return (
           <div className="flex items-center justify-end gap-0.5">
             <IconAction label={`Edit ${f.title}`} onClick={() => openForm(f)}>
@@ -162,6 +193,29 @@ export default function ManageFactsPage() {
           </div>
         }
       />
+
+      <Card className="py-4">
+        <CardContent className="flex flex-wrap items-center gap-4">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+            <Sparkles className="size-5" aria-hidden="true" />
+          </span>
+          <div className="flex min-w-0 flex-1 flex-col">
+            <span className="text-sm font-semibold">AI facts from what you teach</span>
+            <span className="text-xs text-muted-foreground">
+              Short &ldquo;Did you know?&rdquo; facts and step-by-step solved questions on the topics your teachers log in daily activity. Every fact is reviewed
+              before it appears, and each student only sees facts for their own class.
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            {(['students', 'teachers'] as const).map((k) => (
+              <label key={k} className="m-0 flex items-center gap-2 text-sm font-medium capitalize">
+                <Switch aria-label={`AI facts for ${k}`} checked={ai[k]} disabled={aiSetting.loading || aiSaving} onCheckedChange={(v) => setAi(k, v)} />
+                {k}
+              </label>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {list.error ? (
         <ErrorState title="Unable to load facts" onRetry={list.reload} />

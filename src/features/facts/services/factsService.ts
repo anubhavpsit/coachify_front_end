@@ -27,6 +27,23 @@ export type Fact = {
   saved_by_me?: boolean
   liked_by_me?: boolean
   is_opted_in?: boolean
+  /** 'ai_activity' = made by AI from what institutes teach (Super Admin reviewed) */
+  origin?: string | null
+  fact_kind?: FactKind | null
+  grade?: number | null
+  /** Question facts: answer text and step-by-step solution (HTML). */
+  answer?: string | null
+  solution?: string | null
+  /** Why an AI fact is in this user's feed (null for other facts). */
+  reason?: FactReason | null
+}
+export type FactKind = 'did_you_know' | 'question'
+export type FactReason = 'taught' | 'upcoming_test' | 'your_class'
+
+export const REASON_LABEL: Record<FactReason, string> = {
+  taught: 'From this month’s lessons',
+  upcoming_test: 'For your upcoming test',
+  your_class: 'For your class',
 }
 export type FeedTab = 'all' | 'saved' | 'superadmin'
 export type ShareChannel = 'WHATSAPP' | 'FACEBOOK' | 'TWITTER' | 'EMAIL' | 'COPY_LINK' | 'WEB_SHARE'
@@ -55,6 +72,8 @@ const feedUrl = (tab: FeedTab) => (tab === 'saved' ? `${API_BASE_URL}/facts/save
 
 export async function fetchFeedPage(tab: FeedTab, page: number): Promise<{ list: Fact[]; current: number; last: number }> {
   const params = new URLSearchParams({ page: String(page), per_page: '10' })
+  // This client can show question cards (HTML question + solution).
+  if (tab === 'all') params.append('include_questions', '1')
   const res = await axios.get(`${feedUrl(tab)}?${params}`, { headers: auth() })
   const list: Fact[] = res.data?.data?.facts || res.data?.data?.items || []
   const pg = res.data?.data?.pagination || {}
@@ -119,3 +138,18 @@ export async function uploadFactImage(file: File): Promise<string> {
 export const createFact = (p: FactPayload) => axios.post(`${API_BASE_URL}/facts`, p, { headers: auth() })
 export const updateFact = (id: number, p: FactPayload | { is_active: boolean }) => axios.put(`${API_BASE_URL}/facts/${id}`, p, { headers: auth() })
 export const deleteFact = (id: number) => axios.delete(`${API_BASE_URL}/facts/${id}`, { headers: auth() })
+
+// ---- AI facts from what the institute teaches (coaching admin switch) ----
+export type AiFactsSetting = { students: boolean; teachers: boolean }
+
+export async function fetchAiFactsSetting(): Promise<AiFactsSetting> {
+  const res = await axios.get(`${API_BASE_URL}/tenant/ai-facts`, { headers: auth() })
+  const d = res.data?.data || {}
+  return { students: !!d.students, teachers: !!d.teachers }
+}
+
+export async function updateAiFactsSetting(next: AiFactsSetting): Promise<{ setting: AiFactsSetting; message: string }> {
+  const res = await axios.put(`${API_BASE_URL}/tenant/ai-facts`, next, { headers: auth() })
+  const d = res.data?.data || {}
+  return { setting: { students: !!d.students, teachers: !!d.teachers }, message: res.data?.message || 'Saved.' }
+}

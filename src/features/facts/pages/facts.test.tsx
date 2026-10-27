@@ -40,7 +40,7 @@ describe('FactsPage (feed)', () => {
     const get = mockGets()
     renderIt(<FactsPage />)
     expect(await screen.findByRole('heading', { name: 'Honey never spoils' })).toBeTruthy()
-    expect(get).toHaveBeenCalledWith(expect.stringMatching(/\/facts\?page=1&per_page=10$/), auth)
+    expect(get).toHaveBeenCalledWith(expect.stringMatching(/\/facts\?page=1&per_page=10&include_questions=1$/), auth)
     expect(screen.queryByRole('tab', { name: /Featured/ })).toBeNull()
     expect(screen.queryByRole('link', { name: /Manage/ })).toBeNull()
   })
@@ -77,7 +77,69 @@ describe('FactsPage (feed)', () => {
   })
 })
 
+describe('AI facts in the feed', () => {
+  const aiFact = { id: 21, tenant_id: 0, title: 'Walking needs friction', content: 'Without friction you would slip.', content_type: 'text', is_pinned: false, origin: 'ai_activity', fact_kind: 'did_you_know', reason: 'taught' }
+  const questionFact = {
+    id: 22,
+    tenant_id: 0,
+    title: 'Solve it: Friction',
+    content: '<p>Which surface has most friction?</p><ol type="a"><li>Glass</li><li>Sandpaper</li></ol><img src=x onerror="alert(1)">',
+    content_type: 'text',
+    is_pinned: false,
+    origin: 'ai_activity',
+    fact_kind: 'question',
+    reason: 'upcoming_test',
+    answer: '(b) Sandpaper',
+    solution: '<ol><li>Rough surfaces have more friction.</li><li>Sandpaper is the roughest.</li></ol><p><strong>Tip:</strong> Rough = more friction.</p>',
+  }
+
+  it('shows why a fact is there, and a question reveals its answer and steps', async () => {
+    signIn('student')
+    vi.spyOn(axios, 'get').mockResolvedValue({ data: { success: true, data: { facts: [aiFact, questionFact], pagination: { current_page: 1, last_page: 1 } } } })
+    renderIt(<FactsPage />)
+
+    const first = (await screen.findByRole('heading', { name: 'Walking needs friction' })).closest('article')!
+    expect(within(first).getByText(/Did you know\?/)).toBeTruthy()
+    expect(within(first).getByText('· From this month’s lessons')).toBeTruthy()
+
+    const q = screen.getByRole('heading', { name: 'Solve it: Friction' }).closest('article')!
+    expect(within(q).getByText(/Practice question/)).toBeTruthy()
+    expect(within(q).getByText('· For your upcoming test')).toBeTruthy()
+    expect(within(q).getByText('Which surface has most friction?')).toBeTruthy()
+    expect(within(q).queryByText(/Sandpaper is the roughest/)).toBeNull()
+    expect(q.querySelector('img[onerror]')).toBeNull()
+
+    await userEvent.click(within(q).getByRole('button', { name: 'Show answer & solution' }))
+    const panel = within(q).getByRole('region', { name: 'About: Solve it: Friction' })
+    expect(within(panel).getByText('(b) Sandpaper')).toBeTruthy()
+    expect(within(panel).getByText('Sandpaper is the roughest.')).toBeTruthy()
+    expect(within(panel).getByText(/Rough = more friction/)).toBeTruthy()
+  })
+})
+
 describe('ManageFactsPage', () => {
+  it('AI facts switch: loads the setting and saves students / teachers', async () => {
+    signIn('coaching_admin')
+    const get = mockGets()
+    get.mockImplementation((url: string) => {
+      const ok = (d: unknown) => Promise.resolve({ data: { success: true, data: d } })
+      if (url.endsWith('/tenant/ai-facts')) return ok({ students: false, teachers: true })
+      if (url.includes('/admin/facts?')) return ok({ data: [own, { ...shared, id: 12, title: 'AI shared', origin: 'ai_activity' }] })
+      return ok([])
+    })
+    const put = vi.spyOn(axios, 'put').mockResolvedValue({ data: { success: true, message: 'AI facts are now on for students and teachers.', data: { students: true, teachers: true } } })
+    renderIt(<ManageFactsPage />)
+
+    const students = await screen.findByRole('switch', { name: 'AI facts for students' })
+    await waitFor(() => expect(screen.getByRole('switch', { name: 'AI facts for teachers' }).getAttribute('aria-checked')).toBe('true'))
+    expect(students.getAttribute('aria-checked')).toBe('false')
+    expect(within(screen.getByText('AI shared').closest('tr')!).getByText('AI fact')).toBeTruthy()
+
+    await userEvent.click(students)
+    await waitFor(() => expect(put).toHaveBeenCalledWith(expect.stringMatching(/\/tenant\/ai-facts$/), { students: true, teachers: true }, auth))
+    await waitFor(() => expect(screen.getByRole('switch', { name: 'AI facts for students' }).getAttribute('aria-checked')).toBe('true'))
+  })
+
   it('own facts are editable; shared (Featured) ones are not', async () => {
     signIn('coaching_admin')
     mockGets()

@@ -1,9 +1,10 @@
 import { memo, useEffect, useLayoutEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { m } from 'motion/react'
-import { Bookmark, ExternalLink, Heart, Lightbulb, Pin, Share2, Sparkles, X } from 'lucide-react'
+import DOMPurify from 'dompurify'
+import { Bookmark, ExternalLink, Heart, Lightbulb, ListOrdered, Pin, Share2, Sparkles, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { compactCount, hostOf, timeAgo } from '../lib/reelFormat'
-import { absoluteUrl, factImageSrc, type Fact } from '../services/factsService'
+import { REASON_LABEL, absoluteUrl, factImageSrc, type Fact } from '../services/factsService'
 
 // Background for facts without an image — cycles by position (legacy palette).
 const GRADIENTS = [
@@ -14,6 +15,14 @@ const GRADIENTS = [
   'linear-gradient(160deg,#be185d 0%,#ec4899 100%)',
   'linear-gradient(160deg,#b45309 0%,#ea580c 100%)',
 ]
+
+/** Question / solution HTML from the server (question bank + reviewed AI solution), sanitised. */
+function Html({ html, className }: { html?: string | null; className?: string }) {
+  return <div className={className} dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html || '') }} />
+}
+
+// Lists inside question/solution HTML (options a–d, numbered steps).
+const RICH = '[&_ol]:m-0 [&_ol]:pl-6 [&_ol[type=a]]:list-[lower-alpha] [&_p]:m-0 [&_li]:my-0.5'
 
 function RailButton({ label, pressed, onClick, children, caption, activeClass }: { label: string; pressed?: boolean; onClick: () => void; children: ReactNode; caption?: ReactNode; activeClass?: string }) {
   return (
@@ -64,6 +73,7 @@ function ReelCard({ fact: f, index, setSize, featured, author, onLike, onSave, o
   const [truncated, setTruncated] = useState(false)
   const [details, setDetails] = useState(false)
   const [burst, setBurst] = useState(0)
+  const isQuestion = f.fact_kind === 'question'
   const hasImage = !!f.image_url
   const src = hasImage ? factImageSrc(f) : ''
   const when = timeAgo(f.publish_at || f.updated_at)
@@ -141,8 +151,27 @@ function ReelCard({ fact: f, index, setSize, featured, author, onLike, onSave, o
           ) : (
             // Text-only fact: big centred text, like a coloured-background post.
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 pt-16 pr-[4.5rem] pb-44 pl-6 text-center text-white md:px-7">
+              {(f.reason || isQuestion) && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-black/25 px-3 py-1 text-xs font-semibold tracking-wide text-white">
+                  {isQuestion ? <ListOrdered className="size-3.5" aria-hidden="true" /> : <Sparkles className="size-3.5" aria-hidden="true" />}
+                  {isQuestion ? 'Practice question' : 'Did you know?'}
+                  {f.reason && <span className="font-normal text-white/80">· {REASON_LABEL[f.reason]}</span>}
+                </span>
+              )}
               <h2 className="m-0 text-[clamp(22px,4.5vw,30px)]! leading-tight font-extrabold text-white [text-shadow:0_2px_10px_rgba(0,0,0,0.25)]">{f.title}</h2>
-              {f.content && (
+              {isQuestion ? (
+                <>
+                  <Html html={f.content} className={cn('line-clamp-[8] max-w-md text-left text-[clamp(15px,2.8vw,18px)] leading-relaxed text-white/95', RICH)} />
+                  <button
+                    type="button"
+                    onClick={() => setDetails(true)}
+                    aria-expanded={details}
+                    className="m-0 cursor-pointer rounded-full border-0 bg-white px-4 py-2 text-sm font-semibold text-neutral-900 hover:bg-white/90"
+                  >
+                    Show answer &amp; solution
+                  </button>
+                </>
+              ) : f.content && (
                 <p ref={textRef} className="m-0 line-clamp-[7] text-[clamp(15px,2.8vw,18px)] leading-relaxed whitespace-pre-line text-white/90">
                   {preview}
                 </p>
@@ -167,7 +196,7 @@ function ReelCard({ fact: f, index, setSize, featured, author, onLike, onSave, o
               </>
             )}
             {tags.length > 0 && <p className="m-0 truncate text-sm font-semibold text-white/90">{tags.map((t) => `#${t}`).join(' ')}</p>}
-            {(truncated || host) && (
+            {(truncated || host) && !isQuestion && (
               <button
                 type="button"
                 onClick={() => setDetails(true)}
@@ -216,7 +245,7 @@ function ReelCard({ fact: f, index, setSize, featured, author, onLike, onSave, o
               className="absolute inset-x-0 bottom-0 z-[5] flex max-h-[75%] flex-col rounded-t-2xl bg-neutral-900/95 text-white shadow-[0_-8px_32px_rgba(0,0,0,0.5)] backdrop-blur-md"
             >
               <div className="flex items-center justify-between gap-2 border-b border-solid border-white/10 px-5 py-3">
-                <span className="text-sm font-semibold">Description</span>
+                <span className="text-sm font-semibold">{isQuestion ? 'Answer & solution' : 'Description'}</span>
                 <button
                   type="button"
                   autoFocus
@@ -230,7 +259,24 @@ function ReelCard({ fact: f, index, setSize, featured, author, onLike, onSave, o
               <div className="flex flex-col gap-3 overflow-y-auto px-5 py-4">
                 {meta}
                 <p className="m-0 text-lg leading-snug font-bold">{f.title}</p>
-                {f.content && <p className="m-0 text-[15px] leading-relaxed whitespace-pre-line text-white/90">{f.content}</p>}
+                {isQuestion ? (
+                  <>
+                    <Html html={f.content} className={cn('text-[15px] leading-relaxed text-white/90', RICH)} />
+                    {f.answer && (
+                      <p className="m-0 rounded-lg bg-emerald-500/20 px-3 py-2 text-[15px] text-emerald-100">
+                        <span className="font-semibold">Answer:</span> {f.answer}
+                      </p>
+                    )}
+                    {f.solution && (
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs font-semibold tracking-wider text-white/60 uppercase">Step by step</span>
+                        <Html html={f.solution} className={cn('text-[15px] leading-relaxed text-white/90 [&_ol]:list-decimal', RICH)} />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  f.content && <p className="m-0 text-[15px] leading-relaxed whitespace-pre-line text-white/90">{f.content}</p>
+                )}
                 {tags.length > 0 && <p className="m-0 text-sm font-semibold text-sky-300">{tags.map((t) => `#${t}`).join(' ')}</p>}
                 {host && (
                   <a
