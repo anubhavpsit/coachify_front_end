@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { logShare, type Fact, type ShareChannel } from '../services/factsService'
+import { shareText } from '../lib/factShare'
 
 async function copyText(text: string): Promise<boolean> {
   try {
@@ -46,7 +47,7 @@ const canWebShare = typeof navigator !== 'undefined' && 'share' in navigator
 export default function ShareSheet({ fact, onClose, onShared }: { fact: Fact | null; onClose: () => void; onShared: (id: number, count: number) => void }) {
   const share = async (channel: ShareChannel) => {
     const f = fact!
-    const text = `${f.title}${f.content ? `\n\n${f.content}` : ''}`
+    const text = shareText(f)
     const url = f.source_url || window.location.origin
     try {
       switch (channel) {

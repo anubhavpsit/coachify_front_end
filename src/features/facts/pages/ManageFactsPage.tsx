@@ -203,7 +203,7 @@ export default function ManageFactsPage() {
             <span className="text-sm font-semibold">AI facts from what you teach</span>
             <span className="text-xs text-muted-foreground">
               Short &ldquo;Did you know?&rdquo; facts and step-by-step solved questions on the topics your teachers log in daily activity. Every fact is reviewed
-              before it appears, and each student only sees facts for their own class.
+              before it appears, and each student only sees facts for their own class and subjects.
             </span>
           </div>
           <div className="flex flex-wrap gap-4">
