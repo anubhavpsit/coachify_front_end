@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { m } from 'motion/react'
 import { CalendarClock, CheckCircle2, ClipboardList, FileText, MessageSquareQuote, Paperclip, TrendingUp, UserRound } from 'lucide-react'
 import { stagger } from '@/animations'
 import EmptyState from '@/components/common/EmptyState'
 import ErrorState from '@/components/common/ErrorState'
 import PageHeader from '@/components/common/PageHeader'
+import SegmentedControl from '@/components/common/SegmentedControl'
 import ProgressRing from '@/components/common/ProgressRing'
 import StatCard from '@/components/common/StatCard'
 import { Badge } from '@/components/ui/badge'
@@ -16,6 +17,8 @@ import { cn } from '@/lib/utils'
 import { formatDate } from '@/utils/date'
 import { useFocusRow } from '@/utils/useFocusRow'
 import ReleasedPaperDialog from '../components/ReleasedPaperDialog'
+import AssessmentCalendar, { type CalendarEntry } from '../components/AssessmentCalendar'
+import { toDateInputValue } from '@/utils/date'
 import { fetchMyAssessmentFiles, fetchMyAssessments, studentFileUrl, type StudentAssignment, type StudentFile, type StudentFiles } from '../services/assessmentsService'
 
 const tone = (p: number) => (p >= 75 ? 'text-success' : p >= 40 ? 'text-warning' : 'text-destructive')
@@ -66,8 +69,8 @@ function FileLinks({ label, files }: { label: string; files: StudentFile[] }) {
 /** Route: no guard (Q9) — the student endpoints are self-only. */
 export default function StudentAssessmentsPage() {
   const data = useAsync(() => fetchMyAssessments().catch((e) => (console.error('Error loading assessments:', e), Promise.reject(e))), [])
-  const upcoming = data.data?.upcoming ?? []
-  const history = data.data?.history ?? []
+  const upcoming = useMemo(() => data.data?.upcoming ?? [], [data.data])
+  const history = useMemo(() => data.data?.history ?? [], [data.data])
   const focusId = useFocusRow('assessment', 'student-assessment-row-', !data.loading)
   const [files, setFiles] = useState<Record<number, StudentFiles | 'loading'>>({})
   const [paper, setPaper] = useState<{ id: number; title: string } | null>(null)
@@ -91,6 +94,26 @@ export default function StudentAssessmentsPage() {
     if (!data.loading && focusId !== null && upcoming.some((a) => a.assessment.id === focusId)) loadFiles(focusId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.loading, focusId])
+
+  const [view, setView] = useState<'list' | 'calendar'>('list')
+  const calendarEntries = useMemo<CalendarEntry[]>(() => {
+    const today = toDateInputValue()
+    const upcomingEntries = upcoming.map((a) => ({
+      key: `u${a.id}`,
+      date: a.scheduled_date.slice(0, 10),
+      title: a.assessment.title,
+      subtitle: [a.assessment.subject?.subject, `${a.assessment.total_marks} marks`].filter(Boolean).join(' · '),
+      tone: (a.scheduled_date.slice(0, 10) === today ? 'warning' : 'info') as CalendarEntry['tone'],
+    }))
+    const historyEntries = history.map((a) => ({
+      key: `h${a.id}`,
+      date: (a.scheduled_date ?? a.attempted_at ?? '').slice(0, 10),
+      title: a.assessment.title,
+      subtitle: a.stage === 'absent' ? 'Absent' : a.result ? `${a.result.marks_obtained}/${a.result.total_marks} · ${Number(a.result.percentage).toFixed(0)}%` : 'Done',
+      tone: (a.stage === 'absent' ? 'muted' : 'success') as CalendarEntry['tone'],
+    }))
+    return [...upcomingEntries, ...historyEntries].filter((e) => e.date)
+  }, [upcoming, history])
 
   const scored = history.filter((a) => a.result)
   const absentCount = history.filter((a) => a.stage === 'absent').length
@@ -136,7 +159,25 @@ export default function StudentAssessmentsPage() {
         </m.div>
       )}
 
-      <Card className="gap-4">
+      <SegmentedControl<'list' | 'calendar'>
+        label="View"
+        size="sm"
+        className="self-start"
+        value={view}
+        onChange={setView}
+        options={[
+          { value: 'list', label: 'List' },
+          { value: 'calendar', label: 'Calendar' },
+        ]}
+      />
+
+      {view === 'calendar' && (
+        <Card className="p-5">
+          <AssessmentCalendar entries={calendarEntries} legend={['warning', 'info', 'success', 'muted']} />
+        </Card>
+      )}
+
+      <Card className={cn('gap-4', view === 'calendar' && 'hidden')}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CalendarClock className="size-4 text-info" aria-hidden="true" /> Upcoming
@@ -181,7 +222,7 @@ export default function StudentAssessmentsPage() {
         </CardContent>
       </Card>
 
-      <Card className="gap-4">
+      <Card className={cn('gap-4', view === 'calendar' && 'hidden')}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClipboardList className="size-4 text-success" aria-hidden="true" /> Completed

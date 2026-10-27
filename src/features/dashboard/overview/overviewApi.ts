@@ -47,12 +47,25 @@ export type TeacherOverview = {
   }[]
 }
 
+/** Admin / permitted staff: the assessments card only. */
+export type AdminAssessmentsOverview = {
+  tests_today: number
+  today_list: { assessment_id: number; title: string | null; subject: string; students_count: number }[]
+  this_week: number
+  needs_results: number
+  pending_students: number
+  overdue_by_teacher: { teacher_id: number | null; name: string; assessments: number; students: number }[]
+  /** Results (or absent) entered by the end of the day after the test, this month. */
+  on_time: { on_time: number; total: number; percentage: number | null }
+}
+
 export type Overview = {
-  role: 'student' | 'teacher'
+  role: 'student' | 'teacher' | 'admin'
   today: string
-  alerts: OverviewAlert[]
+  alerts?: OverviewAlert[]
   student?: StudentOverview
   teacher?: TeacherOverview
+  assessments?: AdminAssessmentsOverview
 }
 
 /** One request for the whole smart dashboard (keeps DB connections low). */

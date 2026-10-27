@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { refreshNoticeUnread } from './noticeUnread'
+import { setAssessmentBadgeCount } from './assessmentBadge'
 import { formatDate, formatDateTime } from '../utils/date'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://coachify.local/api/v1'
@@ -75,11 +76,12 @@ export async function fetchInbox(params: { limit?: number; cursor?: string | nul
 }
 
 export async function fetchUnreadCount() {
-  const res = await axios.get<{ success: boolean; data: { unread_count: number } }>(
+  const res = await axios.get<{ success: boolean; data: { unread_count: number; assessments_badge?: number } }>(
     `${API_BASE_URL}/my/notifications/unread-count`,
     { headers: headers() },
   )
   setInboxUnreadCount(res.data.data.unread_count)
+  setAssessmentBadgeCount(res.data.data.assessments_badge)
   return res.data.data.unread_count
 }
 

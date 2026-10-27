@@ -308,3 +308,35 @@ describe('AssessmentsPage — tracking', () => {
   })
 })
 
+describe('AssessmentsPage — calendar', () => {
+  it('shows each test day; picking a day lists its tests and opens their results', async () => {
+    const today = new Date()
+    const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const todayIso = iso(today)
+    signIn('teacher')
+    vi.spyOn(axios, 'get').mockImplementation((url: string) => {
+      const ok = (data: unknown) => Promise.resolve({ data: { success: true, data } })
+      if (url.endsWith('/assessments'))
+        return ok([
+          { ...asm, progress: { total: 2, upcoming: 0, today: 2, awaiting_results: 0, result_out: 0, absent: 0, cancelled: 0, next_date: todayIso, oldest_pending_date: null, stage: 'today', dates: [{ date: todayIso, total: 2, open: 2 }] } },
+        ])
+      if (url.endsWith('/assessments/7')) return ok({ ...detail, assignments: [] })
+      if (url.endsWith('/subjects/4')) return Promise.resolve({ data: { status: true, data: [] } })
+      return ok([])
+    })
+    render(
+      <MemoryRouter>
+        <AssessmentsPage />
+      </MemoryRouter>,
+    )
+    await screen.findByText('Unit Test 1')
+    await userEvent.click(screen.getByRole('tab', { name: 'Calendar' }))
+    const grid = screen.getByRole('grid')
+    const cell = within(grid).getByRole('gridcell', { name: new RegExp(`1 test$`) })
+    expect(cell.getAttribute('aria-selected')).toBe('true') // today is selected by default
+    const entry = await screen.findByRole('button', { name: /Unit Test 1.*0\/2 done/ })
+    await userEvent.click(entry)
+    expect(await screen.findByText('Results — Unit Test 1')).toBeTruthy()
+  })
+})
+

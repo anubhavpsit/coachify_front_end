@@ -22,6 +22,8 @@ export type AssessmentProgress = {
   cancelled: number
   next_date: string | null
   oldest_pending_date: string | null
+  /** Per test date (calendar): students, and how many still have no result / absent. */
+  dates?: { date: string; total: number; open: number }[]
   stage: AssessmentStage
 }
 export type Assessment = {

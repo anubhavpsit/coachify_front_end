@@ -4,6 +4,7 @@ import { pop } from '@/animations'
 import { cn } from '@/lib/utils'
 import { getInboxUnreadCount, subscribeInboxUnread } from '../../lib/myNotifications'
 import { getNoticeUnreadCount, subscribeNoticeUnread } from '../../lib/noticeUnread'
+import { getAssessmentBadgeCount, subscribeAssessmentBadge } from '../../lib/assessmentBadge'
 
 function Badge({ count, label, compact }: { count: number; label: string; compact?: boolean }) {
   // Pop only when the count goes up (not on first render or on decrease).
@@ -22,7 +23,7 @@ function Badge({ count, label, compact }: { count: number; label: string; compac
       variants={pop}
       initial={bumps > 0 ? 'hidden' : false}
       animate="visible"
-      aria-label={`${count} unread ${label}`}
+      aria-label={`${count} ${label}`}
       className={cn(
         'rounded-full bg-destructive font-bold text-destructive-foreground',
         compact
@@ -39,12 +40,19 @@ function Badge({ count, label, compact }: { count: number; label: string; compac
 export function NoticeUnreadBadge({ compact }: { compact?: boolean }) {
   const [count, setCount] = useState(getNoticeUnreadCount)
   useEffect(() => subscribeNoticeUnread(setCount), [])
-  return <Badge count={count} label="notices" compact={compact} />
+  return <Badge count={count} label="unread notices" compact={compact} />
 }
 
 /** Unread notifications. Display only — the top-bar bell polls. */
 export function InboxUnreadBadge({ compact }: { compact?: boolean }) {
   const [count, setCount] = useState(getInboxUnreadCount)
   useEffect(() => subscribeInboxUnread(setCount), [])
-  return <Badge count={count} label="notifications" compact={compact} />
+  return <Badge count={count} label="unread notifications" compact={compact} />
+}
+
+/** Assessments needing action (results to enter / tests in 2 days). Display only — the bell polls. */
+export function AssessmentsBadge({ compact }: { compact?: boolean }) {
+  const [count, setCount] = useState(getAssessmentBadgeCount)
+  useEffect(() => subscribeAssessmentBadge(setCount), [])
+  return <Badge count={count} label="assessments need attention" compact={compact} />
 }

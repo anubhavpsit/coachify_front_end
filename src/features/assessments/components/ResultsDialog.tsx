@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import { useAsync } from '@/hooks/useAsync'
+import { fetchUnreadCount } from '@/lib/myNotifications'
 import { cn } from '@/lib/utils'
 import { formatDate, toDateInputValue } from '@/utils/date'
 import { ASSIGNMENT_STAGE, STAGE_ORDER } from '../lib/stages'
@@ -111,6 +112,7 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
         await uploadAnswerSheet(assessment.id, r.student_id, r.answerFile!)
       }
       toast.success('Results saved.')
+      fetchUnreadCount().catch(() => undefined) // menu badge
       onSaved()
       onClose()
     } catch (err) {
@@ -127,6 +129,7 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
       const { message } = await bulkUpdateAssignments(assessment.id, [...selected], action, action === 'reschedule' ? newDate : undefined)
       toast.success(message)
       setSelected(new Set())
+      fetchUnreadCount().catch(() => undefined) // menu badge
       onSaved()
       detail.reload()
     } catch (err) {

@@ -88,3 +88,31 @@ describe('stripHtml', () => {
     expect(spy).not.toHaveBeenCalled()
   })
 })
+
+describe('StudentAssessmentsPage — calendar & absent', () => {
+  it('missed tests show as Absent; the calendar lists results and absences by day', async () => {
+    const absent = { id: 3, scheduled_date: '2026-09-25', status: 'missed', stage: 'absent', attempted_at: null, assessment: { id: 9, title: 'Waves quiz', total_marks: 20, subject: { id: 6, subject: 'Science' } }, result: null }
+    vi.spyOn(axios, 'get').mockImplementation((url: string) => {
+      const ok = (data: unknown) => Promise.resolve({ data: { success: true, data } })
+      if (url.endsWith('/student/assessments/upcoming')) return ok([])
+      if (url.endsWith('/student/assessments/history')) return ok([...history, absent])
+      return ok([])
+    })
+    renderAt()
+    expect(await screen.findByText('Waves quiz')).toBeTruthy()
+    expect(screen.getAllByText('Absent').length).toBeGreaterThan(0) // badge + ring
+    expect(screen.getByText('· 1 missed')).toBeTruthy()
+
+    await userEvent.click(screen.getByRole('tab', { name: 'Calendar' }))
+    // go back to September 2026 and pick the 25th
+    const prev = screen.getByRole('button', { name: 'Previous month' })
+    const target = new Date(2026, 8, 1)
+    const now = new Date()
+    for (let i = 0; i < (now.getFullYear() - target.getFullYear()) * 12 + now.getMonth() - target.getMonth(); i++) await userEvent.click(prev)
+    await userEvent.click(screen.getByRole('gridcell', { name: /25\/09\/2026: 1 test/ }))
+    const panel = await screen.findByRole('region', { name: 'Tests on 25/09/2026' })
+    expect(within(panel).getByText('Waves quiz')).toBeTruthy()
+    expect(within(panel).getByText('Absent')).toBeTruthy()
+  })
+})
+

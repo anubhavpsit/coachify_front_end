@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { m } from 'motion/react'
 import { transitions } from '@/animations'
-import { InboxUnreadBadge, NoticeUnreadBadge } from '@/components/layout/SidebarBadge'
+import { AssessmentsBadge, InboxUnreadBadge, NoticeUnreadBadge } from '@/components/layout/SidebarBadge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { usePermission, visibleNavGroups, type NavItem } from '@/permissions'
@@ -17,6 +17,7 @@ interface Props {
 function ItemBadge({ item, compact }: { item: NavItem; compact: boolean }) {
   if (item.badge === 'notices') return <NoticeUnreadBadge compact={compact} />
   if (item.badge === 'inbox') return <InboxUnreadBadge compact={compact} />
+  if (item.badge === 'assessments') return <AssessmentsBadge compact={compact} />
   return null
 }
 

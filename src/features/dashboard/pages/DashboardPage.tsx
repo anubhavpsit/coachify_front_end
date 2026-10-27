@@ -12,6 +12,9 @@ import ErrorState from '@/components/common/ErrorState'
 import PageHeader from '@/components/common/PageHeader'
 import NoticeBoardCard from '@/features/notices/components/NoticeBoardCard'
 import SmartDashboard from '../overview/SmartDashboard'
+import { AdminAssessmentHero, StudentAssessmentHero, TeacherAssessmentHero } from '../overview/AssessmentHeroCard'
+import { fetchOverview } from '../overview/overviewApi'
+import { useAsync } from '@/hooks/useAsync'
 import { ROLES } from '@/constants/roles'
 import { PERMISSIONS as P, usePermission } from '@/permissions'
 import { AdminStats, StatsSkeleton, StudentStats, TeacherStats } from '../components/StatSections'
@@ -53,9 +56,19 @@ export default function DashboardPage() {
 
   const skeletonCount = isTeacher ? 3 : isStudent ? 4 : isAdminOrStaff ? DASHBOARD_STAT_KEYS.filter((k) => can(k)).length : 0
 
+  // One request: the assessment card at the top + (teacher/student) the smart widgets below.
+  const seesAssessments =
+    isTeacher || isStudent || role === ROLES.COACHING_ADMIN || (role === ROLES.STAFF && canAny([P.ASSESSMENTS_VIEW, P.ASSESSMENTS_MANAGE, P.ASSESSMENTS_GRADE]))
+  const overview = useAsync(fetchOverview, [], { enabled: !!role && seesAssessments })
+
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title="Dashboard" description={user?.name ? `Welcome back, ${user.name}` : 'Overview'} className="mb-0" />
+
+      {/* Assessments first — what to act on today */}
+      {overview.data?.student && <StudentAssessmentHero data={overview.data.student} />}
+      {overview.data?.teacher && <TeacherAssessmentHero data={overview.data.teacher} />}
+      {overview.data?.assessments && <AdminAssessmentHero data={overview.data.assessments} />}
 
       {loading && skeletonCount > 0 && <StatsSkeleton count={skeletonCount} />}
       {error && !loading && <ErrorState title="Couldn't load your stats" description={error} onRetry={() => void reload()} className="py-6" />}
@@ -105,7 +118,7 @@ export default function DashboardPage() {
       )}
 
       {/* Teachers/students: smart alerts + widgets (+ Notice Board) below their stats cards. */}
-      {(isTeacher || isStudent) && <SmartDashboard role={isTeacher ? 'teacher' : 'student'} />}
+      {(isTeacher || isStudent) && <SmartDashboard role={isTeacher ? 'teacher' : 'student'} state={overview} />}
 
       {(role === ROLES.COACHING_ADMIN || can(P.ACTIVITY_LOGS_VIEW)) && (
         <div className="defer-render">

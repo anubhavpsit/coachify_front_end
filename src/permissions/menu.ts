@@ -32,7 +32,7 @@ import { ROUTES } from '@/constants/routes'
 import { PERMISSIONS as P } from './keys'
 import type { PermissionApi } from './usePermission'
 
-export type NavBadge = 'notices' | 'inbox'
+export type NavBadge = 'notices' | 'inbox' | 'assessments'
 
 export interface NavItem {
   to: string
@@ -91,7 +91,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Learning',
     items: [
       { to: ROUTES.STUDENT_ACTIVITIES, label: 'My Activities', icon: CalendarCheck2, visible: (p) => p.hasRole(ROLES.STUDENT) },
-      { to: ROUTES.STUDENT_ASSESSMENTS, label: 'My Assessments', icon: FilePenLine, visible: (p) => p.hasRole(ROLES.STUDENT) },
+      { to: ROUTES.STUDENT_ASSESSMENTS, label: 'My Assessments', icon: FilePenLine, badge: 'assessments', visible: (p) => p.hasRole(ROLES.STUDENT) },
       {
         to: ROUTES.TEACHER_DAILY_ACTIVITIES,
         label: 'Daily Activities',
@@ -102,6 +102,7 @@ export const NAV_GROUPS: NavGroup[] = [
         to: ROUTES.ASSESSMENTS,
         label: 'Assessments',
         icon: FilePenLine,
+        badge: 'assessments',
         visible: (p) =>
           p.hasRole(ROLES.TEACHER) || p.can(P.ASSESSMENTS_VIEW) || p.can(P.ASSESSMENTS_MANAGE) || p.can(P.ASSESSMENTS_GRADE),
       },

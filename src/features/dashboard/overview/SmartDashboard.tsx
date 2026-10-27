@@ -1,8 +1,8 @@
 import NoticeBoardCard from '@/features/notices/components/NoticeBoardCard'
 import WidgetCard from '@/components/common/WidgetCard'
-import { useAsync } from '@/hooks/useAsync'
+import { useAsync, type AsyncState } from '@/hooks/useAsync'
 import DashboardAlerts from './DashboardAlerts'
-import { fetchOverview } from './overviewApi'
+import { fetchOverview, type Overview } from './overviewApi'
 import { StudentAttendanceCard, StudentHomeworkCard, StudentNewContentCard, StudentResultsCard, StudentUpcomingCard } from './StudentWidgets'
 import { TeacherAttentionCard, TeacherGradingCard, TeacherPapersCard, TeacherTodayCard, TeacherUpcomingCard } from './TeacherWidgets'
 
@@ -12,8 +12,10 @@ const GRID = 'grid items-start gap-4 md:grid-cols-2 2xl:grid-cols-3'
  * Teacher / student "smart" dashboard below the stats cards: prioritised
  * alerts + role widgets, all from ONE request (GET /dashboard/overview).
  */
-export default function SmartDashboard({ role }: { role: 'student' | 'teacher' }) {
-  const { data, loading, error, reload } = useAsync(fetchOverview, [])
+export default function SmartDashboard({ role, state }: { role: 'student' | 'teacher'; state?: AsyncState<Overview> }) {
+  // The dashboard page loads the overview once (it also feeds the assessment card at the top).
+  const own = useAsync(fetchOverview, [], { enabled: !state })
+  const { data, loading, error, reload } = state ?? own
 
   return (
     <div className="flex flex-col gap-4">

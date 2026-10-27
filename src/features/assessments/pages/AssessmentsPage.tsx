@@ -23,6 +23,8 @@ import CreateAssessmentDialog from '../components/CreateAssessmentDialog'
 import FilesDialog from '../components/FilesDialog'
 import QuestionPaperDialog from '../components/QuestionPaperDialog'
 import ResultsDialog from '../components/ResultsDialog'
+import AssessmentCalendar, { type CalendarEntry } from '../components/AssessmentCalendar'
+import { toDateInputValue } from '@/utils/date'
 import { ASSESSMENT_STAGE, STAGE_TAB_LABEL, STAGE_TABS, tabFor, type StageTab } from '../lib/stages'
 import {
   fetchAssessments,
@@ -84,6 +86,7 @@ export default function AssessmentsPage() {
   const [tabChoice, setTabChoice] = useState<StageTab | null>(urlTab && STAGE_TABS.includes(urlTab) ? urlTab : null)
   const tab: StageTab = tabChoice ?? (focusId ? 'all' : tabCounts.needs_results > 0 ? 'needs_results' : 'all')
   const shown = tab === 'all' ? filtered : filtered.filter((a) => tabFor(a.progress?.stage) === tab)
+  const [view, setView] = useState<'list' | 'calendar'>('list')
 
   const [createOpen, setCreateOpen] = useState(false)
   const [assignFor, setAssignFor] = useState<Assessment | null>(null)
@@ -93,6 +96,22 @@ export default function AssessmentsPage() {
   const [preview, setPreview] = useState<AssessmentFile | null>(null)
   const [approvalFor, setApprovalFor] = useState<Assessment | null>(null)
   const [autoConfirm, setAutoConfirm] = useState<boolean | null>(null)
+
+  // Calendar: one entry per (assessment, test date), coloured by what's left to do.
+  const calendarEntries = useMemo<CalendarEntry[]>(() => {
+    const today = toDateInputValue()
+    return filtered.flatMap((a) => {
+      const dates = a.progress?.dates?.length ? a.progress.dates : a.scheduled_date ? [{ date: a.scheduled_date.slice(0, 10), total: 0, open: 0 }] : []
+      return dates.map((d) => ({
+        key: `${a.id}-${d.date}`,
+        date: d.date,
+        title: a.title,
+        subtitle: [a.subject?.subject, a.class?.name, d.total ? `${d.total - d.open}/${d.total} done` : 'No students yet'].filter(Boolean).join(' · '),
+        tone: d.total === 0 ? 'muted' : d.open === 0 ? 'success' : d.date < today ? 'danger' : d.date === today ? 'warning' : 'info',
+        onOpen: () => setResultsFor(a),
+      }))
+    })
+  }, [filtered])
 
   // "Enter results" notification → open that assessment's results straight away (once).
   const openResultsId = searchParams.get('results') === '1' ? focusId : null
@@ -297,59 +316,80 @@ export default function AssessmentsPage() {
         </Card>
       )}
 
-      <SegmentedControl<StageTab>
-        label="Assessments by stage"
-        className="flex-wrap self-start"
-        value={tab}
-        onChange={(v) => {
-          setTabChoice(v)
-          setSearchParams(
-            (prev) => {
-              const next = new URLSearchParams(prev)
-              next.delete('tab')
-              return next
-            },
-            { replace: true },
-          )
-        }}
-        options={STAGE_TABS.map((t) => ({ value: t, label: `${STAGE_TAB_LABEL[t]} (${tabCounts[t]})` }))}
-      />
-
-      <Card className="gap-0 overflow-hidden py-0">
-        <DataTable
-          columns={columns}
-          data={shown}
-          loading={list.loading && assessments.length === 0}
-          getRowId={(a) => String(a.id)}
-          rowProps={(a) => ({ id: `assessment-row-${a.id}`, className: a.id === focusId ? 'bg-primary-soft/50 shadow-[inset_4px_0_0_var(--color-primary)]' : undefined })}
-          searchPlaceholder="Search assessments"
-          emptyIcon={ClipboardList}
-          emptyTitle={tab === 'needs_results' ? 'No results waiting — all caught up. 🎉' : 'No assessments found.'}
-          emptyAction={
-            <Button size="sm" variant="soft" onClick={() => setCreateOpen(true)}>
-              <Plus aria-hidden="true" /> Create the first one
-            </Button>
-          }
-          pageSize={focusId ? undefined : 25}
-          toolbar={
-            <div className="flex flex-wrap items-center gap-2">
-              <NativeSelect aria-label="Subject" className="w-full sm:w-40" value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)}>
-                <option value="">All subjects</option>
-                {(catalog.data?.subjects ?? []).map((s) => (
-                  <option key={s.id} value={String(s.id)}>
-                    {s.subject}
-                  </option>
-                ))}
-              </NativeSelect>
-              <NativeSelect aria-label="Approval" className="w-full sm:w-40" value={approvalFilter} onChange={(e) => setApprovalFilter(e.target.value)}>
-                <option value="">Any approval</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-              </NativeSelect>
-            </div>
-          }
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <SegmentedControl<'list' | 'calendar'>
+          label="View"
+          size="sm"
+          value={view}
+          onChange={setView}
+          options={[
+            { value: 'list', label: 'List' },
+            { value: 'calendar', label: 'Calendar' },
+          ]}
         />
-      </Card>
+      </div>
+
+      {view === 'calendar' ? (
+        <Card className="p-5">
+          <AssessmentCalendar entries={calendarEntries} legend={['danger', 'warning', 'info', 'success', 'muted']} />
+        </Card>
+      ) : (
+        <>
+          <SegmentedControl<StageTab>
+            label="Assessments by stage"
+            className="flex-wrap self-start"
+            value={tab}
+            onChange={(v) => {
+              setTabChoice(v)
+              setSearchParams(
+                (prev) => {
+                  const next = new URLSearchParams(prev)
+                  next.delete('tab')
+                  return next
+                },
+                { replace: true },
+              )
+            }}
+            options={STAGE_TABS.map((t) => ({ value: t, label: `${STAGE_TAB_LABEL[t]} (${tabCounts[t]})` }))}
+          />
+
+          <Card className="gap-0 overflow-hidden py-0">
+            <DataTable
+              columns={columns}
+              data={shown}
+              loading={list.loading && assessments.length === 0}
+              getRowId={(a) => String(a.id)}
+              rowProps={(a) => ({ id: `assessment-row-${a.id}`, className: a.id === focusId ? 'bg-primary-soft/50 shadow-[inset_4px_0_0_var(--color-primary)]' : undefined })}
+              searchPlaceholder="Search assessments"
+              emptyIcon={ClipboardList}
+              emptyTitle={tab === 'needs_results' ? 'No results waiting — all caught up. 🎉' : 'No assessments found.'}
+              emptyAction={
+                <Button size="sm" variant="soft" onClick={() => setCreateOpen(true)}>
+                  <Plus aria-hidden="true" /> Create the first one
+                </Button>
+              }
+              pageSize={focusId ? undefined : 25}
+              toolbar={
+                <div className="flex flex-wrap items-center gap-2">
+                  <NativeSelect aria-label="Subject" className="w-full sm:w-40" value={subjectFilter} onChange={(e) => setSubjectFilter(e.target.value)}>
+                    <option value="">All subjects</option>
+                    {(catalog.data?.subjects ?? []).map((s) => (
+                      <option key={s.id} value={String(s.id)}>
+                        {s.subject}
+                      </option>
+                    ))}
+                  </NativeSelect>
+                  <NativeSelect aria-label="Approval" className="w-full sm:w-40" value={approvalFilter} onChange={(e) => setApprovalFilter(e.target.value)}>
+                    <option value="">Any approval</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                  </NativeSelect>
+                </div>
+              }
+            />
+          </Card>
+        </>
+      )}
 
       <CreateAssessmentDialog
         open={createOpen}
