@@ -14,6 +14,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import { ROLES } from '@/constants/roles'
+import { restrictsContacts } from '@/lib/contactPrivacy'
+import { useAuthUser } from '@/permissions'
 import { formatDate } from '@/utils/date'
 import AssignTeachersModal from '../components/AssignTeachersModal'
 import { BulkPromoteDialog, PromoteDialog, ReactivateDialog } from '../components/StudentActionDialogs'
@@ -32,6 +34,8 @@ const FIELD = 'm-0 flex flex-col gap-1.5 text-sm font-medium text-foreground'
  */
 export default function StudentsPage() {
   const data = useStudentsData()
+  // Teachers don't see students' contact details (the API sends none).
+  const showContacts = !restrictsContacts(useAuthUser())
   const isAdmin = data.role === ROLES.COACHING_ADMIN
   const [search, setSearch] = useState('')
   const [classFilter, setClassFilter] = useState<number | ''>('')
@@ -75,15 +79,19 @@ export default function StudentsPage() {
         </button>
       ),
     },
-    {
-      accessorKey: 'email',
-      header: 'Email',
-      cell: ({ row }) => (
-        <span className="inline-block max-w-40 truncate align-middle text-muted-foreground" title={row.original.email}>
-          {row.original.email}
-        </span>
-      ),
-    },
+    ...(showContacts
+      ? ([
+          {
+            accessorKey: 'email',
+            header: 'Email',
+            cell: ({ row }) => (
+              <span className="inline-block max-w-40 truncate align-middle text-muted-foreground" title={row.original.email}>
+                {row.original.email}
+              </span>
+            ),
+          },
+        ] as ColumnDef<Student, unknown>[])
+      : []),
     { id: 'class', header: 'Class', accessorFn: (s) => classLabelFor(s, data.classes) },
     {
       id: 'subjects',

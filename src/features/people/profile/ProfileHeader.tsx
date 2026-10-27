@@ -84,7 +84,7 @@ export default function ProfileHeader({ user, canEditImage, onUpdated }: { user:
       <div className="min-w-0 flex-1">
         <div className="truncate text-lg font-semibold text-foreground">{user.name}</div>
         <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          <span className="truncate">{user.email}</span>
+          {user.email && <span className="truncate">{user.email}</span>}
           <Badge variant="secondary" className="capitalize">
             {user.role.replace(/_/g, ' ')}
           </Badge>

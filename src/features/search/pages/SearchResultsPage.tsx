@@ -14,7 +14,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ROLES } from '@/constants/roles'
 import { ROUTES } from '@/constants/routes'
 import { useAsync } from '@/hooks/useAsync'
-import { usePermission } from '@/permissions'
+import { restrictsContacts } from '@/lib/contactPrivacy'
+import { useAuthUser, usePermission } from '@/permissions'
 import Highlight from '../lib/Highlight'
 import { searchAll, type SearchUser } from '../services/searchService'
 
@@ -73,6 +74,8 @@ export default function SearchResultsPage() {
   const [params] = useSearchParams()
   const query = (params.get('q') ?? '').trim()
   const { hasRole } = usePermission()
+  // Teachers / students: no contact details of each other (API sends none; search is by name).
+  const showContacts = !restrictsContacts(useAuthUser())
   const isAdmin = hasRole(ROLES.COACHING_ADMIN)
   const search = useAsync(
     () =>
@@ -119,7 +122,7 @@ export default function SearchResultsPage() {
         <ErrorState title={error} onRetry={error === 'You are not authenticated.' ? undefined : search.reload} />
       ) : visible === 0 ? (
         <Card>
-          <EmptyState icon={SearchX} title="No results found." description="Try a different spelling, or search by email or phone." />
+          <EmptyState icon={SearchX} title="No results found." description={showContacts ? 'Try a different spelling, or search by email or phone.' : 'Try a different spelling of the name.'} />
         </Card>
       ) : (
         <m.div key={query} className="flex flex-col gap-4" variants={stagger(0.06)} initial="hidden" animate="visible">
@@ -129,9 +132,9 @@ export default function SearchResultsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
+                    {showContacts && <TableHead>Email</TableHead>}
                     <TableHead>Class</TableHead>
-                    <TableHead>Phone</TableHead>
+                    {showContacts && <TableHead>Phone</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -140,11 +143,13 @@ export default function SearchResultsPage() {
                       <TableCell>
                         <PersonCell user={s} q={query} />
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        <Highlight text={s.email} query={query} />
-                      </TableCell>
+                      {showContacts && (
+                        <TableCell className="text-muted-foreground">
+                          <Highlight text={s.email} query={query} />
+                        </TableCell>
+                      )}
                       <TableCell>{s.student_profile?.class ?? dash}</TableCell>
-                      <TableCell>{s.student_profile?.phone ?? dash}</TableCell>
+                      {showContacts && <TableCell>{s.student_profile?.phone ?? dash}</TableCell>}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -158,7 +163,7 @@ export default function SearchResultsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
+                    {showContacts && <TableHead>Email</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -167,9 +172,11 @@ export default function SearchResultsPage() {
                       <TableCell>
                         <PersonCell user={t} q={query} />
                       </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        <Highlight text={t.email} query={query} />
-                      </TableCell>
+                      {showContacts && (
+                        <TableCell className="text-muted-foreground">
+                          <Highlight text={t.email} query={query} />
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>

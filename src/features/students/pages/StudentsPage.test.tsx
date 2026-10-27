@@ -40,6 +40,7 @@ describe('StudentsPage (Q4 preserved)', () => {
     expect(screen.getByRole('cell', { name: 'Class 10-A' })).toBeTruthy()
     expect(screen.getByText('Physics')).toBeTruthy()
     expect(screen.getByRole('columnheader', { name: /Phone/ })).toBeTruthy()
+    expect(screen.getByRole('columnheader', { name: /Email/ })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Actions for Aarav Mehta' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /Add New Student/ })).toBeTruthy()
     const studentCalls = get.mock.calls.filter(([u]) => /\/students$/.test(u as string))
@@ -67,6 +68,9 @@ describe('StudentsPage (Q4 preserved)', () => {
     const call = get.mock.calls.find(([u]) => /\/teachers\/students$/.test(u as string))
     expect(call?.[1]).toEqual({ ...opts, params: { academic_year_id: 11 } })
     expect(screen.queryByLabelText('Status')).toBeNull()
+    // Teachers never see students' contact details.
+    expect(screen.queryByRole('columnheader', { name: /Email/ })).toBeNull()
+    expect(screen.queryByRole('columnheader', { name: /Phone/ })).toBeNull()
   })
 
   it('admin status filter sends status; client filters search/class', async () => {

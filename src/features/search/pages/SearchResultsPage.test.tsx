@@ -36,6 +36,7 @@ describe('SearchResultsPage', () => {
     expect(await screen.findByRole('region', { name: 'Students' })).toBeTruthy()
     expect(get).toHaveBeenCalledWith(expect.stringMatching(/\/search$/), { headers: { Authorization: 'Bearer tok', Accept: 'application/json' }, params: { q: 'ash' } })
     for (const s of ['Subjects', 'Classes', 'Enquiries']) expect(screen.getByRole('region', { name: s })).toBeTruthy()
+    expect(screen.getAllByRole('columnheader', { name: 'Email' }).length).toBeGreaterThan(0)
     expect(screen.getByRole('link', { name: /Go to Enquiries/ }).getAttribute('href')).toBe('/enquiries')
   })
 
@@ -46,6 +47,9 @@ describe('SearchResultsPage', () => {
     expect(await screen.findByRole('region', { name: 'Students' })).toBeTruthy()
     for (const s of ['Subjects', 'Classes', 'Enquiries']) expect(screen.queryByRole('region', { name: s })).toBeNull()
     expect(screen.queryByText('Physics')).toBeNull()
+    // Teachers never see students' contact details.
+    expect(screen.queryByRole('columnheader', { name: 'Email' })).toBeNull()
+    expect(screen.queryByRole('columnheader', { name: 'Phone' })).toBeNull()
   })
 
   it('says "No results found." when only hidden sections matched', async () => {

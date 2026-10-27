@@ -4,6 +4,8 @@ import PersonRow from '@/components/common/PersonRow'
 import ProgressRing from '@/components/common/ProgressRing'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { seesContactsOf } from '@/lib/contactPrivacy'
+import { useAuthUser } from '@/permissions'
 import { formatDate } from '@/utils/date'
 import type { FeeSummary, RelatedUser, UserProfile } from './profileService'
 
@@ -21,7 +23,7 @@ function People({ list, empty }: { list?: RelatedUser[]; empty: string }) {
   return (
     <div className="max-h-40 divide-y divide-border overflow-y-auto">
       {list.map((p) => (
-        <PersonRow key={p.id} name={p.name} image={p.profile_image ?? p.profile_img} subtitle={p.email} />
+        <PersonRow key={p.id} name={p.name} image={p.profile_image ?? p.profile_img} subtitle={p.email || undefined} />
       ))}
     </div>
   )
@@ -39,12 +41,13 @@ interface Props {
 
 export default function OverviewTab({ user, showFees, fees, showAdminStudentFields }: Props) {
   const isStudent = user.role === 'student'
+  const showContacts = seesContactsOf(useAuthUser(), user.id)
   const hasAttendance = typeof user.attendance_percentage === 'number' || typeof user.not_marked_days === 'number'
   const details: Array<[string, ReactNode]> = []
   if (user.dob) details.push(['DOB', formatDate(user.dob)])
   if (isStudent && user.student_profile) {
     details.push(['Class', user.current_class_name ?? user.student_profile.class ?? '-'])
-    details.push(['Phone', user.student_profile.phone || '-'])
+    if (showContacts) details.push(['Phone', user.student_profile.phone || '-'])
   }
   if (isStudent) {
     // Admission = when they actually started; Added On = when the record was created.

@@ -28,6 +28,9 @@ describe('TeachersPage', () => {
     expect(get).toHaveBeenCalledWith(expect.stringMatching(/\/students\/teachers$/), opts)
     expect(screen.queryByRole('button', { name: 'Edit Meera Iyer' })).toBeNull()
     expect(screen.getByRole('button', { name: 'View Meera Iyer' })).toBeTruthy()
+    // Students never see teachers' contact details.
+    expect(screen.queryByRole('columnheader', { name: /Email/ })).toBeNull()
+    expect(screen.queryByRole('columnheader', { name: /Phone/ })).toBeNull()
   })
 
   it('Q5 preserved: staff with teachers.manage cannot edit; global rows have no actions', async () => {
@@ -36,6 +39,7 @@ describe('TeachersPage', () => {
     render(<TeachersPage />)
     expect(await screen.findByText('Meera Iyer')).toBeTruthy()
     expect(get).toHaveBeenCalledWith(expect.stringMatching(/\/teachers$/), opts)
+    expect(screen.getByRole('link', { name: '9876543210' }).getAttribute('href')).toBe('tel:9876543210')
     expect(screen.queryByRole('button', { name: 'Edit Meera Iyer' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'View Global Demo' })).toBeNull()
     await userEvent.click(screen.getByRole('button', { name: 'View Meera Iyer' }))

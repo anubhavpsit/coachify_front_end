@@ -18,7 +18,8 @@ import PhoneField from '@/features/people/components/PhoneField'
 import { PERSON_FIELDS, type PersonBase } from '@/features/people/schemas/person'
 import { useAsync } from '@/hooks/useAsync'
 import { applyServerErrors } from '@/lib/forms'
-import { usePermission } from '@/permissions'
+import { restrictsContacts } from '@/lib/contactPrivacy'
+import { useAuthUser, usePermission } from '@/permissions'
 import { teacherDefaults, teacherSchema, toTeacherPayload, type TeacherValues } from '../schemas/teacherForm'
 import { createTeacher, deleteTeacher, fetchTeachersFor, updateTeacher, type Teacher } from '../services/teachersService'
 
@@ -31,6 +32,8 @@ import { createTeacher, deleteTeacher, fetchTeachersFor, updateTeacher, type Tea
 export default function TeachersPage() {
   const { role, hasRole } = usePermission()
   const isAdmin = hasRole(ROLES.COACHING_ADMIN)
+  // Students don't see teachers' contact details (the API sends none).
+  const showContacts = !restrictsContacts(useAuthUser())
   const list = useAsync(() => fetchTeachersFor(role), [role], { enabled: !!role })
   const [local, setLocal] = useState<Teacher[] | null>(null)
   const teachers = local ?? list.data ?? []
@@ -104,19 +107,23 @@ export default function TeachersPage() {
         </button>
       ),
     },
-    { accessorKey: 'email', header: 'Email', cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span> },
-    {
-      accessorKey: 'phone',
-      header: 'Phone',
-      cell: ({ row }) =>
-        row.original.phone ? (
-          <a href={`tel:${row.original.phone}`} className="text-foreground no-underline hover:underline">
-            {row.original.phone}
-          </a>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        ),
-    },
+    ...(showContacts
+      ? ([
+          { accessorKey: 'email', header: 'Email', cell: ({ row }) => <span className="text-muted-foreground">{row.original.email}</span> },
+          {
+            accessorKey: 'phone',
+            header: 'Phone',
+            cell: ({ row }) =>
+              row.original.phone ? (
+                <a href={`tel:${row.original.phone}`} className="text-foreground no-underline hover:underline">
+                  {row.original.phone}
+                </a>
+              ) : (
+                <span className="text-muted-foreground">—</span>
+              ),
+          },
+        ] as ColumnDef<Teacher, unknown>[])
+      : []),
     {
       id: 'actions',
       header: () => <span className="sr-only">Actions</span>,
