@@ -1,1 +1,0 @@
-import{aW as i,aa as p}from"./index-Cji4efwy.js";function d(s,n,c,{fieldMap:f={},fallback:u}={}){const r=i(s),e=[];let t=!1;for(const[o,a]of Object.entries(r)){const l=f[o]??o;c.includes(l)?(n(l,{type:"server",message:a},{shouldFocus:!t}),t=!0):e.push(a)}return Object.keys(r).length===0?p(s,u):e.length?e[0]:null}export{d as a};
