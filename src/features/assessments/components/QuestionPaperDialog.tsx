@@ -19,8 +19,8 @@ import { fetchAvailableQuestions, fetchPaper, fetchPaperPdf, removePaperQuestion
 const apiMessage = (err: unknown, fallback: string) => (axios.isAxiosError(err) && err.response?.data?.message ? String(err.response.data.message) : fallback)
 const STATUS: Record<Paper['status'], { label: string; variant: 'secondary' | 'warning' | 'success' | 'info' }> = {
   none: { label: 'No paper', variant: 'secondary' },
-  pending: { label: 'Pending approval', variant: 'warning' },
-  approved: { label: 'Approved', variant: 'success' },
+  pending: { label: 'Draft', variant: 'warning' },
+  approved: { label: 'Ready', variant: 'success' },
   released: { label: 'Released to students', variant: 'info' },
 }
 
@@ -166,12 +166,12 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
               )}
               {paper.status === 'pending' && (
                 <Button size="sm" variant="success" disabled={busy || dirty} title={dirty ? 'Save marks first' : undefined} onClick={() => setConfirm({ kind: 'approve' })}>
-                  <BadgeCheck aria-hidden="true" /> Approve paper
+                  <BadgeCheck aria-hidden="true" /> Mark paper ready
                 </Button>
               )}
               {paper.status === 'approved' && (
                 <Button size="sm" variant="outline" disabled={busy} onClick={() => setConfirm({ kind: 'unapprove' })}>
-                  <Undo2 aria-hidden="true" /> Un-approve
+                  <Undo2 aria-hidden="true" /> Back to draft
                 </Button>
               )}
             </div>
@@ -258,18 +258,18 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
           confirm?.kind === 'remove'
             ? `Remove question ${confirm.n}?`
             : confirm?.kind === 'approve'
-              ? 'Approve this question paper?'
+              ? 'Mark this question paper ready?'
               : confirm?.kind === 'unapprove'
-                ? 'Un-approve this question paper?'
+                ? 'Move this question paper back to draft?'
                 : 'Discard unsaved marks?'
         }
         description={
           confirm?.kind === 'remove'
             ? 'It is taken off this paper. The question stays in the question bank.'
             : confirm?.kind === 'approve'
-              ? 'The paper is marked ready. It stays hidden from students until results are published.'
+              ? 'Students can see it once results are in and every student’s test date has passed.'
               : confirm?.kind === 'unapprove'
-                ? 'It goes back to pending so it can be edited and approved again.'
+                ? 'You can edit it and mark it ready again.'
                 : 'Your changes to the question marks will be lost.'
         }
         confirmLabel={confirm?.kind === 'remove' ? 'Yes, remove' : confirm?.kind === 'discard' ? 'Discard' : 'Yes'}
@@ -279,7 +279,7 @@ function PaperBody({ id, onClose, onChanged }: { id: number; onClose: () => void
           const c = confirm!
           if (c.kind === 'discard') return onClose()
           if (c.kind === 'remove') return run(() => removePaperQuestion(id, c.q.id), 'Failed to remove the question.', 'Question removed.')
-          return run(() => setPaperApproval(id, c.kind === 'approve'), 'Failed to update approval.', c.kind === 'approve' ? 'Paper approved.' : 'Paper moved back to pending.')
+          return run(() => setPaperApproval(id, c.kind === 'approve'), 'Failed to update the paper.', c.kind === 'approve' ? 'Paper marked ready.' : 'Paper moved back to draft.')
         }}
       />
     </>

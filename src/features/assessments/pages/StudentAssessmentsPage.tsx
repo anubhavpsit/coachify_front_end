@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { m } from 'motion/react'
-import { CalendarClock, CheckCircle2, ClipboardList, FileText, MessageSquareQuote, Paperclip, TrendingUp, UserRound } from 'lucide-react'
+import { CalendarClock, CheckCircle2, ClipboardList, FileText, Hourglass, MessageSquareQuote, Paperclip, TrendingUp, UserRound } from 'lucide-react'
 import { stagger } from '@/animations'
 import EmptyState from '@/components/common/EmptyState'
 import ErrorState from '@/components/common/ErrorState'
@@ -69,7 +69,10 @@ function FileLinks({ label, files }: { label: string; files: StudentFile[] }) {
 /** Route: no guard (Q9) — the student endpoints are self-only. */
 export default function StudentAssessmentsPage() {
   const data = useAsync(() => fetchMyAssessments().catch((e) => (console.error('Error loading assessments:', e), Promise.reject(e))), [])
-  const upcoming = useMemo(() => data.data?.upcoming ?? [], [data.data])
+  // The "upcoming" list also holds tests whose date has passed with no result yet.
+  const open = useMemo(() => data.data?.upcoming ?? [], [data.data])
+  const upcoming = useMemo(() => open.filter((a) => a.stage !== 'awaiting_results'), [open])
+  const waiting = useMemo(() => open.filter((a) => a.stage === 'awaiting_results'), [open])
   const history = useMemo(() => data.data?.history ?? [], [data.data])
   const focusId = useFocusRow('assessment', 'student-assessment-row-', !data.loading)
   const [files, setFiles] = useState<Record<number, StudentFiles | 'loading'>>({})
@@ -91,7 +94,7 @@ export default function StudentAssessmentsPage() {
 
   // Opened from the dashboard → show that upcoming assessment's files straight away (legacy).
   useEffect(() => {
-    if (!data.loading && focusId !== null && upcoming.some((a) => a.assessment.id === focusId)) loadFiles(focusId)
+    if (!data.loading && focusId !== null && open.some((a) => a.assessment.id === focusId)) loadFiles(focusId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.loading, focusId])
 
@@ -112,8 +115,15 @@ export default function StudentAssessmentsPage() {
       subtitle: a.stage === 'absent' ? 'Absent' : a.result ? `${a.result.marks_obtained}/${a.result.total_marks} · ${Number(a.result.percentage).toFixed(0)}%` : 'Done',
       tone: (a.stage === 'absent' ? 'muted' : 'success') as CalendarEntry['tone'],
     }))
-    return [...upcomingEntries, ...historyEntries].filter((e) => e.date)
-  }, [upcoming, history])
+    const waitingEntries = waiting.map((a) => ({
+      key: `w${a.id}`,
+      date: a.scheduled_date.slice(0, 10),
+      title: a.assessment.title,
+      subtitle: 'Waiting for result',
+      tone: 'muted' as CalendarEntry['tone'],
+    }))
+    return [...upcomingEntries, ...waitingEntries, ...historyEntries].filter((e) => e.date)
+  }, [upcoming, waiting, history])
 
   const scored = history.filter((a) => a.result)
   const absentCount = history.filter((a) => a.stage === 'absent').length
@@ -130,7 +140,7 @@ export default function StudentAssessmentsPage() {
       )
     const none = f.question_papers.length === 0 && (!includeAnswers || f.answer_sheets.length === 0)
     return none ? (
-      <span className="text-xs text-muted-foreground">No files uploaded.</span>
+      <span className="text-xs text-muted-foreground">{includeAnswers ? 'No files uploaded.' : 'No files yet. The question paper appears here after the test.'}</span>
     ) : (
       <div className="flex flex-col gap-1.5">
         <FileLinks label="Question paper" files={f.question_papers} />
@@ -221,6 +231,39 @@ export default function StudentAssessmentsPage() {
           )}
         </CardContent>
       </Card>
+
+      {waiting.length > 0 && (
+        <Card className={cn('gap-4', view === 'calendar' && 'hidden')}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Hourglass className="size-4 text-warning" aria-hidden="true" /> Waiting for result
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <p className="m-0 text-sm text-muted-foreground">The test date has passed. Your result shows here once your teacher enters it.</p>
+            <ul className="m-0 flex list-none flex-col gap-3 p-0">
+              {waiting.map((a) => (
+                <li
+                  key={a.id}
+                  id={`student-assessment-row-${a.assessment.id}`}
+                  className={cn('flex flex-wrap items-center gap-4 rounded-xl border border-solid border-border p-3', a.assessment.id === focusId && 'border-primary bg-primary-soft/40')}
+                >
+                  <DateTile iso={a.scheduled_date} />
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <span className="font-semibold text-foreground">{a.assessment.title}</span>
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      {a.assessment.subject && <Badge variant="soft">{a.assessment.subject.subject}</Badge>}
+                      <span>{a.assessment.total_marks} marks</span>
+                      <span>{formatDate(a.scheduled_date)}</span>
+                    </div>
+                    {filesBlock(a, true)}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className={cn('gap-4', view === 'calendar' && 'hidden')}>
         <CardHeader>

@@ -55,6 +55,8 @@ export type AdminAssessmentsOverview = {
   needs_results: number
   pending_students: number
   overdue_by_teacher: { teacher_id: number | null; name: string; assessments: number; students: number }[]
+  /** Tests this admin still has to approve; students can't see them until then. */
+  awaiting_approval: number
   /** Results (or absent) entered by the end of the day after the test, this month. */
   on_time: { on_time: number; total: number; percentage: number | null }
 }

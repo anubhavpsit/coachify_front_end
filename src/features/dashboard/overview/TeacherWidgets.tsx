@@ -36,7 +36,7 @@ export function TeacherUpcomingCard({ items }: { items: TeacherOverview['upcomin
 
 export function TeacherPapersCard({ items }: { items: TeacherOverview['papers_to_approve'] }) {
   return (
-    <OverviewCard title="Question Papers to Approve" count={items.length} countTone="danger" viewAllTo="/assessments" isEmpty={items.length === 0} empty="No papers waiting for approval.">
+    <OverviewCard title="Question Papers to Finish" count={items.length} countTone="danger" viewAllTo="/assessments" isEmpty={items.length === 0} empty="No papers waiting for approval.">
       <div className="divide-y divide-border">
         {items.map((p) => (
           <div key={p.assessment_id} className={ROW}>

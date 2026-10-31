@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { requiredText } from '@/lib/validation'
-import type { CreatePayload, ResultPayload } from '../services/assessmentsService'
+import type { Assessment, CreatePayload, ResultPayload } from '../services/assessmentsService'
 
 /** Backend store(): title required|max:255; subject required; class nullable; total_marks required|integer|min:1; scheduled_date nullable|date. */
 export const DESCRIPTION_MAX = 2000
@@ -20,13 +20,23 @@ export const createSchema = z.object({
 export type CreateValues = z.infer<typeof createSchema>
 export const createDefaults = (): CreateValues => ({ title: '', subject_id: '', class_id: '', total_marks: '', scheduled_date: '', description: '' })
 
-export const toCreatePayload = (v: CreateValues): CreatePayload => ({
+export const editDefaults = (a: Assessment): CreateValues => ({
+  title: a.title,
+  subject_id: String(a.subject_id),
+  class_id: a.class_id ? String(a.class_id) : '',
+  total_marks: String(a.total_marks),
+  scheduled_date: a.scheduled_date?.slice(0, 10) ?? '',
+  description: a.description ?? '',
+})
+
+export const toCreatePayload = (v: CreateValues, studentIds: number[] = []): CreatePayload => ({
   title: v.title,
   description: v.description || null,
   subject_id: Number(v.subject_id),
   class_id: v.class_id ? Number(v.class_id) : null,
   total_marks: Number(v.total_marks),
   scheduled_date: v.scheduled_date || null,
+  ...(studentIds.length ? { student_ids: studentIds } : {}),
 })
 
 /** Backend: mimes:jpeg,jpg,png,webp,pdf|max:20480 (KB) for assessment files and answer sheets. */
@@ -53,6 +63,8 @@ export type ResultRow = {
   scheduled_date?: string | null
   stage?: string
   initialAbsent?: boolean
+  /** The saved result, if any — unchanged rows aren't sent again. */
+  saved?: { marks_obtained: string; total_marks: string; teacher_notes: string }
 }
 
 /**
@@ -75,11 +87,14 @@ export function resultRowErrors(r: ResultRow): Partial<Record<'marks_obtained' |
   return e
 }
 
-/** Marks entered → a result; newly ticked Absent → `absent: true`; empty → skipped. */
+const unchanged = (r: ResultRow) =>
+  !!r.saved && r.saved.marks_obtained === r.marks_obtained.trim() && r.saved.total_marks === r.total_marks.trim() && r.saved.teacher_notes === r.teacher_notes
+
+/** New or changed marks → a result; newly ticked Absent → `absent: true`; empty or unchanged → skipped. */
 export const toResultPayloads = (rows: ResultRow[]): ResultPayload[] =>
   rows.flatMap((r): ResultPayload[] => {
     if (r.absent) return r.initialAbsent ? [] : [{ student_id: r.student_id, absent: true }]
-    if (r.marks_obtained === '') return []
+    if (r.marks_obtained === '' || unchanged(r)) return []
     return [
       {
         student_id: r.student_id,

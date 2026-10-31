@@ -70,7 +70,7 @@ describe('Teacher — your assessments', () => {
     expect(screen.getByRole('link', { name: /Results to enter/ }).getAttribute('href')).toBe('/assessments?assessment=7&results=1')
     expect(screen.getByText('Waves · 3 students')).toBeTruthy()
     expect(screen.getByRole('link', { name: /Test today/ }).getAttribute('href')).toBe('/assessments?assessment=8')
-    expect(screen.getByText('Question paper not approved')).toBeTruthy()
+    expect(screen.getByText('Question paper not ready')).toBeTruthy()
     expect(screen.getByRole('link', { name: /This week/ }).getAttribute('href')).toBe('/assessments?tab=upcoming')
   })
 
@@ -92,12 +92,24 @@ describe('Admin — assessments', () => {
     this_week: 2,
     needs_results: 3,
     pending_students: 7,
+    awaiting_approval: 0,
     overdue_by_teacher: [
       { teacher_id: 5, name: 'Meera', assessments: 2, students: 5 },
       { teacher_id: 6, name: 'Ravi', assessments: 1, students: 2 },
     ],
     on_time: { on_time: 9, total: 10, percentage: 90 },
   }
+
+  it('tests waiting for approval link to that list', () => {
+    wrap(<AdminAssessmentHero data={{ ...admin, awaiting_approval: 3 }} />)
+    expect(screen.getByRole('link', { name: /Tests to approve/ }).getAttribute('href')).toBe('/assessments?approval=pending')
+    expect(screen.getByText("Students can't see these yet")).toBeTruthy()
+  })
+
+  it('a waiting test alone still shows the card', () => {
+    wrap(<AdminAssessmentHero data={{ ...admin, needs_results: 0, tests_today: 0, today_list: [], this_week: 0, overdue_by_teacher: [], on_time: { on_time: 0, total: 0, percentage: null }, awaiting_approval: 1 }} />)
+    expect(screen.getByRole('link', { name: /Test to approve/ })).toBeTruthy()
+  })
 
   it('on-time rate, results waiting by teacher, today and this week', () => {
     wrap(<AdminAssessmentHero data={admin} />)

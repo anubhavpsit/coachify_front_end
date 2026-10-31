@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowDownRight, ArrowRight, ArrowUpRight, CalendarClock, ClipboardCheck, PenLine, Sparkles, TriangleAlert } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, ArrowUpRight, BadgeCheck, CalendarClock, ClipboardCheck, PenLine, Sparkles, TriangleAlert } from 'lucide-react'
 import ProgressRing from '@/components/common/ProgressRing'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -143,7 +143,7 @@ export function TeacherAssessmentHero({ data }: { data: TeacherOverview }) {
             hint={
               todayUnapproved ? (
                 <span className="flex items-center gap-1 text-warning">
-                  <TriangleAlert className="size-3" aria-hidden="true" /> Question paper not approved
+                  <TriangleAlert className="size-3" aria-hidden="true" /> Question paper not ready
                 </span>
               ) : (
                 today[0].title
@@ -161,7 +161,8 @@ export function TeacherAssessmentHero({ data }: { data: TeacherOverview }) {
 
 export function AdminAssessmentHero({ data }: { data: AdminAssessmentsOverview }) {
   const rate = data.on_time.percentage
-  if (data.needs_results === 0 && data.tests_today === 0 && data.this_week === 0 && rate === null) return null
+  const awaiting = data.awaiting_approval ?? 0
+  if (awaiting === 0 && data.needs_results === 0 && data.tests_today === 0 && data.this_week === 0 && rate === null) return null
 
   return (
     <Shell title="Assessments" tone={data.needs_results ? 'danger' : 'primary'}>
@@ -182,6 +183,16 @@ export function AdminAssessmentHero({ data }: { data: AdminAssessmentsOverview }
         </div>
 
         <div className="flex flex-col gap-2">
+          {awaiting > 0 && (
+            <Tile
+              to="/assessments?approval=pending"
+              tone="warning"
+              icon={BadgeCheck}
+              value={awaiting}
+              label={awaiting === 1 ? 'Test to approve' : 'Tests to approve'}
+              hint="Students can't see these yet"
+            />
+          )}
           {data.needs_results > 0 ? (
             <Tile to="/assessments?tab=needs_results" tone="danger" icon={PenLine} value={data.needs_results} label="Need results" hint={`${data.pending_students} students waiting`} />
           ) : (

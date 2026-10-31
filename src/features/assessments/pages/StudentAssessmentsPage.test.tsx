@@ -64,6 +64,22 @@ describe('StudentAssessmentsPage', () => {
     expect((await within(item).findByRole('link', { name: /mine.pdf/ })).getAttribute('href')).toMatch(/\/as\/8\.pdf$/)
   })
 
+  it('a test whose date passed with no result shows as waiting, not upcoming', async () => {
+    const get = mockGets()
+    const base = get.getMockImplementation()!
+    get.mockImplementation((url: string, ...rest: unknown[]) =>
+      url.endsWith('/student/assessments/upcoming')
+        ? Promise.resolve({ data: { success: true, data: [...upcoming, { ...upcoming[0], id: 3, scheduled_date: '2026-09-28', stage: 'awaiting_results', assessment: { ...upcoming[0].assessment, id: 9, title: 'Algebra test' } }] } })
+        : (base as (u: string, ...r: unknown[]) => ReturnType<typeof axios.get>)(url, ...rest),
+    )
+    renderAt()
+    const title = await screen.findByText('Waiting for result')
+    const card = title.closest('[data-slot="card"]') as HTMLElement
+    expect(within(card).getByText('Algebra test')).toBeTruthy()
+    expect(within(card).queryByText('Unit Test 1')).toBeNull()
+    expect(screen.getByText('Unit Test 1')).toBeTruthy()
+  })
+
   it('opens the released question paper', async () => {
     mockGets()
     renderAt()

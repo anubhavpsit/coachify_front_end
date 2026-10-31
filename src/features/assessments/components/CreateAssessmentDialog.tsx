@@ -7,8 +7,9 @@ import { Input } from '@/components/ui/input'
 import { NativeSelect } from '@/components/ui/native-select'
 import { Textarea } from '@/components/ui/textarea'
 import { applyServerErrors } from '@/lib/forms'
-import { createDefaults, createSchema, DESCRIPTION_MAX, toCreatePayload, type CreateValues } from '../schemas/assessmentForms'
-import { createAssessment, type Assessment } from '../services/assessmentsService'
+import { createDefaults, createSchema, DESCRIPTION_MAX, editDefaults, toCreatePayload, type CreateValues } from '../schemas/assessmentForms'
+import StudentPicker from './StudentPicker'
+import { createAssessment, updateAssessment, type Assessment, type StudentOption } from '../services/assessmentsService'
 
 interface Props {
   open: boolean
@@ -16,33 +17,55 @@ interface Props {
   subjects: { id: number; subject: string }[]
   classes: { id: number; name: string }[]
   loading: boolean
+  students: StudentOption[]
+  studentsLoaded: boolean
+  /** Set → edit this test instead of creating one. */
+  assessment?: Assessment | null
   onCreated: (a: Assessment) => void
+  onUpdated?: (a: Assessment) => void
 }
 
 const QUICK_MARKS = [10, 20, 25, 50, 100]
 
-export default function CreateAssessmentDialog({ open, onClose, subjects, classes, loading, onCreated }: Props) {
+export default function CreateAssessmentDialog({ open, onClose, subjects, classes, loading, students, studentsLoaded, assessment, onCreated, onUpdated }: Props) {
   const form = useForm<CreateValues>({ resolver: zodResolver(createSchema), defaultValues: createDefaults(), mode: 'onTouched' })
   const [error, setError] = useState<string | null>(null)
-  const [description, marks] = useWatch({ control: form.control, name: ['description', 'total_marks'] })
+  const [description, marks, classValue] = useWatch({ control: form.control, name: ['description', 'total_marks', 'class_id'] })
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+
+  // Same rules as the API (AssessmentController::assertEditAllowed).
+  const hasResults = (assessment?.progress?.result_out ?? 0) > 0
+  const hasStudents = (assessment?.progress?.total ?? 0) > 0
+  const subjectLocked = hasResults || (assessment?.paper_questions_count ?? 0) > 0
 
   useEffect(() => {
-    if (open) form.reset(createDefaults())
-  }, [open, form])
+    if (open) form.reset(assessment ? editDefaults(assessment) : createDefaults())
+  }, [open, assessment, form])
+
+  // Only the chosen class; a student ticked before the class changed isn't sent.
+  const eligible = classValue ? students.filter((s) => s.classId === Number(classValue)) : students
+  const studentIds = [...selected].filter((id) => eligible.some((s) => s.id === id))
 
   const submit = async (v: CreateValues) => {
     setError(null)
+    if (!assessment && studentIds.length > 0 && !v.scheduled_date) {
+      form.setError('scheduled_date', { message: 'Pick the test date to assign students.' })
+      return
+    }
+    const failed = assessment ? 'Failed to save changes' : 'Failed to create assessment'
     try {
-      const created = await createAssessment(toCreatePayload(v))
-      if (!created) {
-        setError('Failed to create assessment')
+      const saved = assessment ? await updateAssessment(assessment.id, toCreatePayload(v)) : await createAssessment(toCreatePayload(v, studentIds))
+      if (!saved) {
+        setError(failed)
         return
       }
-      onCreated(created)
+      if (assessment) onUpdated?.(saved)
+      else onCreated(saved)
+      setSelected(new Set())
       onClose()
     } catch (err) {
-      console.error('Error creating assessment:', err)
-      setError(applyServerErrors(err, form.setError, ['title', 'subject_id', 'class_id', 'total_marks', 'scheduled_date', 'description'], { fallback: 'Failed to create assessment' }))
+      console.error('Error saving assessment:', err)
+      setError(applyServerErrors(err, form.setError, ['title', 'subject_id', 'class_id', 'total_marks', 'scheduled_date', 'description'], { fallback: failed }))
     }
   }
 
@@ -51,13 +74,14 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
       open={open}
       onClose={() => {
         setError(null)
+        setSelected(new Set())
         onClose()
       }}
-      title="Create Assessment"
-      description="Create the test, then assign students and add its question paper."
+      title={assessment ? 'Edit Assessment' : 'Create Assessment'}
+      description={assessment ? assessment.title : 'Add the test details and its students. You can add more students later.'}
       form={form}
       onSubmit={submit}
-      submitLabel="Create"
+      submitLabel={assessment ? 'Save changes' : 'Create'}
       submittingLabel="Saving..."
       error={error}
       className="sm:max-w-xl"
@@ -83,7 +107,7 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
             <FormItem>
               <FormLabel required>Subject</FormLabel>
               <FormControl>
-                <NativeSelect {...field} disabled={loading}>
+                <NativeSelect {...field} disabled={loading || subjectLocked}>
                   <option value="">{loading ? 'Loading…' : 'Select subject'}</option>
                   {subjects.map((s) => (
                     <option key={s.id} value={String(s.id)}>
@@ -92,6 +116,7 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
                   ))}
                 </NativeSelect>
               </FormControl>
+              {subjectLocked && <FormDescription>Locked: this test has results or a question paper.</FormDescription>}
               <FormMessage />
             </FormItem>
           )}
@@ -124,9 +149,10 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
             <FormItem>
               <FormLabel required>Total marks</FormLabel>
               <FormControl>
-                <Input type="number" inputMode="numeric" min={1} max={1000} step={1} placeholder="e.g. 50" {...field} />
+                <Input type="number" inputMode="numeric" min={1} max={1000} step={1} placeholder="e.g. 50" disabled={hasResults} {...field} />
               </FormControl>
-              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Common totals">
+              {hasResults && <FormDescription>Locked: results are already saved.</FormDescription>}
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="Common totals" hidden={hasResults}>
                 {QUICK_MARKS.map((m) => (
                   <button
                     key={m}
@@ -152,11 +178,11 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
           name="scheduled_date"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Scheduled date</FormLabel>
+              <FormLabel>Test date</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input type="date" disabled={hasStudents} {...field} />
               </FormControl>
-              <FormDescription>Optional — you can set it when assigning.</FormDescription>
+              <FormDescription>{hasStudents ? 'Students are assigned. Change their date from Results → Reschedule.' : 'Needed when you pick students now.'}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -180,6 +206,7 @@ export default function CreateAssessmentDialog({ open, onClose, subjects, classe
           </FormItem>
         )}
       />
+      {!assessment && <StudentPicker students={eligible} selected={selected} onChange={setSelected} loading={!studentsLoaded} emptyText="No students available for this class yet." />}
     </FormDialog>
   )
 }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import axios from 'axios'
-import { Ban, CalendarClock, ClipboardList, FileCheck2, Paperclip, RotateCcw, UserX, X } from 'lucide-react'
+import { Ban, CalendarClock, ChevronDown, ClipboardList, FileCheck2, Paperclip, RotateCcw, UserX, X } from 'lucide-react'
 import { toast } from 'sonner'
 import ConfirmDialog from '@/components/common/ConfirmDialog'
 import EmptyState from '@/components/common/EmptyState'
@@ -72,6 +72,7 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
           answerFile: null,
           absent: a.stage === 'absent',
           initialAbsent: a.stage === 'absent',
+          saved: a.result ? { marks_obtained: String(a.result.marks_obtained), total_marks: String(a.result.total_marks), teacher_notes: a.result.teacher_notes || '' } : undefined,
           scheduled_date: a.scheduled_date,
           stage: a.stage,
         })),
@@ -83,6 +84,9 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [bulk, setBulk] = useState<BulkAction | null>(null)
   const [newDate, setNewDate] = useState(toDateInputValue())
+  // Kept out of the way until asked for: tests that didn't go as planned, notes and sheets.
+  const [managing, setManaging] = useState(false)
+  const [openRows, setOpenRows] = useState<Set<number>>(new Set())
 
   const list = rows ?? []
   const errors = list.map(resultRowErrors)
@@ -96,6 +100,17 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
   const set = (i: number, patch: Partial<ResultRow>) => setRows((prev) => (prev ?? []).map((r, idx) => (idx === i ? { ...r, ...patch } : r)))
   const allSelected = list.length > 0 && selected.size === list.length
   const dirty = !nothing
+  const canReopen = list.some((r) => selected.has(r.student_id) && (r.stage === 'absent' || r.stage === 'cancelled'))
+  const bulkActions = (Object.keys(ACTIONS) as BulkAction[]).filter((a) => a !== 'reopen' || canReopen)
+  const closed = list.filter((r) => r.stage === 'result_out' || r.stage === 'absent').length
+  const counted = list.filter((r) => r.stage !== 'cancelled').length
+  const toggleRow = (id: number) =>
+    setOpenRows((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
 
   const askSave = () => {
     setTried(true)
@@ -129,6 +144,7 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
       const { message } = await bulkUpdateAssignments(assessment.id, [...selected], action, action === 'reschedule' ? newDate : undefined)
       toast.success(message)
       setSelected(new Set())
+      setManaging(false)
       fetchUnreadCount().catch(() => undefined) // menu badge
       onSaved()
       detail.reload()
@@ -150,7 +166,7 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
       <DialogHeader>
         <DialogTitle>Results — {assessment.title}</DialogTitle>
         <DialogDescription>
-          Out of {assessment.total_marks}. Enter marks, or switch on <strong>Absent</strong> for anyone who missed it. Leave a row empty to fill it later.
+          Out of {assessment.total_marks}. {closed} of {counted} done. Leave a row empty to fill it later.
           {pending > 0 && ` ${pending} ${pending === 1 ? 'student is' : 'students are'} waiting for results.`}
         </DialogDescription>
       </DialogHeader>
@@ -167,20 +183,40 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
       ) : (
         <div className="flex flex-col gap-2">
           {/* Students whose test didn't happen as planned */}
-          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-solid border-border bg-muted/40 px-3 py-2">
-            <label className="m-0 flex items-center gap-2 text-sm">
-              <Checkbox checked={allSelected} onCheckedChange={() => setSelected(allSelected ? new Set() : new Set(list.map((r) => r.student_id)))} aria-label="Select all students" />
-              {selected.size ? `${selected.size} selected` : 'Select students to'}
-            </label>
-            {(Object.keys(ACTIONS) as BulkAction[]).map((a) => {
-              const Icon = ACTIONS[a].icon
-              return (
-                <Button key={a} size="xs" variant="outline" disabled={selected.size === 0 || saving || dirty} title={dirty ? 'Save or clear the marks you entered first' : undefined} onClick={() => setBulk(a)}>
-                  <Icon aria-hidden="true" /> {ACTIONS[a].label}
+          {managing ? (
+            <div className="flex flex-col gap-2 rounded-lg border border-solid border-border bg-muted/40 px-3 py-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="m-0 flex items-center gap-2 text-sm">
+                  <Checkbox checked={allSelected} onCheckedChange={() => setSelected(allSelected ? new Set() : new Set(list.map((r) => r.student_id)))} aria-label="Select all students" />
+                  {selected.size ? `${selected.size} selected` : 'Select students'}
+                </label>
+                {bulkActions.map((a) => {
+                  const Icon = ACTIONS[a].icon
+                  return (
+                    <Button key={a} size="xs" variant="outline" disabled={selected.size === 0 || saving || dirty} onClick={() => setBulk(a)}>
+                      <Icon aria-hidden="true" /> {ACTIONS[a].label}
+                    </Button>
+                  )
+                })}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  className="ml-auto"
+                  onClick={() => {
+                    setManaging(false)
+                    setSelected(new Set())
+                  }}
+                >
+                  Done
                 </Button>
-              )
-            })}
-          </div>
+              </div>
+              {dirty && <p className="m-0 text-xs text-muted-foreground">Save the marks you entered first.</p>}
+            </div>
+          ) : (
+            <button type="button" onClick={() => setManaging(true)} className="m-0 cursor-pointer self-start border-0 bg-transparent p-0 text-sm font-medium text-primary hover:underline">
+              Reschedule or cancel students
+            </button>
+          )}
 
           <div className="max-h-[55vh] overflow-y-auto rounded-lg border border-solid border-border">
             <ul className="m-0 list-none divide-y divide-border p-0">
@@ -191,20 +227,22 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
                 const stage = r.stage ? ASSIGNMENT_STAGE[r.stage as AssignmentStage] : null
                 const cancelled = r.stage === 'cancelled'
                 return (
-                  <li key={r.student_id} className={cn('grid gap-3 p-3 lg:grid-cols-[auto_minmax(9rem,1fr)_auto_auto_minmax(8rem,1fr)_auto] lg:items-start', r.stage === 'awaiting_results' && 'bg-destructive-soft/30')}>
-                    <Checkbox
-                      className="mt-2.5"
-                      checked={selected.has(r.student_id)}
-                      onCheckedChange={(v) =>
-                        setSelected((prev) => {
-                          const next = new Set(prev)
-                          if (v === true) next.add(r.student_id)
-                          else next.delete(r.student_id)
-                          return next
-                        })
-                      }
-                      aria-label={`Select ${r.student_name}`}
-                    />
+                  <li key={r.student_id} className={cn('grid gap-3 p-3', managing ? 'sm:grid-cols-[auto_minmax(9rem,1fr)_auto_auto] sm:items-start' : 'sm:grid-cols-[minmax(9rem,1fr)_auto_auto] sm:items-start', r.stage === 'awaiting_results' && 'bg-destructive-soft/30')}>
+                    {managing && (
+                      <Checkbox
+                        className="mt-2.5"
+                        checked={selected.has(r.student_id)}
+                        onCheckedChange={(v) =>
+                          setSelected((prev) => {
+                            const next = new Set(prev)
+                            if (v === true) next.add(r.student_id)
+                            else next.delete(r.student_id)
+                            return next
+                          })
+                        }
+                        aria-label={`Select ${r.student_name}`}
+                      />
+                    )}
                     <div className="flex flex-col gap-1 pt-1.5">
                       <span className="flex flex-wrap items-center gap-2 text-sm font-medium">
                         {r.student_name}
@@ -233,18 +271,7 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
                           aria-invalid={!!e.marks_obtained || undefined}
                           onChange={(ev) => set(i, { marks_obtained: ev.target.value })}
                         />
-                        <span className="text-sm text-muted-foreground">/</span>
-                        <Input
-                          aria-label={`Total marks for ${r.student_name}`}
-                          type="number"
-                          inputMode="decimal"
-                          min={1}
-                          className="h-9 w-20"
-                          disabled={r.absent || cancelled}
-                          value={r.total_marks}
-                          aria-invalid={!!e.total_marks || undefined}
-                          onChange={(ev) => set(i, { total_marks: ev.target.value })}
-                        />
+                        <span className="text-sm whitespace-nowrap text-muted-foreground">/ {r.total_marks || assessment.total_marks}</span>
                       </div>
                       {(e.marks_obtained || e.total_marks) && <p className="m-0 text-xs text-destructive">{e.marks_obtained ?? e.total_marks}</p>}
                     </div>
@@ -252,6 +279,20 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
                       <Switch checked={r.absent} disabled={cancelled} onCheckedChange={(v) => set(i, { absent: v, ...(v ? { marks_obtained: '' } : {}) })} aria-label={`${r.student_name} was absent`} />
                       Absent
                     </label>
+                    {!r.absent && !cancelled && (
+                      <div className={cn('flex flex-col gap-2', managing ? 'sm:col-span-4' : 'sm:col-span-3')}>
+                        <button
+                          type="button"
+                          aria-expanded={openRows.has(r.student_id)}
+                          aria-label={`Note or answer sheet for ${r.student_name}`}
+                          onClick={() => toggleRow(r.student_id)}
+                          className="m-0 flex cursor-pointer items-center gap-1 self-start border-0 bg-transparent p-0 text-xs font-medium text-muted-foreground hover:text-foreground"
+                        >
+                          <ChevronDown className={cn('size-3.5 transition-transform', openRows.has(r.student_id) && 'rotate-180')} aria-hidden="true" />
+                          {r.teacher_notes || r.answerFile ? 'Note or answer sheet added' : 'Add a note or answer sheet'}
+                        </button>
+                        {openRows.has(r.student_id) && (
+                          <div className="grid gap-2 sm:grid-cols-[minmax(8rem,1fr)_auto]">
                     <Input aria-label={`Notes for ${r.student_name}`} className="h-9" placeholder="Notes (optional)" disabled={r.absent || cancelled} value={r.teacher_notes} onChange={(ev) => set(i, { teacher_notes: ev.target.value })} />
                     <div className="flex flex-col gap-1">
                       {r.answerFile ? (
@@ -270,6 +311,10 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
                       )}
                       {e.answerFile && <p className="m-0 text-xs text-destructive">{e.answerFile}</p>}
                     </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </li>
                 )
               })}
@@ -277,7 +322,7 @@ function ResultsBody({ assessment, onClose, onSaved }: Props & { assessment: Ass
           </div>
         </div>
       )}
-      {tried && nothing && list.length > 0 && <p className="m-0 text-sm text-destructive">Enter marks or mark at least one student absent.</p>}
+      {tried && nothing && list.length > 0 && <p className="m-0 text-sm text-destructive">Nothing new to save. Enter marks or mark a student absent.</p>}
 
       <DialogFooter>
         <Button variant="outline" onClick={onClose} disabled={saving}>

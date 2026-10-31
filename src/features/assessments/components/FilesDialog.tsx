@@ -16,7 +16,7 @@ import { deleteFile, fetchFiles, fileUrl, setFileApproval, uploadFile, type Asse
 
 interface Props {
   assessment: Assessment | null
-  /** role coaching_admin — approve / mark pending / remove (unchanged rule). */
+  /** role coaching_admin — hide / show / remove. */
   isAdmin: boolean
   onClose: () => void
   onPreview: (f: AssessmentFile) => void
@@ -67,11 +67,11 @@ function FilesBody({ assessment, isAdmin, onClose, onPreview }: Props & { assess
     setBusyId(f.id)
     try {
       await setFileApproval(f.id, approved)
-      toast.success(approved ? `${f.original_name} approved.` : `${f.original_name} marked as pending.`)
+      toast.success(approved ? `${f.original_name} shown to students.` : `${f.original_name} hidden from students.`)
       files.reload()
     } catch (err) {
       console.error('Error updating attachment approval:', err)
-      toast.error('Failed to update attachment approval.')
+      toast.error('Failed to update the file.')
       throw err
     } finally {
       setBusyId(null)
@@ -99,11 +99,12 @@ function FilesBody({ assessment, isAdmin, onClose, onPreview }: Props & { assess
     <>
       <DialogHeader>
         <DialogTitle>Files</DialogTitle>
-        <DialogDescription>{assessment.title} · files are approved separately from the assessment.</DialogDescription>
+        <DialogDescription>{assessment.title}</DialogDescription>
       </DialogHeader>
 
       <div className="flex flex-col gap-2 rounded-lg border border-solid border-border bg-muted/30 p-3">
         <span className="text-sm font-medium">Upload a question paper or document</span>
+        <span className="text-xs text-muted-foreground">Students see a question paper only after every student&apos;s test date has passed. Other files show as soon as the test is approved.</span>
         <div className="flex flex-wrap items-center gap-2">
           <NativeSelect aria-label="File type" className="w-40" value={type} onChange={(e) => setType(e.target.value as AssessmentFileType)}>
             <option value="question_paper">Question paper</option>
@@ -153,7 +154,7 @@ function FilesBody({ assessment, isAdmin, onClose, onPreview }: Props & { assess
                       {f.uploaded_at ? ` · ${formatDateTime(f.uploaded_at)}` : ''}
                     </span>
                   </div>
-                  <Badge variant={f.is_admin_approved ? 'success' : 'warning'}>{f.is_admin_approved ? 'Approved' : 'Pending'}</Badge>
+                  {!f.is_admin_approved && <Badge variant="warning">{assessment.is_admin_approved ? 'Hidden from students' : 'Shown after approval'}</Badge>}
                   <a href={fileUrl(f)} target="_blank" rel="noreferrer" aria-label={`Download ${f.original_name}`} className="flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground">
                     <Download className="size-4" aria-hidden="true" />
                   </a>
@@ -161,11 +162,11 @@ function FilesBody({ assessment, isAdmin, onClose, onPreview }: Props & { assess
                     <div className="flex items-center gap-1">
                       {f.is_admin_approved ? (
                         <Button size="xs" variant="ghost" disabled={busyId === f.id} onClick={() => setConfirm({ kind: 'pending', file: f })}>
-                          <Undo2 aria-hidden="true" /> Mark pending
+                          <Undo2 aria-hidden="true" /> Hide
                         </Button>
                       ) : (
                         <Button size="xs" variant="ghost" className="text-success" disabled={busyId === f.id} onClick={() => void approve(f, true).catch(() => {})}>
-                          <Check aria-hidden="true" /> Approve
+                          <Check aria-hidden="true" /> Show
                         </Button>
                       )}
                       <Button size="xs" variant="ghost" className="text-destructive" disabled={busyId === f.id} onClick={() => setConfirm({ kind: 'remove', file: f })} aria-label={`Remove ${f.original_name}`}>
@@ -189,7 +190,7 @@ function FilesBody({ assessment, isAdmin, onClose, onPreview }: Props & { assess
       <ConfirmDialog
         open={!!confirm}
         onOpenChange={(o) => !o && setConfirm(null)}
-        title={confirm?.kind === 'remove' ? 'Remove this file?' : 'Mark this file as pending?'}
+        title={confirm?.kind === 'remove' ? 'Remove this file?' : 'Hide this file from students?'}
         description={
           confirm?.kind === 'remove' ? (
             <>
@@ -197,11 +198,11 @@ function FilesBody({ assessment, isAdmin, onClose, onPreview }: Props & { assess
             </>
           ) : (
             <>
-              <strong>{confirm?.file.original_name}</strong> goes back to pending until an admin approves it again.
+              <strong>{confirm?.file.original_name}</strong> stays here, but students won&apos;t see it until an admin shows it again.
             </>
           )
         }
-        confirmLabel={confirm?.kind === 'remove' ? 'Yes, remove' : 'Yes, mark pending'}
+        confirmLabel={confirm?.kind === 'remove' ? 'Yes, remove' : 'Yes, hide'}
         cancelLabel="No"
         destructive={confirm?.kind === 'remove'}
         onConfirm={() => (confirm!.kind === 'remove' ? remove(confirm!.file) : approve(confirm!.file, false))}

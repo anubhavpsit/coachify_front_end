@@ -65,7 +65,7 @@ export type AssessmentFile = {
   url?: string | null
   is_admin_approved?: boolean
 }
-export type CreatePayload = { title: string; description: string | null; subject_id: number; class_id: number | null; total_marks: number; scheduled_date: string | null }
+export type CreatePayload = { title: string; description: string | null; subject_id: number; class_id: number | null; total_marks: number; scheduled_date: string | null; student_ids?: number[] }
 export type ResultPayload =
   | { student_id: number; marks_obtained: number; total_marks: number | undefined; teacher_notes: string | undefined }
   | { student_id: number; absent: true }
@@ -109,6 +109,13 @@ export async function createAssessment(p: CreatePayload): Promise<Assessment | n
   const res = await axios.post(`${API_BASE_URL}/assessments`, p, { headers: json() })
   return res.data.success ? res.data.data : null
 }
+
+export async function updateAssessment(id: number, p: CreatePayload): Promise<Assessment | null> {
+  const res = await axios.put(`${API_BASE_URL}/assessments/${id}`, p, { headers: json() })
+  return res.data.success ? res.data.data : null
+}
+
+export const deleteAssessment = (id: number) => axios.delete(`${API_BASE_URL}/assessments/${id}`, { headers: json() })
 
 export async function setAssessmentApproval(id: number, approved: boolean): Promise<Assessment | null> {
   const res = await axios.patch(`${API_BASE_URL}/assessments/${id}/approval`, { approved }, { headers: json() })
